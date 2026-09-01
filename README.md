@@ -25,6 +25,12 @@ non-zero at the first failed gate and identifies the failed subsystem.
 The coding agent must run this command immediately before every push. Hosted GitHub workflow
 verification is intentionally not configured at this stage.
 
+The MQTT adapter integration check requires Docker and is intentionally separate:
+
+```bash
+./scripts/verify-mqtt
+```
+
 ## Run applications
 
 ```bash

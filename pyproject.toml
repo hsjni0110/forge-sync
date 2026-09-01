@@ -26,6 +26,9 @@ members = [
 
 [tool.pytest.ini_options]
 addopts = "-q"
+markers = [
+  "mqtt_integration: requires the repository-local Mosquitto broker",
+]
 pythonpath = ["."]
 testpaths = [
   "apps/edge-gateway/tests",

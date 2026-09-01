@@ -7,7 +7,10 @@ name = "forgesync-edge-gateway"
 version = "0.1.0"
 description = "ForgeSync manufacturing source acquisition and edge gateway"
 requires-python = ">=3.12,<3.15"
-dependencies = []
+dependencies = [
+  "jsonschema[format]>=4.25,<5",
+  "paho-mqtt>=2.1,<3",
+]
 
 [project.scripts]
 forgesync-source = "forgesync_edge.source_acquisition.cli:main"

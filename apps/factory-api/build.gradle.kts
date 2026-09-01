@@ -22,6 +22,7 @@ dependencies {
     implementation("com.networknt:json-schema-validator:2.0.4") {
         exclude(group = "com.fasterxml.jackson.dataformat", module = "jackson-dataformat-yaml")
     }
+    implementation("org.eclipse.paho:org.eclipse.paho.mqttv5.client:1.2.5")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
 

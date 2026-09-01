@@ -6,3 +6,9 @@ management:
     web:
       exposure:
         include: health
+
+forgesync:
+  mqtt:
+    enabled: false
+    server-uri: tcp://localhost:1883
+    client-id: forgesync-api-local

@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+compose_file="$repository_root/infra/mqtt/compose.yaml"
+mqtt_port=${FORGESYNC_MQTT_PORT:-18883}
+compose_project="forgesync-mqtt-test-$$"
+
+run_compose() {
+  FORGESYNC_MQTT_PORT="$mqtt_port" \
+    docker compose --project-name "$compose_project" --file "$compose_file" "$@"
+}
+
+cleanup() {
+  run_compose down --volumes
+}
+trap cleanup EXIT INT TERM
+
+run_compose up --detach --wait
+
+FORGESYNC_MQTT_INTEGRATION=1 \
+FORGESYNC_MQTT_HOST=127.0.0.1 \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+uv run pytest "$repository_root/apps/edge-gateway/tests/test_mqtt_broker_integration.py"
+
+FORGESYNC_MQTT_INTEGRATION=1 \
+FORGESYNC_MQTT_HOST=127.0.0.1 \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+"$repository_root/apps/factory-api/gradlew" \
+  -p "$repository_root/apps/factory-api" \
+  test --tests '*MqttObservationBrokerIntegrationTest'
