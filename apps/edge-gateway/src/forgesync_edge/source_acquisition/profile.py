@@ -14,7 +14,7 @@ from typing import Any
 from .domain import MachineCatalog, ParseStatus, RawRecord, SourceArtifactSpec, SourceLock
 from .shdr_decoder import PARSER_VERSION, parse_source_timestamp
 
-PROFILE_SCHEMA_VERSION = "1.0.0"
+PROFILE_SCHEMA_VERSION = "2.0.0"
 SAMPLE_LIMIT = 5
 ISSUE_SAMPLE_LIMIT = 25
 
@@ -237,12 +237,13 @@ def render_markdown(profile: dict[str, Any]) -> str:
         "",
         "## DataItem catalog와 관찰 수",
         "",
-        "| Name | Category | Type | Unit | Records | Unavailable | Ambiguous |",
-        "|---|---|---|---|---:|---:|---|",
+        "| Name | Component | Category | Type | Unit | Records | Unavailable | Ambiguous |",
+        "|---|---|---|---|---|---:|---:|---|",
     ]
     for item in profile["dataItems"]:
         lines.append(
-            f"| `{item['name']}` | {item['category']} | `{item['type']}` | "
+            f"| `{item['name']}` | `{item['componentId']}` | {item['category']} | "
+            f"`{item['type']}` | "
             f"`{item['units'] or '-'}` | {item['recordCount']} | "
             f"{item['unavailableCount']} | {'YES' if item['ambiguousName'] else 'NO'} |"
         )

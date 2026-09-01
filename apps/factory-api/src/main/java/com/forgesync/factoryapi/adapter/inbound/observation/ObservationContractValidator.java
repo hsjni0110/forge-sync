@@ -14,7 +14,7 @@ import java.util.List;
 public final class ObservationContractValidator {
 
   private static final String SCHEMA_RESOURCE =
-      "contracts/observation-envelope/v1/observation-envelope.schema.json";
+      "contracts/observation-envelope/v2/observation-envelope.schema.json";
 
   private final Schema schema;
 

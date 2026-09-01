@@ -1,1 +1,0 @@
-{"schemaVersion":"1.0.0","eventId":"fba64e55-3d72-4c79-817a-ab90dcf660fb","sourceEventKey":"record-1150","machineId":"Mazak01","observationKind":"CONDITION","source":{"sourceObservedAt":"2016-10-05T09:01:00Z"},"payload":{"conditionType":"SYSTEM","level":"WARNING","nativeCode":"406"}}

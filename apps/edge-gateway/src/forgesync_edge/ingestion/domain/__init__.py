@@ -1,5 +1,16 @@
 """Framework-independent canonical observation models."""
 
+from .mapping import (
+    CatalogDataItem,
+    CatalogSnapshot,
+    MappingCandidate,
+    MappingContext,
+    MappingDefinition,
+    MappingResult,
+    MappingStatus,
+    MappingTable,
+    ObservationMapper,
+)
 from .observation import (
     Availability,
     ConditionLevel,
@@ -8,6 +19,7 @@ from .observation import (
     EventType,
     ObservationEnvelope,
     ObservationKind,
+    ObservationSubject,
     Provenance,
     ProvenanceSource,
     ReplayIdentity,
@@ -20,12 +32,22 @@ from .observation import (
 
 __all__ = [
     "Availability",
+    "CatalogDataItem",
+    "CatalogSnapshot",
     "ConditionLevel",
     "ConditionPayload",
     "EventPayload",
     "EventType",
+    "MappingCandidate",
+    "MappingContext",
+    "MappingDefinition",
+    "MappingResult",
+    "MappingStatus",
+    "MappingTable",
     "ObservationEnvelope",
     "ObservationKind",
+    "ObservationSubject",
+    "ObservationMapper",
     "Provenance",
     "ProvenanceSource",
     "ReplayIdentity",

@@ -4,8 +4,8 @@
 
 - Source: NIST Smart Manufacturing Systems Test Bed
 - Upstream commit: `968279f14ebe96c03c8877eeb1901cf6b4c8fbab`
-- Processing run: `sha256:213d97c586e95d85369b10aa4ad063d078ec2007e4cc21252d8e72cd82ab1c5c`
-- Parser/Profile schema: `1.0.0` / `1.0.0`
+- Processing run: `sha256:b0f6d75c12eac620b2b1a278a12fa3b5b31ef57c54290ef4afa55cc1a4179a91`
+- Parser/Profile schema: `1.0.0` / `2.0.0`
 - Terms: https://github.com/usnistgov/smstestbed#disclaimers
 - Acknowledgement: Source data and metadata originate from NIST. No NIST endorsement is implied and the NIST logo is not used.
 
@@ -28,73 +28,73 @@
 
 ## DataItem catalog와 관찰 수
 
-| Name | Category | Type | Unit | Records | Unavailable | Ambiguous |
-|---|---|---|---|---:|---:|---|
-| `Bdeg` | SAMPLE | `ANGLE` | `DEGREE` | 943 | 25 | NO |
-| `Bfrt` | SAMPLE | `ANGULAR_VELOCITY` | `DEGREE/SECOND` | 913 | 25 | NO |
-| `Bload` | SAMPLE | `LOAD` | `PERCENT` | 2077 | 25 | NO |
-| `Btravel` | CONDITION | `ANGLE` | `-` | 49 | 25 | NO |
-| `Cdeg` | SAMPLE | `ANGLE` | `DEGREE` | 424 | 25 | NO |
-| `Cfrt` | SAMPLE | `ANGULAR_VELOCITY` | `DEGREE/SECOND` | 331 | 25 | NO |
-| `Cload` | SAMPLE | `LOAD` | `PERCENT` | 85 | 25 | NO |
-| `Ctravel` | CONDITION | `ANGLE` | `-` | 49 | 25 | NO |
-| `Fact` | SAMPLE | `PATH_FEEDRATE` | `MILLIMETER/SECOND` | 7633 | 25 | NO |
-| `Fovr` | EVENT | `PATH_FEEDRATE_OVERRIDE` | `PERCENT` | 49 | 25 | NO |
-| `Frapidovr` | EVENT | `PATH_FEEDRATE_OVERRIDE` | `PERCENT` | 86 | 25 | NO |
-| `PartCountAct` | EVENT | `PART_COUNT` | `-` | 49 | 25 | NO |
-| `S2load` | SAMPLE | `LOAD` | `PERCENT` | 1040 | 25 | NO |
-| `S2load_cond` | CONDITION | `LOAD` | `-` | 49 | 25 | NO |
-| `S2rpm` | SAMPLE | `ROTARY_VELOCITY` | `REVOLUTION/MINUTE` | 1107 | 25 | NO |
-| `S2temp` | SAMPLE | `TEMPERATURE` | `CELSIUS` | 7448 | 25 | NO |
-| `S2temp_cond` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
-| `Sload` | SAMPLE | `LOAD` | `PERCENT` | 1055 | 25 | NO |
-| `Sload_cond` | CONDITION | `LOAD` | `-` | 49 | 25 | NO |
-| `Sovr` | EVENT | `ROTARY_VELOCITY_OVERRIDE` | `PERCENT` | 49 | 25 | NO |
-| `Srpm` | SAMPLE | `ROTARY_VELOCITY` | `REVOLUTION/MINUTE` | 1593 | 25 | NO |
-| `Stemp` | SAMPLE | `TEMPERATURE` | `CELSIUS` | 2755 | 25 | NO |
-| `Stemp_cond` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
-| `Tool_group` | EVENT | `x:TOOL_GROUP` | `-` | 49 | 25 | NO |
-| `Tool_number` | EVENT | `TOOL_NUMBER` | `-` | 593 | 25 | NO |
-| `Tool_suffix` | EVENT | `x:TOOL_SUFFIX` | `-` | 595 | 25 | NO |
-| `Xabs` | SAMPLE | `POSITION` | `MILLIMETER` | 6868 | 25 | NO |
-| `Xfrt` | SAMPLE | `AXIS_FEEDRATE` | `MILLIMETER/SECOND` | 4575 | 25 | NO |
-| `Xload` | SAMPLE | `LOAD` | `PERCENT` | 4306 | 25 | NO |
-| `Xtravel` | CONDITION | `POSITION` | `-` | 49 | 25 | NO |
-| `Yabs` | SAMPLE | `POSITION` | `MILLIMETER` | 1538 | 25 | NO |
-| `Yfrt` | SAMPLE | `AXIS_FEEDRATE` | `MILLIMETER/SECOND` | 1167 | 25 | NO |
-| `Yload` | SAMPLE | `LOAD` | `PERCENT` | 1260 | 25 | NO |
-| `Ytravel` | CONDITION | `POSITION` | `-` | 49 | 25 | NO |
-| `Zabs` | SAMPLE | `POSITION` | `MILLIMETER` | 7380 | 25 | NO |
-| `Zfrt` | SAMPLE | `AXIS_FEEDRATE` | `MILLIMETER/SECOND` | 5404 | 25 | NO |
-| `Zload` | SAMPLE | `LOAD` | `PERCENT` | 4735 | 25 | NO |
-| `Ztravel` | CONDITION | `POSITION` | `-` | 49 | 25 | NO |
-| `auto_time` | SAMPLE | `ACCUMULATED_TIME` | `-` | 10111 | 25 | NO |
-| `avail` | EVENT | `AVAILABILITY` | `-` | 0 | 0 | NO |
-| `comms_cond` | CONDITION | `COMMUNICATIONS` | `-` | 49 | 25 | NO |
-| `coolant_level` | CONDITION | `LEVEL` | `-` | 49 | 25 | NO |
-| `coolant_pres` | CONDITION | `PRESSURE` | `-` | 49 | 25 | NO |
-| `coolant_temp` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
-| `cut_time` | SAMPLE | `ACCUMULATED_TIME` | `-` | 3516 | 25 | NO |
-| `electric_temp` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
-| `estop` | EVENT | `EMERGENCY_STOP` | `-` | 51 | 25 | NO |
-| `execution` | EVENT | `EXECUTION` | `-` | 329 | 25 | NO |
-| `hydra_cond` | CONDITION | `PRESSURE` | `-` | 49 | 25 | NO |
-| `line` | EVENT | `LINE` | `-` | 686 | 25 | NO |
-| `logic_cond` | CONDITION | `LOGIC_PROGRAM` | `-` | 56 | 25 | NO |
-| `mode` | EVENT | `CONTROLLER_MODE` | `-` | 79 | 25 | NO |
-| `motion_cond` | CONDITION | `MOTION_PROGRAM` | `-` | 49 | 25 | NO |
-| `path_system` | CONDITION | `SYSTEM` | `-` | 49 | 25 | NO |
-| `pneu_cond` | CONDITION | `PRESSURE` | `-` | 49 | 25 | NO |
-| `power` | EVENT | `POWER_STATE` | `-` | 49 | 25 | NO |
-| `program` | EVENT | `PROGRAM` | `-` | 50 | 25 | NO |
-| `program_cmt` | EVENT | `x:PROGRAM_COMMENT` | `-` | 50 | 25 | NO |
-| `sequenceNum` | EVENT | `x:SEQUENCE_NUMBER` | `-` | 686 | 25 | NO |
-| `servo_cond` | CONDITION | `ACTUATOR` | `-` | 49 | 25 | NO |
-| `subprogram` | EVENT | `PROGRAM` | `-` | 49 | 25 | NO |
-| `subprogram_cmt` | EVENT | `x:PROGRAM_COMMENT` | `-` | 49 | 25 | NO |
-| `system_cond` | CONDITION | `SYSTEM` | `-` | 65 | 25 | NO |
-| `total_time` | SAMPLE | `ACCUMULATED_TIME` | `-` | 32471 | 25 | NO |
-| `unitNum` | EVENT | `x:UNIT` | `-` | 634 | 25 | NO |
+| Name | Component | Category | Type | Unit | Records | Unavailable | Ambiguous |
+|---|---|---|---|---|---:|---:|---|
+| `Bdeg` | `Mazak01-B` | SAMPLE | `ANGLE` | `DEGREE` | 943 | 25 | NO |
+| `Bfrt` | `Mazak01-B` | SAMPLE | `ANGULAR_VELOCITY` | `DEGREE/SECOND` | 913 | 25 | NO |
+| `Bload` | `Mazak01-B` | SAMPLE | `LOAD` | `PERCENT` | 2077 | 25 | NO |
+| `Btravel` | `Mazak01-B` | CONDITION | `ANGLE` | `-` | 49 | 25 | NO |
+| `Cdeg` | `Mazak01-C` | SAMPLE | `ANGLE` | `DEGREE` | 424 | 25 | NO |
+| `Cfrt` | `Mazak01-C` | SAMPLE | `ANGULAR_VELOCITY` | `DEGREE/SECOND` | 331 | 25 | NO |
+| `Cload` | `Mazak01-C` | SAMPLE | `LOAD` | `PERCENT` | 85 | 25 | NO |
+| `Ctravel` | `Mazak01-C` | CONDITION | `ANGLE` | `-` | 49 | 25 | NO |
+| `Fact` | `Mazak01-path` | SAMPLE | `PATH_FEEDRATE` | `MILLIMETER/SECOND` | 7633 | 25 | NO |
+| `Fovr` | `Mazak01-path` | EVENT | `PATH_FEEDRATE_OVERRIDE` | `PERCENT` | 49 | 25 | NO |
+| `Frapidovr` | `Mazak01-path` | EVENT | `PATH_FEEDRATE_OVERRIDE` | `PERCENT` | 86 | 25 | NO |
+| `PartCountAct` | `Mazak01-path` | EVENT | `PART_COUNT` | `-` | 49 | 25 | NO |
+| `S2load` | `Mazak01-C2` | SAMPLE | `LOAD` | `PERCENT` | 1040 | 25 | NO |
+| `S2load_cond` | `Mazak01-C2` | CONDITION | `LOAD` | `-` | 49 | 25 | NO |
+| `S2rpm` | `Mazak01-C2` | SAMPLE | `ROTARY_VELOCITY` | `REVOLUTION/MINUTE` | 1107 | 25 | NO |
+| `S2temp` | `Mazak01-C2` | SAMPLE | `TEMPERATURE` | `CELSIUS` | 7448 | 25 | NO |
+| `S2temp_cond` | `Mazak01-C2` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
+| `Sload` | `Mazak01-C` | SAMPLE | `LOAD` | `PERCENT` | 1055 | 25 | NO |
+| `Sload_cond` | `Mazak01-C` | CONDITION | `LOAD` | `-` | 49 | 25 | NO |
+| `Sovr` | `Mazak01-C` | EVENT | `ROTARY_VELOCITY_OVERRIDE` | `PERCENT` | 49 | 25 | NO |
+| `Srpm` | `Mazak01-C` | SAMPLE | `ROTARY_VELOCITY` | `REVOLUTION/MINUTE` | 1593 | 25 | NO |
+| `Stemp` | `Mazak01-C` | SAMPLE | `TEMPERATURE` | `CELSIUS` | 2755 | 25 | NO |
+| `Stemp_cond` | `Mazak01-C` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
+| `Tool_group` | `Mazak01-path` | EVENT | `x:TOOL_GROUP` | `-` | 49 | 25 | NO |
+| `Tool_number` | `Mazak01-path` | EVENT | `TOOL_NUMBER` | `-` | 593 | 25 | NO |
+| `Tool_suffix` | `Mazak01-path` | EVENT | `x:TOOL_SUFFIX` | `-` | 595 | 25 | NO |
+| `Xabs` | `Mazak01-X` | SAMPLE | `POSITION` | `MILLIMETER` | 6868 | 25 | NO |
+| `Xfrt` | `Mazak01-X` | SAMPLE | `AXIS_FEEDRATE` | `MILLIMETER/SECOND` | 4575 | 25 | NO |
+| `Xload` | `Mazak01-X` | SAMPLE | `LOAD` | `PERCENT` | 4306 | 25 | NO |
+| `Xtravel` | `Mazak01-X` | CONDITION | `POSITION` | `-` | 49 | 25 | NO |
+| `Yabs` | `Mazak01-Y` | SAMPLE | `POSITION` | `MILLIMETER` | 1538 | 25 | NO |
+| `Yfrt` | `Mazak01-Y` | SAMPLE | `AXIS_FEEDRATE` | `MILLIMETER/SECOND` | 1167 | 25 | NO |
+| `Yload` | `Mazak01-Y` | SAMPLE | `LOAD` | `PERCENT` | 1260 | 25 | NO |
+| `Ytravel` | `Mazak01-Y` | CONDITION | `POSITION` | `-` | 49 | 25 | NO |
+| `Zabs` | `Mazak01-Z` | SAMPLE | `POSITION` | `MILLIMETER` | 7380 | 25 | NO |
+| `Zfrt` | `Mazak01-Z` | SAMPLE | `AXIS_FEEDRATE` | `MILLIMETER/SECOND` | 5404 | 25 | NO |
+| `Zload` | `Mazak01-Z` | SAMPLE | `LOAD` | `PERCENT` | 4735 | 25 | NO |
+| `Ztravel` | `Mazak01-Z` | CONDITION | `POSITION` | `-` | 49 | 25 | NO |
+| `auto_time` | `Mazak01-path` | SAMPLE | `ACCUMULATED_TIME` | `-` | 10111 | 25 | NO |
+| `avail` | `Mazak01` | EVENT | `AVAILABILITY` | `-` | 0 | 0 | NO |
+| `comms_cond` | `Mazak01-controller` | CONDITION | `COMMUNICATIONS` | `-` | 49 | 25 | NO |
+| `coolant_level` | `Mazak01-coolant` | CONDITION | `LEVEL` | `-` | 49 | 25 | NO |
+| `coolant_pres` | `Mazak01-coolant` | CONDITION | `PRESSURE` | `-` | 49 | 25 | NO |
+| `coolant_temp` | `Mazak01-coolant` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
+| `cut_time` | `Mazak01-path` | SAMPLE | `ACCUMULATED_TIME` | `-` | 3516 | 25 | NO |
+| `electric_temp` | `Mazak01-electric` | CONDITION | `TEMPERATURE` | `-` | 49 | 25 | NO |
+| `estop` | `Mazak01-controller` | EVENT | `EMERGENCY_STOP` | `-` | 51 | 25 | NO |
+| `execution` | `Mazak01-path` | EVENT | `EXECUTION` | `-` | 329 | 25 | NO |
+| `hydra_cond` | `Mazak01-hydraulic` | CONDITION | `PRESSURE` | `-` | 49 | 25 | NO |
+| `line` | `Mazak01-path` | EVENT | `LINE` | `-` | 686 | 25 | NO |
+| `logic_cond` | `Mazak01-controller` | CONDITION | `LOGIC_PROGRAM` | `-` | 56 | 25 | NO |
+| `mode` | `Mazak01-path` | EVENT | `CONTROLLER_MODE` | `-` | 79 | 25 | NO |
+| `motion_cond` | `Mazak01-path` | CONDITION | `MOTION_PROGRAM` | `-` | 49 | 25 | NO |
+| `path_system` | `Mazak01-path` | CONDITION | `SYSTEM` | `-` | 49 | 25 | NO |
+| `pneu_cond` | `Mazak01-pneumatic` | CONDITION | `PRESSURE` | `-` | 49 | 25 | NO |
+| `power` | `Mazak01-electric` | EVENT | `POWER_STATE` | `-` | 49 | 25 | NO |
+| `program` | `Mazak01-path` | EVENT | `PROGRAM` | `-` | 50 | 25 | NO |
+| `program_cmt` | `Mazak01-path` | EVENT | `x:PROGRAM_COMMENT` | `-` | 50 | 25 | NO |
+| `sequenceNum` | `Mazak01-path` | EVENT | `x:SEQUENCE_NUMBER` | `-` | 686 | 25 | NO |
+| `servo_cond` | `Mazak01-base` | CONDITION | `ACTUATOR` | `-` | 49 | 25 | NO |
+| `subprogram` | `Mazak01-path` | EVENT | `PROGRAM` | `-` | 49 | 25 | NO |
+| `subprogram_cmt` | `Mazak01-path` | EVENT | `x:PROGRAM_COMMENT` | `-` | 49 | 25 | NO |
+| `system_cond` | `Mazak01-controller` | CONDITION | `SYSTEM` | `-` | 65 | 25 | NO |
+| `total_time` | `Mazak01-path` | SAMPLE | `ACCUMULATED_TIME` | `-` | 32471 | 25 | NO |
+| `unitNum` | `Mazak01-path` | EVENT | `x:UNIT` | `-` | 634 | 25 | NO |
 
 ## 검토가 필요한 항목
 

@@ -1,0 +1,939 @@
+{
+  "ambiguousDataItems": [],
+  "failureSamples": [],
+  "limitations": [
+    "Unsupported DataItems remain traceable Raw Records and are not Canonical metrics.",
+    "Telemetry PART_COUNT is not a ProductionResult.",
+    "Cload is deferred because it collides with Sload on the same component LOAD channel."
+  ],
+  "mapperVersion": "2.0.0",
+  "mappingVersion": "2.0.0",
+  "mappings": [
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-B",
+      "dataItemId": "Mazak01-B_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 2077,
+      "name": "Bload",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 25,
+      "unit": "PERCENT"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-B",
+      "dataItemId": "Mazak01-B_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Btravel",
+      "subType": null,
+      "target": "ANGLE",
+      "type": "ANGLE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C2",
+      "dataItemId": "Mazak01-C2_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 1040,
+      "name": "S2load",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 25,
+      "unit": "PERCENT"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C2",
+      "dataItemId": "Mazak01-C2_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 1107,
+      "name": "S2rpm",
+      "subType": "ACTUAL",
+      "target": "SPINDLE_SPEED",
+      "type": "ROTARY_VELOCITY",
+      "unavailableRecords": 25,
+      "unit": "REVOLUTION/MINUTE"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C2",
+      "dataItemId": "Mazak01-C2_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 7448,
+      "name": "S2temp",
+      "subType": null,
+      "target": "TEMPERATURE",
+      "type": "TEMPERATURE",
+      "unavailableRecords": 25,
+      "unit": "CELSIUS"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-C2",
+      "dataItemId": "Mazak01-C2_4",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "S2load_cond",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-C2",
+      "dataItemId": "Mazak01-C2_5",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "S2temp_cond",
+      "subType": null,
+      "target": "TEMPERATURE",
+      "type": "TEMPERATURE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_10",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Stemp_cond",
+      "subType": null,
+      "target": "TEMPERATURE",
+      "type": "TEMPERATURE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 1055,
+      "name": "Sload",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 25,
+      "unit": "PERCENT"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Ctravel",
+      "subType": null,
+      "target": "ANGLE",
+      "type": "ANGLE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_5",
+      "invalidValueRecords": 0,
+      "mappedRecords": 1593,
+      "name": "Srpm",
+      "subType": "ACTUAL",
+      "target": "SPINDLE_SPEED",
+      "type": "ROTARY_VELOCITY",
+      "unavailableRecords": 25,
+      "unit": "REVOLUTION/MINUTE"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_7",
+      "invalidValueRecords": 0,
+      "mappedRecords": 2755,
+      "name": "Stemp",
+      "subType": null,
+      "target": "TEMPERATURE",
+      "type": "TEMPERATURE",
+      "unavailableRecords": 25,
+      "unit": "CELSIUS"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_9",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Sload_cond",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-X",
+      "dataItemId": "Mazak01-X_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 6868,
+      "name": "Xabs",
+      "subType": "ACTUAL",
+      "target": "POSITION",
+      "type": "POSITION",
+      "unavailableRecords": 25,
+      "unit": "MILLIMETER"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-X",
+      "dataItemId": "Mazak01-X_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Xtravel",
+      "subType": null,
+      "target": "POSITION",
+      "type": "POSITION",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-X",
+      "dataItemId": "Mazak01-X_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 4306,
+      "name": "Xload",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 25,
+      "unit": "PERCENT"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-Y",
+      "dataItemId": "Mazak01-Y_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 1538,
+      "name": "Yabs",
+      "subType": "ACTUAL",
+      "target": "POSITION",
+      "type": "POSITION",
+      "unavailableRecords": 25,
+      "unit": "MILLIMETER"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-Y",
+      "dataItemId": "Mazak01-Y_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Ytravel",
+      "subType": null,
+      "target": "POSITION",
+      "type": "POSITION",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-Y",
+      "dataItemId": "Mazak01-Y_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 1260,
+      "name": "Yload",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 25,
+      "unit": "PERCENT"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-Z",
+      "dataItemId": "Mazak01-Z_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 7380,
+      "name": "Zabs",
+      "subType": "ACTUAL",
+      "target": "POSITION",
+      "type": "POSITION",
+      "unavailableRecords": 25,
+      "unit": "MILLIMETER"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-Z",
+      "dataItemId": "Mazak01-Z_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "Ztravel",
+      "subType": null,
+      "target": "POSITION",
+      "type": "POSITION",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-Z",
+      "dataItemId": "Mazak01-Z_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 4735,
+      "name": "Zload",
+      "subType": null,
+      "target": "LOAD",
+      "type": "LOAD",
+      "unavailableRecords": 25,
+      "unit": "PERCENT"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-base",
+      "dataItemId": "Mazak01-base_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "servo_cond",
+      "subType": null,
+      "target": "ACTUATOR",
+      "type": "ACTUATOR",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-controller",
+      "dataItemId": "Mazak01-controller_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "comms_cond",
+      "subType": null,
+      "target": "COMMUNICATIONS",
+      "type": "COMMUNICATIONS",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-controller",
+      "dataItemId": "Mazak01-controller_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 56,
+      "name": "logic_cond",
+      "subType": null,
+      "target": "LOGIC_PROGRAM",
+      "type": "LOGIC_PROGRAM",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-controller",
+      "dataItemId": "Mazak01-controller_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 65,
+      "name": "system_cond",
+      "subType": null,
+      "target": "SYSTEM",
+      "type": "SYSTEM",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-coolant",
+      "dataItemId": "Mazak01-coolant_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "coolant_pres",
+      "subType": null,
+      "target": "PRESSURE",
+      "type": "PRESSURE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-coolant",
+      "dataItemId": "Mazak01-coolant_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "coolant_temp",
+      "subType": null,
+      "target": "TEMPERATURE",
+      "type": "TEMPERATURE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-coolant",
+      "dataItemId": "Mazak01-coolant_3",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "coolant_level",
+      "subType": null,
+      "target": "LEVEL",
+      "type": "LEVEL",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-electric",
+      "dataItemId": "Mazak01-electric_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "power",
+      "subType": null,
+      "target": "POWER_STATE",
+      "type": "POWER_STATE",
+      "unavailableRecords": 25,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-electric",
+      "dataItemId": "Mazak01-electric_2",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "electric_temp",
+      "subType": null,
+      "target": "TEMPERATURE",
+      "type": "TEMPERATURE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-hydraulic",
+      "dataItemId": "Mazak01-hydraulic_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "hydra_cond",
+      "subType": null,
+      "target": "PRESSURE",
+      "type": "PRESSURE",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 50,
+      "name": "program",
+      "subType": null,
+      "target": "PROGRAM",
+      "type": "PROGRAM",
+      "unavailableRecords": 25,
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_10",
+      "invalidValueRecords": 0,
+      "mappedRecords": 593,
+      "name": "Tool_number",
+      "subType": null,
+      "target": "TOOL_NUMBER",
+      "type": "TOOL_NUMBER",
+      "unavailableRecords": 25,
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_13",
+      "invalidValueRecords": 0,
+      "mappedRecords": 329,
+      "name": "execution",
+      "subType": null,
+      "target": "EXECUTION",
+      "type": "EXECUTION",
+      "unavailableRecords": 25,
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_14",
+      "invalidValueRecords": 0,
+      "mappedRecords": 79,
+      "name": "mode",
+      "subType": null,
+      "target": "CONTROLLER_MODE",
+      "type": "CONTROLLER_MODE",
+      "unavailableRecords": 25,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_20",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "motion_cond",
+      "subType": null,
+      "target": "MOTION_PROGRAM",
+      "type": "MOTION_PROGRAM",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_21",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "path_system",
+      "subType": null,
+      "target": "SYSTEM",
+      "type": "SYSTEM",
+      "unavailableRecords": 0,
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_6",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "PartCountAct",
+      "subType": null,
+      "target": "PART_COUNT",
+      "type": "PART_COUNT",
+      "unavailableRecords": 25,
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_7",
+      "invalidValueRecords": 0,
+      "mappedRecords": 7633,
+      "name": "Fact",
+      "subType": "ACTUAL",
+      "target": "PATH_FEEDRATE",
+      "type": "PATH_FEEDRATE",
+      "unavailableRecords": 25,
+      "unit": "MILLIMETER/SECOND"
+    },
+    {
+      "category": "CONDITION",
+      "componentId": "Mazak01-pneumatic",
+      "dataItemId": "Mazak01-pneumatic_1",
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "pneu_cond",
+      "subType": null,
+      "target": "PRESSURE",
+      "type": "PRESSURE",
+      "unavailableRecords": 0,
+      "unit": null
+    }
+  ],
+  "parserVersion": "1.0.0",
+  "processingRunId": "sha256:bf5a3342dcfcc896153c5b69059de66479e8e19d9f225caa72477ec1dc6a2416",
+  "records": {
+    "byStatus": {
+      "MAPPED": 52996,
+      "UNKNOWN_DATA_ITEM": 22,
+      "UNSUPPORTED_DATA_ITEM": 62973
+    },
+    "mapped": 52996,
+    "syntacticallyParsed": 115991,
+    "total": 115991
+  },
+  "reportSchemaVersion": "2.0.0",
+  "semanticCoverage": {
+    "definition": "mapped records / syntactically parsed records",
+    "mappedRecords": 52996,
+    "parsedRecords": 115991,
+    "ratio": 0.4568975179108724
+  },
+  "source": {
+    "devicesArtifactId": "sha256:bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
+    "machineId": "Mazak01",
+    "mappingTableSha256": "179fe21fbec5c7dd88de27c307e97b23c8a80143f8a4e0799d525c1828980212",
+    "rawArtifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+    "sourceSetId": "nist-mazak01-20161005"
+  },
+  "unknownDataItems": [
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=188-234",
+      "name": "Brfunc",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=679-724",
+      "name": "C2deg",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=494-539",
+      "name": "C2frt",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=235-281",
+      "name": "C2load",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=441-493",
+      "name": "C2travel",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1217-1262",
+      "name": "C3deg",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=773-819",
+      "name": "C3load",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=979-1031",
+      "name": "C3travel",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=2841-2895",
+      "name": "Mazak01-dtop_1",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=586-631",
+      "name": "S2ovr",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1032-1077",
+      "name": "S3frt",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=932-978",
+      "name": "S3load",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=820-875",
+      "name": "S3load_cond",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1124-1169",
+      "name": "S3ovr",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1078-1123",
+      "name": "S3rpm",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1170-1216",
+      "name": "S3temp",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=876-931",
+      "name": "S3temp_cond",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=725-772",
+      "name": "c2rfunc",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1263-1310",
+      "name": "c3rfunc",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1791-1837",
+      "name": "crfunc",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=4165-4217",
+      "name": "d1_asset_chg",
+      "recordCount": 1
+    },
+    {
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=4218-4270",
+      "name": "d1_asset_rem",
+      "recordCount": 1
+    }
+  ],
+  "unsupportedDataItems": [
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-B",
+      "dataItemId": "Mazak01-B_2",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=46-90",
+      "name": "Bfrt",
+      "recordCount": 913,
+      "subType": null,
+      "type": "ANGULAR_VELOCITY",
+      "unit": "DEGREE/SECOND"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-B",
+      "dataItemId": "Mazak01-B_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=143-187",
+      "name": "Bdeg",
+      "recordCount": 943,
+      "subType": "ACTUAL",
+      "type": "ANGLE",
+      "unit": "DEGREE"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_1",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1311-1356",
+      "name": "Cload",
+      "recordCount": 85,
+      "subType": null,
+      "type": "LOAD",
+      "unit": "PERCENT"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1565-1609",
+      "name": "Cfrt",
+      "recordCount": 331,
+      "subType": null,
+      "type": "ANGULAR_VELOCITY",
+      "unit": "DEGREE/SECOND"
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_6",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1655-1699",
+      "name": "Sovr",
+      "recordCount": 49,
+      "subType": null,
+      "type": "ROTARY_VELOCITY_OVERRIDE",
+      "unit": "PERCENT"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-C",
+      "dataItemId": "Mazak01-C_8",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1746-1790",
+      "name": "Cdeg",
+      "recordCount": 424,
+      "subType": "ACTUAL",
+      "type": "ANGLE",
+      "unit": "DEGREE"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-X",
+      "dataItemId": "Mazak01-X_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1981-2025",
+      "name": "Xfrt",
+      "recordCount": 4575,
+      "subType": null,
+      "type": "AXIS_FEEDRATE",
+      "unit": "MILLIMETER/SECOND"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-Y",
+      "dataItemId": "Mazak01-Y_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=2169-2213",
+      "name": "Yfrt",
+      "recordCount": 1167,
+      "subType": null,
+      "type": "AXIS_FEEDRATE",
+      "unit": "MILLIMETER/SECOND"
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-Z",
+      "dataItemId": "Mazak01-Z_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=2357-2401",
+      "name": "Zfrt",
+      "recordCount": 5404,
+      "subType": null,
+      "type": "AXIS_FEEDRATE",
+      "unit": "MILLIMETER/SECOND"
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-controller",
+      "dataItemId": "Mazak01-controller_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=2623-2668",
+      "name": "estop",
+      "recordCount": 51,
+      "subType": null,
+      "type": "EMERGENCY_STOP",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_11",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3155-3205",
+      "name": "Tool_group",
+      "recordCount": 49,
+      "subType": null,
+      "type": "x:TOOL_GROUP",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_12",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3206-3257",
+      "name": "Tool_suffix",
+      "recordCount": 595,
+      "subType": null,
+      "type": "x:TOOL_SUFFIX",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_15",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3353-3404",
+      "name": "program_cmt",
+      "recordCount": 50,
+      "subType": null,
+      "type": "x:PROGRAM_COMMENT",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_16",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3405-3459",
+      "name": "subprogram_cmt",
+      "recordCount": 49,
+      "subType": "x:SUB",
+      "type": "x:PROGRAM_COMMENT",
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_17",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3460-3509",
+      "name": "auto_time",
+      "recordCount": 10111,
+      "subType": "x:AUTO",
+      "type": "ACCUMULATED_TIME",
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_18",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3510-3560",
+      "name": "total_time",
+      "recordCount": 32471,
+      "subType": "x:TOTAL",
+      "type": "ACCUMULATED_TIME",
+      "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_19",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3561-3609",
+      "name": "cut_time",
+      "recordCount": 3516,
+      "subType": "x:CUT",
+      "type": "ACCUMULATED_TIME",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_2",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3610-3660",
+      "name": "subprogram",
+      "recordCount": 49,
+      "subType": "x:SUB",
+      "type": "PROGRAM",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_3",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3773-3817",
+      "name": "line",
+      "recordCount": 686,
+      "subType": null,
+      "type": "LINE",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_4",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3818-3865",
+      "name": "unitNum",
+      "recordCount": 634,
+      "subType": null,
+      "type": "x:UNIT",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_5",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3866-3917",
+      "name": "sequenceNum",
+      "recordCount": 686,
+      "subType": null,
+      "type": "x:SEQUENCE_NUMBER",
+      "unit": null
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_8",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=4016-4065",
+      "name": "Frapidovr",
+      "recordCount": 86,
+      "subType": "RAPID",
+      "type": "PATH_FEEDRATE_OVERRIDE",
+      "unit": "PERCENT"
+    },
+    {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_9",
+      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=4066-4110",
+      "name": "Fovr",
+      "recordCount": 49,
+      "subType": "PROGRAMMED",
+      "type": "PATH_FEEDRATE_OVERRIDE",
+      "unit": "PERCENT"
+    }
+  ]
+}

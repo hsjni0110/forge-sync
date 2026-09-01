@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MTConnectDevices xmlns="urn:mtconnect.org:MTConnectDevices:1.3">
+  <Devices>
+    <Device id="Mazak01" name="Mazak01" uuid="mtc_adapter002">
+      <Description manufacturer="Mazak" model="Integrex">Mazak Integrex 100-IV</Description>
+      <Components>
+        <Axes id="Mazak01-base" name="base">
+          <DataItems>
+            <DataItem category="CONDITION" id="Mazak01-base_1" name="servo_cond" type="ACTUATOR"/>
+          </DataItems>
+          <Components>
+            <Linear id="Mazak01-X" name="X">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-X_1" name="Xabs" subType="ACTUAL" type="POSITION" units="MILLIMETER"/>
+                <DataItem category="SAMPLE" id="Mazak01-X_3" name="Xload" type="LOAD" units="PERCENT"/>
+              </DataItems>
+            </Linear>
+            <Linear id="Mazak01-Y" name="Y">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-Y_1" name="Yabs" subType="ACTUAL" type="POSITION" units="MILLIMETER"/>
+              </DataItems>
+            </Linear>
+            <Linear id="Mazak01-Z" name="Z">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-Z_1" name="Zabs" subType="ACTUAL" type="POSITION" units="MILLIMETER"/>
+              </DataItems>
+            </Linear>
+            <Rotary id="Mazak01-C" name="C">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-C_5" name="Srpm" nativeUnits="REVOLUTION/MINUTE" subType="ACTUAL" type="ROTARY_VELOCITY" units="REVOLUTION/MINUTE"/>
+              </DataItems>
+            </Rotary>
+            <Rotary id="Mazak01-C2" name="C">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-C2_2" name="S2rpm" nativeUnits="REVOLUTION/MINUTE" subType="ACTUAL" type="ROTARY_VELOCITY" units="REVOLUTION/MINUTE"/>
+                <DataItem category="SAMPLE" id="Mazak01-C2_3" name="S2temp" type="TEMPERATURE" units="CELSIUS"/>
+              </DataItems>
+            </Rotary>
+          </Components>
+        </Axes>
+        <Controller id="Mazak01-controller" name="controller">
+          <DataItems>
+            <DataItem category="CONDITION" id="Mazak01-controller_3" name="system_cond" type="SYSTEM"/>
+          </DataItems>
+          <Components>
+            <Path id="Mazak01-path" name="path">
+              <DataItems>
+                <DataItem category="EVENT" id="Mazak01-path_1" name="program" type="PROGRAM"/>
+                <DataItem category="EVENT" id="Mazak01-path_6" name="PartCountAct" type="PART_COUNT"/>
+                <DataItem category="SAMPLE" coordinateSystem="WORK" id="Mazak01-path_7" name="Fact" nativeUnits="FOOT/MINUTE" subType="ACTUAL" type="PATH_FEEDRATE" units="MILLIMETER/SECOND"/>
+                <DataItem category="EVENT" id="Mazak01-path_10" name="Tool_number" type="TOOL_NUMBER"/>
+                <DataItem category="EVENT" id="Mazak01-path_13" name="execution" type="EXECUTION"/>
+                <DataItem category="EVENT" id="Mazak01-path_14" name="mode" type="CONTROLLER_MODE"/>
+              </DataItems>
+            </Path>
+          </Components>
+        </Controller>
+        <Systems id="Mazak01-systems" name="systems">
+          <Components>
+            <Electric id="Mazak01-electric" name="electric">
+              <DataItems>
+                <DataItem category="EVENT" id="Mazak01-electric_1" name="power" type="POWER_STATE"/>
+              </DataItems>
+            </Electric>
+          </Components>
+        </Systems>
+      </Components>
+    </Device>
+  </Devices>
+</MTConnectDevices>

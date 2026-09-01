@@ -85,6 +85,14 @@ class ReplayIdentity:
 
 
 @dataclass(frozen=True, slots=True)
+class ObservationSubject:
+    component_id: str
+
+    def __post_init__(self) -> None:
+        _require_non_empty(self.component_id, "component_id")
+
+
+@dataclass(frozen=True, slots=True)
 class ProvenanceSource:
     source_set_id: str
     artifact_id: str
@@ -99,10 +107,12 @@ class ProvenanceSource:
 class TransformationProvenance:
     raw_record_id: str
     mapping_version: str
+    source_data_item_id: str
 
     def __post_init__(self) -> None:
         _require_non_empty(self.raw_record_id, "raw_record_id")
         _require_non_empty(self.mapping_version, "mapping_version")
+        _require_non_empty(self.source_data_item_id, "source_data_item_id")
 
 
 @dataclass(frozen=True, slots=True)
@@ -170,6 +180,7 @@ class ObservationEnvelope:
     event_id: UUID
     source_event_key: str
     machine_id: str
+    subject: ObservationSubject
     source: SourceIdentity
     provenance: Provenance
     payload: ObservationPayload

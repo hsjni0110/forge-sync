@@ -4,6 +4,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-B",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -85,6 +86,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-B",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -166,6 +168,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-B",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -247,6 +250,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-B",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -348,6 +352,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -429,6 +434,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -510,6 +516,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -591,6 +598,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -692,6 +700,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -773,6 +782,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -854,6 +864,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -935,6 +946,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -1016,6 +1028,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C2",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1097,6 +1110,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-C2",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1198,6 +1212,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C2",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1279,6 +1294,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C2",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1360,6 +1376,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-C2",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1461,6 +1478,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1542,6 +1560,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1643,6 +1662,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1724,6 +1744,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1805,6 +1826,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1886,6 +1908,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-C",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -1987,6 +2010,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -2068,6 +2092,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -2149,6 +2174,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -2230,6 +2256,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-X",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2311,6 +2338,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-X",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2392,6 +2420,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-X",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2473,6 +2502,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-X",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2574,6 +2604,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-Y",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2655,6 +2686,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-Y",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2736,6 +2768,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-Y",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2817,6 +2850,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-Y",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2918,6 +2952,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-Z",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -2999,6 +3034,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-Z",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -3080,6 +3116,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-Z",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -3161,6 +3198,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-Z",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base",
@@ -3262,6 +3300,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -3343,6 +3382,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01",
       "componentPath": [
         "Device:Mazak01"
       ],
@@ -3361,6 +3401,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-controller",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller"
@@ -3461,6 +3502,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-coolant",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -3562,6 +3604,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-coolant",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -3663,6 +3706,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-coolant",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -3764,6 +3808,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -3845,6 +3890,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-electric",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -3946,6 +3992,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-controller",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller"
@@ -4026,6 +4073,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -4107,6 +4155,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-hydraulic",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -4208,6 +4257,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -4289,6 +4339,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-controller",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller"
@@ -4389,6 +4440,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -4470,6 +4522,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -4571,6 +4624,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -4672,6 +4726,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-pneumatic",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -4773,6 +4828,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-electric",
       "componentPath": [
         "Device:Mazak01",
         "Systems:systems",
@@ -4854,6 +4910,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -4935,6 +4992,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -5016,6 +5074,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -5097,6 +5156,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-base",
       "componentPath": [
         "Device:Mazak01",
         "Axes:base"
@@ -5197,6 +5257,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -5278,6 +5339,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -5359,6 +5421,7 @@
     {
       "ambiguousName": false,
       "category": "CONDITION",
+      "componentId": "Mazak01-controller",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller"
@@ -5459,6 +5522,7 @@
     {
       "ambiguousName": false,
       "category": "SAMPLE",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -5540,6 +5604,7 @@
     {
       "ambiguousName": false,
       "category": "EVENT",
+      "componentId": "Mazak01-path",
       "componentPath": [
         "Device:Mazak01",
         "Controller:controller",
@@ -5649,8 +5714,8 @@
     "samples": []
   },
   "parserVersion": "1.0.0",
-  "processingRunId": "sha256:213d97c586e95d85369b10aa4ad063d078ec2007e4cc21252d8e72cd82ab1c5c",
-  "profileSchemaVersion": "1.0.0",
+  "processingRunId": "sha256:b0f6d75c12eac620b2b1a278a12fa3b5b31ef57c54290ef4afa55cc1a4179a91",
+  "profileSchemaVersion": "2.0.0",
   "records": {
     "byCategory": {
       "CONDITION": 1052,

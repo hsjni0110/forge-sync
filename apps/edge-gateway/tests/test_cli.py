@@ -59,6 +59,53 @@ def test_cli_acquire_verify_and_profile(
     lock_path.write_text(json.dumps(lock), encoding="utf-8")
     store_path = tmp_path / "raw-store"
     output_path = tmp_path / "profile"
+    canonical_path = tmp_path / "canonical"
+    mapping_report_path = tmp_path / "mapping-report"
+    mapping_path = tmp_path / "mapping.json"
+    mapping_path.write_text(
+        json.dumps(
+            {
+                "mappingVersion": "2.0.0",
+                "sourceSetId": "nist-mazak01-20161005",
+                "machineId": "Mazak01",
+                "devicesArtifactId": f"sha256:{hashlib.sha256(devices_bytes).hexdigest()}",
+                "rawArtifactId": (f"sha256:{hashlib.sha256(representative_raw_bytes).hexdigest()}"),
+                "entries": [
+                    {
+                        "dataItemId": "Mazak01-C_5",
+                        "componentId": "Mazak01-C",
+                        "name": "Srpm",
+                        "category": "SAMPLE",
+                        "type": "ROTARY_VELOCITY",
+                        "subType": "ACTUAL",
+                        "unit": "REVOLUTION/MINUTE",
+                        "target": "SPINDLE_SPEED",
+                    },
+                    {
+                        "dataItemId": "Mazak01-path_13",
+                        "componentId": "Mazak01-path",
+                        "name": "execution",
+                        "category": "EVENT",
+                        "type": "EXECUTION",
+                        "subType": None,
+                        "unit": None,
+                        "target": "EXECUTION",
+                    },
+                    {
+                        "dataItemId": "Mazak01-base_1",
+                        "componentId": "Mazak01-base",
+                        "name": "servo_cond",
+                        "category": "CONDITION",
+                        "type": "ACTUATOR",
+                        "subType": None,
+                        "unit": None,
+                        "target": "SYSTEM",
+                    },
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
     reader = MemoryReader({devices_uri: devices_bytes, raw_uri: representative_raw_bytes})
     monkeypatch.setattr(cli, "HttpsSourceReader", lambda: reader)  # type: ignore[attr-defined]
 
@@ -77,13 +124,46 @@ def test_cli_acquire_verify_and_profile(
             str(output_path),
         ]
     )
+    mapping_exit = cli.main(
+        [
+            "map-observations",
+            "--lock",
+            str(lock_path),
+            "--store",
+            str(store_path),
+            "--machine",
+            "Mazak01",
+            "--mapping",
+            str(mapping_path),
+            "--canonical-store",
+            str(canonical_path),
+            "--report-output",
+            str(mapping_report_path),
+        ]
+    )
 
-    assert (acquire_exit, verify_exit, profile_exit) == (0, 0, 0)
+    assert (acquire_exit, verify_exit, profile_exit, mapping_exit) == (0, 0, 0, 0)
     assert (output_path / "profile.json").is_file()
     assert (output_path / "profile.md").is_file()
+    assert (mapping_report_path / "mapping-report.json").is_file()
+    assert (mapping_report_path / "mapping-report.md").is_file()
+    mapping_report = json.loads(
+        (mapping_report_path / "mapping-report.json").read_text(encoding="utf-8")
+    )
+    assert mapping_report["records"] == {
+        "total": 5,
+        "syntacticallyParsed": 4,
+        "mapped": 3,
+        "byStatus": {
+            "INVALID_RAW_RECORD": 1,
+            "MAPPED": 3,
+            "UNKNOWN_DATA_ITEM": 1,
+        },
+    }
     output_lines = capsys.readouterr().out.splitlines()  # type: ignore[attr-defined]
     assert [json.loads(line)["command"] for line in output_lines] == [
         "acquire",
         "verify",
         "profile",
+        "map-observations",
     ]

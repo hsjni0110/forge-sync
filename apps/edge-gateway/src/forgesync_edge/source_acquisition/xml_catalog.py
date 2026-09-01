@@ -44,7 +44,10 @@ def read_machine_catalog(devices_path: Path, machine_id: str) -> MachineCatalog:
     }
     machine_label = _component_label(machine)
     entries: list[DataItemCatalogEntry] = []
-    _collect_data_items(machine, (machine_label,), entries)
+    machine_component_id = machine.get("id")
+    if machine_component_id is None:
+        raise ProfileError("Machine is missing component id")
+    _collect_data_items(machine, machine_component_id, (machine_label,), entries)
     entries.sort(key=lambda entry: (entry.name, entry.data_item_id))
     return MachineCatalog(
         machine_id=machine.get("id", machine_id),
@@ -57,6 +60,7 @@ def read_machine_catalog(devices_path: Path, machine_id: str) -> MachineCatalog:
 
 def _collect_data_items(
     element: element_tree.Element,
+    component_id: str,
     component_path: tuple[str, ...],
     entries: list[DataItemCatalogEntry],
 ) -> None:
@@ -75,6 +79,7 @@ def _collect_data_items(
             entries.append(
                 DataItemCatalogEntry(
                     data_item_id=data_item_id,
+                    component_id=component_id,
                     name=name,
                     category=category,
                     type=item_type,
@@ -90,10 +95,14 @@ def _collect_data_items(
             )
             continue
         if tag in STRUCTURAL_TAGS or tag in {"Description", "Source"}:
+            next_component_id = component_id
             next_path = component_path
         else:
+            next_component_id = child.get("id") or ""
+            if not next_component_id:
+                raise ProfileError(f"Component is missing id: {tag}")
             next_path = (*component_path, _component_label(child))
-        _collect_data_items(child, next_path, entries)
+        _collect_data_items(child, next_component_id, next_path, entries)
 
 
 def _component_label(element: element_tree.Element) -> str:

@@ -10,6 +10,7 @@ from forgesync_edge.ingestion.adapter.outbound.observation_json import observati
 from forgesync_edge.ingestion.domain import (
     Availability,
     ObservationEnvelope,
+    ObservationSubject,
     Provenance,
     ProvenanceSource,
     SampleMetric,
@@ -25,10 +26,10 @@ SCHEMA_PATH = (
     REPOSITORY_ROOT
     / "contracts"
     / "observation-envelope"
-    / "v1"
+    / "v2"
     / "observation-envelope.schema.json"
 )
-FIXTURES_ROOT = REPOSITORY_ROOT / "tests" / "fixtures" / "canonical" / "v1"
+FIXTURES_ROOT = REPOSITORY_ROOT / "tests" / "fixtures" / "canonical" / "v2"
 
 
 def _validator() -> Draft202012Validator:
@@ -62,11 +63,14 @@ def test_edge_mapping_produces_shared_sample_fixture() -> None:
         event_id=UUID("5cb3568f-c5c7-4c34-a8b9-3ee18fcbc5c1"),
         source_event_key=raw_record_id,
         machine_id="Mazak01",
+        subject=ObservationSubject(component_id="Mazak01-C"),
         source=SourceIdentity(datetime(2016, 10, 5, 8, 43, 49, 514000, tzinfo=UTC)),
         provenance=Provenance(
             source=ProvenanceSource(source_set_id="nist-mazak01-20161005", artifact_id=artifact_id),
             transformation=TransformationProvenance(
-                raw_record_id=raw_record_id, mapping_version="1.0.0"
+                raw_record_id=raw_record_id,
+                mapping_version="2.0.0",
+                source_data_item_id="Mazak01-C_5",
             ),
         ),
         payload=SamplePayload(

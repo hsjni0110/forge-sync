@@ -37,6 +37,8 @@ class ObservationContractValidatorTest {
       strings = {
         "condition-missing-provenance.json",
         "event-value-type.json",
+        "missing-source-data-item.json",
+        "missing-subject.json",
         "replay-partial.json",
         "sample-unit-mismatch.json",
         "schema-version-mismatch.json",
@@ -83,7 +85,7 @@ class ObservationContractValidatorTest {
   }
 
   private static String readFixture(String status, String fixtureName) {
-    String path = "fixtures/canonical/v1/" + status + "/" + fixtureName;
+    String path = "fixtures/canonical/v2/" + status + "/" + fixtureName;
     try (InputStream stream =
         ObservationContractValidatorTest.class.getClassLoader().getResourceAsStream(path)) {
       if (stream == null) {

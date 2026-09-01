@@ -71,6 +71,7 @@ class SourceArtifact:
 @dataclass(frozen=True, slots=True)
 class DataItemCatalogEntry:
     data_item_id: str
+    component_id: str
     name: str
     category: str
     type: str
@@ -84,6 +85,7 @@ class DataItemCatalogEntry:
     def to_dict(self) -> dict[str, Any]:
         return {
             "dataItemId": self.data_item_id,
+            "componentId": self.component_id,
             "name": self.name,
             "category": self.category,
             "type": self.type,

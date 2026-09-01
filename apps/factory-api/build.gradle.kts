@@ -30,14 +30,14 @@ dependencies {
 }
 
 tasks.processResources {
-    from("../../contracts/observation-envelope/v1/observation-envelope.schema.json") {
-        into("contracts/observation-envelope/v1")
+    from("../../contracts/observation-envelope/v2/observation-envelope.schema.json") {
+        into("contracts/observation-envelope/v2")
     }
 }
 
 tasks.processTestResources {
-    from("../../tests/fixtures/canonical/v1") {
-        into("fixtures/canonical/v1")
+    from("../../tests/fixtures/canonical/v2") {
+        into("fixtures/canonical/v2")
     }
 }
 

@@ -1,8 +1,11 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "2.0.0",
   "eventId": "5cb3568f-c5c7-4c34-a8b9-3ee18fcbc5c1",
   "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=125",
   "machineId": "Mazak01",
+  "subject": {
+    "componentId": "Mazak01-C"
+  },
   "observationKind": "SAMPLE",
   "source": {
     "sourceObservedAt": "2016-10-05T08:43:49.514Z"
@@ -16,7 +19,8 @@
     },
     "transformation": {
       "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=125",
-      "mappingVersion": "1.0.0"
+      "mappingVersion": "2.0.0",
+      "sourceDataItemId": "Mazak01-C_5"
     }
   },
   "payload": {

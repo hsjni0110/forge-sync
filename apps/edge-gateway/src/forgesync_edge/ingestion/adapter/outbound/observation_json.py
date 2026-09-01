@@ -14,7 +14,7 @@ from ...domain.observation import (
     SamplePayload,
 )
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "2.0.0"
 
 
 def serialize_observation(observation: ObservationEnvelope) -> bytes:
@@ -29,6 +29,7 @@ def observation_to_dict(observation: ObservationEnvelope) -> dict[str, Any]:
         "eventId": str(observation.event_id),
         "sourceEventKey": observation.source_event_key,
         "machineId": observation.machine_id,
+        "subject": {"componentId": observation.subject.component_id},
         "observationKind": observation.observation_kind.value,
         "source": _source_to_dict(observation),
         "provenance": {
@@ -41,6 +42,7 @@ def observation_to_dict(observation: ObservationEnvelope) -> dict[str, Any]:
             "transformation": {
                 "rawRecordId": observation.provenance.transformation.raw_record_id,
                 "mappingVersion": observation.provenance.transformation.mapping_version,
+                "sourceDataItemId": (observation.provenance.transformation.source_data_item_id),
             },
         },
         "payload": _payload_to_dict(observation.payload),

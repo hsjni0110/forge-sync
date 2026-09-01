@@ -32,6 +32,7 @@
 | V-014 | 5/20 machine scene이 목표 성능을 만족한다 | TO_VERIFY | browser/environment별 FPS, frame time, heap 측정 | 26 | - |
 | V-015 | WebGL/asset 실패에도 2D 핵심 기능이 동작한다 | TO_VERIFY | E2E-04 결과 링크 | 13/25 | - |
 | V-016 | 실제 CNC/PLC/Safety PLC를 제어한다 | FALSE_NOT_CLAIMED | Virtual Controller만 허용 | 18 | 2026-09-01 |
+| V-017 | 고정 Mazak01 raw를 component 혼동과 근거 없는 의미 추론 없이 Observation v2로 매핑할 수 있다 | VERIFIED | Mapping `2.0.0`, raw `6eec7a...ef2cf`; 115,991 parsed 중 52,996 mapped 및 v2 schema 검증, 62,973 unsupported, 22 unknown, invalid value 0. [재현 보고서](./data/mappings/nist-mazak01-observation-v2/mapping-report.md) | 04 | 2026-09-01 |
 
 ## 갱신 규칙
 
