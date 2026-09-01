@@ -31,6 +31,9 @@ verification is intentionally not configured at this stage.
 # Existing immutable source acquisition CLI
 uv run --package forgesync-edge-gateway forgesync-source --help
 
+# Verify a deterministic replay schedule without publishing messages
+uv run --package forgesync-edge-gateway forgesync-replay --help
+
 # Factory API; health is GET http://localhost:8080/actuator/health
 apps/factory-api/gradlew -p apps/factory-api bootRun
 

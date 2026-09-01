@@ -33,6 +33,7 @@
 | V-015 | WebGL/asset 실패에도 2D 핵심 기능이 동작한다 | TO_VERIFY | E2E-04 결과 링크 | 13/25 | - |
 | V-016 | 실제 CNC/PLC/Safety PLC를 제어한다 | FALSE_NOT_CLAIMED | Virtual Controller만 허용 | 18 | 2026-09-01 |
 | V-017 | 고정 Mazak01 raw를 component 혼동과 근거 없는 의미 추론 없이 Observation v2로 매핑할 수 있다 | VERIFIED | Mapping `2.0.0`, raw `6eec7a...ef2cf`; 115,991 parsed 중 52,996 mapped 및 v2 schema 검증, 62,973 unsupported, 22 unknown, invalid value 0. [재현 보고서](./data/mappings/nist-mazak01-observation-v2/mapping-report.md) | 04 | 2026-09-01 |
+| V-018 | 동일한 Canonical Processing Run과 정렬 규칙은 같은 Replay event sequence/hash를 만든다 | VERIFIED | Observation output `aee293...9b17f`의 52,996건을 두 번 계획해 sequence hash `c1e806...d9bb6` 재현. [Replay 계획 보고서](./data/replay/nist-mazak01-20161005-observation-v2/replay-plan.md), 고정 Clock/실패 재시도 unit tests | 05 | 2026-09-01 |
 
 ## 갱신 규칙
 
