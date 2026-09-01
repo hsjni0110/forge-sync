@@ -153,7 +153,7 @@ ProfileGenerator   raw/catalog 통계와 검토 문서 생성
 
 - 수집 실패: 부분 파일을 완료 artifact로 등록하지 않는다.
 - checksum 불일치: 격리하고 실패를 명시한다.
-- parse 실패: Raw Artifact는 보존하고 `RawRecord.parseStatus=FAILED` 및 위치/이유를 기록한다.
+- parse 실패: Source Artifact는 보존하고 `RawRecord.parseStatus=INVALID` 및 위치/이유를 기록한다.
 - mapping 실패: unknown으로 계수하고 dead-letter 또는 review queue에 남긴다.
 - schema upgrade: 원본을 수정하지 않고 새로운 `mappingVersion`과 Processing Run을 생성한다.
 - 중복 전달: Inbox에서 business side effect를 막되 관찰 가능한 중복 지표는 유지한다.

@@ -6,6 +6,7 @@
 
 | 문서 | 목적 |
 |---|---|
+| [도메인 용어](./%EB%8F%84%EB%A9%94%EC%9D%B8%20%EC%9A%A9%EC%96%B4.md) | 코드·API·문서·UI에서 함께 사용할 Ubiquitous Language와 금지된 혼용 |
 | [개발 Step](./development/implementation-steps.md) | 테스트 가능한 최소 작업 단위와 순서, 완료 조건 |
 | [엔지니어링 원칙](./architecture/engineering-principles.md) | Clean Architecture, DDD, 객체지향, 모듈 경계와 의존성 규칙 |
 | [Raw 데이터 파이프라인](./data/raw-to-canonical-pipeline.md) | 원본 보존부터 Canonical Observation, Twin Projection까지의 데이터 계약 |

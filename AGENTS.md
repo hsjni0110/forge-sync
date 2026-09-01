@@ -11,7 +11,7 @@ ADR, 개발 Step, 데이터 계약을 먼저 읽는다.
 1. 안전, 데이터 진실성, 원천 및 provenance 보존
 2. `docs/ForgeSync_PRD_v1.4_Spatial_Digital_Twin.md`의 제품 범위와 사용자 행동
 3. `docs/architecture/engineering-principles.md`와 `docs/adr/**`의 구조 및 결정
-4. `docs/data/**`의 데이터 계약
+4. `docs/도메인 용어.md`의 Ubiquitous Language와 `docs/data/**`의 데이터 계약
 5. `docs/development/implementation-steps.md`의 작업 순서와 완료 조건
 6. `docs/testing/test-strategy.md`와 `docs/development/coding-and-review-guide.md`
 
@@ -119,7 +119,7 @@ DTO를 직접 해석하지 않고 `MachineVisualState` Adapter를 거친다. Web
 
 ## 5. 코드 스타일과 네이밍
 
-- 이름은 PRD의 ubiquitous language를 사용한다. 같은 개념에 `job`, `task`, `operation` 같은
+- 이름은 `docs/도메인 용어.md`의 Ubiquitous Language를 사용한다. 같은 개념에 `job`, `task`, `operation` 같은
   동의어를 섞지 않는다.
 - 함수/use case는 구체적인 행동으로, Adapter는 기술과 역할로 이름 짓는다. `process(data)`,
   `handle()`, `execute(flag)`보다 `preserve_source_artifact`, `StartReplay`처럼 의도를 드러낸다.
