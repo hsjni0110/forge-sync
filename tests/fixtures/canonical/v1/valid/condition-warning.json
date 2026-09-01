@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.0.0",
+  "eventId": "fba64e55-3d72-4c79-817a-ab90dcf660fb",
+  "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1708",
+  "machineId": "Mazak01",
+  "observationKind": "CONDITION",
+  "source": {
+    "sourceObservedAt": "2016-10-05T09:03:57.872Z"
+  },
+  "provenance": {
+    "source": {
+      "kind": "REAL",
+      "provider": "NIST",
+      "sourceSetId": "nist-mazak01-20161005",
+      "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+    },
+    "transformation": {
+      "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1708",
+      "mappingVersion": "1.0.0"
+    }
+  },
+  "payload": {
+    "conditionType": "SYSTEM",
+    "level": "WARNING",
+    "nativeCode": "406",
+    "message": "MEMORY PROTECT"
+  }
+}

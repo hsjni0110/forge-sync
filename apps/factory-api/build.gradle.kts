@@ -19,11 +19,26 @@ repositories {
 }
 
 dependencies {
+    implementation("com.networknt:json-schema-validator:2.0.4") {
+        exclude(group = "com.fasterxml.jackson.dataformat", module = "jackson-dataformat-yaml")
+    }
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+}
+
+tasks.processResources {
+    from("../../contracts/observation-envelope/v1/observation-envelope.schema.json") {
+        into("contracts/observation-envelope/v1")
+    }
+}
+
+tasks.processTestResources {
+    from("../../tests/fixtures/canonical/v1") {
+        into("fixtures/canonical/v1")
+    }
 }
 
 tasks.withType<Test> {

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "eventId": "7095c845-332c-49d8-8ee3-48d778179b18",
+  "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=67",
+  "machineId": "Mazak01",
+  "observationKind": "EVENT",
+  "source": {
+    "sourceObservedAt": "2016-10-05T05:27:55.740706Z"
+  },
+  "provenance": {
+    "source": {
+      "kind": "REAL",
+      "provider": "NIST",
+      "sourceSetId": "nist-mazak01-20161005",
+      "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+    },
+    "transformation": {
+      "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=67",
+      "mappingVersion": "1.0.0"
+    }
+  },
+  "payload": {
+    "eventType": "EXECUTION",
+    "availability": "UNAVAILABLE"
+  }
+}
