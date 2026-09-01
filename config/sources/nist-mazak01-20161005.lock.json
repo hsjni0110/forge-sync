@@ -1,0 +1,28 @@
+{
+  "sourceSetId": "nist-mazak01-20161005",
+  "sourceName": "NIST Smart Manufacturing Systems Test Bed",
+  "upstreamRepository": "https://github.com/usnistgov/smstestbed",
+  "upstreamCommit": "968279f14ebe96c03c8877eeb1901cf6b4c8fbab",
+  "licenseOrTermsReference": "https://github.com/usnistgov/smstestbed#disclaimers",
+  "evidenceState": "VERIFIED_OFFICIAL_SOURCE",
+  "artifacts": [
+    {
+      "alias": "devicesXml",
+      "role": "MTCONNECT_DEVICES",
+      "repositoryPath": "mtconnect/agent/Devices.xml",
+      "sourceUri": "https://raw.githubusercontent.com/usnistgov/smstestbed/968279f14ebe96c03c8877eeb1901cf6b4c8fbab/mtconnect/agent/Devices.xml",
+      "mediaType": "application/xml",
+      "expectedByteLength": 39450,
+      "sha256": "bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166"
+    },
+    {
+      "alias": "mazak01DailyRaw",
+      "role": "SHDR_RAW",
+      "repositoryPath": "raw/Mazak01/Mazak01-20161005-20161006.txt",
+      "sourceUri": "https://raw.githubusercontent.com/usnistgov/smstestbed/968279f14ebe96c03c8877eeb1901cf6b4c8fbab/raw/Mazak01/Mazak01-20161005-20161006.txt",
+      "mediaType": "text/plain",
+      "expectedByteLength": 4609711,
+      "sha256": "6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+    }
+  ]
+}

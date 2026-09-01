@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MTConnectDevices xmlns="urn:mtconnect.org:MTConnectDevices:1.3">
+  <Devices>
+    <Device id="Mazak01" name="Mazak01" uuid="mtc_adapter002">
+      <Description manufacturer="Mazak" model="Integrex">Mazak Integrex 100-IV</Description>
+      <Components>
+        <Axes id="Mazak01-base" name="base">
+          <DataItems>
+            <DataItem category="CONDITION" id="Mazak01-base_1" name="servo_cond" type="ACTUATOR"/>
+          </DataItems>
+          <Components>
+            <Rotary id="Mazak01-C" name="C">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-C_5" name="Srpm" nativeUnits="REVOLUTION/MINUTE" subType="ACTUAL" type="ROTARY_VELOCITY" units="REVOLUTION/MINUTE"/>
+              </DataItems>
+            </Rotary>
+          </Components>
+        </Axes>
+        <Controller id="Mazak01-controller" name="controller">
+          <Components>
+            <Path id="Mazak01-path" name="path">
+              <DataItems>
+                <DataItem category="EVENT" id="Mazak01-path_13" name="execution" type="EXECUTION"/>
+              </DataItems>
+            </Path>
+          </Components>
+        </Controller>
+      </Components>
+    </Device>
+  </Devices>
+</MTConnectDevices>

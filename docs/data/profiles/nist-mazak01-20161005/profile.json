@@ -1,0 +1,6145 @@
+{
+  "ambiguousDataItems": [],
+  "dataItems": [
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:B"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-B_4",
+      "name": "Bdeg",
+      "nativeUnits": "DEGREE",
+      "recordCount": 943,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 188,
+            "byteStart": 143,
+            "lineNumber": 4
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5673,
+            "byteStart": 5634,
+            "lineNumber": 119
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "-0.00735"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26509,
+            "byteStart": 26477,
+            "lineNumber": 612
+          },
+          "timestampRaw": "2016-10-05T08:49:59.026Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 121814,
+            "byteStart": 121781,
+            "lineNumber": 2892
+          },
+          "timestampRaw": "2016-10-05T09:16:39.557Z",
+          "valueFieldsRaw": [
+            "45"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 122160,
+            "byteStart": 122122,
+            "lineNumber": 2901
+          },
+          "timestampRaw": "2016-10-05T09:16:40.609Z",
+          "valueFieldsRaw": [
+            "55.6875"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "ANGLE",
+      "unavailableCount": 25,
+      "units": "DEGREE"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:B"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-B_2",
+      "name": "Bfrt",
+      "nativeUnits": "DEGREE/MINUTE",
+      "recordCount": 913,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 91,
+            "byteStart": 46,
+            "lineNumber": 2
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5705,
+            "byteStart": 5673,
+            "lineNumber": 120
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26552,
+            "byteStart": 26509,
+            "lineNumber": 613
+          },
+          "timestampRaw": "2016-10-05T08:49:59.026Z",
+          "valueFieldsRaw": [
+            "0.0005833333"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26736,
+            "byteStart": 26704,
+            "lineNumber": 618
+          },
+          "timestampRaw": "2016-10-05T08:50:00.057Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 121854,
+            "byteStart": 121814,
+            "lineNumber": 2893
+          },
+          "timestampRaw": "2016-10-05T09:16:39.557Z",
+          "valueFieldsRaw": [
+            "0.1228611"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "ANGULAR_VELOCITY",
+      "unavailableCount": 25,
+      "units": "DEGREE/SECOND"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:B"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-B_1",
+      "name": "Bload",
+      "nativeUnits": "PERCENT",
+      "recordCount": 2077,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 46,
+            "byteStart": 0,
+            "lineNumber": 1
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5738,
+            "byteStart": 5705,
+            "lineNumber": 121
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26586,
+            "byteStart": 26552,
+            "lineNumber": 614
+          },
+          "timestampRaw": "2016-10-05T08:49:59.026Z",
+          "valueFieldsRaw": [
+            "21"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26769,
+            "byteStart": 26736,
+            "lineNumber": 619
+          },
+          "timestampRaw": "2016-10-05T08:50:00.057Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64807,
+            "byteStart": 64773,
+            "lineNumber": 1524
+          },
+          "timestampRaw": "2016-10-05T09:01:37.891Z",
+          "valueFieldsRaw": [
+            "21"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:B"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-B_3",
+      "name": "Btravel",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 143,
+            "byteStart": 91,
+            "lineNumber": 3
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4998,
+            "byteStart": 4954,
+            "lineNumber": 102
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265372,
+            "byteStart": 265320,
+            "lineNumber": 6536
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269456,
+            "byteStart": 269412,
+            "lineNumber": 6622
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 574506,
+            "byteStart": 574454,
+            "lineNumber": 14430
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "ANGLE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_8",
+      "name": "Cdeg",
+      "nativeUnits": "DEGREE",
+      "recordCount": 424,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1791,
+            "byteStart": 1746,
+            "lineNumber": 37
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5770,
+            "byteStart": 5738,
+            "lineNumber": 122
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26931,
+            "byteStart": 26891,
+            "lineNumber": 623
+          },
+          "timestampRaw": "2016-10-05T08:50:02.190Z",
+          "valueFieldsRaw": [
+            "228.91315"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 27094,
+            "byteStart": 27054,
+            "lineNumber": 627
+          },
+          "timestampRaw": "2016-10-05T08:50:03.242Z",
+          "valueFieldsRaw": [
+            "307.31315"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 27217,
+            "byteStart": 27178,
+            "lineNumber": 630
+          },
+          "timestampRaw": "2016-10-05T08:50:04.293Z",
+          "valueFieldsRaw": [
+            "140.5444"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "ANGLE",
+      "unavailableCount": 25,
+      "units": "DEGREE"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_4",
+      "name": "Cfrt",
+      "nativeUnits": "DEGREE/MINUTE",
+      "recordCount": 331,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1610,
+            "byteStart": 1565,
+            "lineNumber": 33
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5802,
+            "byteStart": 5770,
+            "lineNumber": 123
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26970,
+            "byteStart": 26931,
+            "lineNumber": 624
+          },
+          "timestampRaw": "2016-10-05T08:50:02.190Z",
+          "valueFieldsRaw": [
+            "4.999972"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 27256,
+            "byteStart": 27217,
+            "lineNumber": 631
+          },
+          "timestampRaw": "2016-10-05T08:50:04.293Z",
+          "valueFieldsRaw": [
+            "5.000139"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 27438,
+            "byteStart": 27406,
+            "lineNumber": 636
+          },
+          "timestampRaw": "2016-10-05T08:50:05.345Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "ANGULAR_VELOCITY",
+      "unavailableCount": 25,
+      "units": "DEGREE/SECOND"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_1",
+      "name": "Cload",
+      "nativeUnits": "PERCENT",
+      "recordCount": 85,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1357,
+            "byteStart": 1311,
+            "lineNumber": 28
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5835,
+            "byteStart": 5802,
+            "lineNumber": 124
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265715,
+            "byteStart": 265669,
+            "lineNumber": 6543
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269701,
+            "byteStart": 269668,
+            "lineNumber": 6629
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 354884,
+            "byteStart": 354851,
+            "lineNumber": 8809
+          },
+          "timestampRaw": "2016-10-05T09:41:26.345Z",
+          "valueFieldsRaw": [
+            "6"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_3",
+      "name": "Ctravel",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1565,
+            "byteStart": 1513,
+            "lineNumber": 32
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5042,
+            "byteStart": 4998,
+            "lineNumber": 103
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265923,
+            "byteStart": 265871,
+            "lineNumber": 6547
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269597,
+            "byteStart": 269553,
+            "lineNumber": 6626
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575057,
+            "byteStart": 575005,
+            "lineNumber": 14441
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "ANGLE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": "WORK",
+      "dataItemId": "Mazak01-path_7",
+      "name": "Fact",
+      "nativeUnits": "FOOT/MINUTE",
+      "recordCount": 7633,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4016,
+            "byteStart": 3971,
+            "lineNumber": 81
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6303,
+            "byteStart": 6271,
+            "lineNumber": 137
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22157,
+            "byteStart": 22118,
+            "lineNumber": 505
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "216.8813"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22509,
+            "byteStart": 22471,
+            "lineNumber": 514
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "507.999"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22824,
+            "byteStart": 22785,
+            "lineNumber": 522
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "17.54835"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "PATH_FEEDRATE",
+      "unavailableCount": 25,
+      "units": "MILLIMETER/SECOND"
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_9",
+      "name": "Fovr",
+      "nativeUnits": "PERCENT",
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4111,
+            "byteStart": 4066,
+            "lineNumber": 83
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6337,
+            "byteStart": 6303,
+            "lineNumber": 138
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "100"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268367,
+            "byteStart": 268322,
+            "lineNumber": 6596
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270397,
+            "byteStart": 270363,
+            "lineNumber": 6647
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "100"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 577501,
+            "byteStart": 577456,
+            "lineNumber": 14490
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "PROGRAMMED",
+      "type": "PATH_FEEDRATE_OVERRIDE",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_8",
+      "name": "Frapidovr",
+      "nativeUnits": "PERCENT",
+      "recordCount": 86,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4066,
+            "byteStart": 4016,
+            "lineNumber": 82
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6376,
+            "byteStart": 6337,
+            "lineNumber": 139
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "100"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64438,
+            "byteStart": 64401,
+            "lineNumber": 1515
+          },
+          "timestampRaw": "2016-10-05T09:01:33.554Z",
+          "valueFieldsRaw": [
+            "5"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64694,
+            "byteStart": 64656,
+            "lineNumber": 1521
+          },
+          "timestampRaw": "2016-10-05T09:01:36.809Z",
+          "valueFieldsRaw": [
+            "50"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 66719,
+            "byteStart": 66680,
+            "lineNumber": 1572
+          },
+          "timestampRaw": "2016-10-05T09:01:54.244Z",
+          "valueFieldsRaw": [
+            "100"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "RAPID",
+      "type": "PATH_FEEDRATE_OVERRIDE",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_6",
+      "name": "PartCountAct",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3971,
+            "byteStart": 3918,
+            "lineNumber": 80
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6676,
+            "byteStart": 6636,
+            "lineNumber": 147
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268227,
+            "byteStart": 268174,
+            "lineNumber": 6593
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270740,
+            "byteStart": 270700,
+            "lineNumber": 6656
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 577361,
+            "byteStart": 577308,
+            "lineNumber": 14487
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "PART_COUNT",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C2_1",
+      "name": "S2load",
+      "nativeUnits": "PERCENT",
+      "recordCount": 1040,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 441,
+            "byteStart": 394,
+            "lineNumber": 9
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6001,
+            "byteStart": 5967,
+            "lineNumber": 129
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 134845,
+            "byteStart": 134811,
+            "lineNumber": 3218
+          },
+          "timestampRaw": "2016-10-05T09:18:43.075Z",
+          "valueFieldsRaw": [
+            "8"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 135216,
+            "byteStart": 135182,
+            "lineNumber": 3228
+          },
+          "timestampRaw": "2016-10-05T09:18:44.156Z",
+          "valueFieldsRaw": [
+            "3"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 141573,
+            "byteStart": 141537,
+            "lineNumber": 3391
+          },
+          "timestampRaw": "2016-10-05T09:19:06.549Z",
+          "valueFieldsRaw": [
+            "118"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C2_4",
+      "name": "S2load_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 338,
+            "byteStart": 282,
+            "lineNumber": 7
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5184,
+            "byteStart": 5136,
+            "lineNumber": 106
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265473,
+            "byteStart": 265417,
+            "lineNumber": 6538
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270044,
+            "byteStart": 269996,
+            "lineNumber": 6638
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 574607,
+            "byteStart": 574551,
+            "lineNumber": 14432
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C2_2",
+      "name": "S2rpm",
+      "nativeUnits": "REVOLUTION/MINUTE",
+      "recordCount": 1107,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 586,
+            "byteStart": 540,
+            "lineNumber": 12
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5967,
+            "byteStart": 5934,
+            "lineNumber": 128
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 134811,
+            "byteStart": 134775,
+            "lineNumber": 3217
+          },
+          "timestampRaw": "2016-10-05T09:18:43.075Z",
+          "valueFieldsRaw": [
+            "2000"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 141537,
+            "byteStart": 141501,
+            "lineNumber": 3390
+          },
+          "timestampRaw": "2016-10-05T09:19:06.549Z",
+          "valueFieldsRaw": [
+            "1029"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 141856,
+            "byteStart": 141820,
+            "lineNumber": 3398
+          },
+          "timestampRaw": "2016-10-05T09:19:07.600Z",
+          "valueFieldsRaw": [
+            "2000"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "ROTARY_VELOCITY",
+      "unavailableCount": 25,
+      "units": "REVOLUTION/MINUTE"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C2_3",
+      "name": "S2temp",
+      "nativeUnits": "CELSIUS",
+      "recordCount": 7448,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 679,
+            "byteStart": 632,
+            "lineNumber": 14
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6036,
+            "byteStart": 6001,
+            "lineNumber": 130
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "25"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6840,
+            "byteStart": 6806,
+            "lineNumber": 151
+          },
+          "timestampRaw": "2016-10-05T08:43:50.566Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6920,
+            "byteStart": 6885,
+            "lineNumber": 153
+          },
+          "timestampRaw": "2016-10-05T08:43:51.597Z",
+          "valueFieldsRaw": [
+            "25"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 7449,
+            "byteStart": 7415,
+            "lineNumber": 165
+          },
+          "timestampRaw": "2016-10-05T08:44:03.254Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TEMPERATURE",
+      "unavailableCount": 25,
+      "units": "CELSIUS"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C2_5",
+      "name": "S2temp_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 394,
+            "byteStart": 338,
+            "lineNumber": 8
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5232,
+            "byteStart": 5184,
+            "lineNumber": 107
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265529,
+            "byteStart": 265473,
+            "lineNumber": 6539
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270092,
+            "byteStart": 270044,
+            "lineNumber": 6639
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 574663,
+            "byteStart": 574607,
+            "lineNumber": 14433
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TEMPERATURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_2",
+      "name": "Sload",
+      "nativeUnits": "PERCENT",
+      "recordCount": 1055,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1513,
+            "byteStart": 1467,
+            "lineNumber": 31
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5900,
+            "byteStart": 5867,
+            "lineNumber": 126
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 148110,
+            "byteStart": 148076,
+            "lineNumber": 3556
+          },
+          "timestampRaw": "2016-10-05T09:19:38.084Z",
+          "valueFieldsRaw": [
+            "43"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 148424,
+            "byteStart": 148391,
+            "lineNumber": 3564
+          },
+          "timestampRaw": "2016-10-05T09:19:39.135Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 159162,
+            "byteStart": 159128,
+            "lineNumber": 3839
+          },
+          "timestampRaw": "2016-10-05T09:20:19.113Z",
+          "valueFieldsRaw": [
+            "45"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_9",
+      "name": "Sload_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1412,
+            "byteStart": 1357,
+            "lineNumber": 29
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5089,
+            "byteStart": 5042,
+            "lineNumber": 104
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265770,
+            "byteStart": 265715,
+            "lineNumber": 6544
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269847,
+            "byteStart": 269800,
+            "lineNumber": 6633
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 574904,
+            "byteStart": 574849,
+            "lineNumber": 14438
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_6",
+      "name": "Sovr",
+      "nativeUnits": "PERCENT",
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1700,
+            "byteStart": 1655,
+            "lineNumber": 35
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6410,
+            "byteStart": 6376,
+            "lineNumber": 140
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "100"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266058,
+            "byteStart": 266013,
+            "lineNumber": 6550
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270469,
+            "byteStart": 270435,
+            "lineNumber": 6649
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "100"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575192,
+            "byteStart": 575147,
+            "lineNumber": 14444
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "ROTARY_VELOCITY_OVERRIDE",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_5",
+      "name": "Srpm",
+      "nativeUnits": "REVOLUTION/MINUTE",
+      "recordCount": 1593,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1655,
+            "byteStart": 1610,
+            "lineNumber": 34
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5867,
+            "byteStart": 5835,
+            "lineNumber": 125
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65040,
+            "byteStart": 65007,
+            "lineNumber": 1530
+          },
+          "timestampRaw": "2016-10-05T09:01:39.012Z",
+          "valueFieldsRaw": [
+            "49"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65161,
+            "byteStart": 65128,
+            "lineNumber": 1533
+          },
+          "timestampRaw": "2016-10-05T09:01:40.094Z",
+          "valueFieldsRaw": [
+            "10"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65428,
+            "byteStart": 65396,
+            "lineNumber": 1540
+          },
+          "timestampRaw": "2016-10-05T09:01:41.165Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "ROTARY_VELOCITY",
+      "unavailableCount": 25,
+      "units": "REVOLUTION/MINUTE"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_7",
+      "name": "Stemp",
+      "nativeUnits": "CELSIUS",
+      "recordCount": 2755,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1746,
+            "byteStart": 1700,
+            "lineNumber": 36
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5934,
+            "byteStart": 5900,
+            "lineNumber": 127
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "43"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 13793,
+            "byteStart": 13760,
+            "lineNumber": 313
+          },
+          "timestampRaw": "2016-10-05T08:46:13.782Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 13872,
+            "byteStart": 13838,
+            "lineNumber": 315
+          },
+          "timestampRaw": "2016-10-05T08:46:14.833Z",
+          "valueFieldsRaw": [
+            "43"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 14569,
+            "byteStart": 14536,
+            "lineNumber": 331
+          },
+          "timestampRaw": "2016-10-05T08:46:30.586Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TEMPERATURE",
+      "unavailableCount": 25,
+      "units": "CELSIUS"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Rotary:C"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-C_10",
+      "name": "Stemp_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1467,
+            "byteStart": 1412,
+            "lineNumber": 30
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5136,
+            "byteStart": 5089,
+            "lineNumber": 105
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 265825,
+            "byteStart": 265770,
+            "lineNumber": 6545
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269894,
+            "byteStart": 269847,
+            "lineNumber": 6634
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 574959,
+            "byteStart": 574904,
+            "lineNumber": 14439
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TEMPERATURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_11",
+      "name": "Tool_group",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3206,
+            "byteStart": 3155,
+            "lineNumber": 65
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6562,
+            "byteStart": 6524,
+            "lineNumber": 144
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267462,
+            "byteStart": 267411,
+            "lineNumber": 6578
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270626,
+            "byteStart": 270588,
+            "lineNumber": 6653
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576596,
+            "byteStart": 576545,
+            "lineNumber": 14472
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "x:TOOL_GROUP",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_10",
+      "name": "Tool_number",
+      "nativeUnits": null,
+      "recordCount": 593,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3155,
+            "byteStart": 3103,
+            "lineNumber": 64
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6486,
+            "byteStart": 6447,
+            "lineNumber": 142
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 66009,
+            "byteStart": 65969,
+            "lineNumber": 1555
+          },
+          "timestampRaw": "2016-10-05T09:01:44.430Z",
+          "valueFieldsRaw": [
+            "13"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 85370,
+            "byteStart": 85331,
+            "lineNumber": 2018
+          },
+          "timestampRaw": "2016-10-05T09:06:56.969Z",
+          "valueFieldsRaw": [
+            "7"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 102564,
+            "byteStart": 102524,
+            "lineNumber": 2434
+          },
+          "timestampRaw": "2016-10-05T09:11:02.462Z",
+          "valueFieldsRaw": [
+            "11"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TOOL_NUMBER",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_12",
+      "name": "Tool_suffix",
+      "nativeUnits": null,
+      "recordCount": 595,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3258,
+            "byteStart": 3206,
+            "lineNumber": 66
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6524,
+            "byteStart": 6486,
+            "lineNumber": 143
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 66048,
+            "byteStart": 66009,
+            "lineNumber": 1556
+          },
+          "timestampRaw": "2016-10-05T09:01:44.430Z",
+          "valueFieldsRaw": [
+            "N"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 72208,
+            "byteStart": 72170,
+            "lineNumber": 1700
+          },
+          "timestampRaw": "2016-10-05T09:03:49.971Z",
+          "valueFieldsRaw": [
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 72766,
+            "byteStart": 72727,
+            "lineNumber": 1712
+          },
+          "timestampRaw": "2016-10-05T09:04:00.836Z",
+          "valueFieldsRaw": [
+            "N"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "x:TOOL_SUFFIX",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:X"
+      ],
+      "coordinateSystem": "MACHINE",
+      "dataItemId": "Mazak01-X_1",
+      "name": "Xabs",
+      "nativeUnits": "MILLIMETER",
+      "recordCount": 6868,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1883,
+            "byteStart": 1838,
+            "lineNumber": 39
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5367,
+            "byteStart": 5328,
+            "lineNumber": 110
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "-0.00127"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 21934,
+            "byteStart": 21893,
+            "lineNumber": 499
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "-75.665838"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22243,
+            "byteStart": 22202,
+            "lineNumber": 507
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "-22.227794"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22595,
+            "byteStart": 22554,
+            "lineNumber": 516
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "-17.911064"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "POSITION",
+      "unavailableCount": 25,
+      "units": "MILLIMETER"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:X"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-X_4",
+      "name": "Xfrt",
+      "nativeUnits": "MILLIMETER/SECOND",
+      "recordCount": 4575,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2026,
+            "byteStart": 1981,
+            "lineNumber": 42
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5399,
+            "byteStart": 5367,
+            "lineNumber": 111
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 21971,
+            "byteStart": 21934,
+            "lineNumber": 500
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "27.559"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22280,
+            "byteStart": 22243,
+            "lineNumber": 508
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "1.9939"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22634,
+            "byteStart": 22595,
+            "lineNumber": 517
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "1.998133"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "AXIS_FEEDRATE",
+      "unavailableCount": 25,
+      "units": "MILLIMETER/SECOND"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:X"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-X_3",
+      "name": "Xload",
+      "nativeUnits": "PERCENT",
+      "recordCount": 4306,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1981,
+            "byteStart": 1935,
+            "lineNumber": 41
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5433,
+            "byteStart": 5399,
+            "lineNumber": 112
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "31"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22005,
+            "byteStart": 21971,
+            "lineNumber": 501
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "46"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 24074,
+            "byteStart": 24040,
+            "lineNumber": 554
+          },
+          "timestampRaw": "2016-10-05T08:49:19.068Z",
+          "valueFieldsRaw": [
+            "38"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 26477,
+            "byteStart": 26443,
+            "lineNumber": 611
+          },
+          "timestampRaw": "2016-10-05T08:49:59.026Z",
+          "valueFieldsRaw": [
+            "44"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:X"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-X_2",
+      "name": "Xtravel",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1935,
+            "byteStart": 1883,
+            "lineNumber": 40
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4866,
+            "byteStart": 4822,
+            "lineNumber": 99
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266246,
+            "byteStart": 266194,
+            "lineNumber": 6554
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269016,
+            "byteStart": 268972,
+            "lineNumber": 6610
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575380,
+            "byteStart": 575328,
+            "lineNumber": 14448
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "POSITION",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Y"
+      ],
+      "coordinateSystem": "MACHINE",
+      "dataItemId": "Mazak01-Y_1",
+      "name": "Yabs",
+      "nativeUnits": "MILLIMETER",
+      "recordCount": 1538,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2071,
+            "byteStart": 2026,
+            "lineNumber": 43
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5465,
+            "byteStart": 5433,
+            "lineNumber": 113
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22321,
+            "byteStart": 22280,
+            "lineNumber": 509
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "-28.533344"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22675,
+            "byteStart": 22634,
+            "lineNumber": 518
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "-18.424144"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22987,
+            "byteStart": 22946,
+            "lineNumber": 526
+          },
+          "timestampRaw": "2016-10-05T08:49:14.742Z",
+          "valueFieldsRaw": [
+            "-16.265779"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "POSITION",
+      "unavailableCount": 25,
+      "units": "MILLIMETER"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Y"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-Y_4",
+      "name": "Yfrt",
+      "nativeUnits": "MILLIMETER/SECOND",
+      "recordCount": 1167,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2214,
+            "byteStart": 2169,
+            "lineNumber": 46
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5497,
+            "byteStart": 5465,
+            "lineNumber": 114
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22359,
+            "byteStart": 22321,
+            "lineNumber": 510
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "99.9998"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22712,
+            "byteStart": 22675,
+            "lineNumber": 519
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "1.9939"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 23581,
+            "byteStart": 23542,
+            "lineNumber": 541
+          },
+          "timestampRaw": "2016-10-05T08:49:16.905Z",
+          "valueFieldsRaw": [
+            "1.998133"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "AXIS_FEEDRATE",
+      "unavailableCount": 25,
+      "units": "MILLIMETER/SECOND"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Y"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-Y_3",
+      "name": "Yload",
+      "nativeUnits": "PERCENT",
+      "recordCount": 1260,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2169,
+            "byteStart": 2123,
+            "lineNumber": 45
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5530,
+            "byteStart": 5497,
+            "lineNumber": 115
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22393,
+            "byteStart": 22359,
+            "lineNumber": 511
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "14"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22745,
+            "byteStart": 22712,
+            "lineNumber": 520
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "6"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 84440,
+            "byteStart": 84407,
+            "lineNumber": 1994
+          },
+          "timestampRaw": "2016-10-05T09:06:51.572Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Y"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-Y_2",
+      "name": "Ytravel",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2123,
+            "byteStart": 2071,
+            "lineNumber": 44
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4910,
+            "byteStart": 4866,
+            "lineNumber": 100
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266434,
+            "byteStart": 266382,
+            "lineNumber": 6558
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269166,
+            "byteStart": 269122,
+            "lineNumber": 6614
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575568,
+            "byteStart": 575516,
+            "lineNumber": 14452
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "POSITION",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Z"
+      ],
+      "coordinateSystem": "MACHINE",
+      "dataItemId": "Mazak01-Z_1",
+      "name": "Zabs",
+      "nativeUnits": "MILLIMETER",
+      "recordCount": 7380,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2259,
+            "byteStart": 2214,
+            "lineNumber": 47
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5569,
+            "byteStart": 5530,
+            "lineNumber": 116
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "9.635617"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22046,
+            "byteStart": 22005,
+            "lineNumber": 502
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "-34.405189"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22434,
+            "byteStart": 22393,
+            "lineNumber": 512
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "-10.152761"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22785,
+            "byteStart": 22745,
+            "lineNumber": 521
+          },
+          "timestampRaw": "2016-10-05T08:49:13.671Z",
+          "valueFieldsRaw": [
+            "-7.994396"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "ACTUAL",
+      "type": "POSITION",
+      "unavailableCount": 25,
+      "units": "MILLIMETER"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Z"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-Z_4",
+      "name": "Zfrt",
+      "nativeUnits": "MILLIMETER/SECOND",
+      "recordCount": 5404,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2402,
+            "byteStart": 2357,
+            "lineNumber": 50
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5601,
+            "byteStart": 5569,
+            "lineNumber": 117
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22085,
+            "byteStart": 22046,
+            "lineNumber": 503
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "78.84583"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22471,
+            "byteStart": 22434,
+            "lineNumber": 513
+          },
+          "timestampRaw": "2016-10-05T08:49:12.619Z",
+          "valueFieldsRaw": [
+            "1.9939"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 23660,
+            "byteStart": 23621,
+            "lineNumber": 543
+          },
+          "timestampRaw": "2016-10-05T08:49:16.905Z",
+          "valueFieldsRaw": [
+            "1.998133"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "AXIS_FEEDRATE",
+      "unavailableCount": 25,
+      "units": "MILLIMETER/SECOND"
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Z"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-Z_3",
+      "name": "Zload",
+      "nativeUnits": "PERCENT",
+      "recordCount": 4735,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2357,
+            "byteStart": 2311,
+            "lineNumber": 49
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5634,
+            "byteStart": 5601,
+            "lineNumber": 118
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 22118,
+            "byteStart": 22085,
+            "lineNumber": 504
+          },
+          "timestampRaw": "2016-10-05T08:49:11.568Z",
+          "valueFieldsRaw": [
+            "7"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 33554,
+            "byteStart": 33521,
+            "lineNumber": 781
+          },
+          "timestampRaw": "2016-10-05T08:52:01.071Z",
+          "valueFieldsRaw": [
+            "2"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65363,
+            "byteStart": 65330,
+            "lineNumber": 1538
+          },
+          "timestampRaw": "2016-10-05T09:01:41.165Z",
+          "valueFieldsRaw": [
+            "9"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOAD",
+      "unavailableCount": 25,
+      "units": "PERCENT"
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base",
+        "Linear:Z"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-Z_2",
+      "name": "Ztravel",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2311,
+            "byteStart": 2259,
+            "lineNumber": 48
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4954,
+            "byteStart": 4910,
+            "lineNumber": 101
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266622,
+            "byteStart": 266570,
+            "lineNumber": 6562
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 269307,
+            "byteStart": 269263,
+            "lineNumber": 6618
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575756,
+            "byteStart": 575704,
+            "lineNumber": 14456
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "POSITION",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_17",
+      "name": "auto_time",
+      "nativeUnits": null,
+      "recordCount": 10111,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3510,
+            "byteStart": 3460,
+            "lineNumber": 71
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6719,
+            "byteStart": 6676,
+            "lineNumber": 148
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "7717972"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64927,
+            "byteStart": 64884,
+            "lineNumber": 1527
+          },
+          "timestampRaw": "2016-10-05T09:01:37.891Z",
+          "valueFieldsRaw": [
+            "7717973"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65083,
+            "byteStart": 65040,
+            "lineNumber": 1531
+          },
+          "timestampRaw": "2016-10-05T09:01:39.012Z",
+          "valueFieldsRaw": [
+            "7717974"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65204,
+            "byteStart": 65161,
+            "lineNumber": 1534
+          },
+          "timestampRaw": "2016-10-05T09:01:40.094Z",
+          "valueFieldsRaw": [
+            "7717975"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "x:AUTO",
+      "type": "ACCUMULATED_TIME",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-dtop_1",
+      "name": "avail",
+      "nativeUnits": null,
+      "recordCount": 0,
+      "sampleValues": [],
+      "sourceText": null,
+      "subType": null,
+      "type": "AVAILABILITY",
+      "unavailableCount": 0,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-controller_1",
+      "name": "comms_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2512,
+            "byteStart": 2457,
+            "lineNumber": 52
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4365,
+            "byteStart": 4318,
+            "lineNumber": 88
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266823,
+            "byteStart": 266768,
+            "lineNumber": 6566
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268549,
+            "byteStart": 268502,
+            "lineNumber": 6600
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575957,
+            "byteStart": 575902,
+            "lineNumber": 14460
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "COMMUNICATIONS",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Coolant:coolant"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-coolant_3",
+      "name": "coolant_level",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2841,
+            "byteStart": 2783,
+            "lineNumber": 58
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4603,
+            "byteStart": 4553,
+            "lineNumber": 93
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267152,
+            "byteStart": 267094,
+            "lineNumber": 6572
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268787,
+            "byteStart": 268737,
+            "lineNumber": 6605
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576286,
+            "byteStart": 576228,
+            "lineNumber": 14466
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LEVEL",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Coolant:coolant"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-coolant_1",
+      "name": "coolant_pres",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2726,
+            "byteStart": 2669,
+            "lineNumber": 56
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4701,
+            "byteStart": 4652,
+            "lineNumber": 95
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267037,
+            "byteStart": 266980,
+            "lineNumber": 6570
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268885,
+            "byteStart": 268836,
+            "lineNumber": 6607
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576171,
+            "byteStart": 576114,
+            "lineNumber": 14464
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "PRESSURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Coolant:coolant"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-coolant_2",
+      "name": "coolant_temp",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2783,
+            "byteStart": 2726,
+            "lineNumber": 57
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4652,
+            "byteStart": 4603,
+            "lineNumber": 94
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267094,
+            "byteStart": 267037,
+            "lineNumber": 6571
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268836,
+            "byteStart": 268787,
+            "lineNumber": 6606
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576228,
+            "byteStart": 576171,
+            "lineNumber": 14465
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TEMPERATURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_19",
+      "name": "cut_time",
+      "nativeUnits": null,
+      "recordCount": 3516,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3610,
+            "byteStart": 3561,
+            "lineNumber": 73
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6761,
+            "byteStart": 6719,
+            "lineNumber": 149
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "3819274"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 135791,
+            "byteStart": 135749,
+            "lineNumber": 3242
+          },
+          "timestampRaw": "2016-10-05T09:18:46.309Z",
+          "valueFieldsRaw": [
+            "3819276"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 136479,
+            "byteStart": 136437,
+            "lineNumber": 3260
+          },
+          "timestampRaw": "2016-10-05T09:18:48.473Z",
+          "valueFieldsRaw": [
+            "3819277"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 136805,
+            "byteStart": 136763,
+            "lineNumber": 3268
+          },
+          "timestampRaw": "2016-10-05T09:18:49.554Z",
+          "valueFieldsRaw": [
+            "3819278"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "x:CUT",
+      "type": "ACCUMULATED_TIME",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Electric:electric"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-electric_2",
+      "name": "electric_temp",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3000,
+            "byteStart": 2942,
+            "lineNumber": 61
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4788,
+            "byteStart": 4738,
+            "lineNumber": 97
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267256,
+            "byteStart": 267198,
+            "lineNumber": 6574
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268972,
+            "byteStart": 268922,
+            "lineNumber": 6609
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576390,
+            "byteStart": 576332,
+            "lineNumber": 14468
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "TEMPERATURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-controller_4",
+      "name": "estop",
+      "nativeUnits": null,
+      "recordCount": 51,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2669,
+            "byteStart": 2623,
+            "lineNumber": 55
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4738,
+            "byteStart": 4701,
+            "lineNumber": 96
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "ARMED"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266980,
+            "byteStart": 266934,
+            "lineNumber": 6569
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268922,
+            "byteStart": 268885,
+            "lineNumber": 6608
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "ARMED"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576114,
+            "byteStart": 576068,
+            "lineNumber": 14463
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "EMERGENCY_STOP",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_13",
+      "name": "execution",
+      "nativeUnits": null,
+      "recordCount": 329,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3308,
+            "byteStart": 3258,
+            "lineNumber": 67
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6239,
+            "byteStart": 6196,
+            "lineNumber": 135
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "STOPPED"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64401,
+            "byteStart": 64360,
+            "lineNumber": 1514
+          },
+          "timestampRaw": "2016-10-05T09:01:33.554Z",
+          "valueFieldsRaw": [
+            "READY"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64884,
+            "byteStart": 64842,
+            "lineNumber": 1526
+          },
+          "timestampRaw": "2016-10-05T09:01:37.891Z",
+          "valueFieldsRaw": [
+            "ACTIVE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 65969,
+            "byteStart": 65928,
+            "lineNumber": 1554
+          },
+          "timestampRaw": "2016-10-05T09:01:44.430Z",
+          "valueFieldsRaw": [
+            "READY"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "EXECUTION",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Hydraulic:hydraulic"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-hydraulic_1",
+      "name": "hydra_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3055,
+            "byteStart": 3000,
+            "lineNumber": 62
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4553,
+            "byteStart": 4506,
+            "lineNumber": 92
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267311,
+            "byteStart": 267256,
+            "lineNumber": 6575
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268737,
+            "byteStart": 268690,
+            "lineNumber": 6604
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576445,
+            "byteStart": 576390,
+            "lineNumber": 14469
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "PRESSURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_3",
+      "name": "line",
+      "nativeUnits": null,
+      "recordCount": 686,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3818,
+            "byteStart": 3773,
+            "lineNumber": 77
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6271,
+            "byteStart": 6239,
+            "lineNumber": 136
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 131459,
+            "byteStart": 131427,
+            "lineNumber": 3130
+          },
+          "timestampRaw": "2016-10-05T09:18:30.447Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 139002,
+            "byteStart": 138970,
+            "lineNumber": 3324
+          },
+          "timestampRaw": "2016-10-05T09:18:58.146Z",
+          "valueFieldsRaw": [
+            "2"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 143264,
+            "byteStart": 143232,
+            "lineNumber": 3434
+          },
+          "timestampRaw": "2016-10-05T09:19:13.909Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LINE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-controller_2",
+      "name": "logic_cond",
+      "nativeUnits": null,
+      "recordCount": 56,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2567,
+            "byteStart": 2512,
+            "lineNumber": 53
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4412,
+            "byteStart": 4365,
+            "lineNumber": 89
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266878,
+            "byteStart": 266823,
+            "lineNumber": 6567
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268596,
+            "byteStart": 268549,
+            "lineNumber": 6601
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576012,
+            "byteStart": 575957,
+            "lineNumber": 14461
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "LOGIC_PROGRAM",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_14",
+      "name": "mode",
+      "nativeUnits": null,
+      "recordCount": 79,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3353,
+            "byteStart": 3308,
+            "lineNumber": 68
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6447,
+            "byteStart": 6410,
+            "lineNumber": 141
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "MANUAL"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 64486,
+            "byteStart": 64438,
+            "lineNumber": 1516
+          },
+          "timestampRaw": "2016-10-05T09:01:33.554Z",
+          "valueFieldsRaw": [
+            "MANUAL_DATA_INPUT"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 66756,
+            "byteStart": 66719,
+            "lineNumber": 1573
+          },
+          "timestampRaw": "2016-10-05T09:01:54.244Z",
+          "valueFieldsRaw": [
+            "MANUAL"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 83732,
+            "byteStart": 83684,
+            "lineNumber": 1976
+          },
+          "timestampRaw": "2016-10-05T09:06:47.276Z",
+          "valueFieldsRaw": [
+            "MANUAL_DATA_INPUT"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "CONTROLLER_MODE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_20",
+      "name": "motion_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3717,
+            "byteStart": 3661,
+            "lineNumber": 75
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5280,
+            "byteStart": 5232,
+            "lineNumber": 108
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267973,
+            "byteStart": 267917,
+            "lineNumber": 6588
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270918,
+            "byteStart": 270870,
+            "lineNumber": 6660
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 577107,
+            "byteStart": 577051,
+            "lineNumber": 14482
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "MOTION_PROGRAM",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_21",
+      "name": "path_system",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3773,
+            "byteStart": 3717,
+            "lineNumber": 76
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 5328,
+            "byteStart": 5280,
+            "lineNumber": 109
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268029,
+            "byteStart": 267973,
+            "lineNumber": 6589
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270966,
+            "byteStart": 270918,
+            "lineNumber": 6661
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 577163,
+            "byteStart": 577107,
+            "lineNumber": 14483
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "SYSTEM",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Pneumatic:pneumatic"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-pneumatic_1",
+      "name": "pneu_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4165,
+            "byteStart": 4111,
+            "lineNumber": 84
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4506,
+            "byteStart": 4460,
+            "lineNumber": 91
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268421,
+            "byteStart": 268367,
+            "lineNumber": 6597
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268690,
+            "byteStart": 268644,
+            "lineNumber": 6603
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 577555,
+            "byteStart": 577501,
+            "lineNumber": 14491
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "PRESSURE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Systems:systems",
+        "Electric:electric"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-electric_1",
+      "name": "power",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2942,
+            "byteStart": 2896,
+            "lineNumber": 60
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4822,
+            "byteStart": 4788,
+            "lineNumber": 98
+          },
+          "timestampRaw": "2016-10-05T08:43:47.421Z",
+          "valueFieldsRaw": [
+            "ON"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267198,
+            "byteStart": 267152,
+            "lineNumber": 6573
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268455,
+            "byteStart": 268421,
+            "lineNumber": 6598
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "ON"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576332,
+            "byteStart": 576286,
+            "lineNumber": 14467
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "POWER_STATE",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_1",
+      "name": "program",
+      "nativeUnits": null,
+      "recordCount": 50,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3103,
+            "byteStart": 3055,
+            "lineNumber": 63
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6073,
+            "byteStart": 6036,
+            "lineNumber": 131
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "114"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 116586,
+            "byteStart": 116549,
+            "lineNumber": 2763
+          },
+          "timestampRaw": "2016-10-05T09:15:37.498Z",
+          "valueFieldsRaw": [
+            "155"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267359,
+            "byteStart": 267311,
+            "lineNumber": 6576
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270129,
+            "byteStart": 270092,
+            "lineNumber": 6640
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "155"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "PROGRAM",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_15",
+      "name": "program_cmt",
+      "nativeUnits": null,
+      "recordCount": 50,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3405,
+            "byteStart": 3353,
+            "lineNumber": 69
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6155,
+            "byteStart": 6110,
+            "lineNumber": 133
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "bob can"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 116636,
+            "byteStart": 116586,
+            "lineNumber": 2764
+          },
+          "timestampRaw": "2016-10-05T09:15:37.498Z",
+          "valueFieldsRaw": [
+            "ff standoffs"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267661,
+            "byteStart": 267609,
+            "lineNumber": 6582
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270216,
+            "byteStart": 270166,
+            "lineNumber": 6642
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "ff standoffs"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "x:PROGRAM_COMMENT",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_5",
+      "name": "sequenceNum",
+      "nativeUnits": null,
+      "recordCount": 686,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3918,
+            "byteStart": 3866,
+            "lineNumber": 79
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6601,
+            "byteStart": 6562,
+            "lineNumber": 145
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 131537,
+            "byteStart": 131498,
+            "lineNumber": 3132
+          },
+          "timestampRaw": "2016-10-05T09:18:30.447Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 139080,
+            "byteStart": 139041,
+            "lineNumber": 3326
+          },
+          "timestampRaw": "2016-10-05T09:18:58.146Z",
+          "valueFieldsRaw": [
+            "2"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 143342,
+            "byteStart": 143303,
+            "lineNumber": 3436
+          },
+          "timestampRaw": "2016-10-05T09:19:13.909Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "x:SEQUENCE_NUMBER",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Axes:base"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-base_1",
+      "name": "servo_cond",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2457,
+            "byteStart": 2402,
+            "lineNumber": 51
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4318,
+            "byteStart": 4271,
+            "lineNumber": 87
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 266768,
+            "byteStart": 266713,
+            "lineNumber": 6565
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 268502,
+            "byteStart": 268455,
+            "lineNumber": 6599
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 575902,
+            "byteStart": 575847,
+            "lineNumber": 14459
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "ACTUATOR",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_2",
+      "name": "subprogram",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3661,
+            "byteStart": 3610,
+            "lineNumber": 74
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6110,
+            "byteStart": 6073,
+            "lineNumber": 132
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267917,
+            "byteStart": 267866,
+            "lineNumber": 6587
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270166,
+            "byteStart": 270129,
+            "lineNumber": 6641
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 577051,
+            "byteStart": 577000,
+            "lineNumber": 14481
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "x:SUB",
+      "type": "PROGRAM",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_16",
+      "name": "subprogram_cmt",
+      "nativeUnits": null,
+      "recordCount": 49,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3460,
+            "byteStart": 3405,
+            "lineNumber": 70
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6196,
+            "byteStart": 6155,
+            "lineNumber": 134
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 267716,
+            "byteStart": 267661,
+            "lineNumber": 6583
+          },
+          "timestampRaw": "2016-10-05T09:32:44.274315Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 270257,
+            "byteStart": 270216,
+            "lineNumber": 6643
+          },
+          "timestampRaw": "2016-10-05T09:33:27.487Z",
+          "valueFieldsRaw": [
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 576850,
+            "byteStart": 576795,
+            "lineNumber": 14477
+          },
+          "timestampRaw": "2016-10-05T10:00:37.537071Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "x:SUB",
+      "type": "x:PROGRAM_COMMENT",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "CONDITION",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-controller_3",
+      "name": "system_cond",
+      "nativeUnits": null,
+      "recordCount": 65,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2623,
+            "byteStart": 2567,
+            "lineNumber": 54
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4460,
+            "byteStart": 4412,
+            "lineNumber": 90
+          },
+          "timestampRaw": "2016-10-05T08:41:37.164Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 72589,
+            "byteStart": 72523,
+            "lineNumber": 1708
+          },
+          "timestampRaw": "2016-10-05T09:03:57.872Z",
+          "valueFieldsRaw": [
+            "Warning",
+            "406",
+            "",
+            "",
+            "MEMORY PROTECT"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 72682,
+            "byteStart": 72634,
+            "lineNumber": 1710
+          },
+          "timestampRaw": "2016-10-05T09:03:59.755Z",
+          "valueFieldsRaw": [
+            "Normal",
+            "",
+            "",
+            "",
+            ""
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 124875,
+            "byteStart": 124797,
+            "lineNumber": 2970
+          },
+          "timestampRaw": "2016-10-05T09:16:58.444Z",
+          "valueFieldsRaw": [
+            "Warning",
+            "1105",
+            "",
+            "",
+            "SAFETY SHIELD CALCULATING"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "SYSTEM",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "SAMPLE",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_18",
+      "name": "total_time",
+      "nativeUnits": null,
+      "recordCount": 32471,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3561,
+            "byteStart": 3510,
+            "lineNumber": 72
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6806,
+            "byteStart": 6761,
+            "lineNumber": 150
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "39932651"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6885,
+            "byteStart": 6840,
+            "lineNumber": 152
+          },
+          "timestampRaw": "2016-10-05T08:43:50.566Z",
+          "valueFieldsRaw": [
+            "39932652"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6965,
+            "byteStart": 6920,
+            "lineNumber": 154
+          },
+          "timestampRaw": "2016-10-05T08:43:51.597Z",
+          "valueFieldsRaw": [
+            "39932653"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 7010,
+            "byteStart": 6965,
+            "lineNumber": 155
+          },
+          "timestampRaw": "2016-10-05T08:43:52.629Z",
+          "valueFieldsRaw": [
+            "39932654"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": "x:TOTAL",
+      "type": "ACCUMULATED_TIME",
+      "unavailableCount": 25,
+      "units": null
+    },
+    {
+      "ambiguousName": false,
+      "category": "EVENT",
+      "componentPath": [
+        "Device:Mazak01",
+        "Controller:controller",
+        "Path:path"
+      ],
+      "coordinateSystem": null,
+      "dataItemId": "Mazak01-path_4",
+      "name": "unitNum",
+      "nativeUnits": null,
+      "recordCount": 634,
+      "sampleValues": [
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 3866,
+            "byteStart": 3818,
+            "lineNumber": 78
+          },
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 6636,
+            "byteStart": 6601,
+            "lineNumber": 146
+          },
+          "timestampRaw": "2016-10-05T08:43:49.514Z",
+          "valueFieldsRaw": [
+            "0"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 131572,
+            "byteStart": 131537,
+            "lineNumber": 3133
+          },
+          "timestampRaw": "2016-10-05T09:18:30.447Z",
+          "valueFieldsRaw": [
+            "1"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 143377,
+            "byteStart": 143342,
+            "lineNumber": 3437
+          },
+          "timestampRaw": "2016-10-05T09:19:13.909Z",
+          "valueFieldsRaw": [
+            "2"
+          ]
+        },
+        {
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 144043,
+            "byteStart": 144008,
+            "lineNumber": 3454
+          },
+          "timestampRaw": "2016-10-05T09:19:16.012Z",
+          "valueFieldsRaw": [
+            "3"
+          ]
+        }
+      ],
+      "sourceText": null,
+      "subType": null,
+      "type": "x:UNIT",
+      "unavailableCount": 25,
+      "units": null
+    }
+  ],
+  "invalidRecords": {
+    "count": 0,
+    "samples": []
+  },
+  "limitations": [
+    "Raw values are preserved as strings; canonical numeric and enum mapping is not evaluated.",
+    "Coverage means catalog matching only, not canonical observation coverage.",
+    "The report covers one selected Mazak01 daily raw artifact, not the full corpus."
+  ],
+  "machine": {
+    "dataItemCount": 65,
+    "description": {
+      "manufacturer": "Mazak",
+      "model": "Integrex",
+      "serialNumber": "M7303290458",
+      "text": "Mazak Integrex 100-IV"
+    },
+    "id": "Mazak01",
+    "name": "Mazak01",
+    "uuid": "mtc_adapter002"
+  },
+  "observedTimeRange": {
+    "first": "2016-10-05T05:27:55.740706+00:00",
+    "last": "2016-10-05T19:15:07.025798+00:00"
+  },
+  "ordering": {
+    "anomalyCount": 0,
+    "samples": []
+  },
+  "parserVersion": "1.0.0",
+  "processingRunId": "sha256:213d97c586e95d85369b10aa4ad063d078ec2007e4cc21252d8e72cd82ab1c5c",
+  "profileSchemaVersion": "1.0.0",
+  "records": {
+    "byCategory": {
+      "CONDITION": 1052,
+      "EVENT": 4182,
+      "SAMPLE": 110735
+    },
+    "byStatus": {
+      "PARSED": 115969,
+      "UNKNOWN_DATA_ITEM": 22
+    },
+    "total": 115991,
+    "unavailable": 1600
+  },
+  "semanticCoverage": {
+    "canonicalMappingEvaluated": false,
+    "definition": "catalog-matched records / syntactically parsed records",
+    "mappedRecords": 115969,
+    "parsedRecords": 115991,
+    "ratio": 0.999810330111819
+  },
+  "sourceSet": {
+    "artifacts": [
+      {
+        "alias": "devicesXml",
+        "artifactId": "sha256:bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
+        "byteLength": 39450,
+        "mediaType": "application/xml",
+        "repositoryPath": "mtconnect/agent/Devices.xml",
+        "role": "MTCONNECT_DEVICES",
+        "sha256": "bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
+        "sourceUri": "https://raw.githubusercontent.com/usnistgov/smstestbed/968279f14ebe96c03c8877eeb1901cf6b4c8fbab/mtconnect/agent/Devices.xml"
+      },
+      {
+        "alias": "mazak01DailyRaw",
+        "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+        "byteLength": 4609711,
+        "mediaType": "text/plain",
+        "repositoryPath": "raw/Mazak01/Mazak01-20161005-20161006.txt",
+        "role": "SHDR_RAW",
+        "sha256": "6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+        "sourceUri": "https://raw.githubusercontent.com/usnistgov/smstestbed/968279f14ebe96c03c8877eeb1901cf6b4c8fbab/raw/Mazak01/Mazak01-20161005-20161006.txt"
+      }
+    ],
+    "licenseOrTermsReference": "https://github.com/usnistgov/smstestbed#disclaimers",
+    "sourceName": "NIST Smart Manufacturing Systems Test Bed",
+    "sourceSetId": "nist-mazak01-20161005",
+    "upstreamCommit": "968279f14ebe96c03c8877eeb1901cf6b4c8fbab",
+    "upstreamRepository": "https://github.com/usnistgov/smstestbed"
+  },
+  "unknownDataItems": [
+    {
+      "count": 1,
+      "name": "Brfunc",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 235,
+            "byteStart": 188,
+            "lineNumber": 5
+          },
+          "name": "Brfunc",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C2deg",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 725,
+            "byteStart": 679,
+            "lineNumber": 15
+          },
+          "name": "C2deg",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C2frt",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 540,
+            "byteStart": 494,
+            "lineNumber": 11
+          },
+          "name": "C2frt",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C2load",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 282,
+            "byteStart": 235,
+            "lineNumber": 6
+          },
+          "name": "C2load",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C2travel",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 494,
+            "byteStart": 441,
+            "lineNumber": 10
+          },
+          "name": "C2travel",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable||||"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C3deg",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1263,
+            "byteStart": 1217,
+            "lineNumber": 26
+          },
+          "name": "C3deg",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C3load",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 820,
+            "byteStart": 773,
+            "lineNumber": 17
+          },
+          "name": "C3load",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "C3travel",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1032,
+            "byteStart": 979,
+            "lineNumber": 21
+          },
+          "name": "C3travel",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable||||"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "Mazak01-dtop_1",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 2896,
+            "byteStart": 2841,
+            "lineNumber": 59
+          },
+          "name": "Mazak01-dtop_1",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S2ovr",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 632,
+            "byteStart": 586,
+            "lineNumber": 13
+          },
+          "name": "S2ovr",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3frt",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1078,
+            "byteStart": 1032,
+            "lineNumber": 22
+          },
+          "name": "S3frt",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3load",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 979,
+            "byteStart": 932,
+            "lineNumber": 20
+          },
+          "name": "S3load",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3load_cond",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 876,
+            "byteStart": 820,
+            "lineNumber": 18
+          },
+          "name": "S3load_cond",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable||||"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3ovr",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1170,
+            "byteStart": 1124,
+            "lineNumber": 24
+          },
+          "name": "S3ovr",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3rpm",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1124,
+            "byteStart": 1078,
+            "lineNumber": 23
+          },
+          "name": "S3rpm",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3temp",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1217,
+            "byteStart": 1170,
+            "lineNumber": 25
+          },
+          "name": "S3temp",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "S3temp_cond",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 932,
+            "byteStart": 876,
+            "lineNumber": 19
+          },
+          "name": "S3temp_cond",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "Unavailable||||"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "c2rfunc",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 773,
+            "byteStart": 725,
+            "lineNumber": 16
+          },
+          "name": "c2rfunc",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "c3rfunc",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1311,
+            "byteStart": 1263,
+            "lineNumber": 27
+          },
+          "name": "c3rfunc",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "crfunc",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 1838,
+            "byteStart": 1791,
+            "lineNumber": 38
+          },
+          "name": "crfunc",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "d1_asset_chg",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4218,
+            "byteStart": 4165,
+            "lineNumber": 85
+          },
+          "name": "d1_asset_chg",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    },
+    {
+      "count": 1,
+      "name": "d1_asset_rem",
+      "samples": [
+        {
+          "error": "DATA_ITEM_NOT_IN_MACHINE_CATALOG",
+          "locator": {
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+            "byteEnd": 4271,
+            "byteStart": 4218,
+            "lineNumber": 86
+          },
+          "name": "d1_asset_rem",
+          "timestampRaw": "2016-10-05T05:27:55.740706Z",
+          "valueFieldsRaw": [
+            "UNAVAILABLE"
+          ]
+        }
+      ]
+    }
+  ]
+}

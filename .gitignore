@@ -1,0 +1,12 @@
+.DS_Store
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+__pycache__/
+*.py[cod]
+
+# External raw artifacts are content-addressed local data, not source code.
+datasets/raw/**
+!datasets/raw/README.md
+
