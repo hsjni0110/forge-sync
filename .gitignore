@@ -5,8 +5,12 @@
 .venv/
 __pycache__/
 *.py[cod]
+dist/
+build/
+.gradle/
+node_modules/
+*.tsbuildinfo
 
 # External raw artifacts are content-addressed local data, not source code.
 datasets/raw/**
 !datasets/raw/README.md
-

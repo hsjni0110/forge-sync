@@ -75,7 +75,7 @@
 
 - PRD 109의 `apps`, `contracts`, `tests`, `infra`, `config` 구조
 - 언어별 format/lint/type/unit 명령
-- root 단일 검증 진입점과 CI
+- root 단일 검증 진입점과 에이전트의 push 전 검증 절차
 - domain/application/adapter package boundary 골격
 
 **테스트**
@@ -84,7 +84,9 @@
 - architecture test가 domain → framework 의존을 의도적으로 넣은 fixture를 거절한다.
 - root 검증 명령이 한 app의 실패를 정상 성공으로 숨기지 않는다.
 
-**완료 조건**: 깨끗한 checkout에서 문서화된 한 명령으로 lint, type/compile, unit, architecture test가 재현된다.
+**완료 조건**: 깨끗한 checkout에서 문서화된 한 명령으로 lint, type/compile, unit, architecture test가
+재현되며, 에이전트는 push 직전에 이 명령을 실행하고 실패한 변경을 push하지 않는다. 현재 단계에서는
+동일 검사를 수행하는 hosted GitHub Workflow를 별도로 운영하지 않는다.
 
 **선행 조건**: Step 01 산출물의 위치를 보존해야 한다.
 

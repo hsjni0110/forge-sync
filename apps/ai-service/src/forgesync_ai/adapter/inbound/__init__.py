@@ -1,0 +1,1 @@
+"""Inbound intelligence adapters."""

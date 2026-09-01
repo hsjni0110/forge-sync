@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "forgesync-edge-gateway"
+version = "0.1.0"
+description = "ForgeSync manufacturing source acquisition and edge gateway"
+requires-python = ">=3.12,<3.15"
+dependencies = []
+
+[project.scripts]
+forgesync-source = "forgesync_edge.source_acquisition.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/forgesync_edge"]
