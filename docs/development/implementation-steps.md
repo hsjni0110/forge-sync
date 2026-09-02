@@ -273,8 +273,8 @@
 
 ### Step 11 — WebSocket Patch와 REST Resync
 
-**상태**: `IN_PROGRESS` — contract/server/frontend integration test까지 구현하며, 실제 브라우저
-단절/복구 E2E가 추가되기 전에는 `DONE`으로 표시하지 않는다.
+**상태**: `DONE` — 실제 Chromium에서 단절, STALE, REST resync, WebSocket 재구독과 권위
+snapshot 수렴을 자동화했다.
 
 **목적**: WebSocket을 알림/patch로 사용하고 gap 발생 시 REST snapshot으로 권위 상태를 복구한다.
 
@@ -301,6 +301,9 @@
 ## Phase C — Operational UI and Spatial Twin
 
 ### Step 12 — 2D Machine Detail Vertical Slice
+
+**상태**: `DONE` — 접근 가능한 route와 P0 section, 명시적인 unavailable/error 상태, 실제 replay
+업데이트 E2E를 자동화했다.
 
 **목적**: 3D 없이도 핵심 Twin 상태와 provenance를 사용할 수 있는 접근 가능한 2D 화면을 만든다.
 

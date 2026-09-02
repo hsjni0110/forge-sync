@@ -9,6 +9,7 @@ import type {
   TwinSocketCallbacks,
   TwinSocketFactory,
 } from "./ports";
+import { TwinSnapshotLoadError } from "./errors";
 import { TwinLiveSession } from "./TwinLiveSession";
 
 const testTimer: Timer = {
@@ -191,6 +192,39 @@ describe("TwinLiveSession", () => {
     expect(session.currentState().connectionStatus).toBe("RESYNCING");
     expect(session.currentState().snapshot?.consistency.twinVersion).toBe(4);
     expect(snapshotReader.loadSnapshot).toHaveBeenCalledTimes(2);
+    session.dispose();
+  });
+
+  it("treats not-found as terminal and lets an operator retry explicitly", async () => {
+    const snapshotReader = {
+      loadSnapshot: vi
+        .fn()
+        .mockRejectedValueOnce(new TwinSnapshotLoadError("NOT_FOUND", "missing"))
+        .mockResolvedValueOnce(snapshotAt(1, "2026-09-02T01:02:04Z")),
+    };
+    const sockets = new ControlledSocketFactory();
+    const session = new TwinLiveSession(
+      "Mazak01",
+      snapshotReader,
+      sockets,
+      testPatchDecoder,
+      { nowMillis: () => Date.now() },
+      testTimer,
+    );
+
+    session.start();
+    await flushPromises();
+    expect(session.currentState()).toMatchObject({
+      connectionStatus: "UNAVAILABLE",
+      failure: "NOT_FOUND",
+    });
+    await vi.advanceTimersByTimeAsync(30_000);
+    expect(snapshotReader.loadSnapshot).toHaveBeenCalledTimes(1);
+
+    session.retryNow();
+    await flushPromises();
+    expect(snapshotReader.loadSnapshot).toHaveBeenCalledTimes(2);
+    expect(sockets.callbacks).toHaveLength(1);
     session.dispose();
   });
 });

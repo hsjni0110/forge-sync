@@ -1,4 +1,5 @@
 import type { TwinPatch, TwinSnapshot } from "../domain/twin";
+import type { TwinLiveState } from "./TwinLiveSession";
 
 export interface TwinSnapshotReader {
   loadSnapshot(machineId: string): Promise<TwinSnapshot>;
@@ -30,3 +31,13 @@ export interface Timer {
   schedule(callback: () => void, delayMillis: number): number;
   cancel(timerId: number): void;
 }
+
+export interface TwinSession {
+  start(): void;
+  subscribe(listener: (state: TwinLiveState) => void): () => void;
+  currentState(): TwinLiveState;
+  retryNow(): void;
+  dispose(): void;
+}
+
+export type TwinSessionFactory = (machineId: string) => TwinSession;

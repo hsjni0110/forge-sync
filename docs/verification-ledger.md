@@ -39,6 +39,7 @@
 | V-021 | 늦거나 순서가 낮은 Observation은 history를 보존하면서 Latest Observation과 TwinVersion을 rollback하지 않는다 | VERIFIED | Pure ordering unit tests와 실제 PostgreSQL concurrent integration test에서 same-session sequence, cross-session source time, source key tie-break, DataItem 분리, projection 실패 전체 rollback 확인. [ADR-026](./adr/ADR-026-latest-observation-ordering.md) | 08 | 2026-09-02 |
 | V-022 | Equipment State는 current Latest Observation만으로 결정되고 freshness는 historical source time이 아닌 projected wall clock으로 계산된다 | VERIFIED | 고정 시각 unit tests에서 2초/10초 경계와 unavailable/Condition 집계를 검증하고, `./scripts/verify-database`에서 state/version 원자성, out-of-order 무변경, state 저장 실패 전체 rollback 확인. [ADR-027](./adr/ADR-027-equipment-state-and-freshness.md) | 09 | 2026-09-02 |
 | V-023 | Versioned Operational Twin REST snapshot은 한 읽기 일관성 경계에서 TwinVersion, freshness, P0 값과 field-level provenance를 제공한다 | VERIFIED | Twin v1 schema/golden/API tests와 `./scripts/verify-database`에서 실제 PostgreSQL Projection의 state/version 및 Canonical provenance 보존 확인. 복수 spindle은 primary를 추측하지 않고 모두 반환. [ADR-028](./adr/ADR-028-versioned-operational-twin-snapshot.md), [Twin contract](../contracts/twin/README.md) | 10 | 2026-09-02 |
+| V-024 | 2D Machine Detail은 실제 replay 업데이트를 표시하고 WebSocket 단절 뒤 STALE을 알린 후 권위 REST snapshot version/value로 수렴한다 | VERIFIED | Canonical Observation output `aee293...9b17f`에서 고정한 세 record와 실제 PostgreSQL/Mosquitto/API/Web/Chromium을 `./scripts/verify-e2e`로 검증. P0 component tests와 [ADR-030](./adr/ADR-030-accessible-machine-detail-client.md) 참조 | 11/12 | 2026-09-02 |
 
 ## 갱신 규칙
 

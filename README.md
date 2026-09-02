@@ -37,7 +37,23 @@ The PostgreSQL transaction and concurrent Inbox check also requires Docker and i
 ./scripts/verify-database
 ```
 
+The Machine Detail browser journey requires Docker and Playwright Chromium and is also separate:
+
+```bash
+npx --prefix apps/factory-web playwright install chromium
+./scripts/verify-e2e
+```
+
 ## Run applications
+
+To open the local Machine Detail demo with one command:
+
+```bash
+./scripts/run-local
+```
+
+Open the URL printed by the script and press `Ctrl+C` when finished. The script starts and cleans
+up its own PostgreSQL, Mosquitto, Factory API, and Factory Web processes.
 
 ```bash
 # Existing immutable source acquisition CLI

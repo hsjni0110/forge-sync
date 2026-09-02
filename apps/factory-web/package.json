@@ -12,16 +12,19 @@
     "lint": "eslint src",
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
+    "test:e2e": "playwright test --config playwright.config.ts",
     "architecture": "node scripts/test-architecture.mjs",
     "verify": "npm run lint && npm run typecheck && npm run test && npm run architecture && npm run build"
   },
   "dependencies": {
     "ajv": "^8.20.0",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.62.1",
     "@testing-library/react": "^16.3.0",
     "@types/node": "^22.18.0",
     "@types/react": "^19.1.12",

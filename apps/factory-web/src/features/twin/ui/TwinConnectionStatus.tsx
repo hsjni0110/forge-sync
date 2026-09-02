@@ -1,61 +1,43 @@
-import { useMemo } from "react";
-
-import {
-  type TwinLiveState,
-  TwinLiveSession,
-} from "../application/TwinLiveSession";
-import { browserClock, browserTimer } from "../adapters/browserRuntime";
-import { BrowserTwinSocketFactory } from "../adapters/browserTwinSocketFactory";
-import { HttpTwinSnapshotReader } from "../adapters/httpTwinSnapshotReader";
-import { AjvTwinPatchDecoder } from "../adapters/twinContract";
-import { useTwinLiveSession } from "./useTwinLiveSession";
+import type { TwinLiveState } from "../application/TwinLiveSession";
 
 interface TwinConnectionStatusViewProps {
   state: TwinLiveState;
 }
 
-export function TwinConnectionStatusView({ state }: TwinConnectionStatusViewProps) {
+export function TwinConnectionStatus({ state }: TwinConnectionStatusViewProps) {
   return (
-    <section aria-label="Twin connection status">
-      <dl>
-        <div>
-          <dt>Connection</dt>
-          <dd>{state.connectionStatus}</dd>
-        </div>
-        <div>
-          <dt>Consistency</dt>
-          <dd>{state.snapshot?.consistency.status ?? "UNAVAILABLE"}</dd>
-        </div>
-        <div>
-          <dt>Freshness</dt>
-          <dd>{state.freshness ?? "UNAVAILABLE"}</dd>
-        </div>
-      </dl>
+    <section className="status-strip" aria-label="트윈 연결 상태" aria-live="polite">
+      <StatusValue label="연결" value={state.connectionStatus} />
+      <StatusValue
+        label="데이터 일치"
+        value={state.snapshot?.consistency.status ?? "UNAVAILABLE"}
+      />
+      <StatusValue label="최신 상태" value={state.freshness ?? "UNAVAILABLE"} />
     </section>
   );
 }
 
-interface TwinConnectionStatusProps {
-  machineId: string;
-  apiBaseUrl?: string;
+function StatusValue({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="status-value">
+      <span>{label}</span>
+      <strong className="status-badge" data-status={value.toLowerCase()}>
+        {STATUS_LABELS[value] ?? value}
+      </strong>
+    </div>
+  );
 }
 
-export function TwinConnectionStatus({
-  machineId,
-  apiBaseUrl = "",
-}: TwinConnectionStatusProps) {
-  const session = useMemo(
-    () =>
-      new TwinLiveSession(
-        machineId,
-        new HttpTwinSnapshotReader(apiBaseUrl),
-        new BrowserTwinSocketFactory(apiBaseUrl || window.location.origin),
-        new AjvTwinPatchDecoder(),
-        browserClock,
-        browserTimer,
-      ),
-    [apiBaseUrl, machineId],
-  );
-  const state = useTwinLiveSession(session);
-  return <TwinConnectionStatusView state={state} />;
-}
+const STATUS_LABELS: Record<string, string> = {
+  LOADING: "불러오는 중",
+  LIVE: "실시간 연결됨",
+  RECONNECTING: "다시 연결 중",
+  RESYNCING: "최신 상태 동기화 중",
+  UNAVAILABLE: "확인할 수 없음",
+  CONSISTENT: "정상",
+  PARTIAL: "일부 정보 부족",
+  DEGRADED: "품질 저하",
+  FRESH: "최신",
+  LAGGING: "지연됨",
+  STALE: "오래된 데이터",
+};

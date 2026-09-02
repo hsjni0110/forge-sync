@@ -39,5 +39,5 @@ on different versions if only part of a message is applied.
 - Server integration tests cover machine-scoped delivery and non-fatal publication failure.
 - Frontend fake-clock tests cover continuous, duplicate, regressive, gap, invalid, disconnect, stale,
   resync, and resubscribe behavior.
-- Browser-level disconnect recovery remains a separate completion condition before Step 11 is marked
-  `DONE`.
+- `./scripts/verify-e2e`에서 실제 Chromium의 offline 전환, STALE 경계, offline 중 새 Observation,
+  online 복구 뒤 REST snapshot version/value 수렴과 WebSocket 재구독을 검증한다.

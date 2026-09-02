@@ -1,0 +1,83 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+database_compose="$repository_root/infra/database/compose.yaml"
+mqtt_compose="$repository_root/infra/mqtt/compose.yaml"
+database_port=${FORGESYNC_DATABASE_PORT:-15434}
+mqtt_port=${FORGESYNC_MQTT_PORT:-18884}
+api_port=${FORGESYNC_API_PORT:-18080}
+web_port=${FORGESYNC_WEB_PORT:-4173}
+database_project="forgesync-e2e-database-$$"
+mqtt_project="forgesync-e2e-mqtt-$$"
+api_mqtt_client_id="forgesync-api-e2e-$$"
+runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-e2e.XXXXXX")
+api_pid=""
+web_pid=""
+
+run_database_compose() {
+  FORGESYNC_DATABASE_PORT="$database_port" \
+    docker compose --project-name "$database_project" --file "$database_compose" "$@"
+}
+
+run_mqtt_compose() {
+  FORGESYNC_MQTT_PORT="$mqtt_port" \
+    docker compose --project-name "$mqtt_project" --file "$mqtt_compose" "$@"
+}
+
+cleanup() {
+  verification_exit_code=$?
+  trap - EXIT INT TERM
+  if [ -n "$web_pid" ]; then kill "$web_pid" 2>/dev/null || true; fi
+  if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
+  run_mqtt_compose down --volumes || true
+  run_database_compose down --volumes || true
+  rm -rf "$repository_root/apps/factory-api/$api_mqtt_client_id"
+  rm -rf "$runtime_directory"
+  exit "$verification_exit_code"
+}
+trap cleanup EXIT INT TERM
+
+wait_for_url() {
+  url=$1
+  log_file=$2
+  attempts=0
+  until curl --fail --silent --show-error "$url" >/dev/null 2>&1; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 90 ]; then
+      tail -n 100 "$log_file"
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+run_database_compose up --detach --wait
+run_mqtt_compose up --detach --wait
+
+FORGESYNC_DATABASE_URL="jdbc:postgresql://127.0.0.1:$database_port/forgesync" \
+FORGESYNC_DATABASE_USERNAME=forgesync \
+FORGESYNC_DATABASE_PASSWORD=forgesync-test \
+FORGESYNC_MQTT_ENABLED=true \
+FORGESYNC_MQTT_SERVER_URI="tcp://127.0.0.1:$mqtt_port" \
+FORGESYNC_MQTT_CLIENT_ID="$api_mqtt_client_id" \
+FORGESYNC_WEBSOCKET_ALLOWED_ORIGINS="http://127.0.0.1:$web_port" \
+SERVER_PORT="$api_port" \
+  "$repository_root/apps/factory-api/gradlew" -p "$repository_root/apps/factory-api" bootRun \
+  >"$runtime_directory/api.log" 2>&1 &
+api_pid=$!
+
+VITE_API_BASE_URL="http://127.0.0.1:$api_port" \
+  npm --prefix "$repository_root/apps/factory-web" run dev -- --host 127.0.0.1 --port "$web_port" \
+  >"$runtime_directory/web.log" 2>&1 &
+web_pid=$!
+
+wait_for_url "http://127.0.0.1:$api_port/actuator/health" "$runtime_directory/api.log"
+wait_for_url "http://127.0.0.1:$web_port" "$runtime_directory/web.log"
+
+FORGESYNC_REPOSITORY_ROOT="$repository_root" \
+FORGESYNC_API_BASE_URL="http://127.0.0.1:$api_port" \
+FORGESYNC_WEB_BASE_URL="http://127.0.0.1:$web_port" \
+FORGESYNC_MQTT_HOST=127.0.0.1 \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+  npm --prefix "$repository_root/apps/factory-web" run test:e2e

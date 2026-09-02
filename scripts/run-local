@@ -1,0 +1,126 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+database_compose="$repository_root/infra/database/compose.yaml"
+mqtt_compose="$repository_root/infra/mqtt/compose.yaml"
+database_port=${FORGESYNC_DATABASE_PORT:-15432}
+mqtt_port=${FORGESYNC_MQTT_PORT:-18883}
+api_port=${FORGESYNC_API_PORT:-8080}
+web_port=${FORGESYNC_WEB_PORT:-5173}
+database_project="forgesync-local-database-$$"
+mqtt_project="forgesync-local-mqtt-$$"
+api_mqtt_client_id="forgesync-api-local-$$"
+runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-local.XXXXXX")
+api_pid=""
+web_pid=""
+
+run_database_compose() {
+  FORGESYNC_DATABASE_PORT="$database_port" \
+    docker compose --project-name "$database_project" --file "$database_compose" "$@"
+}
+
+run_mqtt_compose() {
+  FORGESYNC_MQTT_PORT="$mqtt_port" \
+    docker compose --project-name "$mqtt_project" --file "$mqtt_compose" "$@"
+}
+
+cleanup() {
+  exit_code=$?
+  trap - EXIT INT TERM
+  printf '\nForgeSync local runtime을 종료합니다.\n'
+  if [ -n "$web_pid" ]; then kill "$web_pid" 2>/dev/null || true; fi
+  if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
+  if [ -n "$web_pid" ]; then wait "$web_pid" 2>/dev/null || true; fi
+  if [ -n "$api_pid" ]; then wait "$api_pid" 2>/dev/null || true; fi
+  run_mqtt_compose down --volumes || true
+  run_database_compose down --volumes || true
+  rm -rf "$repository_root/apps/factory-api/$api_mqtt_client_id"
+  rm -rf "$runtime_directory"
+  exit "$exit_code"
+}
+trap cleanup EXIT INT TERM
+
+wait_for_url() {
+  url=$1
+  log_file=$2
+  process_name=$3
+  attempts=0
+  until curl --fail --silent --show-error "$url" >/dev/null 2>&1; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 90 ]; then
+      printf '%s 시작을 기다리다 실패했습니다. 최근 로그:\n' "$process_name" >&2
+      tail -n 100 "$log_file" >&2
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+if [ "${1:-}" = "--help" ]; then
+  cat <<'EOF'
+Usage: ./scripts/run-local
+
+PostgreSQL, Mosquitto, Factory API, Factory Web을 실행하고 Mazak01 demo 데이터를 발행합니다.
+종료하려면 Ctrl+C를 누르세요.
+EOF
+  trap - EXIT INT TERM
+  rm -rf "$runtime_directory"
+  exit 0
+fi
+
+if [ "$#" -ne 0 ]; then
+  printf '지원하지 않는 인자입니다. 사용법: ./scripts/run-local\n' >&2
+  exit 2
+fi
+
+printf 'PostgreSQL과 MQTT를 시작합니다...\n'
+run_database_compose up --detach --wait
+run_mqtt_compose up --detach --wait
+
+printf 'Factory API와 Factory Web을 시작합니다...\n'
+FORGESYNC_DATABASE_URL="jdbc:postgresql://localhost:$database_port/forgesync" \
+FORGESYNC_DATABASE_USERNAME=forgesync \
+FORGESYNC_DATABASE_PASSWORD=forgesync-test \
+FORGESYNC_MQTT_ENABLED=true \
+FORGESYNC_MQTT_SERVER_URI="tcp://localhost:$mqtt_port" \
+FORGESYNC_MQTT_CLIENT_ID="$api_mqtt_client_id" \
+FORGESYNC_WEBSOCKET_ALLOWED_ORIGINS="http://localhost:$web_port" \
+SERVER_PORT="$api_port" \
+  "$repository_root/apps/factory-api/gradlew" -p "$repository_root/apps/factory-api" bootRun \
+  >"$runtime_directory/api.log" 2>&1 &
+api_pid=$!
+
+VITE_API_BASE_URL="http://localhost:$api_port" \
+  npm --prefix "$repository_root/apps/factory-web" run dev -- --host localhost --port "$web_port" \
+  >"$runtime_directory/web.log" 2>&1 &
+web_pid=$!
+
+wait_for_url "http://localhost:$api_port/actuator/health" "$runtime_directory/api.log" "Factory API"
+wait_for_url "http://localhost:$web_port" "$runtime_directory/web.log" "Factory Web"
+
+printf 'Mazak01 초기 데이터를 발행합니다...\n'
+FORGESYNC_MQTT_HOST=localhost \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+  uv run python "$repository_root/tests/e2e/support/publish_observation.py" initial
+wait_for_url \
+  "http://localhost:$api_port/api/v1/machines/Mazak01/twin" \
+  "$runtime_directory/api.log" \
+  "Mazak01 Twin"
+
+printf '\nForgeSync가 실행 중입니다.\n'
+printf '화면: http://localhost:%s/machines/Mazak01\n' "$web_port"
+printf '종료: Ctrl+C\n'
+printf '\n실시간 값 변경을 보려면 다른 터미널에서 실행하세요:\n'
+printf 'FORGESYNC_MQTT_PORT=%s uv run python tests/e2e/support/publish_observation.py live-update\n\n' "$mqtt_port"
+
+while kill -0 "$api_pid" 2>/dev/null && kill -0 "$web_pid" 2>/dev/null; do
+  sleep 1
+done
+
+printf 'Factory API 또는 Factory Web이 예기치 않게 종료되었습니다.\n' >&2
+printf '\nFactory API 최근 로그:\n' >&2
+tail -n 50 "$runtime_directory/api.log" >&2
+printf '\nFactory Web 최근 로그:\n' >&2
+tail -n 50 "$runtime_directory/web.log" >&2
+exit 1

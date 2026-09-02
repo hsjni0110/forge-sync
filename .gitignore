@@ -10,6 +10,10 @@ build/
 .gradle/
 node_modules/
 *.tsbuildinfo
+playwright-report/
+test-results/
+apps/factory-api/forgesync-api-local-*/
+apps/factory-api/forgesync-api-e2e-*/
 
 # External raw artifacts are content-addressed local data, not source code.
 datasets/raw/**

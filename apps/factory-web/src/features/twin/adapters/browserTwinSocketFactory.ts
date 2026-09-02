@@ -12,6 +12,18 @@ export class BrowserTwinSocketFactory implements TwinSocketFactory {
     url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
     url.pathname = `/api/v1/ws/machines/${encodeURIComponent(machineId)}/twin`;
     const socket = new WebSocket(url);
+    let hasReportedClosed = false;
+    const reportClosed = () => {
+      window.removeEventListener("offline", closeForOfflineNetwork);
+      if (!hasReportedClosed) {
+        hasReportedClosed = true;
+        callbacks.closed();
+      }
+    };
+    const closeForOfflineNetwork = () => {
+      socket.close();
+      reportClosed();
+    };
     socket.addEventListener("open", callbacks.opened);
     socket.addEventListener("message", (event) => {
       if (typeof event.data === "string") {
@@ -20,8 +32,14 @@ export class BrowserTwinSocketFactory implements TwinSocketFactory {
         callbacks.received("");
       }
     });
-    socket.addEventListener("close", callbacks.closed);
+    socket.addEventListener("close", reportClosed);
     socket.addEventListener("error", () => socket.close());
-    return { close: () => socket.close() };
+    window.addEventListener("offline", closeForOfflineNetwork);
+    return {
+      close: () => {
+        window.removeEventListener("offline", closeForOfflineNetwork);
+        socket.close();
+      },
+    };
   }
 }

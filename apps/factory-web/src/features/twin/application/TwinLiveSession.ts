@@ -9,6 +9,10 @@ import type {
   TwinSocket,
   TwinSocketFactory,
 } from "./ports";
+import {
+  classifyTwinSnapshotFailure,
+  type TwinSnapshotFailureKind,
+} from "./errors";
 
 export type ConnectionStatus =
   | "LOADING"
@@ -21,6 +25,7 @@ export interface TwinLiveState {
   connectionStatus: ConnectionStatus;
   snapshot?: TwinSnapshot;
   freshness?: Freshness;
+  failure?: TwinSnapshotFailureKind;
 }
 
 type StateListener = (state: TwinLiveState) => void;
@@ -48,6 +53,13 @@ export class TwinLiveSession {
 
   start(): void {
     void this.resynchronize("LOADING");
+  }
+
+  retryNow(): void {
+    this.cancelTimer(this.reconnectTimerId);
+    this.reconnectTimerId = undefined;
+    this.reconnectAttempt = 0;
+    void this.resynchronize(this.state.snapshot ? "RESYNCING" : "LOADING");
   }
 
   subscribe(listener: StateListener): () => void {
@@ -80,12 +92,15 @@ export class TwinLiveSession {
       }
       this.updateSnapshot(snapshot);
       this.connectSocket(operationGeneration);
-    } catch {
+    } catch (error) {
       if (this.isStaleOperation(operationGeneration)) {
         return;
       }
-      this.updateState({ ...this.state, connectionStatus: "UNAVAILABLE" });
-      this.scheduleReconnect();
+      const failure = classifyTwinSnapshotFailure(error);
+      this.updateState({ ...this.state, connectionStatus: "UNAVAILABLE", failure });
+      if (failure !== "NOT_FOUND") {
+        this.scheduleReconnect();
+      }
     }
   }
 
@@ -96,7 +111,7 @@ export class TwinLiveSession {
           return;
         }
         this.reconnectAttempt = 0;
-        this.updateState({ ...this.state, connectionStatus: "LIVE" });
+        this.updateState({ ...this.state, connectionStatus: "LIVE", failure: undefined });
       },
       received: (message) => this.receivePatch(message, operationGeneration),
       closed: () => {
@@ -138,6 +153,7 @@ export class TwinLiveSession {
       connectionStatus: this.state.connectionStatus,
       snapshot,
       freshness: classifyFreshness(snapshot, this.clock.nowMillis()),
+      failure: undefined,
     });
     this.scheduleFreshnessBoundary();
   }

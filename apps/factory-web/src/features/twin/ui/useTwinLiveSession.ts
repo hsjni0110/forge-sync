@@ -1,21 +1,29 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-import {
-  type TwinLiveState,
-  TwinLiveSession,
-} from "../application/TwinLiveSession";
+import type { TwinLiveState } from "../application/TwinLiveSession";
+import type { TwinSession } from "../application/ports";
 
-export function useTwinLiveSession(session: TwinLiveSession): TwinLiveState {
-  const [state, setState] = useState(() => session.currentState());
+export function useTwinLiveSession(createSession: () => TwinSession): {
+  state: TwinLiveState;
+  retryNow: () => void;
+} {
+  const [state, setState] = useState<TwinLiveState>({ connectionStatus: "LOADING" });
+  const sessionRef = useRef<TwinSession | undefined>(undefined);
 
   useEffect(() => {
+    const session = createSession();
+    sessionRef.current = session;
     const unsubscribe = session.subscribe(setState);
     session.start();
     return () => {
       unsubscribe();
       session.dispose();
+      if (sessionRef.current === session) {
+        sessionRef.current = undefined;
+      }
     };
-  }, [session]);
+  }, [createSession]);
 
-  return state;
+  const retryNow = useCallback(() => sessionRef.current?.retryNow(), []);
+  return { state, retryNow };
 }
