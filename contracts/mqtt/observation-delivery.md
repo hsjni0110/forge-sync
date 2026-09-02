@@ -40,4 +40,5 @@ Counters use bounded reasons and never use machine, event, or replay identity as
 `forgesync.mqtt.observations.received`, `forwarded`, `handoff.failures`,
 `acknowledgment.failures`, and `rejected{reason}`. Database outcomes use
 `forgesync.ingestion.observations{result=accepted|accepted_late|skipped_duplicate}`. Accepted-late
-means history was committed while the current projection and TwinVersion were kept unchanged.
+means history was committed while Latest Observation, Equipment State, and TwinVersion were kept
+unchanged.

@@ -9,3 +9,7 @@ not imply that every table is a hypertable.
 
 Latest Observation projection is keyed by machine and source DataItem. A separate machine row owns
 the monotonic TwinVersion and provides the transaction lock for concurrent projection updates.
+Equipment State is rebuilt from the machine's current Latest Observations and its base connectivity
+is stored with the same TwinVersion and projected wall-clock time. Freshness and effective STALE
+connectivity are derived at read time so a state can age without a database write; historical source
+time is not used for that calculation.

@@ -37,6 +37,7 @@
 | V-019 | Observation v2 MQTT QoS1 전달은 at-least-once이며 broker PUBACK 이후에만 replay publisher가 성공한다 | VERIFIED | Pinned Mosquitto `2.0.22@sha256:212f89...2b3c`; `./scripts/verify-mqtt`에서 Edge MQTT 5 payload/properties 전달, API duplicate 2회 전달, invalid version reject telemetry 검증. [MQTT 전달 계약](../contracts/mqtt/observation-delivery.md) | 06 | 2026-09-01 |
 | V-020 | Inbox와 Canonical Observation은 선언된 PostgreSQL transaction 경계 안에서 effectively-once로 처리된다 | VERIFIED | Pinned PostgreSQL 17 + TimescaleDB `2.29.2@sha256:bc8527...af2d`; `./scripts/verify-database`에서 동일 Inbox identity 100개 동시 주입 시 acceptance/history 1건과 history 실패 시 Inbox rollback 확인. [ADR-025](./adr/ADR-025-postgres-ingestion-transaction.md) | 07 | 2026-09-02 |
 | V-021 | 늦거나 순서가 낮은 Observation은 history를 보존하면서 Latest Observation과 TwinVersion을 rollback하지 않는다 | VERIFIED | Pure ordering unit tests와 실제 PostgreSQL concurrent integration test에서 same-session sequence, cross-session source time, source key tie-break, DataItem 분리, projection 실패 전체 rollback 확인. [ADR-026](./adr/ADR-026-latest-observation-ordering.md) | 08 | 2026-09-02 |
+| V-022 | Equipment State는 current Latest Observation만으로 결정되고 freshness는 historical source time이 아닌 projected wall clock으로 계산된다 | VERIFIED | 고정 시각 unit tests에서 2초/10초 경계와 unavailable/Condition 집계를 검증하고, `./scripts/verify-database`에서 state/version 원자성, out-of-order 무변경, state 저장 실패 전체 rollback 확인. [ADR-027](./adr/ADR-027-equipment-state-and-freshness.md) | 09 | 2026-09-02 |
 
 ## 갱신 규칙
 

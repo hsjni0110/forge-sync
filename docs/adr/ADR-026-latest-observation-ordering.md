@@ -4,6 +4,7 @@
 - Date: 2026-09-02
 - Related PRD: 14, 16, 24, 97~99
 - Extends: [ADR-025](./ADR-025-postgres-ingestion-transaction.md)
+- Extended by: [ADR-027](./ADR-027-equipment-state-and-freshness.md)
 
 ## Context
 

@@ -22,14 +22,17 @@ public final class PostgresObservationTransaction implements ObservationTransact
   private final JdbcClient jdbcClient;
   private final TransactionTemplate transactionTemplate;
   private final ObservationOrderingPolicy observationOrderingPolicy;
+  private final PostgresEquipmentStateProjection equipmentStateProjection;
 
   public PostgresObservationTransaction(
       JdbcClient jdbcClient,
       PlatformTransactionManager transactionManager,
-      ObservationOrderingPolicy observationOrderingPolicy) {
+      ObservationOrderingPolicy observationOrderingPolicy,
+      PostgresEquipmentStateProjection equipmentStateProjection) {
     this.jdbcClient = Objects.requireNonNull(jdbcClient);
     this.transactionTemplate = new TransactionTemplate(Objects.requireNonNull(transactionManager));
     this.observationOrderingPolicy = Objects.requireNonNull(observationOrderingPolicy);
+    this.equipmentStateProjection = Objects.requireNonNull(equipmentStateProjection);
   }
 
   @Override
@@ -64,6 +67,7 @@ public final class PostgresObservationTransaction implements ObservationTransact
     TwinVersion nextVersion = currentVersion.next();
     updateMachineVersion(observation.machineId(), nextVersion, projectedAt);
     upsertLatestObservation(observation, nextVersion, projectedAt);
+    equipmentStateProjection.project(observation.machineId(), nextVersion, projectedAt);
     return IngestionResult.ACCEPTED;
   }
 

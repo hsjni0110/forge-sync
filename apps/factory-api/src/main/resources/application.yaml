@@ -18,6 +18,10 @@ spring:
 forgesync:
   ingestion:
     enabled: true
+  twin:
+    freshness:
+      fresh-max-age: 2s
+      lagging-max-age: 10s
   mqtt:
     enabled: false
     server-uri: tcp://localhost:1883

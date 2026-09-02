@@ -11,6 +11,7 @@ import com.forgesync.factoryapi.adapter.inbound.mqtt.MqttObservationValidator;
 import com.forgesync.factoryapi.adapter.inbound.observation.ObservationContractValidator;
 import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
+import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +61,9 @@ class PostgresObservationTransactionIntegrationTest {
         new PostgresObservationTransaction(
             jdbcClient,
             new DataSourceTransactionManager(dataSource),
-            new ObservationOrderingPolicy());
+            new ObservationOrderingPolicy(),
+            new PostgresEquipmentStateProjection(
+                jdbcClient, new EquipmentStateProjectionPolicy(), OBJECT_MAPPER));
   }
 
   @BeforeEach
@@ -68,7 +71,8 @@ class PostgresObservationTransactionIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE latest_observation_projection, equipment_twin_version,
+            TRUNCATE equipment_state_projection, latest_observation_projection,
+              equipment_twin_version,
               canonical_observation_history, ingestion_inbox
             """)
         .update();
@@ -191,6 +195,49 @@ class PostgresObservationTransactionIntegrationTest {
         .isEqualTo(3);
     assertThat(rowCount("latest_observation_projection")).isEqualTo(3);
     assertThat(twinVersion("Mazak01")).isEqualTo(3);
+    assertThat(equipmentStateValue("Mazak01", "connectivity_state")).isEqualTo("ONLINE");
+    assertThat(equipmentStateValue("Mazak01", "execution_state")).isEqualTo("ACTIVE");
+    assertThat(equipmentStateValue("Mazak01", "health_state")).isEqualTo("WARNING");
+    assertThat(equipmentStateVersion("Mazak01")).isEqualTo(3);
+    assertThat(equipmentStateProjectedAt("Mazak01")).isEqualTo(PROJECTED_AT);
+  }
+
+  @Test
+  void unavailableInputDoesNotInventOnlineExecutionOrNormalHealth() {
+    ValidatedObservationMessage unavailableEvent = replayedObservation("event-unavailable.json", 1);
+    ValidatedObservationMessage unavailableCondition =
+        replayedCondition("SYSTEM", "UNAVAILABLE", "system-condition", 2);
+
+    assertThat(transaction.storeObservation(unavailableEvent, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(
+            transaction.storeObservation(
+                unavailableCondition, INGESTED_AT.plusSeconds(1), PROJECTED_AT.plusSeconds(1)))
+        .isEqualTo(IngestionResult.ACCEPTED);
+
+    assertThat(equipmentStateValue("Mazak01", "connectivity_state")).isEqualTo("UNKNOWN");
+    assertThat(equipmentStateValue("Mazak01", "execution_state")).isEqualTo("UNKNOWN");
+    assertThat(equipmentStateValue("Mazak01", "health_state")).isEqualTo("UNKNOWN");
+  }
+
+  @Test
+  void aggregatesCurrentConditionsByWorstKnownLevel() {
+    ValidatedObservationMessage normal =
+        replayedCondition("SYSTEM", "NORMAL", "system-condition", 1);
+    ValidatedObservationMessage warning =
+        replayedCondition("TEMPERATURE", "WARNING", "temperature-condition", 2);
+    ValidatedObservationMessage fault = replayedCondition("LOAD", "FAULT", "load-condition", 3);
+
+    assertThat(transaction.storeObservation(normal, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(transaction.storeObservation(warning, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(equipmentStateValue("Mazak01", "health_state")).isEqualTo("WARNING");
+    assertThat(transaction.storeObservation(fault, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+
+    assertThat(equipmentStateValue("Mazak01", "health_state")).isEqualTo("FAULT");
+    assertThat(rowCount("equipment_state_projection")).isEqualTo(1);
   }
 
   @Test
@@ -198,7 +245,8 @@ class PostgresObservationTransactionIntegrationTest {
     ValidatedObservationMessage current =
         replayedEvent(42, REPLAY_SESSION_ID, Instant.parse("2016-10-05T09:01:37Z"), "current");
     ValidatedObservationMessage late =
-        replayedEvent(41, REPLAY_SESSION_ID, Instant.parse("2016-10-06T09:01:37Z"), "late");
+        replayedExecutionEvent(
+            41, REPLAY_SESSION_ID, Instant.parse("2016-10-06T09:01:37Z"), "late", "STOPPED");
 
     assertThat(transaction.storeObservation(current, INGESTED_AT, PROJECTED_AT))
         .isEqualTo(IngestionResult.ACCEPTED);
@@ -212,6 +260,8 @@ class PostgresObservationTransactionIntegrationTest {
     assertThat(latestEventId(current)).isEqualTo(current.eventId());
     assertThat(latestProjectedAt(current)).isEqualTo(PROJECTED_AT);
     assertThat(twinVersion(current.machineId())).isEqualTo(1);
+    assertThat(equipmentStateValue(current.machineId(), "execution_state")).isEqualTo("ACTIVE");
+    assertThat(equipmentStateVersion(current.machineId())).isEqualTo(1);
   }
 
   @Test
@@ -281,6 +331,47 @@ class PostgresObservationTransactionIntegrationTest {
     assertThat(rowCount("canonical_observation_history")).isZero();
     assertThat(rowCount("latest_observation_projection")).isZero();
     assertThat(twinVersion(observation.machineId())).isEqualTo(Long.MAX_VALUE);
+    assertThat(rowCount("equipment_state_projection")).isZero();
+  }
+
+  @Test
+  void equipmentStateFailureRollsBackTheWholeIngestionTransaction() {
+    ValidatedObservationMessage observation = replayedObservation("event-execution.json", 42);
+    jdbcClient
+        .sql(
+            """
+            CREATE FUNCTION reject_equipment_state_projection() RETURNS trigger
+            LANGUAGE plpgsql AS $$
+            BEGIN
+              RAISE EXCEPTION 'forced equipment state failure';
+            END;
+            $$
+            """)
+        .update();
+    jdbcClient
+        .sql(
+            """
+            CREATE TRIGGER reject_equipment_state_projection
+            BEFORE INSERT OR UPDATE ON equipment_state_projection
+            FOR EACH ROW EXECUTE FUNCTION reject_equipment_state_projection()
+            """)
+        .update();
+    try {
+      assertThatThrownBy(() -> transaction.storeObservation(observation, INGESTED_AT, PROJECTED_AT))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessageContaining("forced equipment state failure");
+
+      assertThat(rowCount("ingestion_inbox")).isZero();
+      assertThat(rowCount("canonical_observation_history")).isZero();
+      assertThat(rowCount("latest_observation_projection")).isZero();
+      assertThat(rowCount("equipment_twin_version")).isZero();
+      assertThat(rowCount("equipment_state_projection")).isZero();
+    } finally {
+      jdbcClient
+          .sql("DROP TRIGGER reject_equipment_state_projection ON equipment_state_projection")
+          .update();
+      jdbcClient.sql("DROP FUNCTION reject_equipment_state_projection()").update();
+    }
   }
 
   @Test
@@ -328,6 +419,40 @@ class PostgresObservationTransactionIntegrationTest {
         .param("machine_id", machineId)
         .query(Long.class)
         .single();
+  }
+
+  private static String equipmentStateValue(String machineId, String columnName) {
+    return jdbcClient
+        .sql(
+            "SELECT "
+                + columnName
+                + " FROM equipment_state_projection WHERE machine_id = :machine_id")
+        .param("machine_id", machineId)
+        .query(String.class)
+        .single();
+  }
+
+  private static long equipmentStateVersion(String machineId) {
+    return jdbcClient
+        .sql(
+            """
+            SELECT twin_version FROM equipment_state_projection WHERE machine_id = :machine_id
+            """)
+        .param("machine_id", machineId)
+        .query(Long.class)
+        .single();
+  }
+
+  private static Instant equipmentStateProjectedAt(String machineId) {
+    return jdbcClient
+        .sql(
+            """
+            SELECT projected_at FROM equipment_state_projection WHERE machine_id = :machine_id
+            """)
+        .param("machine_id", machineId)
+        .query(OffsetDateTime.class)
+        .single()
+        .toInstant();
   }
 
   private static long latestReplaySequence(ValidatedObservationMessage observation) {
@@ -383,6 +508,16 @@ class PostgresObservationTransactionIntegrationTest {
 
   private static ValidatedObservationMessage replayedEvent(
       long replaySequence, UUID replaySessionId, Instant sourceObservedAt, String identitySuffix) {
+    return replayedExecutionEvent(
+        replaySequence, replaySessionId, sourceObservedAt, identitySuffix, "ACTIVE");
+  }
+
+  private static ValidatedObservationMessage replayedExecutionEvent(
+      long replaySequence,
+      UUID replaySessionId,
+      Instant sourceObservedAt,
+      String identitySuffix,
+      String execution) {
     ObjectNode document = (ObjectNode) readFixture("event-execution.json");
     String sourceEventKey = document.path("sourceEventKey").asText() + "#" + identitySuffix;
     document.put(
@@ -390,6 +525,7 @@ class PostgresObservationTransactionIntegrationTest {
         UUID.nameUUIDFromBytes(sourceEventKey.getBytes(StandardCharsets.UTF_8)).toString());
     document.put("sourceEventKey", sourceEventKey);
     ((ObjectNode) document.path("source")).put("sourceObservedAt", sourceObservedAt.toString());
+    ((ObjectNode) document.path("payload")).put("value", execution);
     return validateReplayedDocument(document, replaySequence, replaySessionId);
   }
 
@@ -415,6 +551,22 @@ class PostgresObservationTransactionIntegrationTest {
         UUID.nameUUIDFromBytes(sourceEventKey.getBytes(StandardCharsets.UTF_8)).toString());
     document.put("sourceEventKey", sourceEventKey);
     ((ObjectNode) document.path("subject")).put("componentId", componentId);
+    ((ObjectNode) document.path("provenance").path("transformation"))
+        .put("sourceDataItemId", sourceDataItemId);
+    return validateReplayedDocument(document, replaySequence, REPLAY_SESSION_ID);
+  }
+
+  private static ValidatedObservationMessage replayedCondition(
+      String conditionType, String level, String sourceDataItemId, long replaySequence) {
+    ObjectNode document = (ObjectNode) readFixture("condition-warning.json");
+    String sourceEventKey = document.path("sourceEventKey").asText() + "#" + sourceDataItemId;
+    document.put(
+        "eventId",
+        UUID.nameUUIDFromBytes(sourceEventKey.getBytes(StandardCharsets.UTF_8)).toString());
+    document.put("sourceEventKey", sourceEventKey);
+    ObjectNode payload = (ObjectNode) document.path("payload");
+    payload.put("conditionType", conditionType);
+    payload.put("level", level);
     ((ObjectNode) document.path("provenance").path("transformation"))
         .put("sourceDataItemId", sourceDataItemId);
     return validateReplayedDocument(document, replaySequence, REPLAY_SESSION_ID);
