@@ -20,9 +20,9 @@ import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapsho
 import java.util.List;
 import java.util.Map;
 
-final class TwinSnapshotResponseMapper {
+public final class TwinSnapshotResponseMapper {
 
-  TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
+  public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
         "1.0.0",
         new MachineDto(snapshot.machineId()),

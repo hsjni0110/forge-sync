@@ -14,3 +14,12 @@
 - Expected meaning: a contract-complete, FRESH Mazak01 snapshot with REAL:NIST field provenance.
   Empty business sections assert only that those Contexts are outside this fixture; they do not
   assert an absence of real production, Alarm, Maintenance, Intelligence, or spatial information.
+
+## `mazak01-twin-patch.json`
+
+- Derivation status: `DERIVED_FIXTURE`
+- Fixture SHA-256: `ac879c8323852669fb8e704958962ffd5d2d8646ebfeb231b000f1c9b4632310`
+- Derivation: the operational Twin fixture is wrapped unchanged in the WebSocket v1 whole-snapshot
+  envelope with deterministic base/target versions.
+- Expected meaning: a continuous patch from TwinVersion 3 to 4 for Mazak01. WebSocket transport is
+  not asserted as source provenance; every field retains the nested snapshot provenance.

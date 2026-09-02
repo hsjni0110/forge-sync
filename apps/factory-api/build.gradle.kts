@@ -26,6 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.flywaydb:flyway-core")
     runtimeOnly("org.flywaydb:flyway-database-postgresql")
     runtimeOnly("org.postgresql:postgresql")
@@ -43,6 +44,9 @@ tasks.processResources {
     }
     from("../../contracts/twin/v1/twin-snapshot.schema.json") {
         into("contracts/twin/v1")
+    }
+    from("../../contracts/websocket/v1/twin-patch.schema.json") {
+        into("contracts/websocket/v1")
     }
 }
 

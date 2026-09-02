@@ -74,7 +74,7 @@ tests/fixtures/contracts/    REST/WebSocket payload examples
 
 - observation에서 EquipmentState로의 mapping
 - TwinVersion 단조 증가
-- REST snapshot과 WebSocket patch version 계약
+- REST snapshot 전체를 담은 WebSocket patch의 base/target version 계약
 - version gap/역행 감지 후 REST resync
 - field-level provenance와 consistency state 노출
 

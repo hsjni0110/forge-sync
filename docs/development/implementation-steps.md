@@ -273,6 +273,9 @@
 
 ### Step 11 — WebSocket Patch와 REST Resync
 
+**상태**: `IN_PROGRESS` — contract/server/frontend integration test까지 구현하며, 실제 브라우저
+단절/복구 E2E가 추가되기 전에는 `DONE`으로 표시하지 않는다.
+
 **목적**: WebSocket을 알림/patch로 사용하고 gap 발생 시 REST snapshot으로 권위 상태를 복구한다.
 
 **구현 범위**

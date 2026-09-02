@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.application.IngestObservation;
 import com.forgesync.factoryapi.application.ObservationIngress;
 import com.forgesync.factoryapi.application.ObservationTransaction;
+import com.forgesync.factoryapi.equipmenttwin.application.TwinProjectionNotifier;
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,12 +27,17 @@ public class ObservationIngestionConfiguration {
       PlatformTransactionManager transactionManager,
       ObservationOrderingPolicy observationOrderingPolicy,
       EquipmentStateProjectionPolicy equipmentStateProjectionPolicy,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      ObjectProvider<TwinProjectionNotifier> twinProjectionNotifier) {
     PostgresEquipmentStateProjection equipmentStateProjection =
         new PostgresEquipmentStateProjection(
             jdbcClient, equipmentStateProjectionPolicy, objectMapper);
     return new PostgresObservationTransaction(
-        jdbcClient, transactionManager, observationOrderingPolicy, equipmentStateProjection);
+        jdbcClient,
+        transactionManager,
+        observationOrderingPolicy,
+        equipmentStateProjection,
+        twinProjectionNotifier.getIfAvailable(TwinProjectionNotifier::noOp));
   }
 
   @Bean

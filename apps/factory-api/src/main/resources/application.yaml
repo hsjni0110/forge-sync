@@ -24,6 +24,8 @@ forgesync:
     freshness:
       fresh-max-age: 2s
       lagging-max-age: 10s
+  websocket:
+    allowed-origins: http://localhost:5173
   mqtt:
     enabled: false
     server-uri: tcp://localhost:1883

@@ -3,6 +3,7 @@ package com.forgesync.factoryapi.adapter.outbound.postgres;
 import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ObservationTransaction;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
+import com.forgesync.factoryapi.equipmenttwin.application.TwinProjectionNotifier;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrder;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.ProjectionDecision;
@@ -23,16 +24,32 @@ public final class PostgresObservationTransaction implements ObservationTransact
   private final TransactionTemplate transactionTemplate;
   private final ObservationOrderingPolicy observationOrderingPolicy;
   private final PostgresEquipmentStateProjection equipmentStateProjection;
+  private final TwinProjectionNotifier twinProjectionNotifier;
 
   public PostgresObservationTransaction(
       JdbcClient jdbcClient,
       PlatformTransactionManager transactionManager,
       ObservationOrderingPolicy observationOrderingPolicy,
       PostgresEquipmentStateProjection equipmentStateProjection) {
+    this(
+        jdbcClient,
+        transactionManager,
+        observationOrderingPolicy,
+        equipmentStateProjection,
+        TwinProjectionNotifier.noOp());
+  }
+
+  public PostgresObservationTransaction(
+      JdbcClient jdbcClient,
+      PlatformTransactionManager transactionManager,
+      ObservationOrderingPolicy observationOrderingPolicy,
+      PostgresEquipmentStateProjection equipmentStateProjection,
+      TwinProjectionNotifier twinProjectionNotifier) {
     this.jdbcClient = Objects.requireNonNull(jdbcClient);
     this.transactionTemplate = new TransactionTemplate(Objects.requireNonNull(transactionManager));
     this.observationOrderingPolicy = Objects.requireNonNull(observationOrderingPolicy);
     this.equipmentStateProjection = Objects.requireNonNull(equipmentStateProjection);
+    this.twinProjectionNotifier = Objects.requireNonNull(twinProjectionNotifier);
   }
 
   @Override
@@ -41,7 +58,11 @@ public final class PostgresObservationTransaction implements ObservationTransact
     IngestionResult result =
         transactionTemplate.execute(
             status -> storeWithinTransaction(observation, ingestedAt, projectedAt));
-    return Objects.requireNonNull(result, "transaction result");
+    IngestionResult committedResult = Objects.requireNonNull(result, "transaction result");
+    if (committedResult == IngestionResult.ACCEPTED) {
+      twinProjectionNotifier.projectionCommitted(observation.machineId());
+    }
+    return committedResult;
   }
 
   private IngestionResult storeWithinTransaction(

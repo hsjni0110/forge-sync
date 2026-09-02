@@ -1718,16 +1718,21 @@ Backend WebSocket event:
 
 ```json
 {
+  "schemaVersion": "1.0.0",
   "type": "TWIN_PATCH",
   "machineId": "cnc-mill-01",
-  "version": 10231,
-  "changed": {
-    "SPINDLE_SPEED": 6842,
-    "EXECUTION": "ACTIVE"
-  },
-  "projectedAt": "..."
+  "baseVersion": 10230,
+  "targetVersion": 10231,
+  "projectedAt": "...",
+  "snapshot": {
+    "schemaVersion": "1.0.0",
+    "machine": { "machineId": "cnc-mill-01" },
+    "consistency": { "twinVersion": 10231 }
+  }
 }
 ```
+
+실제 `snapshot`은 v1 Twin snapshot 전체 계약을 따르며 부분 필드 변경이 아니다.
 
 ---
 
@@ -1745,7 +1750,7 @@ Reconnect:
 1. GET Twin
 2. store version
 3. subscribe
-4. apply patch > current version only
+4. baseVersion이 현재 version이고 targetVersion이 다음 version일 때만 snapshot 전체 교체
 ```
 
 ---

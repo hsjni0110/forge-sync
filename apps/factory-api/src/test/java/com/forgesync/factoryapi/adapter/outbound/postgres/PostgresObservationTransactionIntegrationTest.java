@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -54,6 +55,7 @@ class PostgresObservationTransactionIntegrationTest {
   private static JdbcClient jdbcClient;
   private static PostgresObservationTransaction transaction;
   private static PostgresTwinProjectionReader twinProjectionReader;
+  private static final List<String> committedProjectionNotifications = new CopyOnWriteArrayList<>();
 
   @BeforeAll
   static void migrateDatabase() {
@@ -66,7 +68,8 @@ class PostgresObservationTransactionIntegrationTest {
             new DataSourceTransactionManager(dataSource),
             new ObservationOrderingPolicy(),
             new PostgresEquipmentStateProjection(
-                jdbcClient, new EquipmentStateProjectionPolicy(), OBJECT_MAPPER));
+                jdbcClient, new EquipmentStateProjectionPolicy(), OBJECT_MAPPER),
+            committedProjectionNotifications::add);
     twinProjectionReader =
         new PostgresTwinProjectionReader(
             jdbcClient, OBJECT_MAPPER, new DataSourceTransactionManager(dataSource));
@@ -74,6 +77,7 @@ class PostgresObservationTransactionIntegrationTest {
 
   @BeforeEach
   void clearDatabase() {
+    committedProjectionNotifications.clear();
     jdbcClient
         .sql(
             """
@@ -112,6 +116,7 @@ class PostgresObservationTransactionIntegrationTest {
 
     assertThat(rowCount("ingestion_inbox")).isEqualTo(1);
     assertThat(rowCount("canonical_observation_history")).isEqualTo(1);
+    assertThat(committedProjectionNotifications).containsExactly("Mazak01");
   }
 
   @Test
@@ -128,6 +133,7 @@ class PostgresObservationTransactionIntegrationTest {
 
     assertThat(rowCount("ingestion_inbox")).isEqualTo(1);
     assertThat(rowCount("canonical_observation_history")).isEqualTo(1);
+    assertThat(committedProjectionNotifications).containsExactly("Mazak01");
     assertThat(
             jdbcClient
                 .sql(
