@@ -2,6 +2,8 @@ package com.forgesync.factoryapi.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -13,29 +15,35 @@ import org.junit.jupiter.api.Test;
 class IngestObservationTest {
 
   private static final Instant INGESTED_AT = Instant.parse("2026-09-02T01:02:03Z");
+  private static final Instant PROJECTED_AT = Instant.parse("2026-09-02T01:02:04Z");
 
   @Test
   void storesObservationWithInjectedWallClockAndReturnsAcceptance() {
     AtomicReference<Instant> capturedIngestedAt = new AtomicReference<>();
+    AtomicReference<Instant> capturedProjectedAt = new AtomicReference<>();
+    Clock clock = mock(Clock.class);
+    when(clock.instant()).thenReturn(INGESTED_AT, PROJECTED_AT);
     IngestObservation useCase =
         new IngestObservation(
-            (observation, ingestedAt) -> {
+            (observation, ingestedAt, projectedAt) -> {
               capturedIngestedAt.set(ingestedAt);
+              capturedProjectedAt.set(projectedAt);
               return IngestionResult.ACCEPTED;
             },
-            Clock.fixed(INGESTED_AT, ZoneOffset.UTC));
+            clock);
 
     IngestionResult result = useCase.acceptObservation(observation());
 
     assertThat(result).isEqualTo(IngestionResult.ACCEPTED);
     assertThat(capturedIngestedAt).hasValue(INGESTED_AT);
+    assertThat(capturedProjectedAt).hasValue(PROJECTED_AT);
   }
 
   @Test
   void preservesDuplicateResultFromAtomicPersistenceBoundary() {
     IngestObservation useCase =
         new IngestObservation(
-            (observation, ingestedAt) -> IngestionResult.SKIPPED_DUPLICATE,
+            (observation, ingestedAt, projectedAt) -> IngestionResult.SKIPPED_DUPLICATE,
             Clock.fixed(INGESTED_AT, ZoneOffset.UTC));
 
     assertThat(useCase.acceptObservation(observation()))
@@ -46,7 +54,7 @@ class IngestObservationTest {
   void propagatesPersistenceFailureWithoutReportingAcceptance() {
     IngestObservation useCase =
         new IngestObservation(
-            (observation, ingestedAt) -> {
+            (observation, ingestedAt, projectedAt) -> {
               throw new IllegalStateException("database unavailable");
             },
             Clock.fixed(INGESTED_AT, ZoneOffset.UTC));

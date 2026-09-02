@@ -3,6 +3,7 @@
 - Status: Accepted
 - Date: 2026-09-02
 - Related PRD: 97~100
+- Extended by: [ADR-026](./ADR-026-latest-observation-ordering.md)
 
 ## Context
 
@@ -31,9 +32,9 @@ requirements for Observation history.
   complete validated Canonical envelope as JSONB.
 - Run regular PostgreSQL tables on the pinned PostgreSQL + TimescaleDB image. Do not create a
   hypertable until partitioning and retention requirements are decided and tested.
-- The declared boundary currently covers Inbox and Observation history. Latest/Condition/Machine
-  projections and their version changes will extend the same boundary in their owning development
-  steps; raw telemetry does not create Outbox records.
+- At this stage the declared boundary covers Inbox and Observation history. ADR-026 extends it with
+  Latest Observation projection and machine TwinVersion; raw telemetry does not create Outbox
+  records.
 
 ## Consequences
 

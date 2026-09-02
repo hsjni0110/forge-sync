@@ -17,6 +17,7 @@ public final class IngestObservation implements ObservationIngress {
   @Override
   public IngestionResult acceptObservation(ValidatedObservationMessage observation) {
     Instant ingestedAt = clock.instant();
-    return observationTransaction.storeObservation(observation, ingestedAt);
+    Instant projectedAt = clock.instant();
+    return observationTransaction.storeObservation(observation, ingestedAt, projectedAt);
   }
 }

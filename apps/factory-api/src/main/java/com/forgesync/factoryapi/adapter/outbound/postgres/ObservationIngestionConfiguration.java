@@ -3,6 +3,7 @@ package com.forgesync.factoryapi.adapter.outbound.postgres;
 import com.forgesync.factoryapi.application.IngestObservation;
 import com.forgesync.factoryapi.application.ObservationIngress;
 import com.forgesync.factoryapi.application.ObservationTransaction;
+import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
 import java.time.Clock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -24,8 +25,16 @@ public class ObservationIngestionConfiguration {
 
   @Bean
   ObservationTransaction observationTransaction(
-      JdbcClient jdbcClient, PlatformTransactionManager transactionManager) {
-    return new PostgresObservationTransaction(jdbcClient, transactionManager);
+      JdbcClient jdbcClient,
+      PlatformTransactionManager transactionManager,
+      ObservationOrderingPolicy observationOrderingPolicy) {
+    return new PostgresObservationTransaction(
+        jdbcClient, transactionManager, observationOrderingPolicy);
+  }
+
+  @Bean
+  ObservationOrderingPolicy observationOrderingPolicy() {
+    return new ObservationOrderingPolicy();
   }
 
   @Bean

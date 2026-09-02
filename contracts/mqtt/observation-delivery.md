@@ -39,4 +39,5 @@ continues to allow the group to be absent before replay.
 Counters use bounded reasons and never use machine, event, or replay identity as tags:
 `forgesync.mqtt.observations.received`, `forwarded`, `handoff.failures`,
 `acknowledgment.failures`, and `rejected{reason}`. Database outcomes use
-`forgesync.ingestion.observations{result=accepted|skipped_duplicate}`.
+`forgesync.ingestion.observations{result=accepted|accepted_late|skipped_duplicate}`. Accepted-late
+means history was committed while the current projection and TwinVersion were kept unchanged.
