@@ -31,6 +31,12 @@ The MQTT adapter integration check requires Docker and is intentionally separate
 ./scripts/verify-mqtt
 ```
 
+The PostgreSQL transaction and concurrent Inbox check also requires Docker and is separate:
+
+```bash
+./scripts/verify-database
+```
+
 ## Run applications
 
 ```bash
@@ -39,6 +45,9 @@ uv run --package forgesync-edge-gateway forgesync-source --help
 
 # Verify a deterministic replay schedule without publishing messages
 uv run --package forgesync-edge-gateway forgesync-replay --help
+
+# Start the local database required by Factory API ingestion
+docker compose --file infra/database/compose.yaml up --detach --wait
 
 # Factory API; health is GET http://localhost:8080/actuator/health
 apps/factory-api/gradlew -p apps/factory-api bootRun

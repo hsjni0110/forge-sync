@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.adapter.inbound.observation.ObservationContractValidator;
+import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.IOException;
@@ -47,6 +48,7 @@ class MqttObservationBrokerIntegrationTest {
             observation -> {
               accepted.add(observation);
               acceptedTwice.countDown();
+              return IngestionResult.ACCEPTED;
             },
             new MqttObservationValidator(new ObservationContractValidator(), new ObjectMapper()),
             registry);

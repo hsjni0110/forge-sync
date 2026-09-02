@@ -7,7 +7,17 @@ management:
       exposure:
         include: health
 
+spring:
+  datasource:
+    url: ${FORGESYNC_DATABASE_URL:jdbc:postgresql://127.0.0.1:15432/forgesync}
+    username: ${FORGESYNC_DATABASE_USERNAME:forgesync}
+    password: ${FORGESYNC_DATABASE_PASSWORD:forgesync-test}
+  flyway:
+    enabled: true
+
 forgesync:
+  ingestion:
+    enabled: true
   mqtt:
     enabled: false
     server-uri: tcp://localhost:1883

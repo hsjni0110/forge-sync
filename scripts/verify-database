@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+compose_file="$repository_root/infra/database/compose.yaml"
+database_port=${FORGESYNC_DATABASE_PORT:-15432}
+compose_project="forgesync-database-test-$$"
+
+run_compose() {
+  FORGESYNC_DATABASE_PORT="$database_port" \
+    docker compose --project-name "$compose_project" --file "$compose_file" "$@"
+}
+
+cleanup() {
+  verification_exit_code=$?
+  trap - EXIT INT TERM
+  run_compose down --volumes || true
+  exit "$verification_exit_code"
+}
+trap cleanup EXIT INT TERM
+
+run_compose up --detach --wait
+
+FORGESYNC_DATABASE_INTEGRATION=1 \
+FORGESYNC_DATABASE_URL="jdbc:postgresql://127.0.0.1:$database_port/forgesync" \
+FORGESYNC_DATABASE_USERNAME=forgesync \
+FORGESYNC_DATABASE_PASSWORD=forgesync-test \
+"$repository_root/apps/factory-api/gradlew" \
+  -p "$repository_root/apps/factory-api" \
+  test --tests '*PostgresObservationTransactionIntegrationTest'

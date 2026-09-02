@@ -1,0 +1,17 @@
+services:
+  database:
+    image: timescale/timescaledb:2.29.2-pg17@sha256:bc8527e62f70f0766b29515077965025872fabb5349db421565f69ee273baf2d
+    environment:
+      POSTGRES_DB: forgesync
+      POSTGRES_USER: forgesync
+      POSTGRES_PASSWORD: forgesync-test
+    ports:
+      - "127.0.0.1:${FORGESYNC_DATABASE_PORT:-15432}:5432"
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U forgesync -d forgesync
+      interval: 1s
+      timeout: 4s
+      retries: 30
+      start_period: 3s

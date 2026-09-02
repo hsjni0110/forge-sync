@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.adapter.inbound.observation.ObservationContractValidator;
+import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.io.IOException;
@@ -33,7 +34,10 @@ class MqttObservationConsumerTest {
   void setUp() {
     consumer =
         new MqttObservationConsumer(
-            accepted::add,
+            observation -> {
+              accepted.add(observation);
+              return IngestionResult.ACCEPTED;
+            },
             new MqttObservationValidator(new ObservationContractValidator(), new ObjectMapper()),
             meterRegistry);
   }
@@ -51,12 +55,25 @@ class MqttObservationConsumerTest {
   @Test
   void exposesDuplicateQoS1DeliveriesToApplicationForInboxHandling() {
     MqttObservationPacket duplicate = validPacket();
+    AtomicInteger handoffs = new AtomicInteger();
+    consumer =
+        new MqttObservationConsumer(
+            observation -> {
+              accepted.add(observation);
+              return handoffs.getAndIncrement() == 0
+                  ? IngestionResult.ACCEPTED
+                  : IngestionResult.SKIPPED_DUPLICATE;
+            },
+            new MqttObservationValidator(new ObservationContractValidator(), new ObjectMapper()),
+            meterRegistry);
 
     consumer.consumeObservation(duplicate, acknowledgments::incrementAndGet);
     consumer.consumeObservation(duplicate, acknowledgments::incrementAndGet);
 
     assertThat(accepted).hasSize(2);
     assertThat(acknowledgments).hasValue(2);
+    assertThat(ingestionResult("accepted")).isEqualTo(1);
+    assertThat(ingestionResult("skipped_duplicate")).isEqualTo(1);
   }
 
   @Test
@@ -197,6 +214,14 @@ class MqttObservationConsumerTest {
     return meterRegistry
         .get("forgesync.mqtt.observations.rejected")
         .tag("reason", reason)
+        .counter()
+        .count();
+  }
+
+  private double ingestionResult(String result) {
+    return meterRegistry
+        .get("forgesync.ingestion.observations")
+        .tag("result", result)
         .counter()
         .count();
   }

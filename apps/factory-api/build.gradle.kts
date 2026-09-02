@@ -24,7 +24,11 @@ dependencies {
     }
     implementation("org.eclipse.paho:org.eclipse.paho.mqttv5.client:1.2.5")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.flywaydb:flyway-core")
+    runtimeOnly("org.flywaydb:flyway-database-postgresql")
+    runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("com.tngtech.archunit:archunit-junit5:1.4.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -33,6 +37,9 @@ dependencies {
 tasks.processResources {
     from("../../contracts/observation-envelope/v2/observation-envelope.schema.json") {
         into("contracts/observation-envelope/v2")
+    }
+    from("../../db/migration") {
+        into("db/migration")
     }
 }
 

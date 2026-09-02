@@ -10,8 +10,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 public final class MqttObservationValidator {
@@ -40,8 +42,24 @@ public final class MqttObservationValidator {
     String replaySessionId = replay.path("replaySessionId").asText();
     String sourceEventKey = document.path("sourceEventKey").asText();
     validateRoutingMetadata(observationPacket, machineId, replaySessionId, sourceEventKey);
+    JsonNode provenance = document.path("provenance");
+    JsonNode sourceProvenance = provenance.path("source");
+    JsonNode transformation = provenance.path("transformation");
     return new ValidatedObservationMessage(
-        observationJson, machineId, replaySessionId, sourceEventKey);
+        observationJson,
+        UUID.fromString(document.path("eventId").asText()),
+        machineId,
+        document.path("subject").path("componentId").asText(),
+        document.path("observationKind").asText(),
+        Instant.parse(document.path("source").path("sourceObservedAt").asText()),
+        UUID.fromString(replaySessionId),
+        replay.path("replaySequence").asLong(),
+        Instant.parse(replay.path("replayPublishedAt").asText()),
+        sourceEventKey,
+        sourceProvenance.path("artifactId").asText(),
+        transformation.path("rawRecordId").asText(),
+        transformation.path("mappingVersion").asText(),
+        transformation.path("sourceDataItemId").asText());
   }
 
   private static void validateTransportMetadata(MqttObservationPacket observationPacket) {

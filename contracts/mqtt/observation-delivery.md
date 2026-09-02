@@ -31,9 +31,12 @@ continues to allow the group to be absent before replay.
 - The API acknowledges rejected permanent packets so malformed poison messages are not redelivered
   forever. Application and acknowledgment failures remain unacknowledged and force reconnect so
   the broker may deliver them again. They are reported as distinct failure causes.
-- Duplicate delivery is expected. Step 7 owns Inbox identity
-  `(replaySessionId, sourceEventKey)` and idempotent business handling.
+- Duplicate delivery is expected. The Ingestion transaction owns Inbox identity
+  `(replaySessionId, sourceEventKey)` and returns `SKIPPED_DUPLICATE` without another Observation
+  insert. Both accepted and skipped-duplicate deliveries are acknowledged only after that database
+  transaction returns. Database failure remains unacknowledged.
 
 Counters use bounded reasons and never use machine, event, or replay identity as tags:
 `forgesync.mqtt.observations.received`, `forwarded`, `handoff.failures`,
-`acknowledgment.failures`, and `rejected{reason}`.
+`acknowledgment.failures`, and `rejected{reason}`. Database outcomes use
+`forgesync.ingestion.observations{result=accepted|skipped_duplicate}`.

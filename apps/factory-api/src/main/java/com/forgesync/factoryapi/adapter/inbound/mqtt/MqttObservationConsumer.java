@@ -1,5 +1,6 @@
 package com.forgesync.factoryapi.adapter.inbound.mqtt;
 
+import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ObservationIngress;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
 import io.micrometer.core.instrument.Counter;
@@ -36,14 +37,17 @@ public final class MqttObservationConsumer {
       return;
     }
 
-    handOffObservation(observation);
+    IngestionResult ingestionResult = handOffObservation(observation);
     forwarded.increment();
+    meterRegistry
+        .counter("forgesync.ingestion.observations", "result", ingestionResult.metricValue())
+        .increment();
     acknowledgeObservation(acknowledger);
   }
 
-  private void handOffObservation(ValidatedObservationMessage observation) {
+  private IngestionResult handOffObservation(ValidatedObservationMessage observation) {
     try {
-      observationIngress.acceptObservation(observation);
+      return observationIngress.acceptObservation(observation);
     } catch (RuntimeException exception) {
       meterRegistry.counter("forgesync.mqtt.observations.handoff.failures").increment();
       throw new ObservationHandoffException(exception);
