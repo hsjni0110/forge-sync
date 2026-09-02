@@ -6,7 +6,6 @@ import com.forgesync.factoryapi.application.ObservationIngress;
 import com.forgesync.factoryapi.application.ObservationTransaction;
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
-import java.time.Clock;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,11 +18,6 @@ import org.springframework.transaction.PlatformTransactionManager;
     havingValue = "true",
     matchIfMissing = true)
 public class ObservationIngestionConfiguration {
-
-  @Bean
-  Clock ingestionClock() {
-    return Clock.systemUTC();
-  }
 
   @Bean
   ObservationTransaction observationTransaction(
@@ -46,7 +40,7 @@ public class ObservationIngestionConfiguration {
 
   @Bean
   ObservationIngress observationIngress(
-      ObservationTransaction observationTransaction, Clock ingestionClock) {
-    return new IngestObservation(observationTransaction, ingestionClock);
+      ObservationTransaction observationTransaction, java.time.Clock applicationClock) {
+    return new IngestObservation(observationTransaction, applicationClock);
   }
 }

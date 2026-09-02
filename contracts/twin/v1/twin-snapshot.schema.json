@@ -1,0 +1,233 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/twin/v1/twin-snapshot.schema.json",
+  "title": "ForgeSync Operational Twin Snapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "machine", "consistency", "state", "metrics", "conditions",
+    "production", "productionResult", "alarms", "maintenance", "intelligence", "quality",
+    "spatial"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "machine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machineId"],
+      "properties": {
+        "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" }
+      }
+    },
+    "consistency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "twinVersion", "projectedAt", "missingFields"],
+      "properties": {
+        "status": { "enum": ["CONSISTENT", "PARTIAL", "STALE", "DEGRADED"] },
+        "twinVersion": { "type": "integer", "minimum": 1 },
+        "projectedAt": { "$ref": "#/$defs/timestamp" },
+        "missingFields": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "metrics.spindleSpeeds", "state.execution", "metrics.toolNumber", "metrics.program"
+            ]
+          }
+        }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["connectivity", "execution", "health", "freshness"],
+      "properties": {
+        "connectivity": { "$ref": "#/$defs/connectivity" },
+        "execution": { "$ref": "#/$defs/execution" },
+        "health": { "$ref": "#/$defs/health" },
+        "freshness": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["value", "evaluatedAt", "projectedAt", "ageMillis", "basis"],
+          "properties": {
+            "value": { "enum": ["FRESH", "LAGGING", "STALE"] },
+            "evaluatedAt": { "$ref": "#/$defs/timestamp" },
+            "projectedAt": { "$ref": "#/$defs/timestamp" },
+            "ageMillis": { "type": "integer", "minimum": 0 },
+            "basis": { "const": "PROJECTED_AT" }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["spindleSpeeds"],
+      "properties": {
+        "spindleSpeeds": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/spindleSpeed" }
+        },
+        "toolNumber": { "$ref": "#/$defs/observedInteger" },
+        "program": { "$ref": "#/$defs/observedText" }
+      }
+    },
+    "conditions": { "type": "array", "items": { "$ref": "#/$defs/condition" } },
+    "production": { "$ref": "#/$defs/emptyObject" },
+    "productionResult": { "$ref": "#/$defs/emptyObject" },
+    "alarms": { "type": "array", "maxItems": 0 },
+    "maintenance": { "$ref": "#/$defs/emptyObject" },
+    "intelligence": { "$ref": "#/$defs/emptyObject" },
+    "quality": { "$ref": "#/$defs/emptyObject" },
+    "spatial": { "$ref": "#/$defs/emptyObject" }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "emptyObject": { "type": "object", "additionalProperties": false, "maxProperties": 0 },
+    "derivedState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "provenance"],
+      "properties": {
+        "value": { "type": "string" },
+        "provenance": { "type": "array", "items": { "$ref": "#/$defs/provenance" } }
+      }
+    },
+    "connectivity": {
+      "allOf": [
+        { "$ref": "#/$defs/derivedState" },
+        { "properties": { "value": { "enum": ["UNKNOWN", "ONLINE", "STALE", "OFFLINE"] } } }
+      ]
+    },
+    "execution": {
+      "allOf": [
+        { "$ref": "#/$defs/derivedState" },
+        {
+          "properties": {
+            "value": { "enum": ["UNKNOWN", "READY", "ACTIVE", "IDLE", "HOLD", "STOPPED"] }
+          }
+        }
+      ]
+    },
+    "health": {
+      "allOf": [
+        { "$ref": "#/$defs/derivedState" },
+        { "properties": { "value": { "enum": ["UNKNOWN", "NORMAL", "WARNING", "FAULT"] } } }
+      ]
+    },
+    "observationMetadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["componentId", "sourceObservedAt", "projectedAt", "twinVersion"],
+      "properties": {
+        "componentId": { "type": "string", "minLength": 1 },
+        "sourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "projectedAt": { "$ref": "#/$defs/timestamp" },
+        "twinVersion": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "sourceProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "provider", "sourceSetId", "artifactId"],
+      "properties": {
+        "kind": { "const": "REAL" },
+        "provider": { "const": "NIST" },
+        "sourceSetId": { "type": "string", "minLength": 1 },
+        "artifactId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "transformationProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rawRecordId", "mappingVersion", "sourceDataItemId"],
+      "properties": {
+        "rawRecordId": { "type": "string", "minLength": 1 },
+        "mappingVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "sourceDataItemId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "transformation"],
+      "properties": {
+        "source": { "$ref": "#/$defs/sourceProvenance" },
+        "transformation": { "$ref": "#/$defs/transformationProvenance" }
+      }
+    },
+    "observedBase": {
+      "type": "object",
+      "required": ["availability", "observation", "provenance"],
+      "properties": {
+        "availability": { "enum": ["AVAILABLE", "UNAVAILABLE"] },
+        "observation": { "$ref": "#/$defs/observationMetadata" },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "spindleSpeed": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        {
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "const": "REVOLUTION/MINUTE" }
+          }
+        },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value", "unit"] },
+          "else": { "not": { "anyOf": [{ "required": ["value"] }, { "required": ["unit"] }] } }
+        }
+      ]
+    },
+    "observedInteger": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        { "properties": { "value": { "type": "integer", "minimum": 0 } } },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value"] },
+          "else": { "not": { "required": ["value"] } }
+        }
+      ]
+    },
+    "observedText": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        { "properties": { "value": { "type": "string", "minLength": 1 } } },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value"] },
+          "else": { "not": { "required": ["value"] } }
+        }
+      ]
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["conditionType", "level", "observation", "provenance"],
+      "properties": {
+        "conditionType": { "type": "string", "pattern": "^[A-Z][A-Z0-9_:]*$" },
+        "level": { "enum": ["NORMAL", "WARNING", "FAULT", "UNAVAILABLE"] },
+        "nativeCode": { "type": "string" },
+        "nativeSeverity": { "type": "string" },
+        "qualifier": { "type": "string" },
+        "message": { "type": "string" },
+        "observation": { "$ref": "#/$defs/observationMetadata" },
+        "provenance": { "$ref": "#/$defs/provenance" }
+      }
+    }
+  }
+}

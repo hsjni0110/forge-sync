@@ -1,0 +1,121 @@
+{
+  "schemaVersion": "1.0.0",
+  "machine": { "machineId": "Mazak01" },
+  "consistency": {
+    "status": "CONSISTENT",
+    "twinVersion": 4,
+    "projectedAt": "2026-09-02T01:02:04Z",
+    "missingFields": []
+  },
+  "state": {
+    "connectivity": { "value": "ONLINE", "provenance": [] },
+    "execution": {
+      "value": "ACTIVE",
+      "provenance": [
+        {
+          "source": {
+            "kind": "REAL",
+            "provider": "NIST",
+            "sourceSetId": "nist-mazak01-20161005",
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+          },
+          "transformation": {
+            "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1526",
+            "mappingVersion": "2.0.0",
+            "sourceDataItemId": "Mazak01-path_13"
+          }
+        }
+      ]
+    },
+    "health": { "value": "UNKNOWN", "provenance": [] },
+    "freshness": {
+      "value": "FRESH",
+      "evaluatedAt": "2026-09-02T01:02:05Z",
+      "projectedAt": "2026-09-02T01:02:04Z",
+      "ageMillis": 1000,
+      "basis": "PROJECTED_AT"
+    }
+  },
+  "metrics": {
+    "spindleSpeeds": [
+      {
+        "availability": "AVAILABLE",
+        "value": 49.0,
+        "unit": "REVOLUTION/MINUTE",
+        "observation": {
+          "componentId": "Mazak01-C",
+          "sourceObservedAt": "2016-10-05T09:01:39.012Z",
+          "projectedAt": "2026-09-02T01:02:01Z",
+          "twinVersion": 1
+        },
+        "provenance": {
+          "source": {
+            "kind": "REAL",
+            "provider": "NIST",
+            "sourceSetId": "nist-mazak01-20161005",
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+          },
+          "transformation": {
+            "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1530",
+            "mappingVersion": "2.0.0",
+            "sourceDataItemId": "Mazak01-C_5"
+          }
+        }
+      }
+    ],
+    "toolNumber": {
+      "availability": "AVAILABLE",
+      "value": 13,
+      "observation": {
+        "componentId": "Mazak01-path",
+        "sourceObservedAt": "2016-10-05T09:01:44.430Z",
+        "projectedAt": "2026-09-02T01:02:03Z",
+        "twinVersion": 3
+      },
+      "provenance": {
+        "source": {
+          "kind": "REAL",
+          "provider": "NIST",
+          "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+        },
+        "transformation": {
+          "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1555",
+          "mappingVersion": "2.0.0",
+          "sourceDataItemId": "Mazak01-path_10"
+        }
+      }
+    },
+    "program": {
+      "availability": "AVAILABLE",
+      "value": "114",
+      "observation": {
+        "componentId": "Mazak01-path",
+        "sourceObservedAt": "2016-10-05T08:43:49.514Z",
+        "projectedAt": "2026-09-02T01:02:04Z",
+        "twinVersion": 4
+      },
+      "provenance": {
+        "source": {
+          "kind": "REAL",
+          "provider": "NIST",
+          "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+        },
+        "transformation": {
+          "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=131",
+          "mappingVersion": "2.0.0",
+          "sourceDataItemId": "Mazak01-path_1"
+        }
+      }
+    }
+  },
+  "conditions": [],
+  "production": {},
+  "productionResult": {},
+  "alarms": [],
+  "maintenance": {},
+  "intelligence": {},
+  "quality": {},
+  "spatial": {}
+}

@@ -29,6 +29,16 @@ class ArchitectureTest {
           .resideInAnyPackage("org.springframework..", "..adapter..")
           .allowEmptyShould(true);
 
+  private static final ArchRule REST_ADAPTER_PERSISTENCE_RULE =
+      noClasses()
+          .that()
+          .resideInAPackage("..adapter.inbound.rest..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage(
+              "..adapter.outbound..", "org.springframework.jdbc..", "jakarta.persistence..")
+          .allowEmptyShould(true);
+
   @Test
   void productionCodeDependsOnlyTowardTheDomain() {
     JavaClasses productionClasses =
@@ -38,6 +48,7 @@ class ArchitectureTest {
 
     DOMAIN_DEPENDENCY_RULE.check(productionClasses);
     APPLICATION_DEPENDENCY_RULE.check(productionClasses);
+    REST_ADAPTER_PERSISTENCE_RULE.check(productionClasses);
   }
 
   @Test

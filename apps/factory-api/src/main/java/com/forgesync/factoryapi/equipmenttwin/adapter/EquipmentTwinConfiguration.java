@@ -2,13 +2,21 @@ package com.forgesync.factoryapi.equipmenttwin.adapter;
 
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.FreshnessPolicy;
+import java.time.Clock;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class EquipmentTwinConfiguration {
+
+  @Bean
+  @ConditionalOnMissingBean(Clock.class)
+  Clock applicationClock() {
+    return Clock.systemUTC();
+  }
 
   @Bean
   EquipmentStateProjectionPolicy equipmentStateProjectionPolicy() {

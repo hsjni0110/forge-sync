@@ -1,0 +1,90 @@
+package com.forgesync.factoryapi.equipmenttwin.application;
+
+import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
+import com.forgesync.factoryapi.equipmenttwin.domain.ExecutionState;
+import com.forgesync.factoryapi.equipmenttwin.domain.FreshnessState;
+import com.forgesync.factoryapi.equipmenttwin.domain.HealthState;
+import com.forgesync.factoryapi.equipmenttwin.domain.ObservationAvailability;
+import com.forgesync.factoryapi.equipmenttwin.domain.TwinVersion;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+public record OperationalTwinSnapshot(
+    String machineId,
+    TwinVersion twinVersion,
+    Instant projectedAt,
+    TwinConsistencyState consistencyState,
+    List<String> missingFields,
+    ConnectivityState connectivity,
+    ExecutionState execution,
+    HealthState health,
+    FreshnessState freshness,
+    Instant evaluatedAt,
+    Duration age,
+    List<FieldProvenance> connectivityProvenance,
+    List<FieldProvenance> executionProvenance,
+    List<FieldProvenance> healthProvenance,
+    List<SpindleSpeed> spindleSpeeds,
+    Optional<ObservedEvent> toolNumber,
+    Optional<ObservedEvent> program,
+    List<CurrentCondition> conditions) {
+
+  public OperationalTwinSnapshot {
+    Objects.requireNonNull(machineId, "machineId");
+    Objects.requireNonNull(twinVersion, "twinVersion");
+    Objects.requireNonNull(projectedAt, "projectedAt");
+    Objects.requireNonNull(consistencyState, "consistencyState");
+    missingFields = List.copyOf(missingFields);
+    Objects.requireNonNull(connectivity, "connectivity");
+    Objects.requireNonNull(execution, "execution");
+    Objects.requireNonNull(health, "health");
+    Objects.requireNonNull(freshness, "freshness");
+    Objects.requireNonNull(evaluatedAt, "evaluatedAt");
+    Objects.requireNonNull(age, "age");
+    connectivityProvenance = List.copyOf(connectivityProvenance);
+    executionProvenance = List.copyOf(executionProvenance);
+    healthProvenance = List.copyOf(healthProvenance);
+    spindleSpeeds = List.copyOf(spindleSpeeds);
+    Objects.requireNonNull(toolNumber, "toolNumber");
+    Objects.requireNonNull(program, "program");
+    conditions = List.copyOf(conditions);
+  }
+
+  public record ObservationMetadata(
+      String componentId,
+      Instant sourceObservedAt,
+      Instant projectedAt,
+      TwinVersion twinVersion,
+      FieldProvenance provenance) {
+
+    public ObservationMetadata {
+      Objects.requireNonNull(componentId, "componentId");
+      Objects.requireNonNull(sourceObservedAt, "sourceObservedAt");
+      Objects.requireNonNull(projectedAt, "projectedAt");
+      Objects.requireNonNull(twinVersion, "twinVersion");
+      Objects.requireNonNull(provenance, "provenance");
+    }
+  }
+
+  public record SpindleSpeed(
+      ObservationAvailability availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadata metadata) {}
+
+  public record ObservedEvent(
+      ObservationAvailability availability, String value, ObservationMetadata metadata) {}
+
+  public record CurrentCondition(
+      String conditionType,
+      String level,
+      String nativeCode,
+      String nativeSeverity,
+      String qualifier,
+      String message,
+      ObservationMetadata metadata) {}
+}

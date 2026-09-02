@@ -19,6 +19,8 @@ forgesync:
   ingestion:
     enabled: true
   twin:
+    query:
+      enabled: true
     freshness:
       fresh-max-age: 2s
       lagging-max-age: 10s

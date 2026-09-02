@@ -41,11 +41,17 @@ tasks.processResources {
     from("../../db/migration") {
         into("db/migration")
     }
+    from("../../contracts/twin/v1/twin-snapshot.schema.json") {
+        into("contracts/twin/v1")
+    }
 }
 
 tasks.processTestResources {
     from("../../tests/fixtures/canonical/v2") {
         into("fixtures/canonical/v2")
+    }
+    from("../../tests/fixtures/twin/v1") {
+        into("fixtures/twin/v1")
     }
 }
 

@@ -11,6 +11,8 @@ import com.forgesync.factoryapi.adapter.inbound.mqtt.MqttObservationValidator;
 import com.forgesync.factoryapi.adapter.inbound.observation.ObservationContractValidator;
 import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
+import com.forgesync.factoryapi.equipmenttwin.adapter.outbound.postgres.PostgresTwinProjectionReader;
+import com.forgesync.factoryapi.equipmenttwin.application.LoadedTwinProjection;
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
 import java.io.IOException;
@@ -51,6 +53,7 @@ class PostgresObservationTransactionIntegrationTest {
 
   private static JdbcClient jdbcClient;
   private static PostgresObservationTransaction transaction;
+  private static PostgresTwinProjectionReader twinProjectionReader;
 
   @BeforeAll
   static void migrateDatabase() {
@@ -64,6 +67,9 @@ class PostgresObservationTransactionIntegrationTest {
             new ObservationOrderingPolicy(),
             new PostgresEquipmentStateProjection(
                 jdbcClient, new EquipmentStateProjectionPolicy(), OBJECT_MAPPER));
+    twinProjectionReader =
+        new PostgresTwinProjectionReader(
+            jdbcClient, OBJECT_MAPPER, new DataSourceTransactionManager(dataSource));
   }
 
   @BeforeEach
@@ -200,6 +206,28 @@ class PostgresObservationTransactionIntegrationTest {
     assertThat(equipmentStateValue("Mazak01", "health_state")).isEqualTo("WARNING");
     assertThat(equipmentStateVersion("Mazak01")).isEqualTo(3);
     assertThat(equipmentStateProjectedAt("Mazak01")).isEqualTo(PROJECTED_AT);
+  }
+
+  @Test
+  void readsAConsistentTypedTwinProjectionWithFieldProvenance() {
+    ValidatedObservationMessage sample = replayedObservation("sample-spindle-speed.json", 1);
+    ValidatedObservationMessage event = replayedObservation("event-execution.json", 2);
+    ValidatedObservationMessage condition = replayedObservation("condition-warning.json", 3);
+    transaction.storeObservation(sample, INGESTED_AT, PROJECTED_AT);
+    transaction.storeObservation(event, INGESTED_AT, PROJECTED_AT.plusSeconds(1));
+    transaction.storeObservation(condition, INGESTED_AT, PROJECTED_AT.plusSeconds(2));
+
+    LoadedTwinProjection projection = twinProjectionReader.findByMachineId("Mazak01").orElseThrow();
+
+    assertThat(projection.twinVersion()).isEqualTo(projection.equipmentStateVersion());
+    assertThat(projection.projectedAt()).isEqualTo(PROJECTED_AT.plusSeconds(2));
+    assertThat(projection.observations()).hasSize(3);
+    assertThat(projection.observations())
+        .extracting(observation -> observation.provenance().provider())
+        .containsOnly("NIST");
+    assertThat(projection.observations())
+        .extracting(observation -> observation.provenance().rawRecordId())
+        .doesNotContainNull();
   }
 
   @Test
