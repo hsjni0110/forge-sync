@@ -14,6 +14,7 @@ api_mqtt_client_id="forgesync-api-local-$$"
 runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-local.XXXXXX")
 api_pid=""
 web_pid=""
+replay_pid=""
 
 run_database_compose() {
   FORGESYNC_DATABASE_PORT="$database_port" \
@@ -29,8 +30,10 @@ cleanup() {
   exit_code=$?
   trap - EXIT INT TERM
   printf '\nForgeSync local runtime을 종료합니다.\n'
+  if [ -n "$replay_pid" ]; then kill "$replay_pid" 2>/dev/null || true; fi
   if [ -n "$web_pid" ]; then kill "$web_pid" 2>/dev/null || true; fi
   if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
+  if [ -n "$replay_pid" ]; then wait "$replay_pid" 2>/dev/null || true; fi
   if [ -n "$web_pid" ]; then wait "$web_pid" 2>/dev/null || true; fi
   if [ -n "$api_pid" ]; then wait "$api_pid" 2>/dev/null || true; fi
   run_mqtt_compose down --volumes || true
@@ -61,7 +64,8 @@ if [ "${1:-}" = "--help" ]; then
   cat <<'EOF'
 Usage: ./scripts/run-local
 
-PostgreSQL, Mosquitto, Factory API, Factory Web을 실행하고 Mazak01 demo 데이터를 발행합니다.
+PostgreSQL, Mosquitto, Factory API, Factory Web을 실행하고 약 8분 길이의 Mazak01 관찰용
+데이터 흐름을 발행합니다.
 종료하려면 Ctrl+C를 누르세요.
 EOF
   trap - EXIT INT TERM
@@ -99,20 +103,22 @@ web_pid=$!
 wait_for_url "http://localhost:$api_port/actuator/health" "$runtime_directory/api.log" "Factory API"
 wait_for_url "http://localhost:$web_port" "$runtime_directory/web.log" "Factory Web"
 
-printf 'Mazak01 초기 데이터를 발행합니다...\n'
+printf 'Mazak01 관찰용 데이터 흐름을 시작합니다...\n'
 FORGESYNC_MQTT_HOST=localhost \
 FORGESYNC_MQTT_PORT="$mqtt_port" \
-  uv run python "$repository_root/tests/e2e/support/publish_observation.py" initial
+  uv run python "$repository_root/tests/e2e/support/publish_observation.py" guided-demo \
+  >"$runtime_directory/replay.log" 2>&1 &
+replay_pid=$!
 wait_for_url \
   "http://localhost:$api_port/api/v1/machines/Mazak01/twin" \
   "$runtime_directory/api.log" \
   "Mazak01 Twin"
 
 printf '\nForgeSync가 실행 중입니다.\n'
-printf '화면: http://localhost:%s/machines/Mazak01\n' "$web_port"
+printf '화면: http://localhost:%s/factory\n' "$web_port"
 printf '종료: Ctrl+C\n'
-printf '\n실시간 값 변경을 보려면 다른 터미널에서 실행하세요:\n'
-printf 'FORGESYNC_MQTT_PORT=%s uv run python tests/e2e/support/publish_observation.py live-update\n\n' "$mqtt_port"
+printf '\n고정된 NIST 원본의 약 1시간 구간에서 실행 상태와 RPM 337건을 골라\n'
+printf '1.5초 간격으로 약 8분 동안 보여줍니다. 이 간격은 관찰용이며 원본 시간 배속이 아닙니다.\n\n'
 
 while kill -0 "$api_pid" 2>/dev/null && kill -0 "$web_pid" 2>/dev/null; do
   sleep 1

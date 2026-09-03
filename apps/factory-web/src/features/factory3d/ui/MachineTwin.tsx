@@ -6,17 +6,22 @@ import type {
   MachineSceneBinding,
   MachineVisualState,
 } from "../domain/machineVisualState";
+import type { MachineVisualPresentation } from "../domain/machineVisualPresentation";
 import { AssetErrorBoundary } from "./AssetErrorBoundary";
 import { GenericMachinePrimitive } from "./GenericMachinePrimitive";
+import { MachineStatusBeacon } from "./MachineStatusBeacon";
+import { SpindleVisualCue } from "./SpindleVisualCue";
 
 export function MachineTwin({
   binding,
   visualState,
+  visualPresentation,
   onSelectMachine,
   onAssetFallback,
 }: {
   binding: MachineSceneBinding;
   visualState: MachineVisualState | undefined;
+  visualPresentation: MachineVisualPresentation;
   onSelectMachine: (machineId: string) => void;
   onAssetFallback: () => void;
 }) {
@@ -32,11 +37,18 @@ export function MachineTwin({
       }}
     >
       <AssetErrorBoundary
-        fallback={<GenericMachinePrimitive />}
+        fallback={
+          <GenericMachinePrimitive visualPresentation={visualPresentation} />
+        }
         onError={onAssetFallback}
       >
-        <FactoryAssetModel asset={binding.asset} />
+        <FactoryAssetModel
+          asset={binding.asset}
+          visualPresentation={visualPresentation}
+        />
       </AssetErrorBoundary>
+      <SpindleVisualCue visualPresentation={visualPresentation} />
+      <MachineStatusBeacon visualPresentation={visualPresentation} />
       {visualState?.selected && (
         <mesh name="selected-machine-cue" rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
           <ringGeometry args={[2.05, 2.25, 48]} />
@@ -47,9 +59,15 @@ export function MachineTwin({
   );
 }
 
-function FactoryAssetModel({ asset }: { asset: FactoryAsset }): ReactNode {
+function FactoryAssetModel({
+  asset,
+  visualPresentation,
+}: {
+  asset: FactoryAsset;
+  visualPresentation: MachineVisualPresentation;
+}): ReactNode {
   if (asset.representation === "PROCEDURAL") {
-    return <GenericMachinePrimitive />;
+    return <GenericMachinePrimitive visualPresentation={visualPresentation} />;
   }
   return <GlbMachine asset={asset} />;
 }

@@ -24,9 +24,20 @@ describe("FactoryRoute", () => {
     );
     expect(await screen.findByTestId("healthy-scene")).toBeTruthy();
     expect(screen.getByText("3D Mazak01 · Twin v4 · selected")).toBeTruthy();
+    expect(screen.getByText("3D visual · ACTIVE · animation on")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Mazak01" })).toBeTruthy();
     expect(screen.getByText("v4")).toBeTruthy();
     expect(screen.getByText(/SIMULATED_LAYOUT/)).toBeTruthy();
+    expect(screen.getByText(/실제 물리 회전 속도가 아닙니다/)).toBeTruthy();
+    expect(screen.getByText(/범용 수직형 CNC를 단순화한 모습/)).toBeTruthy();
+    expect(screen.getByText(/10초 동안 새 값이 없으면/)).toBeTruthy();
+    expect(screen.getByText(/데이터 재생이 끝났다는 뜻은 아닙니다/)).toBeTruthy();
+
+    const reducedMotion = screen.getByRole("button", { name: "모션 줄이기" });
+    expect(reducedMotion.getAttribute("aria-pressed")).toBe("false");
+    fireEvent.click(reducedMotion);
+    expect(reducedMotion.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByText("3D visual · ACTIVE · animation off")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "2D" }));
     expect(screen.queryByRole("heading", { name: "3D 공장" })).toBeNull();
@@ -133,16 +144,26 @@ const createSession: TwinSessionFactory = () => {
   return session;
 };
 
-function HealthyScene({ visualState, onSelectMachine }: FactorySceneProps) {
+function HealthyScene({
+  visualState,
+  visualPresentation,
+  onSelectMachine,
+}: FactorySceneProps) {
   return (
-    <button
-      type="button"
-      data-testid="healthy-scene"
-      onClick={() => onSelectMachine("Mazak01")}
-    >
-      3D {visualState?.machineId} · Twin v{visualState?.twinVersion} ·{" "}
-      {visualState?.selected ? "selected" : "not selected"}
-    </button>
+    <div>
+      <button
+        type="button"
+        data-testid="healthy-scene"
+        onClick={() => onSelectMachine("Mazak01")}
+      >
+        3D {visualState?.machineId} · Twin v{visualState?.twinVersion} ·{" "}
+        {visualState?.selected ? "selected" : "not selected"}
+      </button>
+      <span>
+        3D visual · {visualPresentation.status} · animation{" "}
+        {visualPresentation.isSpindleAnimating ? "on" : "off"}
+      </span>
+    </div>
   );
 }
 

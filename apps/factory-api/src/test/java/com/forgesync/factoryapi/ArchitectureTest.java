@@ -39,6 +39,20 @@ class ArchitectureTest {
               "..adapter.outbound..", "org.springframework.jdbc..", "jakarta.persistence..")
           .allowEmptyShould(true);
 
+  private static final ArchRule PROCESS_ANALYTICS_CONTEXT_RULE =
+      noClasses()
+          .that()
+          .resideInAnyPackage("..processanalytics.domain..", "..processanalytics.application..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage(
+              "..equipmenttwin..",
+              "..production..",
+              "..intelligence..",
+              "com.forgesync.factoryapi.adapter..",
+              "com.forgesync.factoryapi.application..")
+          .allowEmptyShould(true);
+
   @Test
   void productionCodeDependsOnlyTowardTheDomain() {
     JavaClasses productionClasses =
@@ -49,6 +63,7 @@ class ArchitectureTest {
     DOMAIN_DEPENDENCY_RULE.check(productionClasses);
     APPLICATION_DEPENDENCY_RULE.check(productionClasses);
     REST_ADAPTER_PERSISTENCE_RULE.check(productionClasses);
+    PROCESS_ANALYTICS_CONTEXT_RULE.check(productionClasses);
   }
 
   @Test
@@ -60,6 +75,19 @@ class ArchitectureTest {
                 architecturefixture.adapter.FrameworkAdapter.class);
 
     assertThatThrownBy(() -> DOMAIN_DEPENDENCY_RULE.check(invalidFixture))
+        .isInstanceOf(AssertionError.class);
+  }
+
+  @Test
+  void processAnalyticsRuleRejectsAnIntentionalEquipmentTwinDependency() {
+    JavaClasses invalidFixture =
+        new ClassFileImporter()
+            .importClasses(
+                architecturefixture.processanalytics.application.InvalidProcessAnalyticsService
+                    .class,
+                architecturefixture.equipmenttwin.adapter.InternalTwinRepository.class);
+
+    assertThatThrownBy(() -> PROCESS_ANALYTICS_CONTEXT_RULE.check(invalidFixture))
         .isInstanceOf(AssertionError.class);
   }
 }

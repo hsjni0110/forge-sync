@@ -8,6 +8,7 @@ import { MachineTwin } from "./MachineTwin";
 export default function FactoryScene({
   machineBinding,
   visualState,
+  visualPresentation,
   onSelectMachine,
   onAssetFallback,
   onUnavailable,
@@ -51,6 +52,7 @@ export default function FactoryScene({
         <MachineTwin
           binding={machineBinding}
           visualState={visualState}
+          visualPresentation={visualPresentation}
           onSelectMachine={onSelectMachine}
           onAssetFallback={onAssetFallback}
         />
@@ -58,8 +60,15 @@ export default function FactoryScene({
       <FloatingMachineLabel
         binding={machineBinding}
         visualState={visualState}
+        visualPresentation={visualPresentation}
         onSelectMachine={onSelectMachine}
       />
+      <aside className="scene-visual-legend" aria-label="3D 설비 표현 설명">
+        <strong>범용 수직형 CNC 표현</strong>
+        <span>밝은 원판: RPM에 반응하는 스핀들 표시</span>
+        <span>위쪽 표시등: 현재 상태</span>
+        <span>바닥의 노란 원: 선택된 설비</span>
+      </aside>
       {isSceneReady && <span className="visually-hidden">3D 장면 준비됨</span>}
     </div>
   );

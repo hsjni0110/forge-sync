@@ -7,6 +7,7 @@ import type {
   MachineSceneBinding,
   MachineVisualState,
 } from "../domain/machineVisualState";
+import { deriveMachineVisualPresentation } from "../domain/machineVisualPresentation";
 import FactoryScene from "./FactoryScene";
 
 const loadVerifiedGlbAsset = vi.hoisted(() => vi.fn());
@@ -31,7 +32,7 @@ vi.mock("@react-three/fiber", async () => {
         React.createElement("canvas", undefined, fallback),
       );
     },
-    useFrame: (callback: () => void) => React.useEffect(callback, [callback]),
+    useFrame: () => undefined,
   };
 });
 
@@ -59,6 +60,7 @@ describe("FactoryScene asset isolation", () => {
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
         visualState={visualState}
+        visualPresentation={visualPresentation}
         onSelectMachine={vi.fn()}
         onAssetFallback={vi.fn()}
         onUnavailable={onUnavailable}
@@ -77,6 +79,7 @@ describe("FactoryScene asset isolation", () => {
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
         visualState={visualState}
+        visualPresentation={visualPresentation}
         onSelectMachine={vi.fn()}
         onAssetFallback={vi.fn()}
         onUnavailable={onUnavailable}
@@ -101,6 +104,7 @@ describe("FactoryScene asset isolation", () => {
           <FactoryScene
             machineBinding={binding(externalAsset)}
             visualState={visualState}
+            visualPresentation={visualPresentation}
             onSelectMachine={vi.fn()}
             onAssetFallback={onAssetFallback}
             onUnavailable={vi.fn()}
@@ -120,6 +124,7 @@ describe("FactoryScene asset isolation", () => {
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
         visualState={visualState}
+        visualPresentation={visualPresentation}
         onSelectMachine={onSelectMachine}
         onAssetFallback={vi.fn()}
         onUnavailable={vi.fn()}
@@ -129,9 +134,84 @@ describe("FactoryScene asset isolation", () => {
     await screen.findByText("Twin v4");
     expect(container.querySelector('mesh[name="selected-machine-cue"]')).toBeTruthy();
     fireEvent.click(container.querySelector('group[name="mazak01"]') as Element);
-    fireEvent.click(screen.getByRole("button", { name: /Mazak01 Twin v4 선택됨/ }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /Mazak01 Twin v4.*선택됨/ }),
+    );
     expect(onSelectMachine).toHaveBeenNthCalledWith(1, "Mazak01");
     expect(onSelectMachine).toHaveBeenNthCalledWith(2, "Mazak01");
+  });
+
+  it("renders a recognizable generic vertical CNC with named operator cues", async () => {
+    const { container } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    await screen.findByText("Twin v4");
+    for (const partName of [
+      "cnc-enclosure",
+      "cnc-work-envelope",
+      "cnc-work-table",
+      "cnc-spindle-head",
+      "cnc-control-panel",
+      "cnc-status-tower",
+    ]) {
+      expect(container.querySelector(`[name="${partName}"]`)).toBeTruthy();
+    }
+    expect(screen.getByText("범용 수직형 CNC 표현")).toBeTruthy();
+    expect(screen.getByText(/밝은 원판: RPM에 반응하는 스핀들 표시/)).toBeTruthy();
+  });
+
+  it("renders textual warning and stale cues without relying on color", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const warningState = { ...visualState, health: "WARNING" as const };
+    const { container, rerender } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={warningState}
+        visualPresentation={deriveMachineVisualPresentation(warningState, false)}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("button", { name: /Mazak01 Twin v4 주의 49 RPM/ }),
+    ).toBeTruthy();
+
+    const staleState = {
+      ...warningState,
+      connectivity: "STALE" as const,
+      stale: true,
+    };
+    rerender(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={staleState}
+        visualPresentation={deriveMachineVisualPresentation(staleState, false)}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: /Mazak01 Twin v4 오래된 데이터 49 RPM 시각 회전 꺼짐/,
+      }),
+    ).toBeTruthy();
+    expect(
+      container.querySelector(
+        'group[name="generic-cnc-primitive"] meshstandardmaterial[color="#48545a"][opacity="0.62"]',
+      ),
+    ).toBeTruthy();
   });
 });
 
@@ -160,6 +240,8 @@ const visualState: MachineVisualState = {
   stale: false,
   selected: true,
 };
+
+const visualPresentation = deriveMachineVisualPresentation(visualState, false);
 
 const proceduralAsset = {
   assetId: "procedural-cnc",

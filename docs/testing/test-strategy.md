@@ -97,7 +97,7 @@ tests/fixtures/contracts/    REST/WebSocket payload examples
 - STOPPED 또는 STALE에서 animation 정지
 - warning/fault가 색 이외의 cue도 제공
 - selection과 right panel의 machineId 일치
-- asset 실패 시 fallback primitive
+- asset 실패 시 fallback primitive가 외함/가공실/작업대/스핀들/조작반을 구분해 표시
 - WebGL 실패 시 2D Machine Detail/Replay/Alarm 기능 유지
 - reduced-motion 설정에서 비필수 motion 감소
 
@@ -142,11 +142,19 @@ When 연결이 복구되면
 Then REST snapshot을 먼저 동기화한 뒤 patch 구독을 재개한다
 ```
 
-Step 11~14의 자동화는 `./scripts/verify-e2e`가 담당한다. checksum이 고정된 Canonical NIST
-Observation 세 건을 실제 MQTT/API/Web runtime에 전달하고, Playwright clock으로 STALE 경계를
+Step 11~15의 자동화는 `./scripts/verify-e2e`가 담당한다. checksum이 고정된 Canonical NIST
+Observation 여섯 건을 실제 MQTT/API/Web runtime에 전달하고, Playwright clock으로 STALE 경계를
 결정적으로 이동한다. 이 시나리오는 RPM vertical slice, disconnect/resync, 정상 Factory의 첫 scene
 frame, WebGL 초기화 실패 시 2D 생존, 선택한 3D Mazak01과 오른쪽 panel의 Twin version 일치를
-검증한다. E2E-01의 execution/tool/program 기반 3D 시각 상태 binding까지 완료했다고 주장하지 않는다.
+검증한다. 또한 Canonical ACTIVE/STOPPED와 RPM을 결합해 3D visual spindle의 활성/정지, 단절 후
+STALE 즉시 정지, REST 복구 후 재활성화를 검증한다. tool/program 기반 3D 시각 변화까지 완료했다고
+주장하지 않는다.
+
+사람이 로컬 화면을 관찰하는 `./scripts/run-local`은 자동화 E2E의 짧은 여섯 건과 분리한다.
+checksum `aee293...9b17f`인 같은 Canonical 결과에서 2016-10-05 09:18:27.292Z부터
+10:18:22.999Z까지 `Mazak01-path_13`과 `Mazak01-C_5` 337건을 선택한다. 원본 순서는 유지하되
+화면 관찰을 위해 1.5초 wall-clock 간격으로 발행하며, 이를 1x/10x/100x source-time replay로
+주장하지 않는다. 실제 replay timing과 사용자 제어는 Step 17에서 검증한다.
 
 ### E2E-04 3D Failure Isolation
 

@@ -4,25 +4,66 @@
   "replaySessionId": "9d4cba3e-9de7-43b7-b086-9c2de75e5120",
   "steps": {
     "initial": {
-      "line": 441,
-      "replaySequence": 1,
-      "replayPublishedAt": "2026-09-02T00:00:01Z",
-      "sourceDataItemId": "Mazak01-C_5",
-      "expectedValue": 49.0
+      "observations": [
+        {
+          "line": 439,
+          "replaySequence": 1,
+          "replayPublishedAt": "2026-09-02T00:00:01Z",
+          "sourceDataItemId": "Mazak01-path_13",
+          "expectedValue": "ACTIVE"
+        },
+        {
+          "line": 441,
+          "replaySequence": 2,
+          "replayPublishedAt": "2026-09-02T00:00:02Z",
+          "sourceDataItemId": "Mazak01-C_5",
+          "expectedValue": 49.0
+        }
+      ]
     },
     "live-update": {
-      "line": 442,
-      "replaySequence": 2,
-      "replayPublishedAt": "2026-09-02T00:00:02Z",
-      "sourceDataItemId": "Mazak01-C_5",
-      "expectedValue": 10.0
+      "observations": [
+        {
+          "line": 442,
+          "replaySequence": 3,
+          "replayPublishedAt": "2026-09-02T00:00:03Z",
+          "sourceDataItemId": "Mazak01-C_5",
+          "expectedValue": 10.0
+        }
+      ]
+    },
+    "stopped": {
+      "observations": [
+        {
+          "line": 462,
+          "replaySequence": 4,
+          "replayPublishedAt": "2026-09-02T00:00:04Z",
+          "sourceDataItemId": "Mazak01-path_13",
+          "expectedValue": "STOPPED"
+        }
+      ]
+    },
+    "reactivated": {
+      "observations": [
+        {
+          "line": 587,
+          "replaySequence": 5,
+          "replayPublishedAt": "2026-09-02T00:00:05Z",
+          "sourceDataItemId": "Mazak01-path_13",
+          "expectedValue": "ACTIVE"
+        }
+      ]
     },
     "offline-update": {
-      "line": 1206,
-      "replaySequence": 3,
-      "replayPublishedAt": "2026-09-02T00:00:03Z",
-      "sourceDataItemId": "Mazak01-C_5",
-      "expectedValue": 1873.0
+      "observations": [
+        {
+          "line": 1206,
+          "replaySequence": 6,
+          "replayPublishedAt": "2026-09-02T00:00:06Z",
+          "sourceDataItemId": "Mazak01-C_5",
+          "expectedValue": 1873.0
+        }
+      ]
     }
   }
 }

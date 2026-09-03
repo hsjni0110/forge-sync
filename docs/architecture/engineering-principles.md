@@ -7,6 +7,7 @@ ForgeSync의 핵심 품질은 화려한 3D 자체가 아니라 실제 제조 데
 - NIST 입력 형식이나 전송 방식의 변화
 - 저장소와 프레임워크의 변화
 - 생산, 알람, 정비 규칙의 변화
+- 관측 기반 공정 재구성과 baseline/anomaly 정책의 변화
 - REST/WebSocket/2D/3D 표현의 변화
 - Condition Intelligence 모델의 교체
 
@@ -50,6 +51,7 @@ AI response → Machine FAULT 직접 변경
 | Ingestion | ObservationEnvelope, Inbox, semantic mapping | 수락된 Observation과 품질 결과 발행 |
 | Replay | ReplaySession, ReplayClock, ReplaySequence | 원천 시간은 보존하고 재생 시간만 제어 |
 | Equipment Twin | MachineIdentity, EquipmentState, TwinVersion, Freshness | 권위 있는 현재 상태 Query 제공 |
+| Process Analytics | MachiningRun, CycleFeature, AnomalyAssessment | Canonical Observation만 받아 별도 processing transaction에서 DERIVED 결과 제공 |
 | Production | ProductionRequest, WorkOrder, Routing, OperationExecution, ProductionResult | Machine은 ID로 참조하며 telemetry와 결과를 자동 동일시하지 않음 |
 | Alarm | Alarm, AlarmRule, Acknowledgement | Condition/Data Quality/Advisory 이벤트를 명시적 규칙으로 변환 |
 | Maintenance | MaintenanceRequest, Assignment | Alarm과 연결할 수 있으나 독립 생명주기 유지 |
@@ -110,6 +112,7 @@ Business Event와 raw telemetry를 구분한다. Outbox 대상은 `ALARM_CREATED
 - Inbox 중복 키는 `(replaySessionId, sourceEventKey)`다.
 - Source time과 Replay time을 덮어쓰거나 혼합하지 않는다.
 - `Condition != Alarm`, `Advisory != Fault`, `Telemetry PartCount != ProductionResult`다.
+- `MachiningRun != OperationExecution`, `AnomalyAssessment != Alarm`이다.
 - 3D는 Projection이며 상태를 쓰는 주체가 아니다.
 - STALE 상태에서 live처럼 보이는 애니메이션을 지속하지 않는다.
 - WebGL/asset/AI 장애가 2D 핵심 운영 기능을 중단시키지 않는다.

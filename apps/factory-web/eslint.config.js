@@ -69,6 +69,8 @@ export default tseslint.config(
       "src/features/factory3d/ui/MachineTwin.tsx",
       "src/features/factory3d/ui/FloatingMachineLabel.tsx",
       "src/features/factory3d/ui/GenericMachinePrimitive.tsx",
+      "src/features/factory3d/ui/SpindleVisualCue.tsx",
+      "src/features/factory3d/ui/MachineStatusBeacon.tsx",
       "tests/architecture/fixtures/features/factory3d/ui/invalid.ts",
     ],
     rules: {

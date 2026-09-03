@@ -46,14 +46,17 @@ npx --prefix apps/factory-web playwright install chromium
 
 ## Run applications
 
-To open the local Machine Detail demo with one command:
+To open the local Factory Scene demo with one command:
 
 ```bash
 ./scripts/run-local
 ```
 
 Open the URL printed by the script and press `Ctrl+C` when finished. The script starts and cleans
-up its own PostgreSQL, Mosquitto, Factory API, and Factory Web processes.
+up its own PostgreSQL, Mosquitto, Factory API, Factory Web, and guided data publisher processes. The
+guided flow selects 337 execution/RPM observations from a checksum-pinned, roughly one-hour NIST
+source excerpt and publishes one every 1.5 seconds for about eight minutes. That wall-clock interval
+is explicitly for observing the UI; it is not represented as original replay timing.
 
 The accessible operational detail is available at `/machines/Mazak01`. `/factory` adds a lazy-loaded
 spatial scene with `2D`, `3D`, and `SPLIT` modes; WebGL or asset failure leaves the 2D detail usable.

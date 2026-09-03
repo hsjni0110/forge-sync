@@ -4,12 +4,14 @@ import type {
   MachineSceneBinding,
   MachineVisualState,
 } from "../domain/machineVisualState";
+import type { MachineVisualPresentation } from "../domain/machineVisualPresentation";
 
 export type SceneUnavailableReason = "BUNDLE_OR_SCENE" | "WEBGL";
 
 export interface FactorySceneProps {
   machineBinding: MachineSceneBinding;
   visualState: MachineVisualState | undefined;
+  visualPresentation: MachineVisualPresentation;
   onSelectMachine: (machineId: string) => void;
   onAssetFallback: () => void;
   onUnavailable: (reason: SceneUnavailableReason) => void;
