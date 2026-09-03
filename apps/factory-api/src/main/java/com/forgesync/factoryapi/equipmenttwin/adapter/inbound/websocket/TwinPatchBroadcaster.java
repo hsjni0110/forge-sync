@@ -50,6 +50,10 @@ final class TwinPatchBroadcaster {
     }
     TwinPatchPublicationException failure = null;
     for (Map.Entry<String, WebSocketSession> subscription : sessions.entrySet()) {
+      if (!subscription.getValue().isOpen()) {
+        sessions.remove(subscription.getKey());
+        continue;
+      }
       try {
         send(subscription.getValue(), message);
       } catch (RuntimeException exception) {
@@ -73,9 +77,6 @@ final class TwinPatchBroadcaster {
   }
 
   private static void send(WebSocketSession session, TextMessage message) {
-    if (!session.isOpen()) {
-      return;
-    }
     try {
       session.sendMessage(message);
     } catch (IOException exception) {

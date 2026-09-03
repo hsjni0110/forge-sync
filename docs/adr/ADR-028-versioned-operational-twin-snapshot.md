@@ -15,7 +15,7 @@ may also be unavailable while their observation identity and provenance remain m
 ## Decision
 
 - Expose `GET /api/v1/machines/{machineId}/twin` with media type
-  `application/vnd.forgesync.twin.v1+json` and schema version `1.0.0`.
+  `application/vnd.forgesync.twin.v1+json` and schema version `1.1.0`.
 - Read machine version, Equipment State, and Latest Observations in one PostgreSQL repeatable-read
   transaction through an outbound Application Port. The REST Adapter never reads JDBC state.
 - Reject a missing Equipment State or a state version different from the current machine
@@ -23,6 +23,10 @@ may also be unavailable while their observation identity and provenance remain m
 - Compute Freshness at query time with the injected Clock and ADR-027 policy. `STALE` consistency
   takes precedence over `PARTIAL`; otherwise missing, unavailable, or ambiguous P0 values are
   `PARTIAL`.
+- Include the applied millisecond-precision freshness thresholds in the snapshot. Browser
+  consumers age the snapshot using these server-owned values. Version `1.1.0` replaces `1.0.0`
+  because the strict contract rejects additional fields.
+- Treat unknown Connectivity, Execution, or Health as missing P0 state and report `PARTIAL`.
 - Return all spindle speeds ordered by component and source DataItem identity. Do not select a
   primary spindle without an explicit machine mapping decision.
 - Keep value-level Canonical provenance and observation/source/projection times on RPM, tool,

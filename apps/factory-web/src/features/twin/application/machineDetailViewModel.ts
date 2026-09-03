@@ -1,9 +1,11 @@
 import type {
   Availability,
   FieldProvenance,
+  Freshness,
   ObservedValue,
   TwinSnapshot,
 } from "../domain/twin";
+import { effectiveConnectivity, effectiveConsistency } from "../domain/freshness";
 
 export interface MachineDetailMetric {
   key: string;
@@ -45,7 +47,10 @@ export interface MachineDetailViewModel {
   provenance: MachineDetailProvenance[];
 }
 
-export function mapTwinToMachineDetail(snapshot: TwinSnapshot): MachineDetailViewModel {
+export function mapTwinToMachineDetail(
+  snapshot: TwinSnapshot,
+  freshness: Freshness = snapshot.state.freshness.value,
+): MachineDetailViewModel {
   const provenance: MachineDetailProvenance[] = [];
   appendProvenance(provenance, "네트워크 연결", snapshot.state.connectivity.provenance);
   appendProvenance(provenance, "가동 상태", snapshot.state.execution.provenance);
@@ -93,11 +98,14 @@ export function mapTwinToMachineDetail(snapshot: TwinSnapshot): MachineDetailVie
     machineId: snapshot.machine.machineId,
     twinVersion: snapshot.consistency.twinVersion,
     projectedAt: snapshot.consistency.projectedAt,
-    consistency: snapshot.consistency.status,
+    consistency: effectiveConsistency(snapshot, freshness),
     missingFields: snapshot.consistency.missingFields.map(translateMissingField),
     freshness: snapshot.state.freshness,
     states: [
-      { label: "네트워크 연결", value: translateCode(snapshot.state.connectivity.value) },
+      {
+        label: "네트워크 연결",
+        value: translateCode(effectiveConnectivity(snapshot, freshness)),
+      },
       { label: "가동 상태", value: translateCode(snapshot.state.execution.value) },
       { label: "설비 상태", value: translateCode(snapshot.state.health.value) },
     ],
@@ -149,6 +157,7 @@ function appendProvenance(
 const CODE_LABELS: Record<string, string> = {
   UNKNOWN: "확인되지 않음",
   ONLINE: "온라인",
+  STALE: "오래된 데이터",
   OFFLINE: "오프라인",
   READY: "작업 준비됨",
   ACTIVE: "가동 중",

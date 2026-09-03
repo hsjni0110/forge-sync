@@ -25,6 +25,8 @@ public record OperationalTwinSnapshot(
     FreshnessState freshness,
     Instant evaluatedAt,
     Duration age,
+    long freshMaxAgeMillis,
+    long laggingMaxAgeMillis,
     List<FieldProvenance> connectivityProvenance,
     List<FieldProvenance> executionProvenance,
     List<FieldProvenance> healthProvenance,
@@ -45,6 +47,9 @@ public record OperationalTwinSnapshot(
     Objects.requireNonNull(freshness, "freshness");
     Objects.requireNonNull(evaluatedAt, "evaluatedAt");
     Objects.requireNonNull(age, "age");
+    if (freshMaxAgeMillis < 0 || laggingMaxAgeMillis < freshMaxAgeMillis) {
+      throw new IllegalArgumentException("freshness thresholds must form a non-negative window");
+    }
     connectivityProvenance = List.copyOf(connectivityProvenance);
     executionProvenance = List.copyOf(executionProvenance);
     healthProvenance = List.copyOf(healthProvenance);

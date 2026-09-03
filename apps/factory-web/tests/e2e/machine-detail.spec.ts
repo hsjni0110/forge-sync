@@ -41,6 +41,9 @@ test("replay updates the accessible 2D detail and REST resync converges after di
   publish("offline-update");
   await page.clock.fastForward(10_001);
   await expect(page.getByRole("alert")).toContainText("오래된 데이터입니다");
+  await expect(
+    page.getByLabel("트윈 연결 상태").getByText("오래된 데이터"),
+  ).toHaveCount(2);
   await expect(page.getByText("10 rpm")).toBeVisible();
 
   await page.clock.setFixedTime(new Date());

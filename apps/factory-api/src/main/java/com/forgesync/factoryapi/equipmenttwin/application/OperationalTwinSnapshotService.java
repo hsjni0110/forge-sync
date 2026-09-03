@@ -4,9 +4,11 @@ import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapsho
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservationMetadata;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedEvent;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.SpindleSpeed;
+import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ExecutionState;
 import com.forgesync.factoryapi.equipmenttwin.domain.FreshnessPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.FreshnessState;
+import com.forgesync.factoryapi.equipmenttwin.domain.HealthState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationAvailability;
 import com.forgesync.factoryapi.equipmenttwin.domain.StateObservationKind;
 import java.time.Clock;
@@ -65,6 +67,8 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         freshness,
         evaluatedAt,
         Duration.between(projection.projectedAt(), evaluatedAt),
+        freshnessPolicy.freshMaxAgeMillis(),
+        freshnessPolicy.laggingMaxAgeMillis(),
         provenanceOfAvailable(observations),
         provenanceOf(observations, StateObservationKind.EVENT, EXECUTION),
         provenanceOfKind(observations, StateObservationKind.CONDITION),
@@ -139,12 +143,18 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
       Optional<ObservedEvent> toolNumber,
       Optional<ObservedEvent> program) {
     List<String> missing = new ArrayList<>();
+    if (projection.equipmentState().connectivity() == ConnectivityState.UNKNOWN) {
+      missing.add("state.connectivity");
+    }
     if (spindleSpeeds.stream()
         .noneMatch(item -> item.availability() == ObservationAvailability.AVAILABLE)) {
       missing.add("metrics.spindleSpeeds");
     }
     if (projection.equipmentState().execution() == ExecutionState.UNKNOWN) {
       missing.add("state.execution");
+    }
+    if (projection.equipmentState().health() == HealthState.UNKNOWN) {
+      missing.add("state.health");
     }
     if (toolNumber.filter(OperationalTwinSnapshotService::isAvailable).isEmpty()) {
       missing.add("metrics.toolNumber");

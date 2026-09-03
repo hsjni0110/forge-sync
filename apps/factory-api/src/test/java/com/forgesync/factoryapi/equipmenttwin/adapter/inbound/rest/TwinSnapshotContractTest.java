@@ -49,6 +49,7 @@ class TwinSnapshotContractTest {
             List.of(
                 "metrics.spindleSpeeds",
                 "state.execution",
+                "state.health",
                 "metrics.toolNumber",
                 "metrics.program"),
             ConnectivityState.UNKNOWN,
@@ -57,6 +58,8 @@ class TwinSnapshotContractTest {
             FreshnessState.FRESH,
             projectedAt.plusSeconds(1),
             Duration.ofSeconds(1),
+            2_000,
+            10_000,
             List.of(),
             List.of(),
             List.of(),
@@ -77,7 +80,7 @@ class TwinSnapshotContractTest {
   void rejectsWrongVersionMissingProvenanceAndUnavailableValue() {
     String valid = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
 
-    assertThat(violations(valid.replace("\"1.0.0\"", "\"2.0.0\""))).isNotEmpty();
+    assertThat(violations(valid.replace("\"1.1.0\"", "\"2.0.0\""))).isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"provenance\": \\{", "\"lineage\": {")))
         .isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"AVAILABLE\"", "\"UNAVAILABLE\""))).isNotEmpty();

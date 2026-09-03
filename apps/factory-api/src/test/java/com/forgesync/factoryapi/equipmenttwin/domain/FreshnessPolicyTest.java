@@ -40,4 +40,11 @@ class FreshnessPolicyTest {
     assertThatThrownBy(() -> policy.classify(PROJECTED_AT, PROJECTED_AT.minusNanos(1)))
         .isInstanceOf(IllegalArgumentException.class);
   }
+
+  @Test
+  void rejectsPrecisionTheBrowserContractCannotRepresent() {
+    assertThatThrownBy(() -> new FreshnessPolicy(Duration.ofNanos(1), Duration.ofSeconds(10)))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("millisecond precision");
+  }
 }

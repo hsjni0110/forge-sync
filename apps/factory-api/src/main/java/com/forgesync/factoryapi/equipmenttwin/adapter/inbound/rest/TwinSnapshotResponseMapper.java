@@ -24,7 +24,7 @@ public final class TwinSnapshotResponseMapper {
 
   public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
-        "1.0.0",
+        "1.1.0",
         new MachineDto(snapshot.machineId()),
         new ConsistencyDto(
             snapshot.consistencyState().name(),
@@ -42,6 +42,8 @@ public final class TwinSnapshotResponseMapper {
                 snapshot.evaluatedAt(),
                 snapshot.projectedAt(),
                 snapshot.age().toMillis(),
+                snapshot.freshMaxAgeMillis(),
+                snapshot.laggingMaxAgeMillis(),
                 "PROJECTED_AT")),
         new MetricsDto(
             snapshot.spindleSpeeds().stream()

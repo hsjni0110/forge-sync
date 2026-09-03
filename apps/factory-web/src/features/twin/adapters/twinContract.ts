@@ -9,7 +9,11 @@ const ajv = new Ajv2020({
   allErrors: true,
   strict: true,
   strictTypes: false,
-  validateFormats: false,
+  validateFormats: true,
+});
+ajv.addFormat("date-time", {
+  type: "string",
+  validate: (value: string) => Number.isFinite(Date.parse(value)),
 });
 ajv.addSchema(twinSnapshotSchema);
 const validateSnapshot = ajv.getSchema<TwinSnapshot>(twinSnapshotSchema.$id);
@@ -24,10 +28,21 @@ function requireValidator<T>(
   return validator;
 }
 
-export function decodeTwinSnapshot(document: unknown): TwinSnapshot {
+export function decodeTwinSnapshot(
+  document: unknown,
+  expectedMachineId?: string,
+): TwinSnapshot {
   const validator = requireValidator(validateSnapshot);
   if (!validator(document)) {
     throw new Error("REST Twin snapshot does not satisfy contract v1");
+  }
+  if (
+    (expectedMachineId !== undefined && document.machine.machineId !== expectedMachineId) ||
+    document.state.freshness.projectedAt !== document.consistency.projectedAt ||
+    document.state.freshness.freshMaxAgeMillis >
+      document.state.freshness.laggingMaxAgeMillis
+  ) {
+    throw new Error("REST Twin snapshot identity or freshness contract is inconsistent");
   }
   return document;
 }
@@ -44,6 +59,7 @@ export class AjvTwinPatchDecoder implements TwinPatchDecoder {
       throw new Error("Twin patch does not satisfy contract v1");
     }
     const patch = document;
+    decodeTwinSnapshot(patch.snapshot, expectedMachineId);
     if (
       patch.machineId !== expectedMachineId ||
       patch.snapshot.machine.machineId !== patch.machineId ||

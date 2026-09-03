@@ -1,4 +1,7 @@
-import { classifyFreshness, nextFreshnessBoundaryMillis } from "../domain/freshness";
+import {
+  classifyFreshness,
+  nextFreshnessBoundaryMillis,
+} from "../domain/freshness";
 import type { Freshness, TwinSnapshot } from "../domain/twin";
 import { decidePatch } from "../domain/versionGuard";
 import type {

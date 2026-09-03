@@ -36,7 +36,7 @@ export class HttpTwinSnapshotReader implements TwinSnapshotReader {
       );
     }
     try {
-      return decodeTwinSnapshot(await response.json());
+      return decodeTwinSnapshot(await response.json(), machineId);
     } catch (error) {
       throw new TwinSnapshotLoadError("INVALID_CONTRACT", "Twin snapshot contract is invalid", {
         cause: error,

@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "machine": { "machineId": "Mazak01" },
   "consistency": {
-    "status": "CONSISTENT",
+    "status": "PARTIAL",
     "twinVersion": 4,
     "projectedAt": "2026-09-02T01:02:04Z",
-    "missingFields": []
+    "missingFields": ["state.health"]
   },
   "state": {
     "connectivity": { "value": "ONLINE", "provenance": [] },
@@ -33,6 +33,8 @@
       "evaluatedAt": "2026-09-02T01:02:05Z",
       "projectedAt": "2026-09-02T01:02:04Z",
       "ageMillis": 1000,
+      "freshMaxAgeMillis": 2000,
+      "laggingMaxAgeMillis": 10000,
       "basis": "PROJECTED_AT"
     }
   },

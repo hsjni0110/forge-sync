@@ -7,7 +7,7 @@ GET /api/v1/machines/{machineId}/twin
 Accept: application/vnd.forgesync.twin.v1+json
 ```
 
-Version `1.0.0` is defined by
+Version `1.1.0` is defined by
 [`v1/twin-snapshot.schema.json`](./v1/twin-snapshot.schema.json). The schema keeps the PRD 27
 sections stable while the MVP populates machine identity, consistency, Equipment State, freshness,
 spindle speeds, tool, program, current Conditions, and field-level provenance. Unsupported business
@@ -20,6 +20,11 @@ current `SPINDLE_SPEED`, ordered by `componentId` and `sourceDataItemId`; this c
 a primary spindle. An unavailable observation keeps its identity and provenance but omits `value`
 and `unit`. Missing or unavailable P0 fields are listed in `consistency.missingFields` and never
 become zero or an empty string.
+
+The freshness object carries the applied `freshMaxAgeMillis` and `laggingMaxAgeMillis`. Browser
+consumers use these server-owned thresholds when aging a snapshot between updates; they do not
+redefine the policy locally. Schema `1.1.0` replaces `1.0.0` because strict v1 consumers reject
+the new threshold fields.
 
 ## Consistency and errors
 

@@ -49,7 +49,7 @@ class TwinSnapshotControllerTest {
         .perform(get("/api/v1/machines/Mazak01/twin"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(TwinSnapshotController.TWIN_MEDIA_TYPE))
-        .andExpect(jsonPath("$.schemaVersion").value("1.0.0"))
+        .andExpect(jsonPath("$.schemaVersion").value("1.1.0"))
         .andExpect(jsonPath("$.machine.machineId").value("Mazak01"))
         .andExpect(jsonPath("$.consistency.twinVersion").value(4))
         .andExpect(jsonPath("$.state.freshness.value").value("FRESH"))
@@ -94,13 +94,15 @@ class TwinSnapshotControllerTest {
         new TwinVersion(4),
         projectedAt,
         TwinConsistencyState.PARTIAL,
-        List.of("metrics.spindleSpeeds", "metrics.toolNumber", "metrics.program"),
+        List.of("metrics.spindleSpeeds", "state.health", "metrics.toolNumber", "metrics.program"),
         ConnectivityState.ONLINE,
         ExecutionState.ACTIVE,
         HealthState.UNKNOWN,
         FreshnessState.FRESH,
         projectedAt.plusSeconds(1),
         Duration.ofSeconds(1),
+        2_000,
+        10_000,
         List.of(),
         List.of(),
         List.of(),

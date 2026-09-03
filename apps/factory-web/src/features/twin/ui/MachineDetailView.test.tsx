@@ -49,6 +49,7 @@ describe("MachineDetailView", () => {
     expect(screen.getByText("49 rpm")).toBeTruthy();
     expect(screen.getByText(/마지막으로 받은 값을 표시합니다/)).toBeTruthy();
     expect(screen.getByRole("alert").textContent).toMatch(/실시간 상태로 판단하지 마세요/);
+    expect(screen.getAllByText("오래된 데이터").length).toBeGreaterThanOrEqual(3);
   });
 
   it("shows unavailable for optional metrics without inventing zero", () => {

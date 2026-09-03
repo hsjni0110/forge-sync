@@ -33,10 +33,21 @@ public final class FreshnessPolicy {
     return FreshnessState.STALE;
   }
 
+  public long freshMaxAgeMillis() {
+    return freshMaxAge.toMillis();
+  }
+
+  public long laggingMaxAgeMillis() {
+    return laggingMaxAge.toMillis();
+  }
+
   private static Duration requireNonNegative(Duration duration, String name) {
     Objects.requireNonNull(duration, name);
     if (duration.isNegative()) {
       throw new IllegalArgumentException(name + " must not be negative");
+    }
+    if (!duration.equals(Duration.ofMillis(duration.toMillis()))) {
+      throw new IllegalArgumentException(name + " must use millisecond precision");
     }
     return duration;
   }

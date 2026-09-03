@@ -1,16 +1,21 @@
 import type { TwinLiveState } from "../application/TwinLiveSession";
+import { effectiveConsistency } from "../domain/freshness";
 
 interface TwinConnectionStatusViewProps {
   state: TwinLiveState;
 }
 
 export function TwinConnectionStatus({ state }: TwinConnectionStatusViewProps) {
+  const consistency =
+    state.snapshot && state.freshness
+      ? effectiveConsistency(state.snapshot, state.freshness)
+      : state.snapshot?.consistency.status;
   return (
     <section className="status-strip" aria-label="트윈 연결 상태" aria-live="polite">
       <StatusValue label="연결" value={state.connectionStatus} />
       <StatusValue
         label="데이터 일치"
-        value={state.snapshot?.consistency.status ?? "UNAVAILABLE"}
+        value={consistency ?? "UNAVAILABLE"}
       />
       <StatusValue label="최신 상태" value={state.freshness ?? "UNAVAILABLE"} />
     </section>

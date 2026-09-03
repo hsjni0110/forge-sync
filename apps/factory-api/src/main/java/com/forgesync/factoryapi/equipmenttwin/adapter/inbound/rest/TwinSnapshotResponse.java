@@ -36,7 +36,13 @@ public record TwinSnapshotResponse(
   public record DerivedStateDto(String value, List<FieldProvenanceDto> provenance) {}
 
   public record FreshnessDto(
-      String value, Instant evaluatedAt, Instant projectedAt, long ageMillis, String basis) {}
+      String value,
+      Instant evaluatedAt,
+      Instant projectedAt,
+      long ageMillis,
+      long freshMaxAgeMillis,
+      long laggingMaxAgeMillis,
+      String basis) {}
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record MetricsDto(

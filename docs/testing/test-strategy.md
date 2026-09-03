@@ -77,6 +77,9 @@ tests/fixtures/contracts/    REST/WebSocket payload examples
 - REST snapshot 전체를 담은 WebSocket patch의 base/target version 계약
 - version gap/역행 감지 후 REST resync
 - field-level provenance와 consistency state 노출
+- 서버가 전달한 freshness threshold로 browser aging을 수행하고 STALE connectivity/consistency를
+  함께 투영
+- REST route identity와 snapshot machine identity 불일치 및 malformed timestamp 거절
 
 ### Production / Alarm / Maintenance
 

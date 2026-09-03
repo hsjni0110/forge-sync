@@ -21,6 +21,9 @@ on different versions if only part of a message is applied.
   subscription. Messages received while resynchronizing are not applied.
 - Treat WebSocket delivery as best-effort notification. Publication failure is observable but does
   not roll back ingestion or change MQTT acknowledgment after the database commit.
+- Submit post-commit snapshot query and subscriber fan-out to a bounded single-thread executor.
+  This preserves publication order without making subscriber I/O part of the ingestion caller.
+  Queue rejection is recorded as a publication failure and REST remains the recovery source.
 - Use a machine-scoped raw WebSocket endpoint and an explicit origin allowlist. REST remains the
   authoritative, human-readable query contract.
 

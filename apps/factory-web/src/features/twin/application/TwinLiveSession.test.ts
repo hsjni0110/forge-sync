@@ -49,7 +49,7 @@ function snapshotAt(version: number, evaluatedAt: string, ageMillis = 0) {
 function patch(baseVersion: number, targetVersion: number, evaluatedAt: string) {
   const snapshot = snapshotAt(targetVersion, evaluatedAt);
   return JSON.stringify({
-    schemaVersion: "1.0.0",
+    schemaVersion: "1.1.0",
     type: "TWIN_PATCH",
     machineId: "Mazak01",
     baseVersion,

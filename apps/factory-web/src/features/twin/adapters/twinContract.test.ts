@@ -35,4 +35,27 @@ describe("Twin contract decoders", () => {
       new AjvTwinPatchDecoder().decode(JSON.stringify(validPatch()), "OtherMachine"),
     ).toThrow(/inconsistent/);
   });
+
+  it("rejects a REST snapshot for another machine or with malformed time", () => {
+    expect(() =>
+      decodeTwinSnapshot(structuredClone(twinFixture), "OtherMachine"),
+    ).toThrow(/identity/);
+
+    const malformed = structuredClone(twinFixture);
+    malformed.state.freshness.evaluatedAt = "not-a-dateZ";
+    expect(() => decodeTwinSnapshot(malformed, "Mazak01")).toThrow(/contract/);
+  });
+
+  it("rejects an inverted freshness window", () => {
+    const invalid = structuredClone(twinFixture);
+    invalid.state.freshness.freshMaxAgeMillis = 20_000;
+    invalid.state.freshness.laggingMaxAgeMillis = 10_000;
+    expect(() => decodeTwinSnapshot(invalid, "Mazak01")).toThrow(/freshness/);
+
+    const invalidPatch = validPatch();
+    invalidPatch.snapshot.state.freshness.freshMaxAgeMillis = 20_000;
+    expect(() =>
+      new AjvTwinPatchDecoder().decode(JSON.stringify(invalidPatch), "Mazak01"),
+    ).toThrow(/freshness/);
+  });
 });

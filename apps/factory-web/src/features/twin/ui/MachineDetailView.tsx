@@ -36,7 +36,10 @@ export function MachineDetailView({
     );
   }
 
-  const detail = mapTwinToMachineDetail(state.snapshot);
+  const detail = mapTwinToMachineDetail(
+    state.snapshot,
+    state.freshness ?? state.snapshot.state.freshness.value,
+  );
   const isRecovering =
     state.connectionStatus === "RECONNECTING" ||
     state.connectionStatus === "RESYNCING" ||

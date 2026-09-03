@@ -54,7 +54,7 @@ export interface CurrentCondition {
 }
 
 export interface TwinSnapshot {
-  schemaVersion: "1.0.0";
+  schemaVersion: "1.1.0";
   machine: { machineId: string };
   consistency: {
     status: "CONSISTENT" | "PARTIAL" | "STALE" | "DEGRADED";
@@ -73,6 +73,8 @@ export interface TwinSnapshot {
       evaluatedAt: string;
       projectedAt: string;
       ageMillis: number;
+      freshMaxAgeMillis: number;
+      laggingMaxAgeMillis: number;
       basis: "PROJECTED_AT";
     };
   };
@@ -92,7 +94,7 @@ export interface TwinSnapshot {
 }
 
 export interface TwinPatch {
-  schemaVersion: "1.0.0";
+  schemaVersion: "1.1.0";
   type: "TWIN_PATCH";
   machineId: string;
   baseVersion: number;

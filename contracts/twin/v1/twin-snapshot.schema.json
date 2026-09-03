@@ -10,7 +10,7 @@
     "spatial"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.0.0" },
+    "schemaVersion": { "const": "1.1.0" },
     "machine": {
       "type": "object",
       "additionalProperties": false,
@@ -32,7 +32,8 @@
           "uniqueItems": true,
           "items": {
             "enum": [
-              "metrics.spindleSpeeds", "state.execution", "metrics.toolNumber", "metrics.program"
+              "state.connectivity", "state.execution", "state.health",
+              "metrics.spindleSpeeds", "metrics.toolNumber", "metrics.program"
             ]
           }
         }
@@ -49,12 +50,17 @@
         "freshness": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["value", "evaluatedAt", "projectedAt", "ageMillis", "basis"],
+          "required": [
+            "value", "evaluatedAt", "projectedAt", "ageMillis", "freshMaxAgeMillis",
+            "laggingMaxAgeMillis", "basis"
+          ],
           "properties": {
             "value": { "enum": ["FRESH", "LAGGING", "STALE"] },
             "evaluatedAt": { "$ref": "#/$defs/timestamp" },
             "projectedAt": { "$ref": "#/$defs/timestamp" },
             "ageMillis": { "type": "integer", "minimum": 0 },
+            "freshMaxAgeMillis": { "type": "integer", "minimum": 0 },
+            "laggingMaxAgeMillis": { "type": "integer", "minimum": 0 },
             "basis": { "const": "PROJECTED_AT" }
           }
         }

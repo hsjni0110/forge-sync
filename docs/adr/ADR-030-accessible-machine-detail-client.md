@@ -20,6 +20,10 @@ long-lived session created outside the effect can be disposed and then accidenta
   dispose it on unmount, and create a fresh instance on every effect mount.
 - Decode the versioned Twin contract in the inbound browser Adapter, then map the domain-shaped
   snapshot to a dedicated `MachineDetailViewModel`. The UI does not interpret backend DTO details.
+- Reject REST snapshots whose machine identity differs from the requested route and reject
+  unparseable contract timestamps or invalid freshness windows.
+- Age snapshots with the thresholds carried by the server contract. When local time moves a
+  snapshot to STALE, derive STALE consistency and effective connectivity together.
 - Preserve every spindle and field-level provenance. Missing or unavailable optional values render
   as `Unavailable`; the client never substitutes zero or guesses a primary spindle.
 - Keep last-known values visible during recovery, while showing connection and freshness separately.

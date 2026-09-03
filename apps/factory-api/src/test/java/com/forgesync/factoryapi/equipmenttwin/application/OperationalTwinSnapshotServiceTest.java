@@ -47,6 +47,8 @@ class OperationalTwinSnapshotServiceTest {
     assertThat(snapshot.spindleSpeeds())
         .extracting(item -> item.value().intValue())
         .containsExactly(6842, 2000);
+    assertThat(snapshot.freshMaxAgeMillis()).isEqualTo(2_000);
+    assertThat(snapshot.laggingMaxAgeMillis()).isEqualTo(10_000);
   }
 
   @Test
@@ -69,7 +71,12 @@ class OperationalTwinSnapshotServiceTest {
     assertThat(snapshot.consistencyState()).isEqualTo(TwinConsistencyState.PARTIAL);
     assertThat(snapshot.missingFields())
         .containsExactly(
-            "metrics.spindleSpeeds", "state.execution", "metrics.toolNumber", "metrics.program");
+            "state.connectivity",
+            "metrics.spindleSpeeds",
+            "state.execution",
+            "state.health",
+            "metrics.toolNumber",
+            "metrics.program");
     assertThat(snapshot.toolNumber())
         .get()
         .extracting(OperationalTwinSnapshot.ObservedEvent::value)
@@ -144,7 +151,7 @@ class OperationalTwinSnapshotServiceTest {
         "Mazak01",
         new TwinVersion(5),
         PROJECTED_AT,
-        new EquipmentState(ConnectivityState.ONLINE, ExecutionState.ACTIVE, HealthState.UNKNOWN),
+        new EquipmentState(ConnectivityState.ONLINE, ExecutionState.ACTIVE, HealthState.NORMAL),
         new TwinVersion(5),
         observations);
   }

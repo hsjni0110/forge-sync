@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.forgesync.factoryapi.equipmenttwin.application.GetOperationalTwinSnapshot;
@@ -20,6 +21,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -31,7 +33,8 @@ class WebSocketTwinProjectionNotifierTest {
     TwinPatchBroadcaster broadcaster = mock(TwinPatchBroadcaster.class);
     when(query.getSnapshot("Mazak01")).thenReturn(snapshot());
     WebSocketTwinProjectionNotifier notifier =
-        new WebSocketTwinProjectionNotifier(query, broadcaster, new SimpleMeterRegistry());
+        new WebSocketTwinProjectionNotifier(
+            query, broadcaster, Runnable::run, new SimpleMeterRegistry());
 
     notifier.projectionCommitted("Mazak01");
 
@@ -50,12 +53,29 @@ class WebSocketTwinProjectionNotifierTest {
     when(query.getSnapshot("Mazak01")).thenReturn(snapshot());
     doThrow(new IllegalStateException("socket unavailable")).when(broadcaster).broadcast(any());
     WebSocketTwinProjectionNotifier notifier =
-        new WebSocketTwinProjectionNotifier(query, broadcaster, meterRegistry);
+        new WebSocketTwinProjectionNotifier(query, broadcaster, Runnable::run, meterRegistry);
 
     notifier.projectionCommitted("Mazak01");
 
     assertThat(meterRegistry.counter("forgesync.twin.patch.publication.failures").count())
         .isEqualTo(1);
+  }
+
+  @Test
+  void queuesPublicationWithoutRunningSocketIoOnTheIngestionCaller() {
+    GetOperationalTwinSnapshot query = mock(GetOperationalTwinSnapshot.class);
+    TwinPatchBroadcaster broadcaster = mock(TwinPatchBroadcaster.class);
+    AtomicReference<Runnable> queuedPublication = new AtomicReference<>();
+    when(query.getSnapshot("Mazak01")).thenReturn(snapshot());
+    WebSocketTwinProjectionNotifier notifier =
+        new WebSocketTwinProjectionNotifier(
+            query, broadcaster, queuedPublication::set, new SimpleMeterRegistry());
+
+    notifier.projectionCommitted("Mazak01");
+
+    verifyNoInteractions(query, broadcaster);
+    queuedPublication.get().run();
+    verify(broadcaster).broadcast(any());
   }
 
   private static OperationalTwinSnapshot snapshot() {
@@ -73,6 +93,8 @@ class WebSocketTwinProjectionNotifierTest {
         FreshnessState.FRESH,
         projectedAt,
         Duration.ZERO,
+        2_000,
+        10_000,
         List.of(),
         List.of(),
         List.of(),
