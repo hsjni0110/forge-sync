@@ -15,7 +15,7 @@ function publish(step: "initial" | "live-update" | "offline-update") {
   );
 }
 
-test("replay updates the accessible 2D detail and REST resync converges after disconnect", async ({
+test("replay, REST resync, and 3D failure keep the accessible detail authoritative", async ({
   context,
   page,
   request,
@@ -27,7 +27,7 @@ test("replay updates the accessible 2D detail and REST resync converges after di
 
   await page.clock.install({ time: new Date() });
   await page.goto("/machines/Mazak01");
-  await expect(page.getByRole("heading", { name: "Mazak01" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mazak01", exact: true })).toBeVisible();
   await expect(page.getByText("49 rpm")).toBeVisible();
   await expect(page.getByText(/실제 데이터 · NIST/).first()).toBeVisible();
   await expect(page.getByLabel("트윈 연결 상태").getByText("실시간 연결됨")).toBeVisible();
@@ -59,4 +59,30 @@ test("replay updates the accessible 2D detail and REST resync converges after di
   for (const section of ["기본 정보", "현재 상태", "측정값", "데이터 품질", "데이터 출처"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }
+
+  await page.goto("/factory");
+  await expect(page.getByRole("heading", { name: "Factory Scene" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "SPLIT" })).toHaveAttribute(
+    "aria-pressed",
+    "true",
+  );
+  await expect(page.locator("canvas")).toBeVisible();
+  await expect(page.getByText("1873 rpm")).toBeVisible();
+
+  await page.addInitScript(() => {
+    const originalGetContext = HTMLCanvasElement.prototype.getContext;
+    Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
+      configurable: true,
+      value(this: HTMLCanvasElement, contextId: string, options?: unknown) {
+        if (["webgl", "webgl2", "experimental-webgl"].includes(contextId)) {
+          return null;
+        }
+        return Reflect.apply(originalGetContext, this, [contextId, options]);
+      },
+    });
+  });
+  await page.reload();
+  await expect(page.getByText("3D를 사용할 수 없습니다")).toBeVisible();
+  await expect(page.getByText("1873 rpm")).toBeVisible();
+  await expect(page.getByText(/2D 화면에서 계속 확인할 수 있습니다/)).toBeVisible();
 });

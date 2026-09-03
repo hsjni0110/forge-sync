@@ -24,13 +24,13 @@
 | V-006 | PHM2010 archive를 현재 재현 가능하게 받을 수 있다 | TO_VERIFY | URI, retrievedAt, checksum, integrity 기록 | 22 | - |
 | V-007 | PHM2010 사용/재배포 조건이 프로젝트 방식과 호환된다 | TO_VERIFY | 공식 조건 확인 | 22 | - |
 | V-008 | NASA Milling을 fallback으로 재현 가능하게 받을 수 있다 | TO_VERIFY | PHM 차단 시 동일 artifact/profile 절차 수행 | 22 | - |
-| V-009 | Generic CNC GLB asset의 사용/재배포 조건이 허용된다 | TO_VERIFY | asset manifest와 license 원문 참조 | 13 | - |
+| V-009 | Generic CNC GLB asset의 사용/재배포 조건이 허용된다 | TO_VERIFY | 외부 GLB는 아직 선택/커밋하지 않음. v1 manifest는 procedural primitive의 `NOASSERTION`/`TO_VERIFY`를 명시 | 13 | 2026-09-03 |
 | V-010 | Factory layout은 실제 NIST 공장 layout이다 | FALSE_NOT_CLAIMED | `SIMULATED_LAYOUT`로만 표시 | 14 | 2026-09-01 |
 | V-011 | 3D spindle 회전은 물리적으로 정확한 속도다 | FALSE_NOT_CLAIMED | RPM에 반응하는 정규화된 visual cue로만 정의 | 15 | 2026-09-01 |
 | V-012 | PHM/NASA model은 NIST Mazak01의 실제 RUL을 예측한다 | FALSE_NOT_CLAIMED | 별도 advisory channel과 field-level provenance 사용 | 24 | 2026-09-01 |
 | V-013 | MQTT에서 global exactly-once를 보장한다 | FALSE_NOT_CLAIMED | QoS1 + 선언된 DB 경계 내 effectively-once만 주장 | 07 | 2026-09-01 |
 | V-014 | 5/20 machine scene이 목표 성능을 만족한다 | TO_VERIFY | browser/environment별 FPS, frame time, heap 측정 | 26 | - |
-| V-015 | WebGL/asset 실패에도 2D 핵심 기능이 동작한다 | TO_VERIFY | E2E-04 결과 링크 | 13/25 | - |
+| V-015 | WebGL/asset 실패에도 2D 핵심 기능이 동작한다 | VERIFIED | GLB 크기/SHA-256 검증과 404/invalid fallback, bundle/WebGL2 capability failure, Canvas fallback 오탐 방지 component tests. 실제 Chromium `factory-failure.spec.ts`에서 첫 scene frame과 context 차단 시 2D snapshot 유지를 확인. 전체 runtime `./scripts/verify-e2e`는 Docker daemon unavailable로 별도 재실행 필요 | 13/25 | 2026-09-03 |
 | V-016 | 실제 CNC/PLC/Safety PLC를 제어한다 | FALSE_NOT_CLAIMED | Virtual Controller만 허용 | 18 | 2026-09-01 |
 | V-017 | 고정 Mazak01 raw를 component 혼동과 근거 없는 의미 추론 없이 Observation v2로 매핑할 수 있다 | VERIFIED | Mapping `2.0.0`, raw `6eec7a...ef2cf`; 115,991 parsed 중 52,996 mapped 및 v2 schema 검증, 62,973 unsupported, 22 unknown, invalid value 0. [재현 보고서](./data/mappings/nist-mazak01-observation-v2/mapping-report.md) | 04 | 2026-09-01 |
 | V-018 | 동일한 Canonical Processing Run과 정렬 규칙은 같은 Replay event sequence/hash를 만든다 | VERIFIED | Observation output `aee293...9b17f`의 52,996건을 두 번 계획해 sequence hash `c1e806...d9bb6` 재현. [Replay 계획 보고서](./data/replay/nist-mazak01-20161005-observation-v2/replay-plan.md), 고정 Clock/실패 재시도 unit tests | 05 | 2026-09-01 |

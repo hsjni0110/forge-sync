@@ -9,6 +9,18 @@ const MACHINE_ID = /^[A-Za-z0-9._-]{1,64}$/;
 
 export function MachineDetailRoute({ sessionFactory }: { sessionFactory: TwinSessionFactory }) {
   const machineId = useParams().machineId ?? "";
+  return <MachineDetailPanel machineId={machineId} sessionFactory={sessionFactory} />;
+}
+
+export function MachineDetailPanel({
+  machineId,
+  sessionFactory,
+  layout = "FULL",
+}: {
+  machineId: string;
+  sessionFactory: TwinSessionFactory;
+  layout?: "FULL" | "COMPACT";
+}) {
   if (!MACHINE_ID.test(machineId)) {
     return (
       <section className="page-message" role="alert">
@@ -17,17 +29,32 @@ export function MachineDetailRoute({ sessionFactory }: { sessionFactory: TwinSes
       </section>
     );
   }
-  return <ConnectedMachineDetail machineId={machineId} sessionFactory={sessionFactory} />;
+  return (
+    <ConnectedMachineDetail
+      machineId={machineId}
+      sessionFactory={sessionFactory}
+      layout={layout}
+    />
+  );
 }
 
 function ConnectedMachineDetail({
   machineId,
   sessionFactory,
+  layout,
 }: {
   machineId: string;
   sessionFactory: TwinSessionFactory;
+  layout: "FULL" | "COMPACT";
 }) {
   const createSession = useCallback(() => sessionFactory(machineId), [machineId, sessionFactory]);
   const { state, retryNow } = useTwinLiveSession(createSession);
-  return <MachineDetailView machineId={machineId} state={state} retryNow={retryNow} />;
+  return (
+    <MachineDetailView
+      machineId={machineId}
+      state={state}
+      retryNow={retryNow}
+      layout={layout}
+    />
+  );
 }

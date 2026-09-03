@@ -55,6 +55,9 @@ To open the local Machine Detail demo with one command:
 Open the URL printed by the script and press `Ctrl+C` when finished. The script starts and cleans
 up its own PostgreSQL, Mosquitto, Factory API, and Factory Web processes.
 
+The accessible operational detail is available at `/machines/Mazak01`. `/factory` adds a lazy-loaded
+spatial scene with `2D`, `3D`, and `SPLIT` modes; WebGL or asset failure leaves the 2D detail usable.
+
 ```bash
 # Existing immutable source acquisition CLI
 uv run --package forgesync-edge-gateway forgesync-source --help

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": "1.0.0",
+  "assets": [
+    {
+      "assetId": "cnc-generic-primitive-v1",
+      "displayName": "Generic CNC primitive",
+      "representation": "PROCEDURAL",
+      "origin": "PROJECT_PROCEDURAL",
+      "sourceLocator": "apps/factory-web/src/features/factory3d/ui/GenericMachinePrimitive.tsx",
+      "license": {
+        "expression": "NOASSERTION",
+        "evidenceState": "TO_VERIFY",
+        "attribution": "ForgeSync code-defined procedural geometry; repository license is not declared"
+      }
+    }
+  ]
+}

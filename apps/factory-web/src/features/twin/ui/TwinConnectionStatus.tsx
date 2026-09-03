@@ -3,20 +3,27 @@ import { effectiveConsistency } from "../domain/freshness";
 
 interface TwinConnectionStatusViewProps {
   state: TwinLiveState;
+  layout?: "FULL" | "COMPACT";
 }
 
-export function TwinConnectionStatus({ state }: TwinConnectionStatusViewProps) {
+export function TwinConnectionStatus({
+  state,
+  layout = "FULL",
+}: TwinConnectionStatusViewProps) {
   const consistency =
     state.snapshot && state.freshness
       ? effectiveConsistency(state.snapshot, state.freshness)
       : state.snapshot?.consistency.status;
   return (
-    <section className="status-strip" aria-label="트윈 연결 상태" aria-live="polite">
+    <section
+      className={`status-strip${layout === "COMPACT" ? " status-strip-compact" : ""}`}
+      aria-label="트윈 연결 상태"
+      aria-live="polite"
+    >
       <StatusValue label="연결" value={state.connectionStatus} />
-      <StatusValue
-        label="데이터 일치"
-        value={consistency ?? "UNAVAILABLE"}
-      />
+      {layout === "FULL" && (
+        <StatusValue label="데이터 일치" value={consistency ?? "UNAVAILABLE"} />
+      )}
       <StatusValue label="최신 상태" value={state.freshness ?? "UNAVAILABLE"} />
     </section>
   );

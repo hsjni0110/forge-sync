@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import twinFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-operational-twin.json";
@@ -19,7 +20,7 @@ describe("MachineDetailView", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Mazak01" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Mazak01", level: 1 })).toBeTruthy();
     for (const section of [
       "기본 정보",
       "현재 상태",
@@ -35,6 +36,28 @@ describe("MachineDetailView", () => {
     expect(screen.getByText("114")).toBeTruthy();
     expect(screen.getAllByText(/실제 데이터 · NIST/).length).toBeGreaterThan(0);
     expect(screen.getByText(/상세 품질 정보는 아직 제공하지 않습니다/)).toBeTruthy();
+    expect(screen.getByText(/원본 추적 정보 4건 보기/)).toBeTruthy();
+  });
+
+  it("renders a compact operational summary without the full provenance list", () => {
+    render(
+      <MemoryRouter>
+        <MachineDetailView
+          machineId="Mazak01"
+          state={{ connectionStatus: "LIVE", snapshot, freshness: "FRESH" }}
+          retryNow={vi.fn()}
+          layout="COMPACT"
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("heading", { name: "Mazak01", level: 2 })).toBeTruthy();
+    expect(screen.getByText("49 rpm")).toBeTruthy();
+    expect(screen.getByText("가동 중")).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "데이터 출처" })).toBeNull();
+    expect(screen.getByRole("link", { name: "전체 설비 상세 보기" }).getAttribute("href")).toBe(
+      "/machines/Mazak01",
+    );
   });
 
   it("keeps values visible while reconnecting and warns when stale", () => {

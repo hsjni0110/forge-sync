@@ -34,4 +34,20 @@ describe("App", () => {
     expect(screen.getByRole("heading", { name: "설비를 찾을 수 없습니다" })).toBeTruthy();
     expect(twinSessionFactory).not.toHaveBeenCalled();
   });
+
+  it("links to the isolated factory route from the application shell", () => {
+    render(
+      <MemoryRouter>
+        <App
+          twinSessionFactory={() => {
+            throw new Error("Navigation rendering must not create a Twin session");
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole("link", { name: "공장 보기" }).getAttribute("href")).toBe(
+      "/factory",
+    );
+  });
 });

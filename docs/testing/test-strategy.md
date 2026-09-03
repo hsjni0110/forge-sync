@@ -142,10 +142,11 @@ When 연결이 복구되면
 Then REST snapshot을 먼저 동기화한 뒤 patch 구독을 재개한다
 ```
 
-Step 11~12의 자동화는 `./scripts/verify-e2e`가 담당한다. checksum이 고정된 Canonical NIST
+Step 11~13의 자동화는 `./scripts/verify-e2e`가 담당한다. checksum이 고정된 Canonical NIST
 Observation 세 건을 실제 MQTT/API/Web runtime에 전달하고, Playwright clock으로 STALE 경계를
-결정적으로 이동한다. 이 시나리오는 RPM vertical slice와 disconnect/resync를 검증하며, E2E-01의
-execution/tool/program 및 이후 3D 범위까지 완료했다고 주장하지 않는다.
+결정적으로 이동한다. 이 시나리오는 RPM vertical slice, disconnect/resync, 정상 Factory의 첫 scene
+frame과 WebGL 초기화 실패 시 2D 생존을 검증한다. E2E-01의 execution/tool/program 및 3D 상태
+binding까지 완료했다고 주장하지 않는다.
 
 ### E2E-04 3D Failure Isolation
 

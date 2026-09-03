@@ -326,6 +326,10 @@ snapshot 수렴을 자동화했다.
 
 ### Step 13 — FactoryScene Shell과 3D Failure Isolation
 
+**상태**: `IN_PROGRESS` — `/factory` shell, lazy R3F scene, asset/WebGL/bundle failure boundary와
+자동화는 구현했다. PostgreSQL/MQTT까지 포함한 전체 Chromium E2E는 로컬 Docker daemon 재실행 후
+확인이 남아 있다.
+
 **목적**: 3D scene의 성공 여부가 2D 앱의 생존 여부와 분리된 `/factory` shell을 만든다.
 
 **구현 범위**

@@ -1,12 +1,19 @@
 import { Link, Route, Routes } from "react-router-dom";
 
+import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
+import type { FactorySceneLoader } from "../../factory3d/ui/factorySceneContract";
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import { MachineDetailRoute } from "../../twin/ui/MachineDetailRoute";
 
+const loadFactoryScene: FactorySceneLoader = () =>
+  import("../../factory3d/ui/FactoryScene");
+
 export function App({
   twinSessionFactory,
+  factorySceneLoader = loadFactoryScene,
 }: {
   twinSessionFactory: TwinSessionFactory;
+  factorySceneLoader?: FactorySceneLoader;
 }) {
   return (
     <div className="site-shell">
@@ -19,6 +26,7 @@ export function App({
         </Link>
         <nav aria-label="주요 메뉴">
           <Link to="/machines/Mazak01">설비 상세</Link>
+          <Link to="/factory">공장 보기</Link>
         </nav>
       </header>
       <main id="main-content" className="app-shell">
@@ -27,6 +35,15 @@ export function App({
           <Route
             path="/machines/:machineId"
             element={<MachineDetailRoute sessionFactory={twinSessionFactory} />}
+          />
+          <Route
+            path="/factory"
+            element={
+              <FactoryRoute
+                sessionFactory={twinSessionFactory}
+                sceneLoader={factorySceneLoader}
+              />
+            }
           />
           <Route path="*" element={<NotFound />} />
         </Routes>
