@@ -63,4 +63,27 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: [
+      "src/features/factory3d/ui/FactoryScene.tsx",
+      "src/features/factory3d/ui/MachineTwin.tsx",
+      "src/features/factory3d/ui/FloatingMachineLabel.tsx",
+      "src/features/factory3d/ui/GenericMachinePrimitive.tsx",
+      "tests/architecture/fixtures/features/factory3d/ui/invalid.ts",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["../../twin/**", "**/features/twin/**"],
+              message:
+                "3D renderer components consume MachineVisualState, not Twin/backend response types.",
+            },
+          ],
+        },
+      ],
+    },
+  },
 );

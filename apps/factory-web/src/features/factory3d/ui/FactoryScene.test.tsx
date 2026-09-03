@@ -1,8 +1,12 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Suspense, type ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GlbFactoryAsset } from "../domain/factoryAsset";
+import type {
+  MachineSceneBinding,
+  MachineVisualState,
+} from "../domain/machineVisualState";
 import FactoryScene from "./FactoryScene";
 
 const loadVerifiedGlbAsset = vi.hoisted(() => vi.fn());
@@ -53,7 +57,9 @@ describe("FactoryScene asset isolation", () => {
 
     render(
       <FactoryScene
-        asset={proceduralAsset}
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        onSelectMachine={vi.fn()}
         onAssetFallback={vi.fn()}
         onUnavailable={onUnavailable}
       />,
@@ -69,7 +75,9 @@ describe("FactoryScene asset isolation", () => {
 
     render(
       <FactoryScene
-        asset={proceduralAsset}
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        onSelectMachine={vi.fn()}
         onAssetFallback={vi.fn()}
         onUnavailable={onUnavailable}
       />,
@@ -91,7 +99,9 @@ describe("FactoryScene asset isolation", () => {
       const { container } = render(
         <Suspense fallback={<div>asset loading</div>}>
           <FactoryScene
-            asset={externalAsset}
+            machineBinding={binding(externalAsset)}
+            visualState={visualState}
+            onSelectMachine={vi.fn()}
             onAssetFallback={onAssetFallback}
             onUnavailable={vi.fn()}
           />
@@ -102,7 +112,54 @@ describe("FactoryScene asset isolation", () => {
       expect(container.querySelector('group[name="generic-cnc-primitive"]')).toBeTruthy();
     },
   );
+
+  it("selects the same machine from the 3D object and accessible floating label", async () => {
+    const onSelectMachine = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { container } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        onSelectMachine={onSelectMachine}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    await screen.findByText("Twin v4");
+    expect(container.querySelector('mesh[name="selected-machine-cue"]')).toBeTruthy();
+    fireEvent.click(container.querySelector('group[name="mazak01"]') as Element);
+    fireEvent.click(screen.getByRole("button", { name: /Mazak01 Twin v4 선택됨/ }));
+    expect(onSelectMachine).toHaveBeenNthCalledWith(1, "Mazak01");
+    expect(onSelectMachine).toHaveBeenNthCalledWith(2, "Mazak01");
+  });
 });
+
+function binding(asset: typeof proceduralAsset | GlbFactoryAsset): MachineSceneBinding {
+  return {
+    machineId: "Mazak01",
+    sceneNodeId: "mazak01",
+    asset,
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+    scale: [1, 1, 1],
+    spatialProvenance: "SIMULATED_LAYOUT",
+    visualSpindleSourceDataItemId: "Mazak01-C_5",
+  };
+}
+
+const visualState: MachineVisualState = {
+  machineId: "Mazak01",
+  twinVersion: 4,
+  connectivity: "ONLINE",
+  execution: "ACTIVE",
+  health: "NORMAL",
+  rpm: 49,
+  rpmSourceDataItemId: "Mazak01-C_5",
+  tool: "13",
+  stale: false,
+  selected: true,
+};
 
 const proceduralAsset = {
   assetId: "procedural-cnc",

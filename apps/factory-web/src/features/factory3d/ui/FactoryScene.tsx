@@ -1,14 +1,14 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { use, useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { loadVerifiedGlbAsset } from "../adapters/verifiedGlbAsset";
-import type { FactoryAsset } from "../domain/factoryAsset";
-import { AssetErrorBoundary } from "./AssetErrorBoundary";
+import { FloatingMachineLabel } from "./FloatingMachineLabel";
 import type { FactorySceneProps } from "./factorySceneContract";
-import { GenericMachinePrimitive } from "./GenericMachinePrimitive";
+import { MachineTwin } from "./MachineTwin";
 
 export default function FactoryScene({
-  asset,
+  machineBinding,
+  visualState,
+  onSelectMachine,
   onAssetFallback,
   onUnavailable,
 }: FactorySceneProps) {
@@ -48,30 +48,21 @@ export default function FactoryScene({
           <planeGeometry args={[18, 18]} />
           <meshStandardMaterial color="#0b2028" roughness={0.9} />
         </mesh>
-        <group position={[0, 0.2, 0]} rotation={[0, -0.35, 0]}>
-          <AssetErrorBoundary
-            fallback={<GenericMachinePrimitive />}
-            onError={onAssetFallback}
-          >
-            <FactoryAssetModel asset={asset} />
-          </AssetErrorBoundary>
-        </group>
+        <MachineTwin
+          binding={machineBinding}
+          visualState={visualState}
+          onSelectMachine={onSelectMachine}
+          onAssetFallback={onAssetFallback}
+        />
       </Canvas>
+      <FloatingMachineLabel
+        binding={machineBinding}
+        visualState={visualState}
+        onSelectMachine={onSelectMachine}
+      />
       {isSceneReady && <span className="visually-hidden">3D 장면 준비됨</span>}
     </div>
   );
-}
-
-function FactoryAssetModel({ asset }: { asset: FactoryAsset }): ReactNode {
-  if (asset.representation === "PROCEDURAL") {
-    return <GenericMachinePrimitive />;
-  }
-  return <GlbMachine asset={asset} />;
-}
-
-function GlbMachine({ asset }: { asset: Extract<FactoryAsset, { representation: "GLB" }> }) {
-  const model = use(loadVerifiedGlbAsset(asset));
-  return <primitive object={model.scene} />;
 }
 
 function SceneReadySignal({ onReady }: { onReady: () => void }) {

@@ -16,13 +16,16 @@ afterEach(cleanup);
 describe("FactoryRoute", () => {
   it("starts in SPLIT mode and switches between accessible 2D and 3D views", async () => {
     const sceneLoader = vi.fn(async () => ({ default: HealthyScene }));
-    renderFactory(sceneLoader);
+    const sessionFactory = vi.fn(createSession);
+    renderFactory(sceneLoader, sessionFactory);
 
     expect(screen.getByRole("button", { name: "SPLIT" }).getAttribute("aria-pressed")).toBe(
       "true",
     );
     expect(await screen.findByTestId("healthy-scene")).toBeTruthy();
+    expect(screen.getByText("3D Mazak01 · Twin v4 · selected")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Mazak01" })).toBeTruthy();
+    expect(screen.getByText("v4")).toBeTruthy();
     expect(screen.getByText(/SIMULATED_LAYOUT/)).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "2D" }));
@@ -34,6 +37,45 @@ describe("FactoryRoute", () => {
     fireEvent.click(screen.getByRole("button", { name: "3D" }));
     expect(await screen.findByRole("heading", { name: "3D 공장" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Mazak01" })).toBeNull();
+    expect(sessionFactory).toHaveBeenCalledTimes(1);
+  });
+
+  it("moves the 2D panel and 3D visual state to the same patched Twin version", async () => {
+    let publishState: ((state: ReturnType<TwinSession["currentState"]>) => void) | undefined;
+    const sessionFactory: TwinSessionFactory = () => {
+      let currentState = {
+        connectionStatus: "LIVE" as const,
+        snapshot,
+        freshness: "FRESH" as const,
+      };
+      return {
+        start: vi.fn(),
+        subscribe: (listener) => {
+          publishState = (state) => {
+            currentState = state as typeof currentState;
+            listener(state);
+          };
+          listener(currentState);
+          return () => undefined;
+        },
+        currentState: () => currentState,
+        retryNow: vi.fn(),
+        dispose: vi.fn(),
+      };
+    };
+    renderFactory(async () => ({ default: HealthyScene }), sessionFactory);
+    expect(await screen.findByText("3D Mazak01 · Twin v4 · selected")).toBeTruthy();
+
+    const patchedSnapshot = structuredClone(snapshot);
+    patchedSnapshot.consistency.twinVersion = 5;
+    publishState?.({
+      connectionStatus: "LIVE",
+      snapshot: patchedSnapshot,
+      freshness: "FRESH",
+    });
+
+    expect(await screen.findByText("3D Mazak01 · Twin v5 · selected")).toBeTruthy();
+    expect(screen.getByText("v5")).toBeTruthy();
   });
 
   it("contains a rejected 3D bundle and restores the 2D panel", async () => {
@@ -65,10 +107,13 @@ describe("FactoryRoute", () => {
   });
 });
 
-function renderFactory(sceneLoader: Parameters<typeof FactoryRoute>[0]["sceneLoader"]) {
+function renderFactory(
+  sceneLoader: Parameters<typeof FactoryRoute>[0]["sceneLoader"],
+  sessionFactory: TwinSessionFactory = createSession,
+) {
   render(
     <MemoryRouter>
-      <FactoryRoute sessionFactory={createSession} sceneLoader={sceneLoader} />
+      <FactoryRoute sessionFactory={sessionFactory} sceneLoader={sceneLoader} />
     </MemoryRouter>,
   );
 }
@@ -88,8 +133,17 @@ const createSession: TwinSessionFactory = () => {
   return session;
 };
 
-function HealthyScene() {
-  return <div data-testid="healthy-scene">3D scene ready</div>;
+function HealthyScene({ visualState, onSelectMachine }: FactorySceneProps) {
+  return (
+    <button
+      type="button"
+      data-testid="healthy-scene"
+      onClick={() => onSelectMachine("Mazak01")}
+    >
+      3D {visualState?.machineId} · Twin v{visualState?.twinVersion} ·{" "}
+      {visualState?.selected ? "selected" : "not selected"}
+    </button>
+  );
 }
 
 function WebGlFailureScene({ onUnavailable }: FactorySceneProps) {

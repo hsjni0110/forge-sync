@@ -326,9 +326,8 @@ snapshot 수렴을 자동화했다.
 
 ### Step 13 — FactoryScene Shell과 3D Failure Isolation
 
-**상태**: `IN_PROGRESS` — `/factory` shell, lazy R3F scene, asset/WebGL/bundle failure boundary와
-자동화는 구현했다. PostgreSQL/MQTT까지 포함한 전체 Chromium E2E는 로컬 Docker daemon 재실행 후
-확인이 남아 있다.
+**상태**: `DONE` — `/factory` shell, lazy R3F scene, asset/WebGL/bundle failure boundary와
+PostgreSQL/MQTT/API/Web을 포함한 Chromium E2E를 자동화했다.
 
 **목적**: 3D scene의 성공 여부가 2D 앱의 생존 여부와 분리된 `/factory` shell을 만든다.
 
@@ -350,6 +349,10 @@ snapshot 수렴을 자동화했다.
 **선행 조건**: Step 12.
 
 ### Step 14 — MachineVisualState Adapter와 선택 동기화
+
+**상태**: `DONE` — Mazak01 Twin을 renderer 전용 visual contract로 변환하고, 단일 live session을
+2D 상세와 3D가 공유하도록 구성했다. 장비/label 선택, Twin version 일치, simulated layout provenance,
+renderer import boundary를 unit/component/architecture/전체 runtime E2E로 검증했다.
 
 **목적**: backend DTO를 renderer에서 분리하고 3D 선택과 2D 상세 panel을 같은 machine identity로 연결한다.
 

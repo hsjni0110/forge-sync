@@ -1,11 +1,16 @@
 import type { ComponentType } from "react";
 
-import type { FactoryAsset } from "../domain/factoryAsset";
+import type {
+  MachineSceneBinding,
+  MachineVisualState,
+} from "../domain/machineVisualState";
 
 export type SceneUnavailableReason = "BUNDLE_OR_SCENE" | "WEBGL";
 
 export interface FactorySceneProps {
-  asset: FactoryAsset;
+  machineBinding: MachineSceneBinding;
+  visualState: MachineVisualState | undefined;
+  onSelectMachine: (machineId: string) => void;
   onAssetFallback: () => void;
   onUnavailable: (reason: SceneUnavailableReason) => void;
 }

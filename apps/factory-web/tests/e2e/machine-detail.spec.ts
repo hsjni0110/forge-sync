@@ -29,6 +29,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   await page.goto("/machines/Mazak01");
   await expect(page.getByRole("heading", { name: "Mazak01", exact: true })).toBeVisible();
   await expect(page.getByText("49 rpm")).toBeVisible();
+  await page.getByText(/원본 추적 정보 .*건 보기/).click();
   await expect(page.getByText(/실제 데이터 · NIST/).first()).toBeVisible();
   await expect(page.getByLabel("트윈 연결 상태").getByText("실시간 연결됨")).toBeVisible();
 
@@ -53,7 +54,8 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   await expect(page.getByText("데이터 버전 3")).toBeVisible();
   await expect(page.getByLabel("트윈 연결 상태").getByText("실시간 연결됨")).toBeVisible();
 
-  await page.keyboard.press("Home");
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Mazak01", exact: true })).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "본문으로 바로가기" })).toBeFocused();
   for (const section of ["기본 정보", "현재 상태", "측정값", "데이터 품질", "데이터 출처"]) {
@@ -68,6 +70,13 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   );
   await expect(page.locator("canvas")).toBeVisible();
   await expect(page.getByText("1873 rpm")).toBeVisible();
+  const selectedMachineLabel = page.getByRole("button", {
+    name: /Mazak01 Twin v3 선택됨/,
+  });
+  await expect(selectedMachineLabel).toBeVisible();
+  await selectedMachineLabel.click();
+  await expect(selectedMachineLabel).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator(".machine-summary .machine-version")).toHaveText("v3");
 
   await page.addInitScript(() => {
     const originalGetContext = HTMLCanvasElement.prototype.getContext;

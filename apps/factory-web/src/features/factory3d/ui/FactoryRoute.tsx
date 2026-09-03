@@ -1,9 +1,18 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import type { TwinSessionFactory } from "../../twin/application/ports";
-import { MachineDetailPanel } from "../../twin/ui/MachineDetailRoute";
-import defaultManifestDocument from "../adapters/defaultFactoryAssetManifest.json";
-import { decodeFactoryAssetManifest } from "../adapters/factoryAssetManifest";
+import { MachineDetailView } from "../../twin/ui/MachineDetailView";
+import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
+import { MAZAK01_SCENE_BINDING } from "../adapters/defaultMachineSceneBinding";
+import { mapTwinToMachineVisualState } from "../adapters/twinToMachineVisualState";
+import { MachineSelectionStore } from "../application/MachineSelectionStore";
 import { SceneErrorBoundary } from "./SceneErrorBoundary";
 import type {
   FactorySceneLoader,
@@ -11,8 +20,6 @@ import type {
 } from "./factorySceneContract";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
-
-const defaultAsset = decodeFactoryAssetManifest(defaultManifestDocument).assets[0];
 
 export function FactoryRoute({
   sessionFactory,
@@ -26,6 +33,32 @@ export function FactoryRoute({
     useState<SceneUnavailableReason>();
   const [isAssetFallback, setIsAssetFallback] = useState(false);
   const [sceneAttempt, setSceneAttempt] = useState(0);
+  const selectionStore = useMemo(
+    () => new MachineSelectionStore(MAZAK01_SCENE_BINDING.machineId),
+    [],
+  );
+  const selectedMachineId = useSyncExternalStore(
+    selectionStore.subscribe,
+    selectionStore.currentSelection,
+  );
+  const machineId = selectedMachineId ?? MAZAK01_SCENE_BINDING.machineId;
+  const createSession = useCallback(
+    () => sessionFactory(machineId),
+    [machineId, sessionFactory],
+  );
+  const { state: twinState, retryNow } = useTwinLiveSession(createSession);
+  const visualState = useMemo(() => {
+    if (!twinState.snapshot) {
+      return undefined;
+    }
+    return mapTwinToMachineVisualState({
+      snapshot: twinState.snapshot,
+      freshness: twinState.freshness ?? twinState.snapshot.state.freshness.value,
+      selectedMachineId,
+      visualSpindleSourceDataItemId:
+        MAZAK01_SCENE_BINDING.visualSpindleSourceDataItemId,
+    });
+  }, [selectedMachineId, twinState.freshness, twinState.snapshot]);
   const LazyFactoryScene = useMemo(
     () => lazy(sceneLoader),
     [sceneLoader, sceneAttempt],
@@ -66,7 +99,9 @@ export function FactoryRoute({
         </div>
       </header>
 
-      <p className="layout-provenance">Layout provenance · SIMULATED_LAYOUT</p>
+      <p className="layout-provenance">
+        Layout provenance · {MAZAK01_SCENE_BINDING.spatialProvenance}
+      </p>
       {isAssetFallback && (
         <div className="notice notice-warning" role="status">
           3D 자산을 불러오지 못해 기본 CNC 도형을 표시합니다.
@@ -90,7 +125,9 @@ export function FactoryRoute({
                 >
                   <Suspense fallback={<SceneLoading />}>
                     <LazyFactoryScene
-                      asset={defaultAsset}
+                      machineBinding={MAZAK01_SCENE_BINDING}
+                      visualState={visualState}
+                      onSelectMachine={selectionStore.selectMachine}
                       onAssetFallback={() => setIsAssetFallback(true)}
                       onUnavailable={setUnavailableReason}
                     />
@@ -108,9 +145,10 @@ export function FactoryRoute({
 
         {showsDetail && (
           <section className="factory-detail-panel" aria-label="2D 설비 상세">
-            <MachineDetailPanel
-              machineId="Mazak01"
-              sessionFactory={sessionFactory}
+            <MachineDetailView
+              machineId={machineId}
+              state={twinState}
+              retryNow={retryNow}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}
             />
           </section>

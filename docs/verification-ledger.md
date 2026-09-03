@@ -25,12 +25,12 @@
 | V-007 | PHM2010 사용/재배포 조건이 프로젝트 방식과 호환된다 | TO_VERIFY | 공식 조건 확인 | 22 | - |
 | V-008 | NASA Milling을 fallback으로 재현 가능하게 받을 수 있다 | TO_VERIFY | PHM 차단 시 동일 artifact/profile 절차 수행 | 22 | - |
 | V-009 | Generic CNC GLB asset의 사용/재배포 조건이 허용된다 | TO_VERIFY | 외부 GLB는 아직 선택/커밋하지 않음. v1 manifest는 procedural primitive의 `NOASSERTION`/`TO_VERIFY`를 명시 | 13 | 2026-09-03 |
-| V-010 | Factory layout은 실제 NIST 공장 layout이다 | FALSE_NOT_CLAIMED | `SIMULATED_LAYOUT`로만 표시 | 14 | 2026-09-01 |
+| V-010 | Factory layout은 실제 NIST 공장 layout이다 | FALSE_NOT_CLAIMED | Mazak01 scene binding과 `/factory`에서 `SIMULATED_LAYOUT`로만 표시 | 14 | 2026-09-03 |
 | V-011 | 3D spindle 회전은 물리적으로 정확한 속도다 | FALSE_NOT_CLAIMED | RPM에 반응하는 정규화된 visual cue로만 정의 | 15 | 2026-09-01 |
 | V-012 | PHM/NASA model은 NIST Mazak01의 실제 RUL을 예측한다 | FALSE_NOT_CLAIMED | 별도 advisory channel과 field-level provenance 사용 | 24 | 2026-09-01 |
 | V-013 | MQTT에서 global exactly-once를 보장한다 | FALSE_NOT_CLAIMED | QoS1 + 선언된 DB 경계 내 effectively-once만 주장 | 07 | 2026-09-01 |
 | V-014 | 5/20 machine scene이 목표 성능을 만족한다 | TO_VERIFY | browser/environment별 FPS, frame time, heap 측정 | 26 | - |
-| V-015 | WebGL/asset 실패에도 2D 핵심 기능이 동작한다 | VERIFIED | GLB 크기/SHA-256 검증과 404/invalid fallback, bundle/WebGL2 capability failure, Canvas fallback 오탐 방지 component tests. 실제 Chromium `factory-failure.spec.ts`에서 첫 scene frame과 context 차단 시 2D snapshot 유지를 확인. 전체 runtime `./scripts/verify-e2e`는 Docker daemon unavailable로 별도 재실행 필요 | 13/25 | 2026-09-03 |
+| V-015 | WebGL/asset 실패에도 2D 핵심 기능이 동작한다 | VERIFIED | GLB 크기/SHA-256 검증과 404/invalid fallback, bundle/WebGL2 capability failure, Canvas fallback 오탐 방지 component tests. 실제 PostgreSQL/Mosquitto/API/Web/Chromium `./scripts/verify-e2e`에서 첫 scene frame과 context 차단 시 2D snapshot 유지를 확인 | 13/25 | 2026-09-03 |
 | V-016 | 실제 CNC/PLC/Safety PLC를 제어한다 | FALSE_NOT_CLAIMED | Virtual Controller만 허용 | 18 | 2026-09-01 |
 | V-017 | 고정 Mazak01 raw를 component 혼동과 근거 없는 의미 추론 없이 Observation v2로 매핑할 수 있다 | VERIFIED | Mapping `2.0.0`, raw `6eec7a...ef2cf`; 115,991 parsed 중 52,996 mapped 및 v2 schema 검증, 62,973 unsupported, 22 unknown, invalid value 0. [재현 보고서](./data/mappings/nist-mazak01-observation-v2/mapping-report.md) | 04 | 2026-09-01 |
 | V-018 | 동일한 Canonical Processing Run과 정렬 규칙은 같은 Replay event sequence/hash를 만든다 | VERIFIED | Observation output `aee293...9b17f`의 52,996건을 두 번 계획해 sequence hash `c1e806...d9bb6` 재현. [Replay 계획 보고서](./data/replay/nist-mazak01-20161005-observation-v2/replay-plan.md), 고정 Clock/실패 재시도 unit tests | 05 | 2026-09-01 |
@@ -40,6 +40,7 @@
 | V-022 | Equipment State는 current Latest Observation만으로 결정되고 freshness는 historical source time이 아닌 projected wall clock으로 계산된다 | VERIFIED | 고정 시각 unit tests에서 2초/10초 경계와 unavailable/Condition 집계를 검증하고, `./scripts/verify-database`에서 state/version 원자성, out-of-order 무변경, state 저장 실패 전체 rollback 확인. [ADR-027](./adr/ADR-027-equipment-state-and-freshness.md) | 09 | 2026-09-02 |
 | V-023 | Versioned Operational Twin REST snapshot은 한 읽기 일관성 경계에서 TwinVersion, freshness, P0 값과 field-level provenance를 제공한다 | VERIFIED | Twin v1 schema/golden/API tests와 `./scripts/verify-database`에서 실제 PostgreSQL Projection의 state/version 및 Canonical provenance 보존 확인. 복수 spindle은 primary를 추측하지 않고 모두 반환. [ADR-028](./adr/ADR-028-versioned-operational-twin-snapshot.md), [Twin contract](../contracts/twin/README.md) | 10 | 2026-09-02 |
 | V-024 | 2D Machine Detail은 실제 replay 업데이트를 표시하고 WebSocket 단절 뒤 STALE을 알린 후 권위 REST snapshot version/value로 수렴한다 | VERIFIED | Canonical Observation output `aee293...9b17f`에서 고정한 세 record와 실제 PostgreSQL/Mosquitto/API/Web/Chromium을 `./scripts/verify-e2e`로 검증. P0 component tests와 [ADR-030](./adr/ADR-030-accessible-machine-detail-client.md) 참조 | 11/12 | 2026-09-02 |
+| V-025 | 3D Mazak01과 오른쪽 Machine Detail은 같은 live Twin identity와 version을 표현한다 | VERIFIED | 순수 Twin→MachineVisualState mapping, renderer import boundary, v4→v5 shared-session component test와 실제 PostgreSQL/Mosquitto/API/Web/Chromium `./scripts/verify-e2e`에서 선택 label/panel의 Mazak01 Twin v3 일치 확인 | 14 | 2026-09-03 |
 
 ## 갱신 규칙
 
