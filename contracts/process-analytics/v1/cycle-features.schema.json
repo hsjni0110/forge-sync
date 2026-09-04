@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/process-analytics/v1/cycle-features.schema.json",
+  "title": "ForgeSync Cycle Features v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "featureProcessingRunId", "machiningRunProcessingRunId", "machineId",
+    "cycleFeatureVersion", "inputHash", "inputObservationCount", "eligibleRunCount",
+    "resultHash", "createdAt", "featureSets"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "featureProcessingRunId": { "$ref": "#/$defs/sha256" },
+    "machiningRunProcessingRunId": { "$ref": "#/$defs/sha256" },
+    "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+    "cycleFeatureVersion": { "const": "1.0.0" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "inputObservationCount": { "type": "integer", "minimum": 0 },
+    "eligibleRunCount": { "type": "integer", "minimum": 0 },
+    "resultHash": { "$ref": "#/$defs/sha256" },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "featureSets": { "type": "array", "items": { "$ref": "#/$defs/featureSet" } }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "timestamp": {
+      "type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "seconds": { "type": "number", "minimum": 0, "multipleOf": 0.000000001 },
+    "status": { "enum": ["AVAILABLE", "PARTIAL", "MISSING", "EMPTY_WINDOW"] },
+    "featureSet": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "cycleFeatureSetId", "machiningRunId", "cycleFeatureVersion", "status",
+        "aggregationWindow", "stateFeatures", "metricFeatures", "sourceObservationRange",
+        "provenance", "resultHash"
+      ],
+      "properties": {
+        "cycleFeatureSetId": { "$ref": "#/$defs/sha256" },
+        "machiningRunId": { "$ref": "#/$defs/sha256" },
+        "cycleFeatureVersion": { "const": "1.0.0" },
+        "status": { "$ref": "#/$defs/status" },
+        "aggregationWindow": { "$ref": "#/$defs/window" },
+        "stateFeatures": { "$ref": "#/$defs/stateFeatures" },
+        "metricFeatures": { "type": "array", "minItems": 3, "items": { "$ref": "#/$defs/metricFeature" } },
+        "sourceObservationRange": { "$ref": "#/$defs/observationRange" },
+        "provenance": { "$ref": "#/$defs/derivedProvenance" },
+        "resultHash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "window": {
+      "type": "object", "additionalProperties": false,
+      "required": ["startedAt", "endedAt", "durationSeconds", "boundary"],
+      "properties": {
+        "startedAt": { "$ref": "#/$defs/timestamp" },
+        "endedAt": { "$ref": "#/$defs/timestamp" },
+        "durationSeconds": { "$ref": "#/$defs/seconds" },
+        "boundary": { "const": "[STARTED_AT,ENDED_AT)" }
+      }
+    },
+    "stateFeatures": {
+      "type": "object", "additionalProperties": false,
+      "required": ["calculation", "cuttingSeconds", "idleSeconds", "coverage", "provenance"],
+      "properties": {
+        "calculation": { "const": "EXECUTION_LAST_OBSERVATION_CARRIED_FORWARD" },
+        "cuttingSeconds": { "$ref": "#/$defs/nullableSeconds" },
+        "idleSeconds": { "$ref": "#/$defs/nullableSeconds" },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "provenance": { "type": "array", "items": { "$ref": "#/$defs/observationProvenance" } }
+      }
+    },
+    "metricFeature": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "metric", "status", "calculation", "coverage", "contributingSourceEventKeys", "provenance"
+      ],
+      "properties": {
+        "metric": { "enum": ["SPINDLE_SPEED", "LOAD", "PATH_FEEDRATE"] },
+        "componentId": { "type": "string", "minLength": 1 },
+        "sourceDataItemId": { "type": "string", "minLength": 1 },
+        "unit": { "type": "string", "minLength": 1 },
+        "status": { "$ref": "#/$defs/status" },
+        "calculation": { "const": "TIME_WEIGHTED_LAST_OBSERVATION_CARRIED_FORWARD" },
+        "mean": { "type": "number" },
+        "maximum": { "type": "number" },
+        "populationStandardDeviation": { "type": "number", "minimum": 0 },
+        "coverage": { "$ref": "#/$defs/coverage" },
+        "contributingSourceEventKeys": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "provenance": { "type": "array", "items": { "$ref": "#/$defs/observationProvenance" } }
+      }
+    },
+    "nullableSeconds": { "type": ["number", "null"], "minimum": 0, "multipleOf": 0.000000001 },
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["coveredSeconds", "windowSeconds", "ratio"],
+      "properties": {
+        "coveredSeconds": { "$ref": "#/$defs/seconds" },
+        "windowSeconds": { "$ref": "#/$defs/seconds" },
+        "ratio": { "type": ["number", "null"], "minimum": 0, "maximum": 1, "multipleOf": 0.000001 }
+      }
+    },
+    "observationRange": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "replaySessionId", "firstReplaySequence", "lastReplaySequence",
+        "firstSourceObservedAt", "lastSourceObservedAt", "firstSourceEventKey", "lastSourceEventKey"
+      ],
+      "properties": {
+        "replaySessionId": { "type": "string", "format": "uuid" },
+        "firstReplaySequence": { "type": "integer", "minimum": 0 },
+        "lastReplaySequence": { "type": "integer", "minimum": 0 },
+        "firstSourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "lastSourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "firstSourceEventKey": { "type": "string", "minLength": 1 },
+        "lastSourceEventKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "derivedProvenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["origin", "observations", "transformation"],
+      "properties": {
+        "origin": { "const": "DERIVED" },
+        "observations": { "type": "array", "items": { "$ref": "#/$defs/observationProvenance" } },
+        "transformation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["featureProcessingRunId", "cycleFeatureVersion", "calculation"],
+          "properties": {
+            "featureProcessingRunId": { "$ref": "#/$defs/sha256" },
+            "cycleFeatureVersion": { "const": "1.0.0" },
+            "calculation": { "const": "TIME_WEIGHTED_LAST_OBSERVATION_CARRIED_FORWARD" }
+          }
+        }
+      }
+    },
+    "observationProvenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "transformation"],
+      "properties": {
+        "source": {
+          "type": "object", "additionalProperties": false,
+          "required": ["kind", "provider", "sourceSetId", "artifactId"],
+          "properties": {
+            "kind": { "const": "REAL" }, "provider": { "const": "NIST" },
+            "sourceSetId": { "type": "string", "minLength": 1 },
+            "artifactId": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "transformation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["rawRecordId", "mappingVersion", "sourceDataItemId"],
+          "properties": {
+            "rawRecordId": { "type": "string", "minLength": 1 },
+            "mappingVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+            "sourceDataItemId": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    }
+  }
+}

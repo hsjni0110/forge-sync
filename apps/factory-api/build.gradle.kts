@@ -57,6 +57,9 @@ tasks.processResources {
     from("../../contracts/process-analytics/v1/machining-runs.schema.json") {
         into("contracts/process-analytics/v1")
     }
+    from("../../contracts/process-analytics/v1/cycle-features.schema.json") {
+        into("contracts/process-analytics/v1")
+    }
 }
 
 tasks.processTestResources {

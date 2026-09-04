@@ -17,3 +17,7 @@ time is not used for that calculation.
 Process Analytics processing runs and Machining Run projections are append-only derived data. One
 transaction preserves the processing identity and all of its projections. Their foreign key does
 not connect to Production, Equipment Twin, or the Ingestion Inbox transaction boundary.
+`V006__create_cycle_feature_projection.sql` adds immutable Cycle Feature processing metadata and
+JSONB feature-set projections. The metadata row and every feature set are inserted in one
+transaction; their foreign key references the immutable Machining Run processing result without
+modifying it or Canonical Observation history.

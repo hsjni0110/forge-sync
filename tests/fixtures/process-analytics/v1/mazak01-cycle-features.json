@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0.0",
+  "featureProcessingRunId": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "machiningRunProcessingRunId": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "machineId": "Mazak01",
+  "cycleFeatureVersion": "1.0.0",
+  "inputHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "inputObservationCount": 5,
+  "eligibleRunCount": 1,
+  "resultHash": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+  "createdAt": "2026-09-04T02:00:00Z",
+  "featureSets": [{
+    "cycleFeatureSetId": "sha256:5555555555555555555555555555555555555555555555555555555555555555",
+    "machiningRunId": "sha256:6666666666666666666666666666666666666666666666666666666666666666",
+    "cycleFeatureVersion": "1.0.0",
+    "status": "PARTIAL",
+    "aggregationWindow": {
+      "startedAt": "2016-10-05T09:00:00Z",
+      "endedAt": "2016-10-05T09:00:10Z",
+      "durationSeconds": 10.000000000,
+      "boundary": "[STARTED_AT,ENDED_AT)"
+    },
+    "stateFeatures": {
+      "calculation": "EXECUTION_LAST_OBSERVATION_CARRIED_FORWARD",
+      "cuttingSeconds": 7.000000000,
+      "idleSeconds": 3.000000000,
+      "coverage": { "coveredSeconds": 10.000000000, "windowSeconds": 10.000000000, "ratio": 1.000000 },
+      "provenance": [{
+        "source": {
+          "kind": "REAL", "provider": "NIST", "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "transformation": { "rawRecordId": "raw-active", "mappingVersion": "2.0.0", "sourceDataItemId": "execution" }
+      }]
+    },
+    "metricFeatures": [{
+      "metric": "SPINDLE_SPEED",
+      "componentId": "Mazak01-spindle",
+      "sourceDataItemId": "spindle_speed",
+      "unit": "REVOLUTION/MINUTE",
+      "status": "AVAILABLE",
+      "calculation": "TIME_WEIGHTED_LAST_OBSERVATION_CARRIED_FORWARD",
+      "mean": 120.000000,
+      "maximum": 200,
+      "populationStandardDeviation": 74.833148,
+      "coverage": { "coveredSeconds": 10.000000000, "windowSeconds": 10.000000000, "ratio": 1.000000 },
+      "contributingSourceEventKeys": ["rpm-1", "rpm-2", "rpm-3"],
+      "provenance": [{
+        "source": {
+          "kind": "REAL", "provider": "NIST", "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "transformation": { "rawRecordId": "raw-rpm", "mappingVersion": "2.0.0", "sourceDataItemId": "spindle_speed" }
+      }]
+    }, {
+      "metric": "LOAD", "status": "MISSING",
+      "calculation": "TIME_WEIGHTED_LAST_OBSERVATION_CARRIED_FORWARD",
+      "coverage": { "coveredSeconds": 0.000000000, "windowSeconds": 10.000000000, "ratio": 0.000000 },
+      "contributingSourceEventKeys": [], "provenance": []
+    }, {
+      "metric": "PATH_FEEDRATE", "status": "MISSING",
+      "calculation": "TIME_WEIGHTED_LAST_OBSERVATION_CARRIED_FORWARD",
+      "coverage": { "coveredSeconds": 0.000000000, "windowSeconds": 10.000000000, "ratio": 0.000000 },
+      "contributingSourceEventKeys": [], "provenance": []
+    }],
+    "sourceObservationRange": {
+      "replaySessionId": "00d64db8-967e-41ba-9d09-fdd087710aac",
+      "firstReplaySequence": 1, "lastReplaySequence": 5,
+      "firstSourceObservedAt": "2016-10-05T09:00:00Z",
+      "lastSourceObservedAt": "2016-10-05T09:00:07Z",
+      "firstSourceEventKey": "active", "lastSourceEventKey": "hold"
+    },
+    "provenance": {
+      "origin": "DERIVED",
+      "observations": [{
+        "source": {
+          "kind": "REAL", "provider": "NIST", "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "transformation": { "rawRecordId": "raw-active", "mappingVersion": "2.0.0", "sourceDataItemId": "execution" }
+      }],
+      "transformation": {
+        "featureProcessingRunId": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+        "cycleFeatureVersion": "1.0.0",
+        "calculation": "TIME_WEIGHTED_LAST_OBSERVATION_CARRIED_FORWARD"
+      }
+    },
+    "resultHash": "sha256:7777777777777777777777777777777777777777777777777777777777777777"
+  }]
+}

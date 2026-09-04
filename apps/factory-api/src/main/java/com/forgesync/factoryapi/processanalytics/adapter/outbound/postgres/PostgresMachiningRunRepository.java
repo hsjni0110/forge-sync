@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.processanalytics.application.CanonicalObservationHistory;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunProcessingResult;
+import com.forgesync.factoryapi.processanalytics.application.MachiningRunProcessingSource;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunProjectionStore;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRun;
 import com.forgesync.factoryapi.processanalytics.domain.ObservationProvenance;
@@ -21,7 +22,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public final class PostgresMachiningRunRepository
-    implements CanonicalObservationHistory, MachiningRunProjectionStore {
+    implements CanonicalObservationHistory,
+        MachiningRunProjectionStore,
+        MachiningRunProcessingSource {
 
   private final JdbcClient jdbcClient;
   private final ObjectMapper objectMapper;

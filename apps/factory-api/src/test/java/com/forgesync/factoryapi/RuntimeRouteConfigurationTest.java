@@ -6,8 +6,11 @@ import static org.mockito.Mockito.mock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.equipmenttwin.adapter.EquipmentTwinConfiguration;
 import com.forgesync.factoryapi.processanalytics.adapter.ProcessAnalyticsConfiguration;
+import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.CycleFeatureController;
+import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.CycleFeatureErrorHandler;
 import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.MachiningRunController;
 import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.MachiningRunErrorHandler;
+import com.forgesync.factoryapi.processanalytics.application.CycleFeatureService;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunService;
 import com.forgesync.factoryapi.replay.adapter.ReplayConfiguration;
 import com.forgesync.factoryapi.replay.adapter.inbound.rest.ReplayController;
@@ -54,12 +57,17 @@ class RuntimeRouteConfigurationTest {
         .withUserConfiguration(
             RuntimeDependencies.class,
             ProcessAnalyticsConfiguration.class,
+            CycleFeatureController.class,
+            CycleFeatureErrorHandler.class,
             MachiningRunController.class,
             MachiningRunErrorHandler.class)
         .withPropertyValues("forgesync.process-analytics.enabled=true")
         .run(
             context -> {
               assertThat(context).hasSingleBean(MachiningRunService.class);
+              assertThat(context).hasSingleBean(CycleFeatureService.class);
+              assertThat(context).hasSingleBean(CycleFeatureController.class);
+              assertThat(context).hasSingleBean(CycleFeatureErrorHandler.class);
               assertThat(context).hasSingleBean(MachiningRunController.class);
               assertThat(context).hasSingleBean(MachiningRunErrorHandler.class);
             });

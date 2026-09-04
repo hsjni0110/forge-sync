@@ -25,3 +25,17 @@ The first request returns `201 Created`; an identical input returns the same res
 Read an immutable version with
 `GET /api/v1/machines/{machineId}/machining-runs?processingRunId=sha256:...`. Both responses use
 `application/vnd.forgesync.machining-runs.v1+json`.
+
+`v1/cycle-features.schema.json` describes immutable feature processing results derived only from
+`COMPLETED` Machining Runs. Create or reuse one with
+`POST /api/v1/machines/{machineId}/cycle-features/processing-runs`, supplying
+`machiningRunProcessingRunId` and `cycleFeatureVersion: 1.0.0`; read it with
+`GET /api/v1/machines/{machineId}/cycle-features?featureProcessingRunId=sha256:...`. Responses use
+`application/vnd.forgesync.cycle-features.v1+json`.
+
+Windows are `[startedAt, endedAt)`. State duration uses carried-forward `EXECUTION` observations;
+only `ACTIVE` is cutting and known non-active values are idle. Metric channels remain separate by
+metric, component, source data item, and unit. Mean and population standard deviation are
+time-weighted; missing intervals remain uncovered rather than becoming zero. Every feature reports
+coverage, calculation, observation range, `DERIVED` transformation provenance, and nested
+`REAL:NIST` source provenance.

@@ -5,8 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.forgesync.factoryapi.processanalytics.application.CycleFeatureService;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunService;
+import com.forgesync.factoryapi.processanalytics.application.ProcessCycleFeaturesCommand;
 import com.forgesync.factoryapi.processanalytics.application.SegmentMachiningRunsCommand;
+import com.forgesync.factoryapi.processanalytics.domain.CycleFeatureExtractor;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunSegmentationPolicy;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunStatus;
 import com.forgesync.factoryapi.processanalytics.domain.ProcessFactSourcePolicy;
@@ -34,6 +37,7 @@ class PostgresMachiningRunRepositoryIntegrationTest {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().findAndRegisterModules();
   private static JdbcClient jdbcClient;
   private static MachiningRunService service;
+  private static CycleFeatureService cycleFeatureService;
 
   @BeforeAll
   static void migrateDatabase() {
@@ -50,6 +54,16 @@ class PostgresMachiningRunRepositoryIntegrationTest {
             new MachiningRunSegmentationPolicy(),
             new ProcessFactSourcePolicy(),
             Clock.fixed(Instant.parse("2026-09-04T01:02:03Z"), ZoneOffset.UTC));
+    var cycleFeatureRepository =
+        new PostgresCycleFeatureRepository(
+            jdbcClient, OBJECT_MAPPER, new DataSourceTransactionManager(dataSource));
+    cycleFeatureService =
+        new CycleFeatureService(
+            repository,
+            cycleFeatureRepository,
+            cycleFeatureRepository,
+            new CycleFeatureExtractor(),
+            Clock.fixed(Instant.parse("2026-09-04T02:02:03Z"), ZoneOffset.UTC));
   }
 
   @BeforeEach
@@ -57,11 +71,86 @@ class PostgresMachiningRunRepositoryIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE machining_run_projection, process_analytics_processing_run,
+            TRUNCATE cycle_feature_projection, cycle_feature_processing_run,
+              machining_run_projection, process_analytics_processing_run,
               active_replay_projection, equipment_state_projection, latest_observation_projection,
               equipment_twin_version, canonical_observation_history, ingestion_inbox
             """)
         .update();
+  }
+
+  @Test
+  void preservesQueriesAndVersionsCycleFeaturesWithoutChangingSourceRows() {
+    insertEvent(1, "EXECUTION", "READY");
+    insertEvent(2, "EXECUTION", "ACTIVE");
+    insertSample(3, 100);
+    insertEvent(5, "EXECUTION", "READY");
+    var machining = service.segment(command(5));
+
+    var first = cycleFeatureService.process(cycleCommand(machining.processingRunId()));
+    var repeated = cycleFeatureService.process(cycleCommand(machining.processingRunId()));
+    insertSample(4, 200);
+    var late = cycleFeatureService.process(cycleCommand(machining.processingRunId()));
+    var queried = cycleFeatureService.find("Mazak01", first.featureProcessingRunId());
+
+    assertThat(first.featureSets()).hasSize(1);
+    assertThat(first.featureSets().getFirst().cycleFeature().metricFeatures().getFirst().mean())
+        .isEqualByComparingTo("100.000000");
+    assertThat(repeated.featureProcessingRunId()).isEqualTo(first.featureProcessingRunId());
+    assertThat(repeated.isCreated()).isFalse();
+    assertThat(late.featureProcessingRunId()).isNotEqualTo(first.featureProcessingRunId());
+    assertThat(queried.featureSets()).hasSize(1);
+    assertThat(queried.featureSets().getFirst().cycleFeatureSetId())
+        .isEqualTo(first.featureSets().getFirst().cycleFeatureSetId());
+    assertThat(
+            queried.featureSets().getFirst().cycleFeature().metricFeatures().getFirst().maximum())
+        .isEqualByComparingTo(
+            first.featureSets().getFirst().cycleFeature().metricFeatures().getFirst().maximum());
+    assertThat(rowCount("cycle_feature_processing_run")).isEqualTo(2);
+    assertThat(rowCount("cycle_feature_projection")).isEqualTo(2);
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(5);
+  }
+
+  @Test
+  void rollsBackCycleFeatureMetadataWhenProjectionStorageFails() {
+    insertEvent(1, "EXECUTION", "READY");
+    insertEvent(2, "EXECUTION", "ACTIVE");
+    insertSample(3, 100);
+    insertEvent(4, "EXECUTION", "READY");
+    var machining = service.segment(command(4));
+    jdbcClient
+        .sql(
+            """
+            CREATE FUNCTION reject_cycle_feature_projection() RETURNS trigger
+            LANGUAGE plpgsql AS $$
+            BEGIN
+              RAISE EXCEPTION 'forced cycle feature failure';
+            END;
+            $$
+            """)
+        .update();
+    jdbcClient
+        .sql(
+            """
+            CREATE TRIGGER reject_cycle_feature_projection
+            BEFORE INSERT ON cycle_feature_projection
+            FOR EACH ROW EXECUTE FUNCTION reject_cycle_feature_projection()
+            """)
+        .update();
+    try {
+      assertThatThrownBy(
+              () -> cycleFeatureService.process(cycleCommand(machining.processingRunId())))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessageContaining("forced cycle feature failure");
+      assertThat(rowCount("cycle_feature_processing_run")).isZero();
+      assertThat(rowCount("cycle_feature_projection")).isZero();
+      assertThat(rowCount("machining_run_projection")).isEqualTo(1);
+    } finally {
+      jdbcClient
+          .sql("DROP TRIGGER reject_cycle_feature_projection ON cycle_feature_projection")
+          .update();
+      jdbcClient.sql("DROP FUNCTION reject_cycle_feature_projection()").update();
+    }
   }
 
   @Test
@@ -156,6 +245,11 @@ class PostgresMachiningRunRepositoryIntegrationTest {
   private static SegmentMachiningRunsCommand command(long throughReplaySequence) {
     return new SegmentMachiningRunsCommand(
         "Mazak01", SESSION, throughReplaySequence, MachiningRunSegmentationPolicy.RULE_VERSION);
+  }
+
+  private static ProcessCycleFeaturesCommand cycleCommand(String machiningRunProcessingRunId) {
+    return new ProcessCycleFeaturesCommand(
+        "Mazak01", machiningRunProcessingRunId, CycleFeatureExtractor.FEATURE_VERSION);
   }
 
   private static void insertEvent(long sequence, String eventType, Object value) {

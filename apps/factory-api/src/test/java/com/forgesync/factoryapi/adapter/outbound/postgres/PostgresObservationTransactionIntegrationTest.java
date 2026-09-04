@@ -86,7 +86,8 @@ class PostgresObservationTransactionIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE machining_run_projection, process_analytics_processing_run,
+            TRUNCATE cycle_feature_projection, cycle_feature_processing_run,
+              machining_run_projection, process_analytics_processing_run,
               active_replay_projection, equipment_state_projection,
               latest_observation_projection,
               equipment_twin_version,

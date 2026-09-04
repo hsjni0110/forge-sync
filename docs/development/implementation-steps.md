@@ -515,6 +515,11 @@ result, versioned REST 조회 계약을 구현했다. 같은 입력은 같은 ID
 
 ### Step 19 — Versioned CycleFeature Projection
 
+**상태**: `DONE` (2026-09-04) — 완료 Machining Run에 대해 source-time 기반의 version `1.0.0`
+시간 가중 feature, coverage/provenance, immutable PostgreSQL projection과 versioned REST 조회 계약을
+구현했다. 동일 입력은 재사용하고 late relevant Observation은 기존 결과를 수정하지 않는 새 processing
+result로 보존한다.
+
 **목적**: 완료된 run의 비교 가능한 통계를 raw telemetry 재조회 없이 재현 가능하게 제공한다.
 
 **구현 범위**
