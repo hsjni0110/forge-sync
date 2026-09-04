@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0.0",
+  "processingRunId": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "machineId": "Mazak01",
+  "replaySessionId": "00d64db8-967e-41ba-9d09-fdd087710aac",
+  "throughReplaySequence": 1509,
+  "segmentationRuleVersion": "1.0.0",
+  "inputHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
+  "inputObservationCount": 5,
+  "resultHash": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+  "createdAt": "2026-09-04T01:02:03Z",
+  "machiningRuns": [
+    {
+      "machiningRunId": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
+      "processingRunId": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+      "segmentationRuleVersion": "1.0.0",
+      "machineId": "Mazak01",
+      "status": "COMPLETED",
+      "programName": "155",
+      "startedAt": "2016-10-05T09:18:30.447Z",
+      "endedAt": "2016-10-05T09:20:59.181Z",
+      "confidence": {
+        "level": "HIGH",
+        "reasons": ["EXECUTION_START_CONFIRMED", "PROGRAM_OBSERVED", "POSITIVE_SPINDLE_OBSERVED"]
+      },
+      "sourceObservationRange": {
+        "replaySessionId": "00d64db8-967e-41ba-9d09-fdd087710aac",
+        "firstReplaySequence": 830,
+        "lastReplaySequence": 1509,
+        "firstSourceObservedAt": "2016-10-05T09:15:37.498Z",
+        "lastSourceObservedAt": "2016-10-05T09:20:59.181Z",
+        "firstSourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=116549-116585",
+        "lastSourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=170237-170277"
+      },
+      "startEvidence": {
+        "role": "START",
+        "signal": "EXECUTION",
+        "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=131385-131426",
+        "replaySequence": 1001,
+        "sourceObservedAt": "2016-10-05T09:18:30.447Z",
+        "source": {
+          "kind": "REAL",
+          "provider": "NIST",
+          "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+        },
+        "transformation": {
+          "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=131385-131426",
+          "mappingVersion": "2.0.0",
+          "sourceDataItemId": "Mazak01-path_13"
+        }
+      },
+      "endEvidence": {
+        "role": "END",
+        "signal": "EXECUTION",
+        "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=170237-170277",
+        "replaySequence": 1509,
+        "sourceObservedAt": "2016-10-05T09:20:59.181Z",
+        "source": {
+          "kind": "REAL",
+          "provider": "NIST",
+          "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+        },
+        "transformation": {
+          "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=170237-170277",
+          "mappingVersion": "2.0.0",
+          "sourceDataItemId": "Mazak01-path_13"
+        }
+      },
+      "supportingEvidence": [
+        {
+          "role": "PROGRAM",
+          "signal": "PROGRAM",
+          "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=116549-116585",
+          "replaySequence": 830,
+          "sourceObservedAt": "2016-10-05T09:15:37.498Z",
+          "source": {
+            "kind": "REAL",
+            "provider": "NIST",
+            "sourceSetId": "nist-mazak01-20161005",
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+          },
+          "transformation": {
+            "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=116549-116585",
+            "mappingVersion": "2.0.0",
+            "sourceDataItemId": "Mazak01-path_1"
+          }
+        },
+        {
+          "role": "POSITIVE_SPINDLE",
+          "signal": "SPINDLE_SPEED",
+          "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=134775-134810",
+          "replaySequence": 1047,
+          "sourceObservedAt": "2016-10-05T09:18:43.075Z",
+          "source": {
+            "kind": "REAL",
+            "provider": "NIST",
+            "sourceSetId": "nist-mazak01-20161005",
+            "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+          },
+          "transformation": {
+            "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=134775-134810",
+            "mappingVersion": "2.0.0",
+            "sourceDataItemId": "Mazak01-C2_2"
+          }
+        }
+      ],
+      "provenance": {
+        "origin": "DERIVED",
+        "source": {
+          "kind": "REAL",
+          "provider": "NIST",
+          "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+        },
+        "transformation": {
+          "processingRunId": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+          "segmentationRuleVersion": "1.0.0"
+        }
+      },
+      "resultHash": "sha256:5555555555555555555555555555555555555555555555555555555555555555"
+    }
+  ]
+}

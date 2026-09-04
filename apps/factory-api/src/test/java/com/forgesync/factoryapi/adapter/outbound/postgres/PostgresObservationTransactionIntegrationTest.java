@@ -86,7 +86,8 @@ class PostgresObservationTransactionIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE active_replay_projection, equipment_state_projection,
+            TRUNCATE machining_run_projection, process_analytics_processing_run,
+              active_replay_projection, equipment_state_projection,
               latest_observation_projection,
               equipment_twin_version,
               canonical_observation_history, ingestion_inbox
@@ -100,7 +101,10 @@ class PostgresObservationTransactionIntegrationTest {
     CountDownLatch start = new CountDownLatch(1);
     List<Future<IngestionResult>> futures = new ArrayList<>();
 
-    try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    // PostgreSQL's local test container allows 100 total clients. Keep 100 competing deliveries
+    // while bounding connection concurrency so the test measures the unique constraint, not the
+    // server's administrative connection reserve.
+    try (var executor = Executors.newFixedThreadPool(20)) {
       for (int attempt = 0; attempt < 100; attempt++) {
         futures.add(
             executor.submit(

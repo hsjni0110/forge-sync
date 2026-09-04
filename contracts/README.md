@@ -5,6 +5,7 @@ Cross-runtime schemas live here and are versioned independently of language-spec
 - `observation-envelope/`: canonical SAMPLE, EVENT, and CONDITION envelopes
 - `mqtt/`: MQTT 5 Observation delivery contract
 - `replay/`: Replay Session lifecycle and authoritative Replay Cursor contracts
+- `process-analytics/`: deterministic Machining Run segmentation results
 - `websocket/`: Twin notification and patch contracts
 - `twin/`: authoritative snapshot contracts
 

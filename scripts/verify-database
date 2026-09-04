@@ -27,4 +27,6 @@ FORGESYNC_DATABASE_USERNAME=forgesync \
 FORGESYNC_DATABASE_PASSWORD=forgesync-test \
 "$repository_root/apps/factory-api/gradlew" \
   -p "$repository_root/apps/factory-api" \
-  test --tests '*PostgresObservationTransactionIntegrationTest'
+  test \
+  --tests '*PostgresObservationTransactionIntegrationTest' \
+  --tests '*PostgresMachiningRunRepositoryIntegrationTest'

@@ -489,6 +489,10 @@ Production·Equipment Twin·Intelligence 사이 계약을 구현 전에 결정�
 
 ### Step 18 — Deterministic MachiningRun Segmentation
 
+**상태**: `DONE` (2026-09-04) — Execution 중심 rule `1.0.0`, immutable PostgreSQL processing
+result, versioned REST 조회 계약을 구현했다. 같은 입력은 같은 ID/hash로 멱등 처리하고 late input은
+기존 결과를 수정하지 않는 새 processing version으로 보존한다.
+
 **목적**: NIST observation 이력을 수정하지 않고 연속 상태를 추적 가능한 가공 run으로 재구성한다.
 
 **구현 범위**

@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/process-analytics/v1/machining-runs.schema.json",
+  "title": "ForgeSync Machining Run Segmentation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "processingRunId", "machineId", "replaySessionId",
+    "throughReplaySequence", "segmentationRuleVersion", "inputHash",
+    "inputObservationCount", "resultHash", "createdAt", "machiningRuns"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "processingRunId": { "$ref": "#/$defs/sha256" },
+    "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "segmentationRuleVersion": { "const": "1.0.0" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "inputObservationCount": { "type": "integer", "minimum": 1 },
+    "resultHash": { "$ref": "#/$defs/sha256" },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "machiningRuns": { "type": "array", "items": { "$ref": "#/$defs/machiningRun" } }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "timestamp": {
+      "type": "string", "format": "date-time",
+      "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "machiningRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "machiningRunId", "processingRunId", "segmentationRuleVersion", "machineId",
+        "status", "startedAt", "confidence", "sourceObservationRange", "startEvidence",
+        "supportingEvidence", "provenance", "resultHash"
+      ],
+      "properties": {
+        "machiningRunId": { "$ref": "#/$defs/sha256" },
+        "processingRunId": { "$ref": "#/$defs/sha256" },
+        "segmentationRuleVersion": { "const": "1.0.0" },
+        "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+        "status": { "enum": ["COMPLETED", "INTERRUPTED", "ABORTED", "UNKNOWN"] },
+        "programName": { "type": "string", "minLength": 1 },
+        "startedAt": { "$ref": "#/$defs/timestamp" },
+        "endedAt": { "$ref": "#/$defs/timestamp" },
+        "confidence": { "$ref": "#/$defs/confidence" },
+        "sourceObservationRange": { "$ref": "#/$defs/observationRange" },
+        "startEvidence": { "$ref": "#/$defs/evidence" },
+        "endEvidence": { "$ref": "#/$defs/evidence" },
+        "supportingEvidence": { "type": "array", "items": { "$ref": "#/$defs/evidence" } },
+        "provenance": { "$ref": "#/$defs/provenance" },
+        "resultHash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "confidence": {
+      "type": "object", "additionalProperties": false, "required": ["level", "reasons"],
+      "properties": {
+        "level": { "enum": ["HIGH", "MEDIUM", "LOW", "UNKNOWN"] },
+        "reasons": {
+          "type": "array", "minItems": 1,
+          "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+        }
+      }
+    },
+    "observationRange": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "replaySessionId", "firstReplaySequence", "lastReplaySequence",
+        "firstSourceObservedAt", "lastSourceObservedAt", "firstSourceEventKey",
+        "lastSourceEventKey"
+      ],
+      "properties": {
+        "replaySessionId": { "type": "string", "format": "uuid" },
+        "firstReplaySequence": { "type": "integer", "minimum": 0 },
+        "lastReplaySequence": { "type": "integer", "minimum": 0 },
+        "firstSourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "lastSourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "firstSourceEventKey": { "type": "string", "minLength": 1 },
+        "lastSourceEventKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "role", "signal", "sourceEventKey", "replaySequence", "sourceObservedAt",
+        "source", "transformation"
+      ],
+      "properties": {
+        "role": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "signal": { "enum": ["EXECUTION", "PROGRAM", "SPINDLE_SPEED"] },
+        "sourceEventKey": { "type": "string", "minLength": 1 },
+        "replaySequence": { "type": "integer", "minimum": 0 },
+        "sourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "source": { "$ref": "#/$defs/source" },
+        "transformation": { "$ref": "#/$defs/observationTransformation" }
+      }
+    },
+    "source": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "provider", "sourceSetId", "artifactId"],
+      "properties": {
+        "kind": { "const": "REAL" }, "provider": { "const": "NIST" },
+        "sourceSetId": { "type": "string", "minLength": 1 },
+        "artifactId": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "observationTransformation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["rawRecordId", "mappingVersion", "sourceDataItemId"],
+      "properties": {
+        "rawRecordId": { "type": "string", "minLength": 1 },
+        "mappingVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "sourceDataItemId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["origin", "source", "transformation"],
+      "properties": {
+        "origin": { "const": "DERIVED" },
+        "source": { "$ref": "#/$defs/source" },
+        "transformation": {
+          "type": "object", "additionalProperties": false,
+          "required": ["processingRunId", "segmentationRuleVersion"],
+          "properties": {
+            "processingRunId": { "$ref": "#/$defs/sha256" },
+            "segmentationRuleVersion": { "const": "1.0.0" }
+          }
+        }
+      }
+    }
+  }
+}

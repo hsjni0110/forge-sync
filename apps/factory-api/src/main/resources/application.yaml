@@ -32,3 +32,5 @@ forgesync:
     client-id: forgesync-api-local
   replay:
     edge-base-url: ${FORGESYNC_REPLAY_EDGE_BASE_URL:http://127.0.0.1:8002}
+  process-analytics:
+    enabled: true

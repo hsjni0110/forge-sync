@@ -13,3 +13,7 @@ Equipment State is rebuilt from the machine's current Latest Observations and it
 is stored with the same TwinVersion and projected wall-clock time. Freshness and effective STALE
 connectivity are derived at read time so a state can age without a database write; historical source
 time is not used for that calculation.
+
+Process Analytics processing runs and Machining Run projections are append-only derived data. One
+transaction preserves the processing identity and all of its projections. Their foreign key does
+not connect to Production, Equipment Twin, or the Ingestion Inbox transaction boundary.

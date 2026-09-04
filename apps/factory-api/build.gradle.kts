@@ -54,6 +54,9 @@ tasks.processResources {
     from("../../contracts/replay/v1/replay-session.schema.json") {
         into("contracts/replay/v1")
     }
+    from("../../contracts/process-analytics/v1/machining-runs.schema.json") {
+        into("contracts/process-analytics/v1")
+    }
 }
 
 tasks.processTestResources {
@@ -65,6 +68,9 @@ tasks.processTestResources {
     }
     from("../../tests/fixtures/replay/v1") {
         into("fixtures/replay/v1")
+    }
+    from("../../tests/fixtures/process-analytics/v1") {
+        into("fixtures/process-analytics/v1")
     }
 }
 
