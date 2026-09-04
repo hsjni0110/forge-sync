@@ -41,6 +41,53 @@ class ControlReplayTest {
     assertThat(gateway.prepareCalls).isZero();
   }
 
+  @Test
+  void reconcilesAStartWhoseSuccessfulResponseWasLost() {
+    CallOrder callOrder = new CallOrder();
+    RecordingGateway gateway = new RecordingGateway(callOrder);
+    gateway.loseFirstStartResponse = true;
+    ControlReplay control =
+        new ControlReplay(
+            gateway, new RecordingActivator(callOrder), Clock.fixed(NOW, ZoneOffset.UTC));
+
+    ReplaySessionState result = control.start("Mazak01", "nist-source", 10);
+
+    assertThat(result.status()).isEqualTo("RUNNING");
+    assertThat(callOrder.events).containsExactly("prepare", "activate", "start", "current");
+    assertThat(gateway.startCalls).isEqualTo(1);
+  }
+
+  @Test
+  void retriesTheSamePreparedSessionWhenStartDidNotReachEdge() {
+    CallOrder callOrder = new CallOrder();
+    RecordingGateway gateway = new RecordingGateway(callOrder);
+    gateway.rejectFirstStartBeforeTransition = true;
+    ControlReplay control =
+        new ControlReplay(
+            gateway, new RecordingActivator(callOrder), Clock.fixed(NOW, ZoneOffset.UTC));
+
+    ReplaySessionState result = control.start("Mazak01", "nist-source", 10);
+
+    assertThat(result.status()).isEqualTo("RUNNING");
+    assertThat(callOrder.events)
+        .containsExactly("prepare", "activate", "start", "current", "start");
+    assertThat(gateway.startCalls).isEqualTo(2);
+  }
+
+  @Test
+  void passesTheSeekTargetWhilePreparingAReplacement() {
+    CallOrder callOrder = new CallOrder();
+    RecordingGateway gateway = new RecordingGateway(callOrder);
+    ControlReplay control =
+        new ControlReplay(
+            gateway, new RecordingActivator(callOrder), Clock.fixed(NOW, ZoneOffset.UTC));
+    Instant target = NOW.plusSeconds(5);
+
+    control.seek(SESSION_ID, 1, target, 100);
+
+    assertThat(gateway.replacementTarget).isEqualTo(target);
+  }
+
   private static ReplaySessionState state(String status, long revision) {
     return new ReplaySessionState(
         "1.0.0",
@@ -75,6 +122,11 @@ class ControlReplayTest {
   private static final class RecordingGateway implements ReplayControlGateway {
     private final CallOrder callOrder;
     private int prepareCalls;
+    private int startCalls;
+    private boolean loseFirstStartResponse;
+    private boolean rejectFirstStartBeforeTransition;
+    private Instant replacementTarget;
+    private ReplaySessionState currentState = state("RUNNING", 1);
 
     private RecordingGateway(CallOrder callOrder) {
       this.callOrder = callOrder;
@@ -84,18 +136,30 @@ class ControlReplayTest {
     public ReplaySessionState prepare(String machineId, String sourceSetId, int speedMultiplier) {
       prepareCalls++;
       callOrder.events.add("prepare");
-      return state("PREPARING", 0);
+      currentState = state("PREPARING", 0);
+      return currentState;
     }
 
     @Override
     public ReplaySessionState start(UUID sessionId, long expectedRevision, Instant seekTarget) {
+      startCalls++;
       callOrder.events.add("start");
-      return state("RUNNING", 1);
+      if (rejectFirstStartBeforeTransition) {
+        rejectFirstStartBeforeTransition = false;
+        throw new IllegalStateException("request did not reach Edge");
+      }
+      currentState = state("RUNNING", 1);
+      if (loseFirstStartResponse) {
+        loseFirstStartResponse = false;
+        throw new IllegalStateException("response lost");
+      }
+      return currentState;
     }
 
     @Override
     public ReplaySessionState current(String machineId) {
-      return state("RUNNING", 1);
+      callOrder.events.add("current");
+      return currentState;
     }
 
     @Override
@@ -114,8 +178,11 @@ class ControlReplayTest {
     }
 
     @Override
-    public ReplaySessionState prepareReplacement(UUID id, long revision, int speed) {
-      return state("PREPARING", 0);
+    public ReplaySessionState prepareReplacement(
+        UUID id, long revision, int speed, Instant seekTarget) {
+      replacementTarget = seekTarget;
+      currentState = state("PREPARING", 0);
+      return currentState;
     }
   }
 

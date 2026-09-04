@@ -3,14 +3,17 @@ package com.forgesync.factoryapi.processanalytics.adapter.inbound.rest;
 import com.forgesync.factoryapi.processanalytics.application.CanonicalObservationHistoryNotFoundException;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunProcessingNotFoundException;
 import java.net.URI;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(assignableTypes = MachiningRunController.class)
-@ConditionalOnBean(MachiningRunController.class)
+@ConditionalOnProperty(
+    name = "forgesync.process-analytics.enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public final class MachiningRunErrorHandler {
 
   @ExceptionHandler(InvalidMachiningRunRequestException.class)

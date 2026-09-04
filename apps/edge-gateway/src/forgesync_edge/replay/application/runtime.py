@@ -89,13 +89,22 @@ class ReplayRuntime:
                 self._is_preparing = False
 
     def replace(
-        self, session_id: UUID, expected_revision: int, speed: ReplaySpeed
+        self,
+        session_id: UUID,
+        expected_revision: int,
+        speed: ReplaySpeed,
+        seek_target: datetime,
     ) -> ReplaySessionView:
         with self._condition:
             if self._is_preparing:
                 raise ReplayConflictError("a replacement replay is already being prepared")
             self._wait_for_publication()
             self._require(session_id, expected_revision)
+            assert self._session is not None
+            if seek_target.tzinfo is None or seek_target.utcoffset() is None:
+                raise ValueError("seek target must include a timezone")
+            if not self._session.source_starts_at <= seek_target <= self._session.source_ends_at:
+                raise ValueError("seek target must be inside the source range")
             assert self._machine_id is not None
             assert self._source_set_id is not None
             machine_id = self._machine_id

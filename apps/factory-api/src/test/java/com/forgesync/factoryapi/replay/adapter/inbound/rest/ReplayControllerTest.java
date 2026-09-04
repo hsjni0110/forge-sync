@@ -46,7 +46,9 @@ class ReplayControllerTest {
         .andExpect(status().isCreated())
         .andExpect(content().contentType(ReplayController.REPLAY_MEDIA_TYPE))
         .andExpect(jsonPath("$.status").value("RUNNING"))
-        .andExpect(jsonPath("$.speedMultiplier").value(10));
+        .andExpect(jsonPath("$.speedMultiplier").value(10))
+        .andExpect(jsonPath("$.publicationCursor").doesNotExist())
+        .andExpect(jsonPath("$.failure").doesNotExist());
   }
 
   @Test

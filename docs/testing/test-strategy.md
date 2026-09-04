@@ -145,13 +145,14 @@ When 연결이 복구되면
 Then REST snapshot을 먼저 동기화한 뒤 patch 구독을 재개한다
 ```
 
-Step 11~15의 자동화는 `./scripts/verify-e2e`가 담당한다. checksum이 고정된 Canonical NIST
+Step 11~17의 자동화는 `./scripts/verify-e2e`가 담당한다. checksum이 고정된 Canonical NIST
 Observation 여섯 건을 실제 MQTT/API/Web runtime에 전달하고, Playwright clock으로 STALE 경계를
 결정적으로 이동한다. 이 시나리오는 RPM vertical slice, disconnect/resync, 정상 Factory의 첫 scene
 frame, WebGL 초기화 실패 시 2D 생존, 선택한 3D Mazak01과 오른쪽 panel의 Twin version 일치를
 검증한다. 또한 Canonical ACTIVE/STOPPED와 RPM을 결합해 3D visual spindle의 활성/정지, 단절 후
 STALE 즉시 정지, REST 복구 후 재활성화를 검증한다. tool/program 기반 3D 시각 변화까지 완료했다고
-주장하지 않는다.
+주장하지 않는다. 별도 Replay 시나리오는 실제 Replay Edge를 함께 실행해 브라우저 시작 명령이
+Factory API, MQTT ingestion, 권위 Twin cursor까지 이어지는지 검증한다.
 
 Step 15의 관찰용 `guided-demo` fixture는 checksum `aee293...9b17f`인 Canonical 결과에서
 2016-10-05 09:18:27.292Z부터 10:18:22.999Z까지 337건을 선택하고 1.5초 wall-clock 간격으로

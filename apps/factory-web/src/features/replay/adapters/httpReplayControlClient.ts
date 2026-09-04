@@ -31,8 +31,18 @@ export function decodeReplaySession(document: unknown): ReplaySessionState {
 export class HttpReplayControlClient implements ReplayControlClient {
   constructor(private readonly apiBaseUrl: string) {}
 
-  load(machineId: string): Promise<ReplaySessionState> {
-    return this.request(`/api/v1/machines/${encodeURIComponent(machineId)}/replay-session`);
+  async load(machineId: string): Promise<ReplaySessionState | undefined> {
+    const response = await this.send(
+      `/api/v1/machines/${encodeURIComponent(machineId)}/replay-session`,
+    );
+    if (!response.ok) {
+      const failure = await replayRequestFailure(response);
+      if (failure.status === 404 && failure.code === "REPLAY_SESSION_NOT_FOUND") {
+        return undefined;
+      }
+      throw failure;
+    }
+    return decodeReplaySession(await response.json());
   }
 
   start(machineId: string, sourceSetId: string, speed: ReplaySpeed) {
@@ -80,7 +90,16 @@ export class HttpReplayControlClient implements ReplayControlClient {
   }
 
   private async request(path: string, method = "GET", body?: object) {
-    const response = await fetch(`${this.apiBaseUrl}${path}`, {
+    const response = await this.send(path, method, body);
+    if (!response.ok) {
+      throw await replayRequestFailure(response);
+    }
+    const document: unknown = await response.json();
+    return decodeReplaySession(document);
+  }
+
+  private send(path: string, method = "GET", body?: object) {
+    return fetch(`${this.apiBaseUrl}${path}`, {
       method,
       headers: {
         Accept: "application/vnd.forgesync.replay-session.v1+json",
@@ -88,10 +107,32 @@ export class HttpReplayControlClient implements ReplayControlClient {
       },
       body: body ? JSON.stringify(body) : undefined,
     });
-    if (!response.ok) {
-      throw new Error(`Replay request failed with ${response.status}`);
-    }
-    const document: unknown = await response.json();
-    return decodeReplaySession(document);
   }
+}
+
+export class ReplayControlRequestError extends Error {
+  constructor(
+    readonly status: number,
+    readonly code: string | undefined,
+  ) {
+    super(`Replay request failed with ${status}${code ? ` (${code})` : ""}`);
+    this.name = "ReplayControlRequestError";
+  }
+}
+
+async function replayRequestFailure(response: Response): Promise<ReplayControlRequestError> {
+  let code: string | undefined;
+  try {
+    const problem: unknown = await response.json();
+    if (isRecord(problem) && typeof problem.code === "string") {
+      code = problem.code;
+    }
+  } catch {
+    // A non-JSON error response still retains its HTTP status for presentation and diagnostics.
+  }
+  return new ReplayControlRequestError(response.status, code);
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
 }

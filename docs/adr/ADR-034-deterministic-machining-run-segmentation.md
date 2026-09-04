@@ -21,6 +21,8 @@ must identify its own reproducible input without changing that accepted contract
   signal or an open input ending at its watermark interrupts it.
 - An input that starts at `ACTIVE`, or spindle/program evidence without a confirmed execution
   boundary, remains `UNKNOWN` or `INTERRUPTED`; it is not upgraded by guessing earlier state.
+- An unavailable execution observation breaks boundary continuity. A following `ACTIVE` starts an
+  uncertain run even if an available execution value appeared earlier in the batch.
 - Program and positive spindle signals support confidence. Missing program stays absent. A zero
   spindle never ends an execution-confirmed active run. Without any available execution signal,
   zero spindle observed continuously for at least 30 source-time seconds may end a fallback run as
@@ -29,7 +31,9 @@ must identify its own reproducible input without changing that accepted contract
   plus the ordered relevant Canonical Observation content. Its SHA-256 is the Process Analytics
   `processingRunId`. Identical input is idempotent; added late input produces a new ID and rows.
 - Relevant input is ordered by `replaySequence`, then `sourceObservedAt`, then `sourceEventKey`.
-  Result IDs and hashes use stable UTF-8 hash material and do not contain wall-clock creation time.
+  Result IDs and hashes use null-aware, UTF-8 byte-length-prefixed hash fields and do not contain
+  wall-clock creation time. Field delimiters contained in source values cannot change field
+  boundaries.
 - Results retain `DERIVED` as their transformation origin and nested `REAL:NIST` observation
   provenance. `PART_COUNT`, Production Result, and Operation Execution do not produce run results.
 - PostgreSQL stores a processing record and all of its run projections atomically after the
@@ -48,7 +52,7 @@ must identify its own reproducible input without changing that accepted contract
 ## Verification
 
 - Pure domain tests cover confirmed completion, temporary pauses, abort, missing program,
-  middle-start, open-end, and spindle-only fallback boundaries.
+  middle-start, unavailable execution continuity, open-end, and spindle-only fallback boundaries.
 - Producer and independent consumer tests validate the same Machining Run v1 schema and reviewed
   NIST-derived fixture.
 - PostgreSQL integration tests cover atomic storage, identical-input idempotency, late-input new

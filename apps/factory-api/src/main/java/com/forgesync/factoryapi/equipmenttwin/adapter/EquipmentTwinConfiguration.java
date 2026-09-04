@@ -6,10 +6,9 @@ import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPol
 import com.forgesync.factoryapi.equipmenttwin.domain.FreshnessPolicy;
 import java.time.Clock;
 import java.time.Duration;
-import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -37,7 +36,10 @@ public class EquipmentTwinConfiguration {
   }
 
   @Bean
-  @ConditionalOnBean(DataSource.class)
+  @ConditionalOnProperty(
+      name = "forgesync.replay.enabled",
+      havingValue = "true",
+      matchIfMissing = true)
   ActivateReplayProjection activateReplayProjection(
       JdbcClient jdbcClient, PlatformTransactionManager transactionManager) {
     return new PostgresReplayProjectionActivator(jdbcClient, transactionManager);

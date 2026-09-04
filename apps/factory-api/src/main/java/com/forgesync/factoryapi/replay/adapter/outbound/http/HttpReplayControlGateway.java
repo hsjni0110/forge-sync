@@ -83,11 +83,14 @@ public final class HttpReplayControlGateway implements ReplayControlGateway {
 
   @Override
   public ReplaySessionState prepareReplacement(
-      UUID sessionId, long expectedRevision, int speedMultiplier) {
+      UUID sessionId, long expectedRevision, int speedMultiplier, Instant seekTarget) {
     return post(
         sessionId,
         "replacement",
-        Map.of("expectedRevision", expectedRevision, "speedMultiplier", speedMultiplier));
+        Map.of(
+            "expectedRevision", expectedRevision,
+            "speedMultiplier", speedMultiplier,
+            "seekTarget", seekTarget));
   }
 
   private ReplaySessionState post(UUID sessionId, String action, Map<String, ?> body) {

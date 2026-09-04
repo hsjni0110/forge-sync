@@ -4,6 +4,8 @@ import { useEffect } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import twinFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-operational-twin.json";
+import type { ReplayControlClient } from "../../replay/application/ports";
+import type { ReplaySessionState } from "../../replay/domain/replay";
 import type { TwinSession, TwinSessionFactory } from "../../twin/application/ports";
 import type { TwinSnapshot } from "../../twin/domain/twin";
 import { FactoryRoute } from "./FactoryRoute";
@@ -87,6 +89,54 @@ describe("FactoryRoute", () => {
 
     expect(await screen.findByText("3D Mazak01 · Twin v5 · selected")).toBeTruthy();
     expect(screen.getByText("v5")).toBeTruthy();
+  });
+
+  it("retries Twin bootstrap after starting Replay from an empty factory", async () => {
+    const retryNow = vi.fn();
+    const missingSession: TwinSessionFactory = () => ({
+      start: vi.fn(),
+      subscribe: (listener) => {
+        listener({ connectionStatus: "UNAVAILABLE", failure: "NOT_FOUND" });
+        return () => undefined;
+      },
+      currentState: () => ({ connectionStatus: "UNAVAILABLE", failure: "NOT_FOUND" }),
+      retryNow,
+      dispose: vi.fn(),
+    });
+    const runningReplay: ReplaySessionState = {
+      schemaVersion: "1.0.0",
+      replaySessionId: "10000000-0000-4000-8000-000000000001",
+      machineId: "Mazak01",
+      sourceSetId: "nist-mazak01-20161005",
+      status: "RUNNING",
+      speedMultiplier: 10,
+      revision: 1,
+      sourceRange: {
+        startsAt: "2016-10-05T05:27:55.740Z",
+        endsAt: "2016-10-05T19:15:07.025Z",
+      },
+    };
+    const replayControlClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(undefined),
+      start: vi.fn().mockResolvedValue(runningReplay),
+      pause: vi.fn(),
+      resume: vi.fn(),
+      changeSpeed: vi.fn(),
+      seek: vi.fn(),
+    };
+
+    render(
+      <MemoryRouter>
+        <FactoryRoute
+          sessionFactory={missingSession}
+          replayControlClient={replayControlClient}
+          sceneLoader={async () => ({ default: HealthyScene })}
+        />
+      </MemoryRouter>,
+    );
+    fireEvent.click(await screen.findByRole("button", { name: "Replay 시작" }));
+
+    await waitFor(() => expect(retryNow).toHaveBeenCalledOnce());
   });
 
   it("contains a rejected 3D bundle and restores the 2D panel", async () => {

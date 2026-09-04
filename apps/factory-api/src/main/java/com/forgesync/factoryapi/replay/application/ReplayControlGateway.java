@@ -16,5 +16,6 @@ public interface ReplayControlGateway {
 
   ReplaySessionState changeSpeed(UUID sessionId, long expectedRevision, int speedMultiplier);
 
-  ReplaySessionState prepareReplacement(UUID sessionId, long expectedRevision, int speedMultiplier);
+  ReplaySessionState prepareReplacement(
+      UUID sessionId, long expectedRevision, int speedMultiplier, Instant seekTarget);
 }

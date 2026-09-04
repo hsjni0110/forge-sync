@@ -11,6 +11,7 @@ import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { ReplayStatus } from "../../replay/domain/replay";
 import { ReplayControls } from "../../replay/ui/ReplayControls";
+import { useReplayDrivenTwinBootstrap } from "../../replay/ui/useReplayDrivenTwinBootstrap";
 import { MachineDetailView } from "../../twin/ui/MachineDetailView";
 import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
 import { MAZAK01_SCENE_BINDING } from "../adapters/defaultMachineSceneBinding";
@@ -56,6 +57,7 @@ export function FactoryRoute({
     [machineId, sessionFactory],
   );
   const { state: twinState, retryNow } = useTwinLiveSession(createSession);
+  useReplayDrivenTwinBootstrap(replayStatus, twinState, retryNow);
   const visualState = useMemo(() => {
     if (!twinState.snapshot) {
       return undefined;

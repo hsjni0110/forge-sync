@@ -1,7 +1,7 @@
 package com.forgesync.factoryapi.replay.adapter.inbound.rest;
 
 import java.net.URI;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice(assignableTypes = ReplayController.class)
-@ConditionalOnBean(ReplayController.class)
+@ConditionalOnProperty(
+    name = "forgesync.replay.enabled",
+    havingValue = "true",
+    matchIfMissing = true)
 public final class ReplayErrorHandler {
   @ExceptionHandler(ResponseStatusException.class)
   ResponseEntity<ProblemDetail> handleStatus(ResponseStatusException exception) {

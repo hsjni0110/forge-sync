@@ -22,6 +22,8 @@ export function ReplayControls({
   const [session, setSession] = useState<ReplaySessionState>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>();
+  const [hasLoadFailure, setHasLoadFailure] = useState(false);
+  const [loadRequest, setLoadRequest] = useState(0);
   const [seekMillis, setSeekMillis] = useState(0);
 
   useEffect(() => {
@@ -30,10 +32,17 @@ export function ReplayControls({
     client
       .load(machineId)
       .then((loaded) => {
-        if (active) setSession(loaded);
+        if (active) {
+          setSession(loaded);
+          setHasLoadFailure(false);
+          setError(undefined);
+        }
       })
       .catch(() => {
-        if (active) setSession(undefined);
+        if (active) {
+          setHasLoadFailure(true);
+          setError("Replay 상태를 불러오지 못했습니다. 서버 연결을 확인한 뒤 다시 시도해 주세요.");
+        }
       })
       .finally(() => {
         if (active) setIsLoading(false);
@@ -41,7 +50,7 @@ export function ReplayControls({
     return () => {
       active = false;
     };
-  }, [client, machineId]);
+  }, [client, loadRequest, machineId]);
 
   useEffect(() => {
     onStatusChange?.(session?.status);
@@ -58,7 +67,10 @@ export function ReplayControls({
   useEffect(() => {
     if (session?.status !== "SEEKING") return;
     const timer = window.setTimeout(() => {
-      void client.load(machineId).then(setSession).catch(() => setError("재생 상태를 확인할 수 없습니다."));
+      void client
+        .load(machineId)
+        .then((loaded) => setSession(loaded))
+        .catch(() => setError("재생 상태를 확인할 수 없습니다."));
     }, 250);
     return () => window.clearTimeout(timer);
   }, [client, machineId, session]);
@@ -75,7 +87,8 @@ export function ReplayControls({
       setSession(await action(previous));
     } catch {
       try {
-        setSession(await client.load(machineId));
+        const authoritative = await client.load(machineId);
+        setSession(authoritative ?? previous);
       } catch {
         setSession(previous);
       }
@@ -102,8 +115,14 @@ export function ReplayControls({
         <span aria-live="polite">{session ? statusLabel(session.status) : "시작 전"}</span>
       </div>
       {!session ? (
-        <button type="button" disabled={isLoading} onClick={() => void start()}>
-          {isLoading ? "Replay 확인 중" : "Replay 시작"}
+        <button
+          type="button"
+          disabled={isLoading}
+          onClick={() =>
+            hasLoadFailure ? setLoadRequest((request) => request + 1) : void start()
+          }
+        >
+          {isLoading ? "Replay 확인 중" : hasLoadFailure ? "Replay 상태 다시 확인" : "Replay 시작"}
         </button>
       ) : (
         <>

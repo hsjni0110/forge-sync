@@ -26,6 +26,10 @@ need an explicit session handoff rather than weakening ordering.
 - Seek prepares a new paused Replay Session, activates that session as the machine's projection
   generation, clears only rebuildable L3 latest/state rows, and then republishes through the last
   Observation at or before the requested source time. It ends paused unless it reaches source end.
+- Edge validates the seek target against the current source range before replacing the session, so
+  an invalid target cannot clear the active L3 projection. If the start response is lost, Factory
+  API reads the authoritative Edge session and retries only while that same session is still
+  `PREPARING`.
 - Inbox and Canonical Observation history are never cleared. Messages from a non-active Replay
   Session are stored as history but cannot change current Equipment Twin projection.
 - `SEEKING`, publication failure, and Edge unavailability are explicit. Presentation freezes
@@ -38,8 +42,9 @@ need an explicit session handoff rather than weakening ordering.
 - Backward seek does not weaken the general out-of-order policy or overwrite source history.
 - A seek can temporarily make the Twin unavailable or partial while L3 is rebuilt. The UI labels
   this state and does not present it as a completed cursor.
-- Factory API activation and Edge start are not a distributed transaction. If activation succeeds
-  but Edge start fails, the projection remains unavailable and a new seek/start safely rebuilds it.
+- Factory API activation and Edge start are not a distributed transaction. A confirmed Edge start
+  is recovered from the authoritative session after response loss. If Edge remains unavailable,
+  the projection remains unavailable and a new start can replace the abandoned `PREPARING` session.
 - The active-session fence prevents in-flight messages from the previous session contaminating the
   replacement projection.
 
@@ -51,3 +56,5 @@ need an explicit session handoff rather than weakening ordering.
   monotonic TwinVersion, and cursor/session convergence.
 - Browser tests cover separate time labels, keyboard controls, optimistic rollback, animation
   freeze, and REST/WebSocket convergence.
+- Cross-runtime E2E starts the real Replay Edge and verifies browser start through MQTT to the
+  authoritative Twin. Failure tests cover invalid seek preservation and ambiguous start recovery.

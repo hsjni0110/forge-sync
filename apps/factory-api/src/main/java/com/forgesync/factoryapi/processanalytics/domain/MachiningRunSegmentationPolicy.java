@@ -33,6 +33,7 @@ public final class MachiningRunSegmentationPolicy {
     ProcessObservation currentProgramEvidence = null;
     String previousExecution = null;
     boolean executionSeen = false;
+    boolean hasExecutionGap = false;
 
     for (ProcessObservation observation : observations) {
       if (current != null) {
@@ -66,11 +67,13 @@ public final class MachiningRunSegmentationPolicy {
               current = null;
             }
             previousExecution = null;
+            hasExecutionGap = true;
           } else {
             String execution = observation.textValue().toUpperCase(Locale.ROOT);
             if ("ACTIVE".equals(execution)) {
               if (current == null) {
-                boolean uncertainStart = !executionSeen || isRunActive(previousExecution);
+                boolean uncertainStart =
+                    !executionSeen || hasExecutionGap || isRunActive(previousExecution);
                 current =
                     CurrentRun.start(
                         processingRunId,
@@ -100,6 +103,7 @@ public final class MachiningRunSegmentationPolicy {
             }
             previousExecution = execution;
             executionSeen = true;
+            hasExecutionGap = false;
           }
         }
         case SPINDLE_SPEED -> {

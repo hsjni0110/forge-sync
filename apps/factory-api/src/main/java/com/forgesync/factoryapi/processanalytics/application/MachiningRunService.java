@@ -6,6 +6,7 @@ import com.forgesync.factoryapi.processanalytics.domain.MachiningRunSegmentation
 import com.forgesync.factoryapi.processanalytics.domain.ProcessFactSourcePolicy;
 import com.forgesync.factoryapi.processanalytics.domain.ProcessInputKind;
 import com.forgesync.factoryapi.processanalytics.domain.ProcessObservation;
+import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.Comparator;
 import java.util.List;
@@ -111,36 +112,35 @@ public final class MachiningRunService implements SegmentMachiningRuns, FindMach
   private static String inputHash(List<ProcessObservation> observations) {
     StringBuilder material = new StringBuilder();
     for (ProcessObservation observation : observations) {
-      material
-          .append(observation.replaySequence())
-          .append('|')
-          .append(observation.sourceObservedAt())
-          .append('|')
-          .append(observation.sourceEventKey())
-          .append('|')
-          .append(observation.signal())
-          .append('|')
-          .append(observation.isAvailable())
-          .append('|')
-          .append(Objects.toString(observation.textValue(), ""))
-          .append('|')
-          .append(Objects.toString(observation.numericValue(), ""))
-          .append('|')
-          .append(observation.provenance().artifactId())
-          .append('|')
-          .append(observation.provenance().rawRecordId())
-          .append('|')
-          .append(observation.provenance().sourceKind())
-          .append('|')
-          .append(observation.provenance().provider())
-          .append('|')
-          .append(observation.provenance().sourceSetId())
-          .append('|')
-          .append(observation.provenance().mappingVersion())
-          .append('|')
-          .append(observation.provenance().sourceDataItemId())
-          .append('\n');
+      material.append("observation:14;");
+      appendHashField(material, observation.replaySequence());
+      appendHashField(material, observation.sourceObservedAt());
+      appendHashField(material, observation.sourceEventKey());
+      appendHashField(material, observation.signal());
+      appendHashField(material, observation.isAvailable());
+      appendHashField(material, observation.textValue());
+      appendHashField(material, observation.numericValue());
+      appendHashField(material, observation.provenance().artifactId());
+      appendHashField(material, observation.provenance().rawRecordId());
+      appendHashField(material, observation.provenance().sourceKind());
+      appendHashField(material, observation.provenance().provider());
+      appendHashField(material, observation.provenance().sourceSetId());
+      appendHashField(material, observation.provenance().mappingVersion());
+      appendHashField(material, observation.provenance().sourceDataItemId());
     }
     return DeterministicHash.sha256(material.toString());
+  }
+
+  private static void appendHashField(StringBuilder material, Object field) {
+    if (field == null) {
+      material.append("null;");
+      return;
+    }
+    String value = Objects.toString(field);
+    material
+        .append(value.getBytes(StandardCharsets.UTF_8).length)
+        .append(':')
+        .append(value)
+        .append(';');
   }
 }

@@ -23,7 +23,7 @@ public final class ControlReplay {
     requireSpeed(speedMultiplier);
     ReplaySessionState prepared = gateway.prepare(machineId, sourceSetId, speedMultiplier);
     projectionActivator.activate(machineId, prepared.replaySessionId(), clock.instant());
-    return gateway.start(prepared.replaySessionId(), prepared.revision(), null);
+    return startPrepared(prepared, null);
   }
 
   public synchronized ReplaySessionState seek(
@@ -31,9 +31,9 @@ public final class ControlReplay {
     Objects.requireNonNull(target, "target");
     requireSpeed(speedMultiplier);
     ReplaySessionState prepared =
-        gateway.prepareReplacement(sessionId, expectedRevision, speedMultiplier);
+        gateway.prepareReplacement(sessionId, expectedRevision, speedMultiplier, target);
     projectionActivator.activate(prepared.machineId(), prepared.replaySessionId(), clock.instant());
-    return gateway.start(prepared.replaySessionId(), prepared.revision(), target);
+    return startPrepared(prepared, target);
   }
 
   public ReplaySessionState current(String machineId) {
@@ -58,5 +58,39 @@ public final class ControlReplay {
     if (speedMultiplier != 1 && speedMultiplier != 10 && speedMultiplier != 100) {
       throw new IllegalArgumentException("Replay speed must be 1, 10, or 100");
     }
+  }
+
+  private ReplaySessionState startPrepared(ReplaySessionState prepared, Instant seekTarget) {
+    try {
+      return gateway.start(prepared.replaySessionId(), prepared.revision(), seekTarget);
+    } catch (RuntimeException firstFailure) {
+      ReplaySessionState reconciled = currentAfterAmbiguousStart(prepared, firstFailure);
+      if (!reconciled.status().equals("PREPARING")) {
+        return reconciled;
+      }
+      try {
+        return gateway.start(prepared.replaySessionId(), reconciled.revision(), seekTarget);
+      } catch (RuntimeException retryFailure) {
+        ReplaySessionState retried = currentAfterAmbiguousStart(prepared, retryFailure);
+        if (!retried.status().equals("PREPARING")) {
+          return retried;
+        }
+        retryFailure.addSuppressed(firstFailure);
+        throw retryFailure;
+      }
+    }
+  }
+
+  private ReplaySessionState currentAfterAmbiguousStart(
+      ReplaySessionState prepared, RuntimeException startFailure) {
+    try {
+      ReplaySessionState current = gateway.current(prepared.machineId());
+      if (current.replaySessionId().equals(prepared.replaySessionId())) {
+        return current;
+      }
+    } catch (RuntimeException reconciliationFailure) {
+      startFailure.addSuppressed(reconciliationFailure);
+    }
+    throw startFailure;
   }
 }

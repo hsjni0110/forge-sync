@@ -1,9 +1,11 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import type { TwinSessionFactory } from "../application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
+import type { ReplayStatus } from "../../replay/domain/replay";
 import { ReplayControls } from "../../replay/ui/ReplayControls";
+import { useReplayDrivenTwinBootstrap } from "../../replay/ui/useReplayDrivenTwinBootstrap";
 import { MachineDetailView } from "./MachineDetailView";
 import { useTwinLiveSession } from "./useTwinLiveSession";
 
@@ -60,8 +62,10 @@ function ConnectedMachineDetail({
   replayControlClient?: ReplayControlClient;
   layout: "FULL" | "COMPACT";
 }) {
+  const [replayStatus, setReplayStatus] = useState<ReplayStatus>();
   const createSession = useCallback(() => sessionFactory(machineId), [machineId, sessionFactory]);
   const { state, retryNow } = useTwinLiveSession(createSession);
+  useReplayDrivenTwinBootstrap(replayStatus, state, retryNow);
   return (
     <>
       {replayControlClient && (
@@ -70,6 +74,7 @@ function ConnectedMachineDetail({
           client={replayControlClient}
           snapshot={state.snapshot}
           freshness={state.freshness}
+          onStatusChange={setReplayStatus}
         />
       )}
       <MachineDetailView

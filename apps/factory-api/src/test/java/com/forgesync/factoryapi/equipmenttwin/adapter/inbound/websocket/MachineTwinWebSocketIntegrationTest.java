@@ -27,6 +27,8 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
     properties = {
       "forgesync.ingestion.enabled=false",
       "forgesync.twin.query.enabled=false",
+      "forgesync.replay.enabled=false",
+      "forgesync.process-analytics.enabled=false",
       "spring.autoconfigure.exclude="
           + "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,"
           + "org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration"

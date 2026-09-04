@@ -8,12 +8,14 @@ database_port=${FORGESYNC_DATABASE_PORT:-15434}
 mqtt_port=${FORGESYNC_MQTT_PORT:-18884}
 api_port=${FORGESYNC_API_PORT:-18080}
 web_port=${FORGESYNC_WEB_PORT:-4173}
+replay_api_port=${FORGESYNC_REPLAY_API_PORT:-18002}
 database_project="forgesync-e2e-database-$$"
 mqtt_project="forgesync-e2e-mqtt-$$"
 api_mqtt_client_id="forgesync-api-e2e-$$"
 runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-e2e.XXXXXX")
 api_pid=""
 web_pid=""
+replay_api_pid=""
 
 run_database_compose() {
   FORGESYNC_DATABASE_PORT="$database_port" \
@@ -28,6 +30,7 @@ run_mqtt_compose() {
 cleanup() {
   verification_exit_code=$?
   trap - EXIT INT TERM
+  if [ -n "$replay_api_pid" ]; then kill "$replay_api_pid" 2>/dev/null || true; fi
   if [ -n "$web_pid" ]; then kill "$web_pid" 2>/dev/null || true; fi
   if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
   run_mqtt_compose down --volumes || true
@@ -55,6 +58,19 @@ wait_for_url() {
 run_database_compose up --detach --wait
 run_mqtt_compose up --detach --wait
 
+canonical_run="$repository_root/datasets/canonical/nist-mazak01-20161005/bf5a3342dcfcc896153c5b69059de66479e8e19d9f225caa72477ec1dc6a2416"
+FORGESYNC_REPOSITORY_ROOT="$repository_root" \
+FORGESYNC_REPLAY_SOURCE_PATH="$canonical_run" \
+FORGESYNC_REPLAY_SOURCE_SET_ID="nist-mazak01-20161005" \
+FORGESYNC_MQTT_HOST=127.0.0.1 \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+FORGESYNC_MQTT_CLIENT_ID="forgesync-replay-e2e-$$" \
+FORGESYNC_REPLAY_API_PORT="$replay_api_port" \
+  uv run --package forgesync-edge-gateway forgesync-replay-api \
+  >"$runtime_directory/replay-api.log" 2>&1 &
+replay_api_pid=$!
+wait_for_url "http://127.0.0.1:$replay_api_port/health" "$runtime_directory/replay-api.log"
+
 FORGESYNC_DATABASE_URL="jdbc:postgresql://127.0.0.1:$database_port/forgesync" \
 FORGESYNC_DATABASE_USERNAME=forgesync \
 FORGESYNC_DATABASE_PASSWORD=forgesync-test \
@@ -62,6 +78,7 @@ FORGESYNC_MQTT_ENABLED=true \
 FORGESYNC_MQTT_SERVER_URI="tcp://127.0.0.1:$mqtt_port" \
 FORGESYNC_MQTT_CLIENT_ID="$api_mqtt_client_id" \
 FORGESYNC_WEBSOCKET_ALLOWED_ORIGINS="http://127.0.0.1:$web_port" \
+FORGESYNC_REPLAY_EDGE_BASE_URL="http://127.0.0.1:$replay_api_port" \
 SERVER_PORT="$api_port" \
   "$repository_root/apps/factory-api/gradlew" -p "$repository_root/apps/factory-api" bootRun \
   >"$runtime_directory/api.log" 2>&1 &

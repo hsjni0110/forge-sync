@@ -6,7 +6,6 @@ import com.forgesync.factoryapi.processanalytics.application.MachiningRunService
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunSegmentationPolicy;
 import com.forgesync.factoryapi.processanalytics.domain.ProcessFactSourcePolicy;
 import java.time.Clock;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +20,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 public class ProcessAnalyticsConfiguration {
 
   @Bean
-  @ConditionalOnBean(JdbcClient.class)
   PostgresMachiningRunRepository machiningRunRepository(
       JdbcClient jdbcClient,
       ObjectMapper objectMapper,
@@ -30,7 +28,6 @@ public class ProcessAnalyticsConfiguration {
   }
 
   @Bean
-  @ConditionalOnBean(PostgresMachiningRunRepository.class)
   MachiningRunService machiningRunService(
       PostgresMachiningRunRepository repository, Clock applicationClock) {
     return new MachiningRunService(

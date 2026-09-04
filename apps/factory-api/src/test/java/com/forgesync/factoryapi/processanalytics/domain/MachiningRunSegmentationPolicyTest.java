@@ -128,6 +128,37 @@ class MachiningRunSegmentationPolicyTest {
   }
 
   @Test
+  void keepsAStartAfterUnavailableExecutionUncertain() {
+    ProcessObservation unavailable =
+        new ProcessObservation(
+            "Mazak01",
+            SESSION,
+            3,
+            Instant.parse("2016-10-05T09:00:03Z"),
+            "event-3",
+            ProcessSignal.EXECUTION,
+            false,
+            null,
+            null,
+            provenance(3, ProcessSignal.EXECUTION));
+
+    List<MachiningRun> runs =
+        policy.segment(
+            PROCESSING_RUN_ID,
+            "1.0.0",
+            List.of(
+                execution(1, 0, "READY"),
+                execution(2, 1, "ACTIVE"),
+                unavailable,
+                execution(4, 3, "ACTIVE"),
+                execution(5, 4, "READY")));
+
+    assertThat(runs).hasSize(2);
+    assertThat(runs.get(0).status()).isEqualTo(MachiningRunStatus.INTERRUPTED);
+    assertThat(runs.get(1).status()).isEqualTo(MachiningRunStatus.UNKNOWN);
+  }
+
+  @Test
   void usesThirtySecondZeroSpindleOnlyAsFallbackWithoutExecution() {
     MachiningRun run =
         policy

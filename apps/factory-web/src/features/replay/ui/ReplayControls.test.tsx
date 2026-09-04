@@ -57,6 +57,32 @@ describe("ReplayControls", () => {
     expect(screen.getByRole("alert").textContent).toMatch(/권위 상태/);
     expect(load).toHaveBeenCalledTimes(2);
   });
+
+  it("does not offer Replay start when the current session could not be checked", async () => {
+    const load = vi.fn().mockRejectedValue(new Error("service unavailable"));
+    const start = vi.fn();
+    render(<ReplayControls machineId="Mazak01" client={clientWith({ load, start })} />);
+
+    expect((await screen.findByRole("alert")).textContent).toMatch(/불러오지 못했습니다/);
+    expect(screen.queryByRole("button", { name: "Replay 시작" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "Replay 상태 다시 확인" }));
+    await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
+    expect(start).not.toHaveBeenCalled();
+  });
+
+  it("offers Replay start when the server confirms there is no session", async () => {
+    render(
+      <ReplayControls
+        machineId="Mazak01"
+        client={clientWith({ load: vi.fn().mockResolvedValue(undefined) })}
+      />,
+    );
+
+    expect(
+      (await screen.findByRole("button", { name: "Replay 시작" })).hasAttribute("disabled"),
+    ).toBe(false);
+  });
 });
 
 function clientWith(overrides: Partial<ReplayControlClient>): ReplayControlClient {

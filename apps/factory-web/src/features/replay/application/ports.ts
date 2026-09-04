@@ -1,7 +1,7 @@
 import type { ReplaySessionState, ReplaySpeed } from "../domain/replay";
 
 export interface ReplayControlClient {
-  load(machineId: string): Promise<ReplaySessionState>;
+  load(machineId: string): Promise<ReplaySessionState | undefined>;
   start(machineId: string, sourceSetId: string, speed: ReplaySpeed): Promise<ReplaySessionState>;
   pause(sessionId: string, revision: number): Promise<ReplaySessionState>;
   resume(sessionId: string, revision: number): Promise<ReplaySessionState>;

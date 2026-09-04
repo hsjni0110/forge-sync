@@ -28,6 +28,10 @@ long-lived session created outside the effect can be disposed and then accidenta
   as `Unavailable`; the client never substitutes zero or guesses a primary spindle.
 - Keep last-known values visible during recovery, while showing connection and freshness separately.
   A stale value receives a textual warning and is never presented as live.
+- Treat a Twin 404 as terminal by default. When an authoritative Replay session is `RUNNING`, the
+  route may treat the missing initial projection as a bootstrap race and request at most five Twin
+  resynchronizations with bounded 250 ms to 4 s backoff. This coordination stays outside both the
+  Replay and Equipment Twin domain models.
 - Render semantic headings, definition lists, status/alert regions, and a keyboard skip link. The 2D
   route has no WebGL or asset dependency.
 - Verify the cross-runtime journey with Playwright Chromium against actual PostgreSQL, Mosquitto,
@@ -49,8 +53,8 @@ long-lived session created outside the effect can be disposed and then accidenta
 
 - Component tests cover all P0 sections, provenance, missing/unavailable values, loading, 404,
   retryable failure, reconnecting, and stale warning behavior.
-- Session and hook tests cover patch ordering/resync, terminal 404, explicit retry, and StrictMode
-  lifecycle isolation.
+- Session and hook tests cover patch ordering/resync, terminal 404, bounded Replay-driven bootstrap
+  retry, explicit retry, and StrictMode lifecycle isolation.
 - `./scripts/verify-e2e` covers replay-driven RPM changes, browser disconnect and STALE behavior,
   offline update, REST recovery to the authoritative version, resubscription, keyboard focus, and
   semantic section labels.

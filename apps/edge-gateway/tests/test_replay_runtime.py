@@ -99,6 +99,30 @@ def test_abandoned_preparation_can_be_replaced_by_a_retry() -> None:
     assert retried.speed_multiplier == 10
 
 
+def test_invalid_seek_target_does_not_replace_the_current_session() -> None:
+    now = datetime(2026, 9, 3, tzinfo=UTC)
+    runtime = ReplayRuntime(
+        {"source": Path("configured")},
+        CollectingPublisher(),
+        StaticReader(_observations(now)),
+        JsonReplayEnvelopeEncoder(),
+        FixedClock(now),
+    )
+    prepared = runtime.prepare("Mazak01", "source", ReplaySpeed.X1)
+
+    with pytest.raises(ValueError, match="inside the source range"):
+        runtime.replace(
+            prepared.replay_session_id,
+            prepared.revision,
+            ReplaySpeed.X10,
+            now - timedelta(seconds=1),
+        )
+
+    current = runtime.current("Mazak01")
+    assert current.replay_session_id == prepared.replay_session_id
+    assert current.speed_multiplier == 1
+
+
 def _wait_for_status(runtime: ReplayRuntime, machine_id: str, status: str) -> ReplaySessionView:
     deadline = time.monotonic() + 1
     while time.monotonic() < deadline:

@@ -55,6 +55,10 @@ class ChangeSpeedRequest(RevisionRequest):
     speedMultiplier: int
 
 
+class PrepareReplacementRequest(ChangeSpeedRequest):
+    seekTarget: datetime
+
+
 def create_app(runtime: ReplayRuntime) -> FastAPI:
     app = FastAPI(title="ForgeSync Replay Edge Adapter", version="0.1.0")
     router = APIRouter(prefix="/internal/v1")
@@ -86,12 +90,13 @@ def create_app(runtime: ReplayRuntime) -> FastAPI:
         )
 
     @router.post("/replay-sessions/{session_id}/replacement", status_code=201)
-    def replace(session_id: UUID, request: ChangeSpeedRequest) -> dict[str, object]:
+    def replace(session_id: UUID, request: PrepareReplacementRequest) -> dict[str, object]:
         return _invoke(
             lambda: runtime.replace(
                 session_id,
                 request.expectedRevision,
                 ReplaySpeed.from_multiplier(request.speedMultiplier),
+                request.seekTarget,
             )
         )
 

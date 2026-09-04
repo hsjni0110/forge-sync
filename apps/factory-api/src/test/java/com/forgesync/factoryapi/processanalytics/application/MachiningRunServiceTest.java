@@ -63,6 +63,37 @@ class MachiningRunServiceTest {
         .isInstanceOf(CanonicalObservationHistoryNotFoundException.class);
   }
 
+  @Test
+  void lengthPrefixesHashFieldsThatContainSeparators() {
+    ProcessObservation first =
+        executionWithProvenance(
+            new ObservationProvenance(
+                "REAL",
+                "NIST",
+                "source",
+                "sha256:" + "a".repeat(64),
+                "raw|REAL",
+                "mapping",
+                "item"));
+    ProcessObservation second =
+        executionWithProvenance(
+            new ObservationProvenance(
+                "REAL",
+                "REAL",
+                "NIST",
+                "sha256:" + "a".repeat(64),
+                "raw",
+                "source",
+                "mapping|item"));
+    SegmentMachiningRunsCommand command =
+        new SegmentMachiningRunsCommand("Mazak01", SESSION, 1, "1.0.0");
+
+    String firstId = service(new FakeStore(List.of(first))).segment(command).processingRunId();
+    String secondId = service(new FakeStore(List.of(second))).segment(command).processingRunId();
+
+    assertThat(firstId).isNotEqualTo(secondId);
+  }
+
   private static MachiningRunService service(FakeStore store) {
     return new MachiningRunService(
         store,
@@ -96,6 +127,20 @@ class MachiningRunServiceTest {
             "raw-" + sequence,
             "2.0.0",
             "execution"));
+  }
+
+  private static ProcessObservation executionWithProvenance(ObservationProvenance provenance) {
+    return new ProcessObservation(
+        "Mazak01",
+        SESSION,
+        1,
+        Instant.parse("2016-10-05T09:00:01Z"),
+        "event-1",
+        ProcessSignal.EXECUTION,
+        true,
+        "ACTIVE",
+        null,
+        provenance);
   }
 
   private static final class FakeStore
