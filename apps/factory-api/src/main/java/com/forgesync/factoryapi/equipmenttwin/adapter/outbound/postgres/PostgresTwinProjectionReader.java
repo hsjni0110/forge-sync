@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.equipmenttwin.application.FieldProvenance;
 import com.forgesync.factoryapi.equipmenttwin.application.LoadedTwinProjection;
 import com.forgesync.factoryapi.equipmenttwin.application.ProjectedTwinObservation;
+import com.forgesync.factoryapi.equipmenttwin.application.ReplayCursor;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinProjectionReader;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinSnapshotUnavailableException;
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
@@ -20,6 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -66,6 +68,12 @@ public final class PostgresTwinProjectionReader implements TwinProjectionReader 
             machineId,
             new TwinVersion(found.twinVersion()),
             found.projectedAt().toInstant(),
+            new ReplayCursor(
+                found.replaySessionId(),
+                found.replaySequence(),
+                found.sourceObservedAt().toInstant(),
+                found.replayPublishedAt().toInstant(),
+                new TwinVersion(found.twinVersion())),
             new EquipmentState(
                 ConnectivityState.valueOf(found.connectivity()),
                 ExecutionState.valueOf(found.execution()),
@@ -78,7 +86,9 @@ public final class PostgresTwinProjectionReader implements TwinProjectionReader 
     return jdbcClient
         .sql(
             """
-            SELECT version.twin_version, version.projected_at,
+            SELECT version.twin_version, version.projected_at, version.replay_session_id,
+                   version.replay_sequence, version.source_observed_at,
+                   version.replay_published_at,
                    state.connectivity_state, state.execution_state, state.health_state,
                    state.twin_version AS state_version
             FROM equipment_twin_version version
@@ -91,6 +101,10 @@ public final class PostgresTwinProjectionReader implements TwinProjectionReader 
                 new ProjectionHeader(
                     resultSet.getLong("twin_version"),
                     resultSet.getObject("projected_at", OffsetDateTime.class),
+                    resultSet.getObject("replay_session_id", UUID.class),
+                    resultSet.getLong("replay_sequence"),
+                    resultSet.getObject("source_observed_at", OffsetDateTime.class),
+                    resultSet.getObject("replay_published_at", OffsetDateTime.class),
                     resultSet.getString("connectivity_state"),
                     resultSet.getString("execution_state"),
                     resultSet.getString("health_state"),
@@ -204,6 +218,10 @@ public final class PostgresTwinProjectionReader implements TwinProjectionReader 
   private record ProjectionHeader(
       long twinVersion,
       OffsetDateTime projectedAt,
+      UUID replaySessionId,
+      long replaySequence,
+      OffsetDateTime sourceObservedAt,
+      OffsetDateTime replayPublishedAt,
       String connectivity,
       String execution,
       String health,

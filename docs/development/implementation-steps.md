@@ -402,8 +402,9 @@ renderer import boundary를 unit/component/architecture/전체 runtime E2E로 �
 STALE 즉시 정지와 muted 상태, OS 기본 및 화면 override reduced motion을 구현했다. 고정 Canonical
 NIST ACTIVE/STOPPED/RPM 관찰값의 전체 runtime E2E와 unit/component/접근성 테스트로 검증했다.
 절차형 fallback을 외함/가공실/작업대/스핀들/조작반이 구분되는 범용 수직형 CNC로 개선하고,
-시각 cue와 freshness 의미를 화면에서 설명한다. 로컬 데모는 체크섬 고정 원본의 약 1시간 구간
-337건을 관찰 가능한 1.5초 간격으로 약 8분간 발행하며 원본 replay timing으로 주장하지 않는다.
+시각 cue와 freshness 의미를 화면에서 설명한다. 당시 로컬 관찰용 fixture는 체크섬 고정 원본의 약
+1시간 구간 337건을 1.5초 간격으로 발행했으며 원본 replay timing으로 주장하지 않는다. Step 17부터
+`run-local`은 실제 ReplayClock 기반 제어 runtime을 사용한다.
 
 **목적**: Twin State 변화가 공간 장비의 의미 있는 시각 상태를 바꾸도록 한다.
 
@@ -458,6 +459,8 @@ Production·Equipment Twin·Intelligence 사이 계약을 구현 전에 결정�
 **선행 조건**: Step 15.
 
 ### Step 17 — Replay Controls와 공통 시간 Cursor
+
+**상태**: `DONE` (2026-09-04)
 
 **목적**: 사용자가 replay 상태, source/replay time, 속도, pause를 제어하고 이후 모든 projection이
 같은 ReplayClock과 권위 version을 사용하게 한다.

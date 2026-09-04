@@ -8,13 +8,14 @@ database_port=${FORGESYNC_DATABASE_PORT:-15432}
 mqtt_port=${FORGESYNC_MQTT_PORT:-18883}
 api_port=${FORGESYNC_API_PORT:-8080}
 web_port=${FORGESYNC_WEB_PORT:-5173}
+replay_api_port=${FORGESYNC_REPLAY_API_PORT:-8002}
 database_project="forgesync-local-database-$$"
 mqtt_project="forgesync-local-mqtt-$$"
 api_mqtt_client_id="forgesync-api-local-$$"
 runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-local.XXXXXX")
 api_pid=""
 web_pid=""
-replay_pid=""
+replay_api_pid=""
 
 run_database_compose() {
   FORGESYNC_DATABASE_PORT="$database_port" \
@@ -30,10 +31,10 @@ cleanup() {
   exit_code=$?
   trap - EXIT INT TERM
   printf '\nForgeSync local runtime을 종료합니다.\n'
-  if [ -n "$replay_pid" ]; then kill "$replay_pid" 2>/dev/null || true; fi
+  if [ -n "$replay_api_pid" ]; then kill "$replay_api_pid" 2>/dev/null || true; fi
   if [ -n "$web_pid" ]; then kill "$web_pid" 2>/dev/null || true; fi
   if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
-  if [ -n "$replay_pid" ]; then wait "$replay_pid" 2>/dev/null || true; fi
+  if [ -n "$replay_api_pid" ]; then wait "$replay_api_pid" 2>/dev/null || true; fi
   if [ -n "$web_pid" ]; then wait "$web_pid" 2>/dev/null || true; fi
   if [ -n "$api_pid" ]; then wait "$api_pid" 2>/dev/null || true; fi
   run_mqtt_compose down --volumes || true
@@ -64,8 +65,8 @@ if [ "${1:-}" = "--help" ]; then
   cat <<'EOF'
 Usage: ./scripts/run-local
 
-PostgreSQL, Mosquitto, Factory API, Factory Web을 실행하고 약 8분 길이의 Mazak01 관찰용
-데이터 흐름을 발행합니다.
+PostgreSQL, Mosquitto, Replay Edge API, Factory API, Factory Web을 실행합니다. 화면의 Replay
+시작 버튼으로 checksum이 고정된 Mazak01 데이터를 제어할 수 있습니다.
 종료하려면 Ctrl+C를 누르세요.
 EOF
   trap - EXIT INT TERM
@@ -83,6 +84,18 @@ run_database_compose up --detach --wait
 run_mqtt_compose up --detach --wait
 
 printf 'Factory API와 Factory Web을 시작합니다...\n'
+canonical_run="$repository_root/datasets/canonical/nist-mazak01-20161005/bf5a3342dcfcc896153c5b69059de66479e8e19d9f225caa72477ec1dc6a2416"
+FORGESYNC_REPOSITORY_ROOT="$repository_root" \
+FORGESYNC_REPLAY_SOURCE_PATH="$canonical_run" \
+FORGESYNC_REPLAY_SOURCE_SET_ID="nist-mazak01-20161005" \
+FORGESYNC_MQTT_HOST=localhost \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+FORGESYNC_REPLAY_API_PORT="$replay_api_port" \
+  uv run --package forgesync-edge-gateway forgesync-replay-api \
+  >"$runtime_directory/replay-api.log" 2>&1 &
+replay_api_pid=$!
+wait_for_url "http://localhost:$replay_api_port/health" "$runtime_directory/replay-api.log" "Replay Edge API"
+
 FORGESYNC_DATABASE_URL="jdbc:postgresql://localhost:$database_port/forgesync" \
 FORGESYNC_DATABASE_USERNAME=forgesync \
 FORGESYNC_DATABASE_PASSWORD=forgesync-test \
@@ -90,6 +103,7 @@ FORGESYNC_MQTT_ENABLED=true \
 FORGESYNC_MQTT_SERVER_URI="tcp://localhost:$mqtt_port" \
 FORGESYNC_MQTT_CLIENT_ID="$api_mqtt_client_id" \
 FORGESYNC_WEBSOCKET_ALLOWED_ORIGINS="http://localhost:$web_port" \
+FORGESYNC_REPLAY_EDGE_BASE_URL="http://127.0.0.1:$replay_api_port" \
 SERVER_PORT="$api_port" \
   "$repository_root/apps/factory-api/gradlew" -p "$repository_root/apps/factory-api" bootRun \
   >"$runtime_directory/api.log" 2>&1 &
@@ -103,22 +117,11 @@ web_pid=$!
 wait_for_url "http://localhost:$api_port/actuator/health" "$runtime_directory/api.log" "Factory API"
 wait_for_url "http://localhost:$web_port" "$runtime_directory/web.log" "Factory Web"
 
-printf 'Mazak01 관찰용 데이터 흐름을 시작합니다...\n'
-FORGESYNC_MQTT_HOST=localhost \
-FORGESYNC_MQTT_PORT="$mqtt_port" \
-  uv run python "$repository_root/tests/e2e/support/publish_observation.py" guided-demo \
-  >"$runtime_directory/replay.log" 2>&1 &
-replay_pid=$!
-wait_for_url \
-  "http://localhost:$api_port/api/v1/machines/Mazak01/twin" \
-  "$runtime_directory/api.log" \
-  "Mazak01 Twin"
-
 printf '\nForgeSync가 실행 중입니다.\n'
 printf '화면: http://localhost:%s/factory\n' "$web_port"
 printf '종료: Ctrl+C\n'
-printf '\n고정된 NIST 원본의 약 1시간 구간에서 실행 상태와 RPM 337건을 골라\n'
-printf '1.5초 간격으로 약 8분 동안 보여줍니다. 이 간격은 관찰용이며 원본 시간 배속이 아닙니다.\n\n'
+printf '\nREPLAY 배지를 누르고 재생을 시작하면 고정된 NIST 원본 시간을 보존한 채\n'
+printf '1x, 10x, 100x 배속과 일시정지, 타임라인 이동을 사용할 수 있습니다.\n\n'
 
 while kill -0 "$api_pid" 2>/dev/null && kill -0 "$web_pid" 2>/dev/null; do
   sleep 1

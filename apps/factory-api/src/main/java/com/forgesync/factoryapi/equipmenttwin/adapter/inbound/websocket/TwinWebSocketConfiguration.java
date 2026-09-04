@@ -86,5 +86,10 @@ public class TwinWebSocketConfiguration implements WebMvcConfigurer {
         .allowedOrigins(allowedOrigins)
         .allowedMethods("GET")
         .allowedHeaders("Accept");
+    registry
+        .addMapping("/api/v1/replay-sessions/**")
+        .allowedOrigins(allowedOrigins)
+        .allowedMethods("POST", "PUT")
+        .allowedHeaders("Accept", "Content-Type");
   }
 }

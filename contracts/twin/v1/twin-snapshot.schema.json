@@ -5,12 +5,12 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "schemaVersion", "machine", "consistency", "state", "metrics", "conditions",
+    "schemaVersion", "machine", "consistency", "replayCursor", "state", "metrics", "conditions",
     "production", "productionResult", "alarms", "maintenance", "intelligence", "quality",
     "spatial"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.1.0" },
+    "schemaVersion": { "const": "1.2.0" },
     "machine": {
       "type": "object",
       "additionalProperties": false,
@@ -38,6 +38,9 @@
           }
         }
       }
+    },
+    "replayCursor": {
+      "$ref": "https://forgesync.local/contracts/replay/v1/replay-cursor.schema.json"
     },
     "state": {
       "type": "object",

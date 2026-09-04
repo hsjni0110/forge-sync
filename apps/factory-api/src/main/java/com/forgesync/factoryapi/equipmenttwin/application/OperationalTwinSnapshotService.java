@@ -59,6 +59,7 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         projection.machineId(),
         projection.twinVersion(),
         projection.projectedAt(),
+        projection.replayCursor(),
         consistency,
         missingFields,
         projection.equipmentState().effectiveConnectivity(freshness),
@@ -81,6 +82,9 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
   private static void requireConsistentVersion(LoadedTwinProjection projection) {
     if (!projection.twinVersion().equals(projection.equipmentStateVersion())) {
       throw new TwinSnapshotUnavailableException("Twin projection versions do not match");
+    }
+    if (!projection.twinVersion().equals(projection.replayCursor().twinVersion())) {
+      throw new TwinSnapshotUnavailableException("Replay cursor and Twin versions do not match");
     }
   }
 

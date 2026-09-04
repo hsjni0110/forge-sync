@@ -2,23 +2,33 @@ import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import type { TwinSessionFactory } from "../application/ports";
+import type { ReplayControlClient } from "../../replay/application/ports";
+import { ReplayControls } from "../../replay/ui/ReplayControls";
 import { MachineDetailView } from "./MachineDetailView";
 import { useTwinLiveSession } from "./useTwinLiveSession";
 
 const MACHINE_ID = /^[A-Za-z0-9._-]{1,64}$/;
 
-export function MachineDetailRoute({ sessionFactory }: { sessionFactory: TwinSessionFactory }) {
+export function MachineDetailRoute({
+  sessionFactory,
+  replayControlClient,
+}: {
+  sessionFactory: TwinSessionFactory;
+  replayControlClient?: ReplayControlClient;
+}) {
   const machineId = useParams().machineId ?? "";
-  return <MachineDetailPanel machineId={machineId} sessionFactory={sessionFactory} />;
+  return <MachineDetailPanel machineId={machineId} sessionFactory={sessionFactory} replayControlClient={replayControlClient} />;
 }
 
 export function MachineDetailPanel({
   machineId,
   sessionFactory,
+  replayControlClient,
   layout = "FULL",
 }: {
   machineId: string;
   sessionFactory: TwinSessionFactory;
+  replayControlClient?: ReplayControlClient;
   layout?: "FULL" | "COMPACT";
 }) {
   if (!MACHINE_ID.test(machineId)) {
@@ -33,6 +43,7 @@ export function MachineDetailPanel({
     <ConnectedMachineDetail
       machineId={machineId}
       sessionFactory={sessionFactory}
+      replayControlClient={replayControlClient}
       layout={layout}
     />
   );
@@ -41,20 +52,32 @@ export function MachineDetailPanel({
 function ConnectedMachineDetail({
   machineId,
   sessionFactory,
+  replayControlClient,
   layout,
 }: {
   machineId: string;
   sessionFactory: TwinSessionFactory;
+  replayControlClient?: ReplayControlClient;
   layout: "FULL" | "COMPACT";
 }) {
   const createSession = useCallback(() => sessionFactory(machineId), [machineId, sessionFactory]);
   const { state, retryNow } = useTwinLiveSession(createSession);
   return (
-    <MachineDetailView
-      machineId={machineId}
-      state={state}
-      retryNow={retryNow}
-      layout={layout}
-    />
+    <>
+      {replayControlClient && (
+        <ReplayControls
+          machineId={machineId}
+          client={replayControlClient}
+          snapshot={state.snapshot}
+          freshness={state.freshness}
+        />
+      )}
+      <MachineDetailView
+        machineId={machineId}
+        state={state}
+        retryNow={retryNow}
+        layout={layout}
+      />
+    </>
   );
 }

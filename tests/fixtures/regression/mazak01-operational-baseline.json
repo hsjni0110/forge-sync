@@ -7,11 +7,11 @@
   "checkedInFiles": [
     {
       "path": "tests/fixtures/twin/v1/mazak01-operational-twin.json",
-      "sha256": "6f22dc87b4aabb3be7f33d53560cd6b20f4451353a5869cbe3b6a04adca9e3b3"
+      "sha256": "b7eda522efd48de1021b138228ed3cbe86902d64b14471ceaa3762e4d16fbc83"
     },
     {
       "path": "tests/fixtures/twin/v1/mazak01-twin-patch.json",
-      "sha256": "59df38945edd170032c5a675b5cc0d62a8b21b28a5df506d06664694330a84f6"
+      "sha256": "9796a43b10b217cb3d2982b5cdc84e8b1c5455dc3a73dfa70887851ada82f674"
     },
     {
       "path": "tests/e2e/fixtures/machine-detail-replay.json",

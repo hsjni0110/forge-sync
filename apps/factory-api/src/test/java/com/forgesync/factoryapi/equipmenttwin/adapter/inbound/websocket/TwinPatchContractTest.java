@@ -23,6 +23,8 @@ class TwinPatchContractTest {
 
   private static final String TWIN_SCHEMA_ID =
       "https://forgesync.local/contracts/twin/v1/twin-snapshot.schema.json";
+  private static final String CURSOR_SCHEMA_ID =
+      "https://forgesync.local/contracts/replay/v1/replay-cursor.schema.json";
   private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
   private final Schema schema = loadSchema();
 
@@ -54,7 +56,7 @@ class TwinPatchContractTest {
     assertThatThrownBy(
             () ->
                 new TwinPatchMessage(
-                    "1.1.0",
+                    "1.2.0",
                     "TWIN_PATCH",
                     "Mazak01",
                     4,
@@ -79,10 +81,13 @@ class TwinPatchContractTest {
 
   private static Schema loadSchema() {
     String twinSchema = readResource("contracts/twin/v1/twin-snapshot.schema.json");
+    String cursorSchema = readResource("contracts/replay/v1/replay-cursor.schema.json");
     SchemaRegistry registry =
         SchemaRegistry.withDefaultDialect(
             SpecificationVersion.DRAFT_2020_12,
-            builder -> builder.schemas(Map.of(TWIN_SCHEMA_ID, twinSchema)));
+            builder ->
+                builder.schemas(
+                    Map.of(TWIN_SCHEMA_ID, twinSchema, CURSOR_SCHEMA_ID, cursorSchema)));
     return registry.getSchema(readResource("contracts/websocket/v1/twin-patch.schema.json"));
   }
 

@@ -130,3 +130,52 @@ a:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offs
   .summary-state-grid, .summary-metric-grid { grid-template-columns: 1fr; }
   .provenance-list { grid-template-columns: 1fr; }
 }
+.replay-controls {
+  border: 1px solid #384453;
+  border-radius: 0.75rem;
+  display: grid;
+  gap: 0.75rem;
+  margin-block: 1rem;
+  padding: 1rem;
+}
+
+.replay-heading,
+.replay-actions,
+.replay-actions [role="group"] {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.replay-badge {
+  background: #9b2c2c;
+  border-radius: 999px;
+  color: white;
+  padding: 0.25rem 0.65rem;
+}
+
+.replay-timeline {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.replay-timeline input {
+  width: 100%;
+}
+
+.replay-times {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  margin: 0;
+}
+
+.replay-times div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.replay-times dt {
+  font-weight: 700;
+}

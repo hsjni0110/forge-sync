@@ -176,6 +176,14 @@ class ReplaySession:
             raise ValueError("completed replay has no current observation")
         return self._observations[self._replay_sequence.value]
 
+    @property
+    def source_starts_at(self) -> datetime:
+        return self._observations[0].source_observed_at
+
+    @property
+    def source_ends_at(self) -> datetime:
+        return self._observations[-1].source_observed_at
+
     def is_due(self, now: datetime) -> bool:
         _require_aware(now, "current time")
         return self._status is ReplayStatus.RUNNING and self._clock.is_due(now)
@@ -185,6 +193,16 @@ class ReplaySession:
             raise ValueError("only a running replay can publish")
         if not self.is_due(published_at):
             raise ValueError("observation is not due")
+        self._advance_after_publication(published_at)
+
+    def record_seek_publication(self, published_at: datetime) -> None:
+        """Advance a projection rebuild without pretending source intervals elapsed."""
+        if self._status is not ReplayStatus.RUNNING:
+            raise ValueError("only a running replay can rebuild")
+        _require_aware(published_at, "published at")
+        self._advance_after_publication(published_at)
+
+    def _advance_after_publication(self, published_at: datetime) -> None:
         current_index = self._replay_sequence.value
         if current_index + 1 == len(self._observations):
             self._status = ReplayStatus.COMPLETED

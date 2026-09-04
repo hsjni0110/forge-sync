@@ -35,6 +35,7 @@ export function deriveMachineVisualPresentation(
     visualState?.execution === "ACTIVE" &&
     visualState.connectivity === "ONLINE" &&
     !visualState.stale &&
+    visualState.isReplayAdvancing !== false &&
     normalizedSpeed > 0 &&
     !isReducedMotion;
 

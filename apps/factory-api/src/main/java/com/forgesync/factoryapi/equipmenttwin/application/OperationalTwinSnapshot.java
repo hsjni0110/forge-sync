@@ -17,6 +17,7 @@ public record OperationalTwinSnapshot(
     String machineId,
     TwinVersion twinVersion,
     Instant projectedAt,
+    ReplayCursor replayCursor,
     TwinConsistencyState consistencyState,
     List<String> missingFields,
     ConnectivityState connectivity,
@@ -35,10 +36,56 @@ public record OperationalTwinSnapshot(
     Optional<ObservedEvent> program,
     List<CurrentCondition> conditions) {
 
+  public OperationalTwinSnapshot(
+      String machineId,
+      TwinVersion twinVersion,
+      Instant projectedAt,
+      TwinConsistencyState consistencyState,
+      List<String> missingFields,
+      ConnectivityState connectivity,
+      ExecutionState execution,
+      HealthState health,
+      FreshnessState freshness,
+      Instant evaluatedAt,
+      Duration age,
+      long freshMaxAgeMillis,
+      long laggingMaxAgeMillis,
+      List<FieldProvenance> connectivityProvenance,
+      List<FieldProvenance> executionProvenance,
+      List<FieldProvenance> healthProvenance,
+      List<SpindleSpeed> spindleSpeeds,
+      Optional<ObservedEvent> toolNumber,
+      Optional<ObservedEvent> program,
+      List<CurrentCondition> conditions) {
+    this(
+        machineId,
+        twinVersion,
+        projectedAt,
+        new ReplayCursor(new java.util.UUID(0, 0), 0, projectedAt, projectedAt, twinVersion),
+        consistencyState,
+        missingFields,
+        connectivity,
+        execution,
+        health,
+        freshness,
+        evaluatedAt,
+        age,
+        freshMaxAgeMillis,
+        laggingMaxAgeMillis,
+        connectivityProvenance,
+        executionProvenance,
+        healthProvenance,
+        spindleSpeeds,
+        toolNumber,
+        program,
+        conditions);
+  }
+
   public OperationalTwinSnapshot {
     Objects.requireNonNull(machineId, "machineId");
     Objects.requireNonNull(twinVersion, "twinVersion");
     Objects.requireNonNull(projectedAt, "projectedAt");
+    Objects.requireNonNull(replayCursor, "replayCursor");
     Objects.requireNonNull(consistencyState, "consistencyState");
     missingFields = List.copyOf(missingFields);
     Objects.requireNonNull(connectivity, "connectivity");

@@ -69,6 +69,9 @@ tests/fixtures/contracts/    REST/WebSocket payload examples
 - 같은 session에서는 replaySequence 우선
 - 과거 observation 저장 가능, current Twin rollback 금지
 - 고정 Clock으로 freshness 경계를 2초/10초에서 검증
+- seek는 새 Replay Session으로 L3 projection만 재구성하고 Canonical history를 보존
+- active-session fence 뒤 이전 session의 늦은 message가 current Twin을 변경하지 않음
+- Replay Cursor의 TwinVersion과 snapshot/patch version 일치
 
 ### Equipment Twin / API
 
@@ -150,11 +153,11 @@ frame, WebGL 초기화 실패 시 2D 생존, 선택한 3D Mazak01과 오른쪽 p
 STALE 즉시 정지, REST 복구 후 재활성화를 검증한다. tool/program 기반 3D 시각 변화까지 완료했다고
 주장하지 않는다.
 
-사람이 로컬 화면을 관찰하는 `./scripts/run-local`은 자동화 E2E의 짧은 여섯 건과 분리한다.
-checksum `aee293...9b17f`인 같은 Canonical 결과에서 2016-10-05 09:18:27.292Z부터
-10:18:22.999Z까지 `Mazak01-path_13`과 `Mazak01-C_5` 337건을 선택한다. 원본 순서는 유지하되
-화면 관찰을 위해 1.5초 wall-clock 간격으로 발행하며, 이를 1x/10x/100x source-time replay로
-주장하지 않는다. 실제 replay timing과 사용자 제어는 Step 17에서 검증한다.
+Step 15의 관찰용 `guided-demo` fixture는 checksum `aee293...9b17f`인 Canonical 결과에서
+2016-10-05 09:18:27.292Z부터 10:18:22.999Z까지 337건을 선택하고 1.5초 wall-clock 간격으로
+발행한다. 이는 회귀 fixture일 뿐 실제 replay timing으로 주장하지 않는다. Step 17의
+`./scripts/run-local`은 전체 고정 Canonical 결과를 ReplayClock으로 읽으며 UI의 pause, speed,
+seek 명령을 Edge runtime까지 전달한다.
 
 ### E2E-04 3D Failure Isolation
 

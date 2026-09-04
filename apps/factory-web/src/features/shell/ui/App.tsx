@@ -3,6 +3,7 @@ import { Link, Route, Routes } from "react-router-dom";
 import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
 import type { FactorySceneLoader } from "../../factory3d/ui/factorySceneContract";
 import type { TwinSessionFactory } from "../../twin/application/ports";
+import type { ReplayControlClient } from "../../replay/application/ports";
 import { MachineDetailRoute } from "../../twin/ui/MachineDetailRoute";
 
 const loadFactoryScene: FactorySceneLoader = () =>
@@ -10,9 +11,11 @@ const loadFactoryScene: FactorySceneLoader = () =>
 
 export function App({
   twinSessionFactory,
+  replayControlClient,
   factorySceneLoader = loadFactoryScene,
 }: {
   twinSessionFactory: TwinSessionFactory;
+  replayControlClient?: ReplayControlClient;
   factorySceneLoader?: FactorySceneLoader;
 }) {
   return (
@@ -34,13 +37,14 @@ export function App({
           <Route path="/" element={<Home />} />
           <Route
             path="/machines/:machineId"
-            element={<MachineDetailRoute sessionFactory={twinSessionFactory} />}
+            element={<MachineDetailRoute sessionFactory={twinSessionFactory} replayControlClient={replayControlClient} />}
           />
           <Route
             path="/factory"
             element={
               <FactoryRoute
                 sessionFactory={twinSessionFactory}
+                replayControlClient={replayControlClient}
                 sceneLoader={factorySceneLoader}
               />
             }

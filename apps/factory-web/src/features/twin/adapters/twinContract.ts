@@ -2,6 +2,7 @@ import Ajv2020, { type ValidateFunction } from "ajv/dist/2020.js";
 
 import twinSnapshotSchema from "../../../../../../contracts/twin/v1/twin-snapshot.schema.json";
 import twinPatchSchema from "../../../../../../contracts/websocket/v1/twin-patch.schema.json";
+import replayCursorSchema from "../../../../../../contracts/replay/v1/replay-cursor.schema.json";
 import type { TwinPatch, TwinSnapshot } from "../domain/twin";
 import type { TwinPatchDecoder } from "../application/ports";
 
@@ -15,6 +16,14 @@ ajv.addFormat("date-time", {
   type: "string",
   validate: (value: string) => Number.isFinite(Date.parse(value)),
 });
+ajv.addFormat("uuid", {
+  type: "string",
+  validate: (value: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value,
+    ),
+});
+ajv.addSchema(replayCursorSchema);
 ajv.addSchema(twinSnapshotSchema);
 const validateSnapshot = ajv.getSchema<TwinSnapshot>(twinSnapshotSchema.$id);
 const validatePatch = ajv.compile<TwinPatch>(twinPatchSchema);
@@ -39,6 +48,7 @@ export function decodeTwinSnapshot(
   if (
     (expectedMachineId !== undefined && document.machine.machineId !== expectedMachineId) ||
     document.state.freshness.projectedAt !== document.consistency.projectedAt ||
+    document.replayCursor.twinVersion !== document.consistency.twinVersion ||
     document.state.freshness.freshMaxAgeMillis >
       document.state.freshness.laggingMaxAgeMillis
   ) {

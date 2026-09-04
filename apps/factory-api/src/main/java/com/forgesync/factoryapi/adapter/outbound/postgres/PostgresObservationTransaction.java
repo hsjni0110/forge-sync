@@ -72,7 +72,27 @@ public final class PostgresObservationTransaction implements ObservationTransact
       return IngestionResult.SKIPPED_DUPLICATE;
     }
     insertObservation(observation, ingestedAt);
+    if (!isActiveReplaySession(observation)) {
+      return IngestionResult.ACCEPTED_LATE;
+    }
     return projectLatestObservation(observation, projectedAt);
+  }
+
+  private boolean isActiveReplaySession(ValidatedObservationMessage observation) {
+    return jdbcClient
+        .sql(
+            """
+            SELECT NOT EXISTS (
+              SELECT 1 FROM active_replay_projection WHERE machine_id = :machine_id
+            ) OR EXISTS (
+              SELECT 1 FROM active_replay_projection
+              WHERE machine_id = :machine_id AND replay_session_id = :replay_session_id
+            )
+            """)
+        .param("machine_id", observation.machineId())
+        .param("replay_session_id", observation.replaySessionId())
+        .query(Boolean.class)
+        .single();
   }
 
   private IngestionResult projectLatestObservation(
@@ -86,7 +106,7 @@ public final class PostgresObservationTransaction implements ObservationTransact
     }
 
     TwinVersion nextVersion = currentVersion.next();
-    updateMachineVersion(observation.machineId(), nextVersion, projectedAt);
+    updateMachineVersion(observation, nextVersion, projectedAt);
     upsertLatestObservation(observation, nextVersion, projectedAt);
     equipmentStateProjection.project(observation.machineId(), nextVersion, projectedAt);
     return IngestionResult.ACCEPTED;
@@ -138,17 +158,26 @@ public final class PostgresObservationTransaction implements ObservationTransact
   }
 
   private void updateMachineVersion(
-      String machineId, TwinVersion twinVersion, Instant projectedAt) {
+      ValidatedObservationMessage observation, TwinVersion twinVersion, Instant projectedAt) {
     jdbcClient
         .sql(
             """
             UPDATE equipment_twin_version
-            SET twin_version = :twin_version, projected_at = :projected_at
+            SET twin_version = :twin_version,
+                projected_at = :projected_at,
+                replay_session_id = :replay_session_id,
+                replay_sequence = :replay_sequence,
+                source_observed_at = :source_observed_at,
+                replay_published_at = :replay_published_at
             WHERE machine_id = :machine_id
             """)
         .param("twin_version", twinVersion.value())
         .param("projected_at", asUtcOffset(projectedAt))
-        .param("machine_id", machineId)
+        .param("replay_session_id", observation.replaySessionId())
+        .param("replay_sequence", observation.replaySequence())
+        .param("source_observed_at", asUtcOffset(observation.sourceObservedAt()))
+        .param("replay_published_at", asUtcOffset(observation.replayPublishedAt()))
+        .param("machine_id", observation.machineId())
         .update();
   }
 

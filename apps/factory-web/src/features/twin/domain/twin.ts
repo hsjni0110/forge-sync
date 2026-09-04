@@ -54,13 +54,20 @@ export interface CurrentCondition {
 }
 
 export interface TwinSnapshot {
-  schemaVersion: "1.1.0";
+  schemaVersion: "1.2.0";
   machine: { machineId: string };
   consistency: {
     status: "CONSISTENT" | "PARTIAL" | "STALE" | "DEGRADED";
     twinVersion: number;
     projectedAt: string;
     missingFields: string[];
+  };
+  replayCursor: {
+    replaySessionId: string;
+    replaySequence: number;
+    sourceObservedAt: string;
+    replayPublishedAt: string;
+    twinVersion: number;
   };
   state: {
     connectivity: DerivedState<"UNKNOWN" | "ONLINE" | "STALE" | "OFFLINE">;
@@ -94,7 +101,7 @@ export interface TwinSnapshot {
 }
 
 export interface TwinPatch {
-  schemaVersion: "1.1.0";
+  schemaVersion: "1.2.0";
   type: "TWIN_PATCH";
   machineId: string;
   baseVersion: number;

@@ -8,6 +8,9 @@ import {
 } from "react";
 
 import type { TwinSessionFactory } from "../../twin/application/ports";
+import type { ReplayControlClient } from "../../replay/application/ports";
+import type { ReplayStatus } from "../../replay/domain/replay";
+import { ReplayControls } from "../../replay/ui/ReplayControls";
 import { MachineDetailView } from "../../twin/ui/MachineDetailView";
 import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
 import { MAZAK01_SCENE_BINDING } from "../adapters/defaultMachineSceneBinding";
@@ -25,9 +28,11 @@ export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
 export function FactoryRoute({
   sessionFactory,
+  replayControlClient,
   sceneLoader,
 }: {
   sessionFactory: TwinSessionFactory;
+  replayControlClient?: ReplayControlClient;
   sceneLoader: FactorySceneLoader;
 }) {
   const [viewMode, setViewMode] = useState<FactoryViewMode>("SPLIT");
@@ -35,6 +40,7 @@ export function FactoryRoute({
     useState<SceneUnavailableReason>();
   const [isAssetFallback, setIsAssetFallback] = useState(false);
   const [sceneAttempt, setSceneAttempt] = useState(0);
+  const [replayStatus, setReplayStatus] = useState<ReplayStatus>();
   const { isReducedMotion, toggleReducedMotion } = useReducedMotionPreference();
   const selectionStore = useMemo(
     () => new MachineSelectionStore(MAZAK01_SCENE_BINDING.machineId),
@@ -54,14 +60,17 @@ export function FactoryRoute({
     if (!twinState.snapshot) {
       return undefined;
     }
-    return mapTwinToMachineVisualState({
+    return {
+      ...mapTwinToMachineVisualState({
       snapshot: twinState.snapshot,
       freshness: twinState.freshness ?? twinState.snapshot.state.freshness.value,
       selectedMachineId,
       visualSpindleSourceDataItemId:
         MAZAK01_SCENE_BINDING.visualSpindleSourceDataItemId,
-    });
-  }, [selectedMachineId, twinState.freshness, twinState.snapshot]);
+      }),
+      isReplayAdvancing: replayStatus === undefined || replayStatus === "RUNNING",
+    };
+  }, [replayControlClient, replayStatus, selectedMachineId, twinState.freshness, twinState.snapshot]);
   const visualPresentation = useMemo(
     () => deriveMachineVisualPresentation(visualState, isReducedMotion),
     [isReducedMotion, visualState],
@@ -124,6 +133,15 @@ export function FactoryRoute({
       <p className="visual-cue-note">
         RPM 기반 회전은 상태 변화를 보여주는 시각 효과이며 실제 물리 회전 속도가 아닙니다.
       </p>
+      {replayControlClient && (
+        <ReplayControls
+          machineId={machineId}
+          client={replayControlClient}
+          snapshot={twinState.snapshot}
+          freshness={twinState.freshness}
+          onStatusChange={setReplayStatus}
+        />
+      )}
       {isAssetFallback && (
         <div className="notice notice-warning" role="status">
           3D 자산을 불러오지 못해 기본 CNC 도형을 표시합니다.

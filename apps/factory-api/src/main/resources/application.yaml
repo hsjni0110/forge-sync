@@ -30,3 +30,5 @@ forgesync:
     enabled: false
     server-uri: tcp://localhost:1883
     client-id: forgesync-api-local
+  replay:
+    edge-base-url: ${FORGESYNC_REPLAY_EDGE_BASE_URL:http://127.0.0.1:8002}

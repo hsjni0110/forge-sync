@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/replay/v1/replay-cursor.schema.json",
+  "title": "ForgeSync Replay Cursor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "replaySessionId", "replaySequence", "sourceObservedAt", "replayPublishedAt", "twinVersion"
+  ],
+  "properties": {
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "replaySequence": { "type": "integer", "minimum": 0 },
+    "sourceObservedAt": {
+      "type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "replayPublishedAt": {
+      "type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "twinVersion": { "type": "integer", "minimum": 1 }
+  }
+}

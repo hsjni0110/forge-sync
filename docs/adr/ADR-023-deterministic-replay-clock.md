@@ -23,8 +23,9 @@ failure behavior, so advancing replay before a successful publisher handoff woul
   provenance, event identity, or payload.
 - Replay position and sequence advance only after the `ReplayPublisher` returns successfully. A
   publisher failure leaves the same Observation available for retry.
-- This stage uses a serial in-memory session. Persistence, concurrency, MQTT, real-time sleeping,
-  seek, checkpoints, and MAX speed remain outside this decision.
+- This stage used a serial in-memory session. MQTT publication was added by ADR-024; real-time
+  control and seek rebuild are defined by ADR-033. Durable recovery, checkpoints, and MAX speed
+  remain outside the current decision.
 
 ## Consequences
 

@@ -7,9 +7,9 @@ GET /api/v1/machines/{machineId}/twin
 Accept: application/vnd.forgesync.twin.v1+json
 ```
 
-Version `1.1.0` is defined by
+Version `1.2.0` is defined by
 [`v1/twin-snapshot.schema.json`](./v1/twin-snapshot.schema.json). The schema keeps the PRD 27
-sections stable while the MVP populates machine identity, consistency, Equipment State, freshness,
+sections stable while the MVP populates machine identity, consistency, Replay Cursor, Equipment State, freshness,
 spindle speeds, tool, program, current Conditions, and field-level provenance. Unsupported business
 sections remain typed empty containers; they do not imply simulated or inferred facts.
 
@@ -21,10 +21,12 @@ a primary spindle. An unavailable observation keeps its identity and provenance 
 and `unit`. Missing or unavailable P0 fields are listed in `consistency.missingFields` and never
 become zero or an empty string.
 
+The required `replayCursor` is committed with the projection and its `twinVersion` must equal the
+snapshot consistency version. It keeps `sourceObservedAt` separate from `replayPublishedAt`.
+
 The freshness object carries the applied `freshMaxAgeMillis` and `laggingMaxAgeMillis`. Browser
 consumers use these server-owned thresholds when aging a snapshot between updates; they do not
-redefine the policy locally. Schema `1.1.0` replaces `1.0.0` because strict v1 consumers reject
-the new threshold fields.
+redefine the policy locally.
 
 ## Consistency and errors
 

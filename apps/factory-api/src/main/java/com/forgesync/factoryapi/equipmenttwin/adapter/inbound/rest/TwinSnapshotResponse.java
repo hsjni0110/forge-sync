@@ -11,6 +11,7 @@ public record TwinSnapshotResponse(
     String schemaVersion,
     MachineDto machine,
     ConsistencyDto consistency,
+    ReplayCursorDto replayCursor,
     StateDto state,
     MetricsDto metrics,
     List<ConditionDto> conditions,
@@ -26,6 +27,13 @@ public record TwinSnapshotResponse(
 
   public record ConsistencyDto(
       String status, long twinVersion, Instant projectedAt, List<String> missingFields) {}
+
+  public record ReplayCursorDto(
+      java.util.UUID replaySessionId,
+      long replaySequence,
+      Instant sourceObservedAt,
+      Instant replayPublishedAt,
+      long twinVersion) {}
 
   public record StateDto(
       DerivedStateDto connectivity,

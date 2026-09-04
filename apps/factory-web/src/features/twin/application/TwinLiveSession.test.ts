@@ -39,6 +39,7 @@ class ControlledSocketFactory implements TwinSocketFactory {
 function snapshotAt(version: number, evaluatedAt: string, ageMillis = 0) {
   const document = structuredClone(twinFixture);
   document.consistency.twinVersion = version;
+  document.replayCursor.twinVersion = version;
   document.consistency.projectedAt = evaluatedAt;
   document.state.freshness.evaluatedAt = evaluatedAt;
   document.state.freshness.projectedAt = evaluatedAt;
@@ -49,7 +50,7 @@ function snapshotAt(version: number, evaluatedAt: string, ageMillis = 0) {
 function patch(baseVersion: number, targetVersion: number, evaluatedAt: string) {
   const snapshot = snapshotAt(targetVersion, evaluatedAt);
   return JSON.stringify({
-    schemaVersion: "1.1.0",
+    schemaVersion: "1.2.0",
     type: "TWIN_PATCH",
     machineId: "Mazak01",
     baseVersion,

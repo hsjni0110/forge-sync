@@ -48,6 +48,12 @@ tasks.processResources {
     from("../../contracts/websocket/v1/twin-patch.schema.json") {
         into("contracts/websocket/v1")
     }
+    from("../../contracts/replay/v1/replay-cursor.schema.json") {
+        into("contracts/replay/v1")
+    }
+    from("../../contracts/replay/v1/replay-session.schema.json") {
+        into("contracts/replay/v1")
+    }
 }
 
 tasks.processTestResources {
@@ -56,6 +62,9 @@ tasks.processTestResources {
     }
     from("../../tests/fixtures/twin/v1") {
         into("fixtures/twin/v1")
+    }
+    from("../../tests/fixtures/replay/v1") {
+        into("fixtures/replay/v1")
     }
 }
 

@@ -80,7 +80,7 @@ class TwinSnapshotContractTest {
   void rejectsWrongVersionMissingProvenanceAndUnavailableValue() {
     String valid = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
 
-    assertThat(violations(valid.replace("\"1.1.0\"", "\"2.0.0\""))).isNotEmpty();
+    assertThat(violations(valid.replace("\"1.2.0\"", "\"2.0.0\""))).isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"provenance\": \\{", "\"lineage\": {")))
         .isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"AVAILABLE\"", "\"UNAVAILABLE\""))).isNotEmpty();
@@ -94,7 +94,14 @@ class TwinSnapshotContractTest {
   }
 
   private static Schema loadSchema() {
-    return SchemaRegistry.withDefaultDialect(SpecificationVersion.DRAFT_2020_12)
+    String cursorSchema = readResource("contracts/replay/v1/replay-cursor.schema.json");
+    return SchemaRegistry.withDefaultDialect(
+            SpecificationVersion.DRAFT_2020_12,
+            builder ->
+                builder.schemas(
+                    java.util.Map.of(
+                        "https://forgesync.local/contracts/replay/v1/replay-cursor.schema.json",
+                        cursorSchema)))
         .getSchema(readResource("contracts/twin/v1/twin-snapshot.schema.json"));
   }
 

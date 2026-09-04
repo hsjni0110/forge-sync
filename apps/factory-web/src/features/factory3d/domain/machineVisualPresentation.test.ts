@@ -45,6 +45,7 @@ describe("Machine visual presentation policy", () => {
     expect(presentation({ execution: "HOLD" }).isSpindleAnimating).toBe(false);
     expect(presentation({ connectivity: "OFFLINE" }).isSpindleAnimating).toBe(false);
     expect(presentation({ stale: true }).isSpindleAnimating).toBe(false);
+    expect(presentation({ isReplayAdvancing: false }).isSpindleAnimating).toBe(false);
     expect(presentation({}, true).isSpindleAnimating).toBe(false);
   });
 

@@ -1718,14 +1718,14 @@ Backend WebSocket event:
 
 ```json
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "type": "TWIN_PATCH",
   "machineId": "cnc-mill-01",
   "baseVersion": 10230,
   "targetVersion": 10231,
   "projectedAt": "...",
   "snapshot": {
-    "schemaVersion": "1.1.0",
+    "schemaVersion": "1.2.0",
     "machine": { "machineId": "cnc-mill-01" },
     "consistency": { "twinVersion": 10231 }
   }

@@ -24,13 +24,19 @@ public final class TwinSnapshotResponseMapper {
 
   public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
-        "1.1.0",
+        "1.2.0",
         new MachineDto(snapshot.machineId()),
         new ConsistencyDto(
             snapshot.consistencyState().name(),
             snapshot.twinVersion().value(),
             snapshot.projectedAt(),
             snapshot.missingFields()),
+        new TwinSnapshotResponse.ReplayCursorDto(
+            snapshot.replayCursor().replaySessionId(),
+            snapshot.replayCursor().replaySequence(),
+            snapshot.replayCursor().sourceObservedAt(),
+            snapshot.replayCursor().replayPublishedAt(),
+            snapshot.replayCursor().twinVersion().value()),
         new TwinSnapshotResponse.StateDto(
             new DerivedStateDto(
                 snapshot.connectivity().name(), provenance(snapshot.connectivityProvenance())),

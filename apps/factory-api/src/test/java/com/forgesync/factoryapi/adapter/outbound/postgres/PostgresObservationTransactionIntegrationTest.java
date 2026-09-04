@@ -11,6 +11,7 @@ import com.forgesync.factoryapi.adapter.inbound.mqtt.MqttObservationValidator;
 import com.forgesync.factoryapi.adapter.inbound.observation.ObservationContractValidator;
 import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
+import com.forgesync.factoryapi.equipmenttwin.adapter.outbound.postgres.PostgresReplayProjectionActivator;
 import com.forgesync.factoryapi.equipmenttwin.adapter.outbound.postgres.PostgresTwinProjectionReader;
 import com.forgesync.factoryapi.equipmenttwin.application.LoadedTwinProjection;
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
@@ -55,6 +56,7 @@ class PostgresObservationTransactionIntegrationTest {
   private static JdbcClient jdbcClient;
   private static PostgresObservationTransaction transaction;
   private static PostgresTwinProjectionReader twinProjectionReader;
+  private static PostgresReplayProjectionActivator replayProjectionActivator;
   private static final List<String> committedProjectionNotifications = new CopyOnWriteArrayList<>();
 
   @BeforeAll
@@ -73,6 +75,9 @@ class PostgresObservationTransactionIntegrationTest {
     twinProjectionReader =
         new PostgresTwinProjectionReader(
             jdbcClient, OBJECT_MAPPER, new DataSourceTransactionManager(dataSource));
+    replayProjectionActivator =
+        new PostgresReplayProjectionActivator(
+            jdbcClient, new DataSourceTransactionManager(dataSource));
   }
 
   @BeforeEach
@@ -81,7 +86,8 @@ class PostgresObservationTransactionIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE equipment_state_projection, latest_observation_projection,
+            TRUNCATE active_replay_projection, equipment_state_projection,
+              latest_observation_projection,
               equipment_twin_version,
               canonical_observation_history, ingestion_inbox
             """)
@@ -350,12 +356,21 @@ class PostgresObservationTransactionIntegrationTest {
     jdbcClient
         .sql(
             """
-            INSERT INTO equipment_twin_version (machine_id, twin_version, projected_at)
-            VALUES (:machine_id, :twin_version, :projected_at)
+            INSERT INTO equipment_twin_version (
+              machine_id, twin_version, projected_at, replay_session_id, replay_sequence,
+              source_observed_at, replay_published_at
+            ) VALUES (
+              :machine_id, :twin_version, :projected_at, :replay_session_id, :replay_sequence,
+              :source_observed_at, :replay_published_at
+            )
             """)
         .param("machine_id", observation.machineId())
         .param("twin_version", Long.MAX_VALUE)
         .param("projected_at", asUtcOffset(PROJECTED_AT))
+        .param("replay_session_id", observation.replaySessionId())
+        .param("replay_sequence", observation.replaySequence())
+        .param("source_observed_at", asUtcOffset(observation.sourceObservedAt()))
+        .param("replay_published_at", asUtcOffset(observation.replayPublishedAt()))
         .update();
 
     assertThatThrownBy(() -> transaction.storeObservation(observation, INGESTED_AT, PROJECTED_AT))
@@ -422,6 +437,48 @@ class PostgresObservationTransactionIntegrationTest {
 
     assertThat(twinVersion("Mazak01")).isEqualTo(1);
     assertThat(twinVersion("Mazak02")).isEqualTo(1);
+  }
+
+  @Test
+  void seekKeepsHistoryAndFencesThePreviousReplaySession() {
+    ValidatedObservationMessage oldObservation =
+        replayedEvent(1, REPLAY_SESSION_ID, Instant.parse("2016-10-05T09:00:00Z"), "old");
+    UUID replacementSession = UUID.fromString("10000000-0000-4000-8000-000000000002");
+
+    assertThat(transaction.storeObservation(oldObservation, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    replayProjectionActivator.activate("Mazak01", replacementSession, PROJECTED_AT.plusSeconds(1));
+
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(1);
+    assertThat(rowCount("latest_observation_projection")).isZero();
+    assertThat(rowCount("equipment_state_projection")).isZero();
+    assertThat(twinVersion("Mazak01")).isEqualTo(1);
+
+    ValidatedObservationMessage delayedOldObservation =
+        replayedEvent(2, REPLAY_SESSION_ID, Instant.parse("2016-10-05T09:00:01Z"), "delayed-old");
+    assertThat(
+            transaction.storeObservation(
+                delayedOldObservation, INGESTED_AT.plusSeconds(1), PROJECTED_AT.plusSeconds(1)))
+        .isEqualTo(IngestionResult.ACCEPTED_LATE);
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(2);
+    assertThat(rowCount("latest_observation_projection")).isZero();
+
+    ValidatedObservationMessage replacementObservation =
+        replayedEvent(0, replacementSession, Instant.parse("2016-10-05T08:30:00Z"), "replacement");
+    assertThat(
+            transaction.storeObservation(
+                replacementObservation, INGESTED_AT.plusSeconds(2), PROJECTED_AT.plusSeconds(2)))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(3);
+    assertThat(rowCount("latest_observation_projection")).isEqualTo(1);
+    assertThat(twinVersion("Mazak01")).isEqualTo(2);
+    assertThat(
+            twinProjectionReader
+                .findByMachineId("Mazak01")
+                .orElseThrow()
+                .replayCursor()
+                .replaySessionId())
+        .isEqualTo(replacementSession);
   }
 
   @Test

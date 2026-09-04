@@ -1,11 +1,18 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "machine": { "machineId": "Mazak01" },
   "consistency": {
     "status": "PARTIAL",
     "twinVersion": 4,
     "projectedAt": "2026-09-02T01:02:04Z",
     "missingFields": ["state.health"]
+  },
+  "replayCursor": {
+    "replaySessionId": "10000000-0000-4000-8000-000000000001",
+    "replaySequence": 4,
+    "sourceObservedAt": "2016-10-05T09:01:44.430Z",
+    "replayPublishedAt": "2026-09-02T01:02:04Z",
+    "twinVersion": 4
   },
   "state": {
     "connectivity": { "value": "ONLINE", "provenance": [] },

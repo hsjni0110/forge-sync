@@ -13,6 +13,7 @@ export interface MachineVisualState {
   alarmSeverity?: "WARNING" | "FAULT";
   stale: boolean;
   selected: boolean;
+  isReplayAdvancing?: boolean;
 }
 
 export interface MachineSceneBinding {

@@ -15,7 +15,8 @@ may also be unavailable while their observation identity and provenance remain m
 ## Decision
 
 - Expose `GET /api/v1/machines/{machineId}/twin` with media type
-  `application/vnd.forgesync.twin.v1+json` and schema version `1.1.0`.
+  `application/vnd.forgesync.twin.v1+json`. ADR-033 extends the strict schema to version `1.2.0`
+  with an authoritative Replay Cursor.
 - Read machine version, Equipment State, and Latest Observations in one PostgreSQL repeatable-read
   transaction through an outbound Application Port. The REST Adapter never reads JDBC state.
 - Reject a missing Equipment State or a state version different from the current machine
@@ -24,8 +25,9 @@ may also be unavailable while their observation identity and provenance remain m
   takes precedence over `PARTIAL`; otherwise missing, unavailable, or ambiguous P0 values are
   `PARTIAL`.
 - Include the applied millisecond-precision freshness thresholds in the snapshot. Browser
-  consumers age the snapshot using these server-owned values. Version `1.1.0` replaces `1.0.0`
-  because the strict contract rejects additional fields.
+  consumers age the snapshot using these server-owned values. Version `1.2.0` retains the
+  `1.1.0` freshness fields and adds the required Replay Cursor; strict consumers must reject an
+  unsupported version rather than silently mix cursor and Twin state.
 - Treat unknown Connectivity, Execution, or Health as missing P0 state and report `PARTIAL`.
 - Return all spindle speeds ordered by component and source DataItem identity. Do not select a
   primary spindle without an explicit machine mapping decision.
