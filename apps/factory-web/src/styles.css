@@ -92,16 +92,22 @@ a:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offs
 .scene-introduction { display: grid; gap: 0.25rem; margin-bottom: 0.8rem; padding: 0.75rem 0.85rem; border-left: 3px solid #67cdb3; border-radius: 0.35rem; background: #0b1a21; }
 .scene-introduction strong { color: #bff7e7; font-size: 0.88rem; }
 .scene-introduction span { color: #9db3be; font-size: 0.78rem; line-height: 1.45; }
-.scene-viewport { position: relative; min-height: 36rem; overflow: hidden; border: 1px solid #2d4854; border-radius: 0.6rem; background: #08151b; }
+.scene-viewport { position: relative; min-height: 36rem; overflow: hidden; border: 1px solid #313a3f; border-radius: 0.6rem; background: #10161a; }
 .scene-viewport > div { min-height: inherit; }
-.scene-canvas-root { display: grid; min-height: 36rem; background: #08151b; }
+.scene-canvas-root { display: grid; min-height: 36rem; background: #10161a; }
 .scene-canvas-stage { position: relative; height: 30rem; }
-.scene-canvas-stage:focus-visible { outline: 3px solid #83e6cb; outline-offset: -3px; }
-.machine-inspection-panel { z-index: 3; display: grid; gap: 0.55rem; padding: 0.7rem; border-top: 1px solid #426b67; background: #0b1a21; }
-.camera-button-grid, .inspection-part-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.35rem; }
-.machine-inspection-panel button { min-height: 2rem; padding: 0.35rem 0.45rem; font-size: 0.7rem; }
-.inspection-part-list button[aria-pressed="true"], .machine-inspection-panel > button[aria-pressed="true"] { border-color: #f7c948; color: #f7c948; background: #332d16; }
-.inspection-keyboard-help, .inspection-capability-note { color: #aebdc5; font-size: 0.68rem; line-height: 1.35; }
+.scene-canvas-stage:focus-visible { outline: 2px solid #8b969c; outline-offset: -2px; }
+.machine-inspection-panel { z-index: 3; display: flex; align-items: end; gap: 0.6rem; padding: 0.65rem 0.75rem; border-top: 1px solid #30393e; background: #141b1f; }
+.camera-button-grid { display: flex; gap: 0.3rem; }
+.camera-button-grid button { width: 2.15rem; min-height: 2.15rem; padding: 0; border-color: #3a4449; background: #1b2429; color: #bdc5c9; font-size: 1rem; }
+.camera-button-grid button:hover { border-color: #77838a; background: #242e33; color: #eef1f2; }
+.inspection-part-select { display: grid; min-width: 12rem; gap: 0.2rem; color: #8f9a9f; font-size: 0.68rem; }
+.inspection-part-select select { min-height: 2.15rem; border: 1px solid #3a4449; border-radius: 0.4rem; background: #1b2429; color: #d5dade; }
+.machine-inspection-panel details { color: #aab2b6; font-size: 0.72rem; }
+.machine-inspection-panel summary { min-height: 2.15rem; padding: 0.55rem 0.65rem; border: 1px solid #3a4449; border-radius: 0.4rem; background: #1b2429; cursor: pointer; list-style-position: inside; }
+.machine-inspection-panel details[open] { position: relative; }
+.machine-inspection-panel details[open] > :not(summary) { display: block; margin: 0.45rem 0.35rem 0; }
+.inspection-capability-note { color: #929ca1; font-size: 0.68rem; line-height: 1.35; }
 .floating-machine-label { position: absolute; top: 1rem; left: 1rem; z-index: 2; display: grid; min-width: 10rem; gap: 0.2rem; padding: 0.65rem 0.8rem; border: 2px solid #53717e; border-radius: 0.55rem; background: rgb(8 21 27 / 92%); color: #dbe8ed; text-align: left; }
 .floating-machine-label span { color: #aebdc5; font-size: 0.75rem; }
 .floating-machine-label .machine-visual-status { color: #83e6cb; font-weight: 800; }
@@ -109,9 +115,6 @@ a:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offs
 .floating-machine-label[data-status="fault"] .machine-visual-status { color: #ff8585; }
 .floating-machine-label[data-status="stale"] .machine-visual-status, .floating-machine-label[data-status="offline"] .machine-visual-status { color: #c2ced3; }
 .floating-machine-label.is-selected { border-color: #f7c948; box-shadow: 0 0 0 3px rgb(247 201 72 / 24%); }
-.scene-visual-legend { position: absolute; bottom: 1rem; left: 1rem; z-index: 2; display: grid; gap: 0.2rem; max-width: 18rem; padding: 0.65rem 0.75rem; border: 1px solid #426b67; border-radius: 0.5rem; background: rgb(8 21 27 / 92%); }
-.scene-visual-legend strong { color: #bff7e7; font-size: 0.78rem; }
-.scene-visual-legend span { color: #aebdc5; font-size: 0.7rem; }
 .scene-viewport canvas { display: block; width: 100%; height: 100%; min-height: 0; }
 .scene-loading, .scene-unavailable { display: grid; min-height: 36rem; place-content: center; justify-items: center; gap: 0.65rem; padding: 2rem; color: #aebdc5; text-align: center; }
 .scene-unavailable strong { color: #ffd0d0; font-size: 1.2rem; }
@@ -149,7 +152,8 @@ a:focus-visible, button:focus-visible { outline: 3px solid #ffd166; outline-offs
   .scene-viewport, .scene-loading, .scene-unavailable { min-height: 22rem; }
   .scene-canvas-root { min-height: 22rem; }
   .scene-canvas-stage { height: 18rem; }
-  .scene-visual-legend { display: none; }
+  .machine-inspection-panel { align-items: stretch; flex-wrap: wrap; }
+  .inspection-part-select { flex: 1 1 10rem; }
   .summary-state-grid, .summary-metric-grid { grid-template-columns: 1fr; }
   .provenance-list { grid-template-columns: 1fr; }
 }

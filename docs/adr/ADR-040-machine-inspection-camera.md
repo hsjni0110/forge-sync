@@ -16,8 +16,11 @@ geometry would overstate its provenance.
 ## Decision
 
 - Use Three.js `OrbitControls` without a new dependency. Mouse/touch gestures and an accessible DOM
-  toolbar share the same camera commands. A focused viewport maps arrows, plus/minus, Home, and
-  Escape to rotate, zoom, reset, and part-selection clearing.
+  toolbar share the same camera commands. The default toolbar exposes only zoom out, zoom in, reset,
+  and one part selector; rotation remains available through pointer/touch and keyboard input. A
+  focused viewport maps arrows, plus/minus, Home, and Escape to rotate, zoom, reset, and
+  part-selection clearing. Transparency, provenance, and usage help use progressive disclosure so
+  they do not compete with the model during ordinary inspection.
 - Calculate full-model and part focus from their `Box3`. The default three-quarter view targets
   roughly 70 percent viewport occupancy. Distance is bounded to 0.45–4 times the model radius and
   polar rotation to 20–85 degrees.
@@ -30,6 +33,9 @@ geometry would overstate its provenance.
 - Hover and selection use non-authoritative bounding helpers. Selection shows one visual label and
   an equivalent DOM status. Workpiece remains `대표 공작물 · SIMULATED` and layout remains
   `SIMULATED_LAYOUT`.
+- Use a low-saturation neutral scene, grid, and hover outline. Status beacon and selected-part colors
+  retain their distinct meanings, but the work-area light is limited so it does not wash out the
+  geometry.
 - Procedural enclosure transparency uses opacity 0.2 with depth writing disabled. Original GLB
   materials are cloned before inspection changes and their exact state is restored.
 

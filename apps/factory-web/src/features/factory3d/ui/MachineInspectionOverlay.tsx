@@ -29,7 +29,7 @@ export function MachineInspectionOverlay({
     const partId = selectedPartId ?? hoveredPartId;
     if (!partId) return;
     const part = model.inspection.parts[partId];
-    const helper = new BoxHelper(part.node, selectedPartId ? 0xf7c948 : 0x67cdb3);
+    const helper = new BoxHelper(part.node, selectedPartId ? 0xf7c948 : 0xc5d0d4);
     helper.name = selectedPartId ? "selected-part-helper" : "hovered-part-helper";
     scene.add(helper);
     let label: Sprite | undefined;

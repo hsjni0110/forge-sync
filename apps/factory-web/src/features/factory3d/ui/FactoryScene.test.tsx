@@ -212,7 +212,7 @@ describe("FactoryScene asset isolation", () => {
     expect(screen.getByText(/공장 배치: SIMULATED_LAYOUT/)).toBeTruthy();
   });
 
-  it("offers equivalent camera buttons, keyboard commands, and part focus", async () => {
+  it("keeps camera controls compact while preserving keyboard commands and part focus", async () => {
     render(
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
@@ -228,17 +228,21 @@ describe("FactoryScene asset isolation", () => {
     const viewport = await screen.findByLabelText("3D 조작 영역");
     fireEvent.click(screen.getByRole("button", { name: "확대" }));
     fireEvent.keyDown(viewport, { key: "ArrowLeft" });
-    fireEvent.click(screen.getByRole("button", { name: "Main Chuck" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "부품 살펴보기" }), {
+      target: { value: "mainChuck" },
+    });
 
     expect(cameraCommands).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: "ZOOM_IN" }),
       expect.objectContaining({ type: "ROTATE_LEFT" }),
       expect.objectContaining({ type: "FOCUS_PART", partId: "mainChuck" }),
     ]));
-    expect(screen.getByRole("button", { name: "Main Chuck" }).getAttribute("aria-pressed"))
-      .toBe("true");
-    expect(screen.getByRole<HTMLButtonElement>("button", { name: "선택 부품 맞춤" }).disabled)
-      .toBe(false);
+    expect(screen.getByRole<HTMLSelectElement>("combobox", { name: "부품 살펴보기" }).value)
+      .toBe("mainChuck");
+    expect(screen.queryByRole("button", { name: "왼쪽 회전" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "선택 부품 맞춤" })).toBeNull();
+    expect(screen.getByText("보기 옵션")).toBeTruthy();
+    expect(screen.getByText("모델 정보")).toBeTruthy();
     expect(reducedMotionValues).toContain(true);
   });
 

@@ -81,14 +81,14 @@ export default function FactoryScene({
         onPointerMissed={() => selectPart(undefined)}
       >
         <SceneReadySignal onReady={() => setIsSceneReady(true)} />
-        <color attach="background" args={["#08151b"]} />
-        <ambientLight intensity={1.5} />
-        <directionalLight position={[4, 8, 5]} intensity={2.5} castShadow />
-        <pointLight position={[0, 2.4, 1.8]} intensity={7} distance={5} color="#d8fff4" />
-        <gridHelper args={[18, 18, "#315963", "#18323a"]} />
+        <color attach="background" args={["#10161a"]} />
+        <ambientLight intensity={1.25} />
+        <directionalLight position={[4, 8, 5]} intensity={2.1} castShadow />
+        <pointLight position={[0, 2.4, 1.8]} intensity={3} distance={5} color="#e6dfd2" />
+        <gridHelper args={[18, 18, "#2c3539", "#1b2327"]} />
         <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
           <planeGeometry args={[18, 18]} />
-          <meshStandardMaterial color="#0b2028" roughness={0.9} />
+          <meshStandardMaterial color="#121b20" roughness={0.9} />
         </mesh>
         <MachineTwin
           binding={machineBinding}
@@ -115,14 +115,6 @@ export default function FactoryScene({
           visualPresentation={visualPresentation}
           onSelectMachine={onSelectMachine}
         />
-        <aside className="scene-visual-legend" aria-label="3D 설비 표현 설명">
-          <strong>범용 수직형 CNC 표현</strong>
-          <span>밝은 원판: RPM에 반응하는 스핀들 표시</span>
-          <span>위쪽 표시등: 현재 상태</span>
-          <span>바닥의 노란 원: 선택된 설비</span>
-          <span>대표 공작물: SIMULATED</span>
-          <span>공장 배치: SIMULATED_LAYOUT</span>
-        </aside>
         {isSceneReady && <span className="visually-hidden">3D 장면 준비됨</span>}
       </div>
       <MachineInspectionControls
@@ -152,54 +144,75 @@ function MachineInspectionControls({
   selectPart: (partId?: MachineInspectionPartId) => void;
   toggleEnclosure: () => void;
 }) {
-  const cameraButtons: Array<[string, CameraCommandType]> = [
-    ["확대", "ZOOM_IN"], ["축소", "ZOOM_OUT"], ["왼쪽 회전", "ROTATE_LEFT"],
-    ["오른쪽 회전", "ROTATE_RIGHT"], ["위로 회전", "ROTATE_UP"],
-    ["아래로 회전", "ROTATE_DOWN"], ["전체 보기", "RESET"],
+  const cameraButtons: Array<[string, string, CameraCommandType]> = [
+    ["축소", "−", "ZOOM_OUT"],
+    ["확대", "+", "ZOOM_IN"],
+    ["전체 보기", "⌂", "RESET"],
   ];
   return (
     <aside className="machine-inspection-panel" aria-label="3D 카메라와 부품 검사">
       <div className="camera-button-grid" role="group" aria-label="3D 카메라 조작">
-        {cameraButtons.map(([label, command]) => (
-          <button type="button" key={command} onClick={() => issueCameraCommand(command)}>
-            {label}
-          </button>
-        ))}
-        <button
-          type="button"
-          disabled={!selectedPartId}
-          onClick={() => issueCameraCommand("FOCUS_PART", selectedPartId)}
-        >
-          선택 부품 맞춤
-        </button>
-      </div>
-      <div className="inspection-part-list" role="group" aria-label="기능 부품 선택">
-        {model && Object.entries(model.inspection.parts).map(([id, part]) => (
+        {cameraButtons.map(([label, symbol, command]) => (
           <button
             type="button"
-            key={id}
-            aria-pressed={selectedPartId === id}
-            onClick={() => selectPart(id as MachineInspectionPartId)}
+            aria-label={label}
+            title={label}
+            key={command}
+            onClick={() => issueCameraCommand(command)}
           >
-            {part.label}
+            <span aria-hidden="true">{symbol}</span>
           </button>
         ))}
       </div>
-      <button
-        type="button"
-        aria-pressed={isEnclosureTransparent}
-        disabled={!model?.inspection.enclosure}
-        onClick={toggleEnclosure}
-      >
-        외함 반투명
-      </button>
-      {!model?.inspection.enclosure && model && (
-        <span className="inspection-capability-note">이 모델은 외함 투명화를 지원하지 않습니다.</span>
-      )}
+      <label className="inspection-part-select">
+        <span>부품 살펴보기</span>
+        <select
+          aria-label="부품 살펴보기"
+          value={selectedPartId ?? ""}
+          disabled={!model}
+          onChange={(event) => selectPart(
+            event.target.value
+              ? event.target.value as MachineInspectionPartId
+              : undefined,
+          )}
+        >
+          <option value="">부품을 선택하세요</option>
+          {model && Object.entries(model.inspection.parts).map(([id, part]) => (
+            <option value={id} key={id}>{part.label}</option>
+          ))}
+        </select>
+      </label>
+      <details className="inspection-options">
+        <summary>보기 옵션</summary>
+        <label>
+          <input
+            type="checkbox"
+            checked={isEnclosureTransparent}
+            disabled={!model?.inspection.enclosure}
+            onChange={toggleEnclosure}
+          />
+          외함 반투명
+        </label>
+        {!model?.inspection.enclosure && model && (
+          <span className="inspection-capability-note">이 모델은 외함 투명화를 지원하지 않습니다.</span>
+        )}
+      </details>
+      <details className="scene-model-info">
+        <summary>모델 정보</summary>
+        <span>범용 수직형 CNC 표현</span>
+        <span>밝은 원판: RPM에 반응하는 스핀들 표시</span>
+        <span>위쪽 표시등: 현재 상태</span>
+        <span>바닥의 노란 원: 선택된 설비</span>
+        <span>대표 공작물: SIMULATED</span>
+        <span>공장 배치: SIMULATED_LAYOUT</span>
+      </details>
       <span className="visually-hidden" role="status">
         {selectedPartId && model ? `${model.inspection.parts[selectedPartId].label} 선택됨` : "선택한 부품 없음"}
       </span>
-      <span className="inspection-keyboard-help">방향키 회전 · +/- 확대 · Home 전체 보기 · Esc 선택 해제</span>
+      <details className="inspection-help">
+        <summary>조작법</summary>
+        <span>드래그 회전 · 휠 확대 · 방향키 회전 · +/- 확대 · Home 전체 보기 · Esc 선택 해제</span>
+      </details>
     </aside>
   );
 }
