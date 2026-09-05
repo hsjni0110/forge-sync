@@ -1,3 +1,5 @@
+import { BASELINE_MINIMUM_SAMPLE_COUNT } from "./processGlossary";
+
 export interface ProcessCursor {
   replaySessionId: string;
   replaySequence: number;
@@ -43,9 +45,12 @@ export interface AssessmentReason {
   feature: string; target: number; median: number; difference: number;
   percentage?: number | null; direction: string; sampleCount: number; code: string;
 }
+export interface FeatureBaselineSummary {
+  feature: string; sampleCount: number; unavailableReason: string | null;
+}
 export interface Assessment {
   status: string; classification?: string | null; score?: number | null;
-  reasons: AssessmentReason[]; evidence: TraceEntry[];
+  reasons: AssessmentReason[]; evidence: TraceEntry[]; featureBaselines?: FeatureBaselineSummary[];
 }
 
 export function currentRun(runs: MachiningRun[], cursor: ProcessCursor) {
@@ -63,6 +68,40 @@ const RUN_STATUS_LABEL: Record<string, string> = {
 export function runStatusLabel(run: MachiningRun): string {
   const base = RUN_STATUS_LABEL[run.status] ?? run.status;
   return run.endedAt === undefined ? `${base} · 종료 근거 미확정` : base;
+}
+
+export function limitingFeatureBaseline(featureBaselines: FeatureBaselineSummary[] = []): FeatureBaselineSummary | undefined {
+  const pending = featureBaselines.filter((baseline) => baseline.unavailableReason === "MINIMUM_SAMPLE_COUNT_NOT_MET");
+  if (pending.length === 0) return undefined;
+  return pending.find((baseline) => baseline.feature === "durationSeconds") ??
+    pending.reduce((best, current) => (current.sampleCount > best.sampleCount ? current : best));
+}
+
+export function sampleProgressLabel(assessment?: Pick<Assessment, "status" | "featureBaselines">): string | undefined {
+  if (!assessment || assessment.status !== "INSUFFICIENT_DATA") return undefined;
+  const limiting = limitingFeatureBaseline(assessment.featureBaselines);
+  return limiting ? `${limiting.sampleCount}/${BASELINE_MINIMUM_SAMPLE_COUNT}` : undefined;
+}
+
+export function assessmentUnavailableExplanation(
+  program: string | undefined,
+  assessment: Pick<Assessment, "status" | "featureBaselines">,
+): string | undefined {
+  if (assessment.status === "AVAILABLE") return undefined;
+  if (assessment.status === "UNAVAILABLE") {
+    return program
+      ? "이 가공 자체의 측정값이 부족해 비교 기준을 만들 수 없습니다."
+      : "이 가공은 프로그램 정보가 확인되지 않아 비교 기준을 만들 수 없습니다.";
+  }
+  if (assessment.status === "PARTIAL") {
+    return "일부 측정값은 비교했지만, 다른 일부는 같은 프로그램의 이전 가공이 아직 부족합니다.";
+  }
+  const limiting = limitingFeatureBaseline(assessment.featureBaselines);
+  if (!limiting) return "같은 프로그램의 이전 가공이 아직 충분하지 않습니다.";
+  const remaining = BASELINE_MINIMUM_SAMPLE_COUNT - limiting.sampleCount;
+  const programLabel = program ? `프로그램 ${program}` : "이 프로그램";
+  return `같은 ${programLabel}의 이전 가공이 아직 ${limiting.sampleCount}건입니다. `
+    + `최소 ${BASELINE_MINIMUM_SAMPLE_COUNT}건이 쌓여야 비교할 수 있습니다 (${remaining}건 더 필요).`;
 }
 
 export function hasMatchingWatermark(cursor: ProcessCursor, session: {

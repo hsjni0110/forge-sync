@@ -41,6 +41,10 @@ export function mapProcessAnalysis(runs: RunDocument, features: FeatureDocument,
             target: reason.targetValue, median: reason.baselineMedian, difference: reason.difference,
             percentage: reason.percentageDifference, direction: reason.direction,
             sampleCount: reason.sampleCount, code: reason.reasonCode })),
+          featureBaselines: assessment.baseline.featureBaselines.map((baseline) => ({
+            feature: baseline.featureKey, sampleCount: baseline.sampleCount,
+            unavailableReason: baseline.unavailableReason ?? null,
+          })),
         },
       };
     }).sort((a, b) => a.startSequence - b.startSequence || a.id.localeCompare(b.id)),

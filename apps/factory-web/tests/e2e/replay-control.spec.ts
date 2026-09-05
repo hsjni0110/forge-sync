@@ -39,13 +39,14 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(page.getByText("일시정지됨", { exact: true })).toBeVisible();
   // Scrub the browser range input to just after the reviewed READY boundary.
   // The source fixture and original boundary evidence are pinned in the run contract fixture.
+  // Dragging the scrubber and releasing (native "change") seeks immediately —
+  // there is no separate confirm step.
   await page.getByRole("slider", { name: "Replay timeline" }).evaluate((input) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
     setter?.call(input, String(Date.parse("2016-10-05T09:21:00.740Z")));
     input.dispatchEvent(new Event("input", { bubbles: true }));
     input.dispatchEvent(new Event("change", { bubbles: true }));
   });
-  await page.getByRole("button", { name: "선택 시점으로 이동" }).click();
   const analysis = page.locator(".process-analysis");
   await expect(analysis).toHaveAttribute("data-process-session", /.+/, { timeout: 60_000 });
   const twinResponse = await request.get(`${apiBaseUrl}/api/v1/machines/Mazak01/twin`, {

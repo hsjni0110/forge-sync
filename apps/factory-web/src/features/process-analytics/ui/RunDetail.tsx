@@ -1,11 +1,13 @@
 import type { MachiningRun, TraceEntry } from "../domain/processAnalysis";
-import { runStatusLabel } from "../domain/processAnalysis";
+import { assessmentUnavailableExplanation, runStatusLabel } from "../domain/processAnalysis";
+import { GLOSSARY } from "../domain/processGlossary";
+import { HelpTip } from "./HelpTip";
 
 export function RunDetail({ run }: { run: MachiningRun }) {
   return <article className="run-detail" aria-label="선택한 가공 상세">
     <header className="run-detail-header">
       <div>
-        <h3>선택한 가공 · {run.program ?? "프로그램 미확인"}</h3>
+        <h3>선택한 가공 · {run.program ?? "프로그램 미확인"}<HelpTip text={GLOSSARY.program} /></h3>
         <p className="run-detail-time">
           <span><strong>시작</strong> {formatUtc(run.startedAt)}</span>
           <span><strong>종료</strong> {run.endedAt ? formatUtc(run.endedAt) : "근거 미확정"}</span>
@@ -13,46 +15,52 @@ export function RunDetail({ run }: { run: MachiningRun }) {
       </div>
       <div className="run-detail-badges">
         <span className="status-badge">{runStatusLabel(run)}</span>
-        <span className="provenance-tag" title="관측값을 계산 규칙으로 재구성한 분석값입니다.">DERIVED</span>
+        <span className="provenance-tag">DERIVED</span><HelpTip text={GLOSSARY.derived} />
       </div>
     </header>
-    <p className="section-note">신뢰도 {confidenceLabel(run.confidence)} · {run.reasons.map(reasonLabel).join(" · ")}</p>
-    <TraceDetails title="가공의 관측 근거" entries={run.evidence} observed />
+    <p className="section-note">신뢰도 {confidenceLabel(run.confidence)}<HelpTip text={GLOSSARY.confidence} /> · {run.reasons.map(reasonLabel).join(" · ")}</p>
+    <TraceDetails title="가공의 관측 근거" helpText={GLOSSARY.observedEvidence} entries={run.evidence} observed />
     <section className="run-detail-block" aria-label="PROCESS · 공정 특징">
-      <h3>PROCESS · 공정 특징</h3>
+      <h3>PROCESS · 공정 특징<HelpTip text={GLOSSARY.cyclePurpose} /></h3>
       {!run.feature ? <p className="empty-state">완료된 가공만 분석 가능</p> : <>
         <p className="run-detail-badges">
           <span className="status-badge">{dataStatusLabel(run.feature.status)}</span>
           <span className="provenance-tag">DERIVED</span>
         </p>
         <dl className="definition-list">
-          <div><dt>가공 구간</dt><dd>{run.feature.durationSeconds} 초</dd></div>
-          <div><dt>절삭 시간</dt><dd>{quantity(run.feature.cuttingSeconds, "초")}</dd></div>
-          <div><dt>유휴 시간</dt><dd>{quantity(run.feature.idleSeconds, "초")}</dd></div>
-          <div><dt>상태 coverage</dt><dd>{coverage(run.feature.coverageRatio)}</dd></div>
+          <div><dt>가공 구간<HelpTip text={GLOSSARY.runDuration} /></dt><dd>{run.feature.durationSeconds} 초</dd></div>
+          <div><dt>절삭 시간<HelpTip text={GLOSSARY.cuttingSeconds} /></dt><dd>{quantity(run.feature.cuttingSeconds, "초")}</dd></div>
+          <div><dt>유휴 시간<HelpTip text={GLOSSARY.idleSeconds} /></dt><dd>{quantity(run.feature.idleSeconds, "초")}</dd></div>
+          <div><dt>상태 coverage<HelpTip text={GLOSSARY.stateCoverage} /></dt><dd>{coverage(run.feature.coverageRatio)}</dd></div>
         </dl>
         {run.feature.metrics.map((metric, index) => <article className="metric-card" key={index}>
           <h4>{metricLabel(metric.metric)} · {metric.component ?? "채널 미확인"} · {metric.sourceDataItem}</h4>
-          <p>{dataStatusLabel(metric.status)} · coverage {coverage(metric.coverageRatio)}</p>
-          <dl className="definition-list"><div><dt>시간 가중 평균</dt><dd>{quantity(metric.mean, metric.unit)}</dd></div>
-            <div><dt>최대</dt><dd>{quantity(metric.maximum, metric.unit)}</dd></div>
-            <div><dt>표준편차</dt><dd>{quantity(metric.standardDeviation, metric.unit)}</dd></div></dl>
-          <TraceDetails title="측정값 계산 근거" entries={metric.evidence} />
+          <p>{dataStatusLabel(metric.status)} · coverage {coverage(metric.coverageRatio)}<HelpTip text={GLOSSARY.metricCoverage} /></p>
+          <dl className="definition-list">
+            <div><dt>시간 가중 평균<HelpTip text={GLOSSARY.timeWeightedMean} /></dt><dd>{quantity(metric.mean, metric.unit)}</dd></div>
+            <div><dt>최대<HelpTip text={GLOSSARY.maximum} /></dt><dd>{quantity(metric.maximum, metric.unit)}</dd></div>
+            <div><dt>표준편차<HelpTip text={GLOSSARY.standardDeviation} /></dt><dd>{quantity(metric.standardDeviation, metric.unit)}</dd></div>
+          </dl>
+          <TraceDetails title="측정값 계산 근거" helpText={GLOSSARY.rawEvidence} entries={metric.evidence} />
         </article>)}
-        <TraceDetails title="특징 계산·단위·coverage·출처" entries={run.feature.evidence} />
+        <TraceDetails title="특징 계산·단위·coverage·출처" helpText={GLOSSARY.rawEvidence} entries={run.feature.evidence} />
       </>}
     </section>
     <section className="run-detail-block" aria-label="ANOMALY · 이전 가공과의 차이">
-      <h3>ANOMALY · 이전 가공과의 차이</h3>
+      <h3>ANOMALY · 이전 가공과의 차이<HelpTip text={GLOSSARY.anomalyPurpose} /></h3>
       {!run.assessment ? <p className="empty-state">완료된 가공만 분석 가능</p> : <>
         <p className="status-badge">{dataStatusLabel(run.assessment.status)}</p>
-        {run.assessment.score != null && <p className="anomaly-score">차이 점수 {run.assessment.score} · {classificationLabel(run.assessment.classification)}</p>}
+        {run.assessment.status !== "AVAILABLE" && (
+          <p className="section-note">{assessmentUnavailableExplanation(run.program, run.assessment)}</p>
+        )}
+        {run.assessment.score != null && <p className="anomaly-score">차이 점수 {run.assessment.score} · {classificationLabel(run.assessment.classification)}<HelpTip text={GLOSSARY.anomalyScore} /></p>}
         <p className="section-note">같은 프로그램의 이전 가공과 비교한 분석값(DERIVED)이며 고장 판정이 아닙니다.</p>
         <ol className="anomaly-reasons" aria-label="차이의 상위 이유">{run.assessment.reasons.map((reason) => <li key={reason.feature}>
           {featureLabel(reason.feature)}: 관측 기반 값 {reason.target}, 기준선 중앙값 {reason.median}, 차이 {reason.difference}
           {reason.percentage != null ? ` (${reason.percentage}%)` : " · 백분율 차이는 계산할 수 없음"} · 비교 표본 {reason.sampleCount}개 · {reasonLabel(reason.code)}
+          <HelpTip text={GLOSSARY.baselineMedianSpread} />
         </li>)}</ol>
-        <TraceDetails title="기준선·비교 구간·기여 항목·출처" entries={run.assessment.evidence} />
+        <TraceDetails title="기준선·비교 구간·기여 항목·출처" helpText={GLOSSARY.rawEvidence} entries={run.assessment.evidence} />
       </>}
     </section>
   </article>;
@@ -77,10 +85,10 @@ function reasonLabel(code: string): string {
   } as Record<string, string>)[code] ?? code;
 }
 
-export function TraceDetails({ title, entries, observed = false }: {
-  title: string; entries: TraceEntry[]; observed?: boolean;
+export function TraceDetails({ title, helpText, entries, observed = false }: {
+  title: string; helpText?: string; entries: TraceEntry[]; observed?: boolean;
 }) {
-  return <details className="provenance-disclosure"><summary>{title}</summary>
+  return <details className="provenance-disclosure"><summary>{title}{helpText && <HelpTip text={helpText} />}</summary>
     {observed && <>
       <p>OBSERVED · REAL:NIST</p>
       <p className="section-note">실제 NIST Mazak 설비에서 측정된 값이며, ForgeSync가 계산해서 만든 값이 아닙니다.</p>

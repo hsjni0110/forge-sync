@@ -4,8 +4,10 @@ import type { ReplaySessionState } from "../../replay/domain/replay";
 import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
 import { HttpProcessAnalysisClient } from "../adapters/httpProcessAnalysisClient";
 import type { ProcessAnalysisClient } from "../application/ports";
-import { currentRun, runStatusLabel, type MachiningRun, type RunAnalysis } from "../domain/processAnalysis";
+import { currentRun, runStatusLabel, sampleProgressLabel, type MachiningRun, type RunAnalysis } from "../domain/processAnalysis";
+import { GLOSSARY } from "../domain/processGlossary";
 import { classificationLabel, confidenceLabel, RunDetail } from "./RunDetail";
+import { HelpTip } from "./HelpTip";
 import { useProcessAnalysis } from "./useProcessAnalysis";
 
 const browserClient = new HttpProcessAnalysisClient(import.meta.env.VITE_API_BASE_URL ?? "");
@@ -31,11 +33,11 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
     {layout === "FULL" && <div className="process-glossary">
       <strong>이 화면을 읽는 방법</strong>
       <dl>
-        <div><dt>OBSERVED</dt><dd>설비에서 실제로 측정된 값입니다.</dd></div>
-        <div><dt>DERIVED</dt><dd>관측값을 계산 규칙으로 재구성한 분석값이며, 그 자체가 측정값은 아닙니다.</dd></div>
-        <div><dt>신뢰도</dt><dd>시작·종료·프로그램 근거가 얼마나 충분한지를 나타냅니다.</dd></div>
-        <div><dt>coverage</dt><dd>분석 구간 중 실제 관측값이 차지한 비율입니다. 낮을수록 결측이 많다는 뜻입니다.</dd></div>
-        <div><dt>기준선</dt><dd>같은 설비·같은 프로그램의 이전 가공들로 계산한 비교 기준(중앙값과 산포)입니다.</dd></div>
+        <div><dt>OBSERVED</dt><dd>{GLOSSARY.observed}</dd></div>
+        <div><dt>DERIVED</dt><dd>{GLOSSARY.derived}</dd></div>
+        <div><dt>신뢰도</dt><dd>{GLOSSARY.confidence}</dd></div>
+        <div><dt>coverage</dt><dd>{GLOSSARY.coverageOverview}</dd></div>
+        <div><dt>기준선</dt><dd>{GLOSSARY.baseline}</dd></div>
       </dl>
     </div>}
     <section className="detail-section" aria-label="CURRENT RUN · 현재 가공">
@@ -43,12 +45,12 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
       {!analysis ? <p role="status">{message}</p> : current ? <>
         <p className="run-detail-badges">
           <span className="status-badge" data-status="active">{runStatusLabel(current)}</span>
-          <span className="provenance-tag" title="관측값을 계산 규칙으로 재구성한 분석값입니다.">DERIVED</span>
+          <span className="provenance-tag">DERIVED</span><HelpTip text={GLOSSARY.derived} />
         </p>
         <dl className="definition-list">
-          <div><dt>프로그램</dt><dd>{current.program ?? "확인할 수 없음"}</dd></div>
+          <div><dt>프로그램<HelpTip text={GLOSSARY.program} /></dt><dd>{current.program ?? "확인할 수 없음"}</dd></div>
           <div><dt>시작 시각</dt><dd>{current.startedAt}</dd></div>
-          <div><dt>신뢰도</dt><dd>{confidenceLabel(current.confidence)}</dd></div>
+          <div><dt>신뢰도<HelpTip text={GLOSSARY.confidence} /></dt><dd>{confidenceLabel(current.confidence)}</dd></div>
         </dl>
       </> : <p>현재 가공 없음</p>}
       <button type="button" disabled={!canRetry} onClick={retry}>{analysis ? "분석 다시 계산" : "분석 다시 시도"}</button>
@@ -76,6 +78,7 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
               onClick={() => setSelection({ analysis, runId: run.id })}>
               <span className="run-row-main">
                 <span className="run-timeline-badge">{badge.label}</span>
+                {badge.detail && <span className="run-timeline-badge-detail">{badge.detail}</span>}
                 <span className="run-row-program">PGM {run.program ?? "미확인"}</span>
                 <span className="run-row-time">
                   {formatTimeOfDay(run.startedAt)} → {run.endedAt ? formatTimeOfDay(run.endedAt) : "종료 미확인"}
@@ -225,7 +228,7 @@ function RunRowCompare({ compare }: { compare: { current: number; median: number
   );
 }
 
-function runTimelineBadge(run: MachiningRun): { label: string; tone?: "deviating" | "high_deviation" } {
+function runTimelineBadge(run: MachiningRun): { label: string; tone?: "deviating" | "high_deviation"; detail?: string } {
   if (run.status !== "COMPLETED" || run.endedAt === undefined) {
     return { label: runStatusLabel(run) };
   }
@@ -236,5 +239,5 @@ function runTimelineBadge(run: MachiningRun): { label: string; tone?: "deviating
       tone: classification === "HIGH_DEVIATION" ? "high_deviation" : classification === "DEVIATING" ? "deviating" : undefined,
     };
   }
-  return { label: "비교 불가" };
+  return { label: "비교 불가", detail: sampleProgressLabel(run.assessment) };
 }

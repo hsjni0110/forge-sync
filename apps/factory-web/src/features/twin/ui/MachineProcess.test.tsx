@@ -116,6 +116,7 @@ describe("Machine Detail process analysis", () => {
     const fetch = showProcess(structuredClone(runFixture));
     const timelineItem = await screen.findByRole("button", { name: /가공 선택 · 155/ });
     expect(within(timelineItem).getByText("비교 불가")).toBeTruthy();
+    expect(within(timelineItem).getByText("0/5")).toBeTruthy();
     fireEvent.click(timelineItem);
     const process = screen.getByRole("region", { name: "PROCESS · 공정 특징" });
     expect(within(process).getByText("120 REVOLUTION/MINUTE")).toBeTruthy();
@@ -123,6 +124,7 @@ describe("Machine Detail process analysis", () => {
     expect(within(process).getAllByText("데이터 없음").length).toBeGreaterThan(0);
     const anomaly = screen.getByRole("region", { name: "ANOMALY · 이전 가공과의 차이" });
     expect(within(anomaly).getByText("비교 표본 부족")).toBeTruthy();
+    expect(within(anomaly).getByText(/같은 프로그램 155의 이전 가공이 아직 0건입니다/)).toBeTruthy();
     expect(within(anomaly).queryByText("0%")).toBeNull();
     expect(screen.getByText("OBSERVED · REAL:NIST")).toBeTruthy();
     expect(screen.getByText("startEvidence / sourceEventKey").parentElement?.lastElementChild?.textContent)

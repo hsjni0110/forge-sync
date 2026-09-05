@@ -35,7 +35,10 @@ export interface AssessmentDocument {
   assessments: Array<{
     machiningRunId: string; targetFeatureSetId: string; dataStatus: string;
     classification?: string | null; score?: number | null;
-    baseline: { machineId: string; targetFeatureSetId: string };
+    baseline: {
+      machineId: string; targetFeatureSetId: string;
+      featureBaselines: Array<{ featureKey: string; sampleCount: number; unavailableReason?: string | null }>;
+    };
     lineage: { inputCycleFeature: { featureProcessingRunId: string } };
     topReasons: Array<{
       featureKey: string; targetValue: number; baselineMedian: number; difference: number;
