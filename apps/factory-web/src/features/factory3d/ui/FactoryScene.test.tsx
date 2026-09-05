@@ -12,8 +12,18 @@ import FactoryScene from "./FactoryScene";
 
 const loadVerifiedGlbAsset = vi.hoisted(() => vi.fn());
 const canvasBehavior = vi.hoisted(() => ({ rendersScene: true }));
+const cameraCommands = vi.hoisted(() => [] as unknown[]);
+const reducedMotionValues = vi.hoisted(() => [] as boolean[]);
 
 vi.mock("../adapters/verifiedGlbAsset", () => ({ loadVerifiedGlbAsset }));
+vi.mock("./MachineInspectionOverlay", () => ({ MachineInspectionOverlay: () => null }));
+vi.mock("./CameraNavigationRig", () => ({
+  CameraNavigationRig: ({ command, isReducedMotion }: { command?: unknown; isReducedMotion: boolean }) => {
+    if (command) cameraCommands.push(command);
+    reducedMotionValues.push(isReducedMotion);
+    return null;
+  },
+}));
 
 vi.mock("@react-three/fiber", async () => {
   const React = await import("react");
@@ -48,6 +58,8 @@ afterEach(() => {
   cleanup();
   loadVerifiedGlbAsset.mockReset();
   canvasBehavior.rendersScene = true;
+  cameraCommands.length = 0;
+  reducedMotionValues.length = 0;
   vi.restoreAllMocks();
 });
 
@@ -113,9 +125,32 @@ describe("FactoryScene asset isolation", () => {
       );
 
       await waitFor(() => expect(onAssetFallback).toHaveBeenCalledOnce());
-      expect(container.querySelector('group[name="generic-cnc-primitive"]')).toBeTruthy();
+      expect(container.querySelector('primitive[name="machine-root"]')).toBeTruthy();
     },
   );
+
+  it("falls back atomically when GLB node contract validation fails", async () => {
+    loadVerifiedGlbAsset.mockImplementation(() => {
+      throw new Error("Machine model node main-spindle is missing");
+    });
+    const onAssetFallback = vi.fn();
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { container } = render(
+      <Suspense fallback={<div>asset loading</div>}>
+        <FactoryScene
+          machineBinding={binding(externalAsset)}
+          visualState={visualState}
+          visualPresentation={visualPresentation}
+          onSelectMachine={vi.fn()}
+          onAssetFallback={onAssetFallback}
+          onUnavailable={vi.fn()}
+        />
+      </Suspense>,
+    );
+
+    await waitFor(() => expect(onAssetFallback).toHaveBeenCalledOnce());
+    expect(container.querySelectorAll('primitive[name="machine-root"]')).toHaveLength(1);
+  });
 
   it("selects the same machine from the 3D object and accessible floating label", async () => {
     const onSelectMachine = vi.fn();
@@ -141,7 +176,7 @@ describe("FactoryScene asset isolation", () => {
     expect(onSelectMachine).toHaveBeenNthCalledWith(2, "Mazak01");
   });
 
-  it("renders a recognizable generic vertical CNC with named operator cues", async () => {
+  it("renders the procedural model with named operator cues", async () => {
     const { container } = render(
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
@@ -154,18 +189,57 @@ describe("FactoryScene asset isolation", () => {
     );
 
     await screen.findByText("Twin v4");
-    for (const partName of [
-      "cnc-enclosure",
-      "cnc-work-envelope",
-      "cnc-work-table",
-      "cnc-spindle-head",
-      "cnc-control-panel",
-      "cnc-status-tower",
-    ]) {
-      expect(container.querySelector(`[name="${partName}"]`)).toBeTruthy();
-    }
+    expect(container.querySelector('primitive[name="machine-root"]')).toBeTruthy();
     expect(screen.getByText("범용 수직형 CNC 표현")).toBeTruthy();
     expect(screen.getByText(/밝은 원판: RPM에 반응하는 스핀들 표시/)).toBeTruthy();
+  });
+
+  it("provides the complete functional node hierarchy and simulated workpiece provenance", async () => {
+    const { container } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    await screen.findByText("Twin v4");
+    expect(container.querySelector('primitive[name="machine-root"]')).toBeTruthy();
+    expect(screen.getByText(/대표 공작물: SIMULATED/)).toBeTruthy();
+    expect(screen.getByText(/공장 배치: SIMULATED_LAYOUT/)).toBeTruthy();
+  });
+
+  it("offers equivalent camera buttons, keyboard commands, and part focus", async () => {
+    render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        isReducedMotion
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    const viewport = await screen.findByLabelText("3D 조작 영역");
+    fireEvent.click(screen.getByRole("button", { name: "확대" }));
+    fireEvent.keyDown(viewport, { key: "ArrowLeft" });
+    fireEvent.click(screen.getByRole("button", { name: "Main Chuck" }));
+
+    expect(cameraCommands).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: "ZOOM_IN" }),
+      expect.objectContaining({ type: "ROTATE_LEFT" }),
+      expect.objectContaining({ type: "FOCUS_PART", partId: "mainChuck" }),
+    ]));
+    expect(screen.getByRole("button", { name: "Main Chuck" }).getAttribute("aria-pressed"))
+      .toBe("true");
+    expect(screen.getByRole<HTMLButtonElement>("button", { name: "선택 부품 맞춤" }).disabled)
+      .toBe(false);
+    expect(reducedMotionValues).toContain(true);
   });
 
   it("renders textual warning and stale cues without relying on color", async () => {
@@ -207,11 +281,7 @@ describe("FactoryScene asset isolation", () => {
         name: /Mazak01 Twin v4 오래된 데이터 49 RPM 시각 회전 꺼짐/,
       }),
     ).toBeTruthy();
-    expect(
-      container.querySelector(
-        'group[name="generic-cnc-primitive"] meshstandardmaterial[color="#48545a"][opacity="0.62"]',
-      ),
-    ).toBeTruthy();
+    expect(container.querySelector('primitive[name="machine-root"]')).toBeTruthy();
   });
 });
 
@@ -219,7 +289,7 @@ function binding(asset: typeof proceduralAsset | GlbFactoryAsset): MachineSceneB
   return {
     machineId: "Mazak01",
     sceneNodeId: "mazak01",
-    asset,
+    asset: asset.representation === "GLB" ? { ...asset } : asset,
     position: [0, 0, 0],
     rotation: [0, 0, 0],
     scale: [1, 1, 1],
@@ -248,7 +318,7 @@ const proceduralAsset = {
   displayName: "Procedural CNC test asset",
   representation: "PROCEDURAL" as const,
   origin: "PROJECT_PROCEDURAL" as const,
-  sourceLocator: "apps/factory-web/src/features/factory3d/ui/GenericMachinePrimitive.tsx",
+  sourceLocator: "apps/factory-web/src/features/factory3d/ui/model/createProceduralMachineModel.ts",
   license: {
     expression: "NOASSERTION",
     evidenceState: "TO_VERIFY" as const,

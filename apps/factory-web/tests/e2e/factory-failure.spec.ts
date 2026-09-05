@@ -32,6 +32,14 @@ test("available WebGL keeps the 3D factory scene visible", async ({ page }) => {
   await machineLabel.click();
   await expect(machineLabel).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator(".machine-summary .machine-version")).toHaveText("v4");
+  await page.getByRole("button", { name: "확대", exact: true }).click();
+  await page.getByRole("button", { name: "Main Chuck", exact: true }).click();
+  await expect(page.getByText("Main Chuck 선택됨", { exact: true })).toBeAttached();
+  await expect(page.getByRole("button", { name: "선택 부품 맞춤" })).toBeEnabled();
+  const enclosureToggle = page.getByRole("button", { name: "외함 반투명" });
+  await enclosureToggle.click();
+  await expect(enclosureToggle).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByLabel("시뮬레이션 공장 3D 화면").locator("canvas")).toBeVisible();
 
   await page.getByRole("button", { name: "2D" }).click();
   await expect(page.getByRole("heading", { name: "데이터 품질" })).toBeVisible();

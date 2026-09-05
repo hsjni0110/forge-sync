@@ -12,6 +12,7 @@ export interface FactorySceneProps {
   machineBinding: MachineSceneBinding;
   visualState: MachineVisualState | undefined;
   visualPresentation: MachineVisualPresentation;
+  isReducedMotion?: boolean;
   onSelectMachine: (machineId: string) => void;
   onAssetFallback: () => void;
   onUnavailable: (reason: SceneUnavailableReason) => void;

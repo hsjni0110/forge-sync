@@ -6,7 +6,7 @@
       "displayName": "Generic CNC primitive",
       "representation": "PROCEDURAL",
       "origin": "PROJECT_PROCEDURAL",
-      "sourceLocator": "apps/factory-web/src/features/factory3d/ui/GenericMachinePrimitive.tsx",
+      "sourceLocator": "apps/factory-web/src/features/factory3d/ui/model/createProceduralMachineModel.ts",
       "license": {
         "expression": "NOASSERTION",
         "evidenceState": "TO_VERIFY",

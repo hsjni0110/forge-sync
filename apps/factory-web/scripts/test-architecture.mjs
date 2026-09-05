@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { ESLint } from "eslint";
@@ -24,4 +25,24 @@ assert.ok(
 assert.ok(
   rendererResult.messages.some((message) => message.ruleId === "no-restricted-imports"),
   "3D renderer was allowed to import a Twin/backend response type directly",
+);
+
+const proceduralFactory = await readFile(
+  new URL("../src/features/factory3d/ui/model/createProceduralMachineModel.ts", import.meta.url),
+  "utf8",
+);
+const runtimeBinding = await readFile(
+  new URL("../src/features/factory3d/ui/model/MachineModelBinding.tsx", import.meta.url),
+  "utf8",
+);
+
+assert.doesNotMatch(
+  proceduralFactory,
+  /MachineVisualState|MachineVisualPresentation|features\/twin/,
+  "procedural geometry factory imported runtime or backend Twin state",
+);
+assert.doesNotMatch(
+  runtimeBinding,
+  /(?:Box|Cylinder|Plane|Sphere)Geometry|getObjectByName/,
+  "runtime binding created geometry or searched semantic nodes by name",
 );

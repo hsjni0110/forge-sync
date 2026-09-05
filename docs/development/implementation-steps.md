@@ -605,6 +605,14 @@ PostgreSQL projection과 versioned REST 조회 계약을 구현했다. 높은 de
 
 ### Step 22 — Machine Model Node Contract와 Procedural Skeleton
 
+**상태**: `DONE` (2026-09-05) — procedural geometry와 runtime binding을 분리하고, procedural/GLB가
+공유하는 필수 semantic node 계약과 장면 부착 전 검증을 구현했다. 불완전한 GLB는 부분 렌더링하지
+않고 전체 procedural 모델로 교체하며, 대표 공작물과 배치는 각각 `SIMULATED`,
+`SIMULATED_LAYOUT`으로 표시한다. 구조와 범위는
+[ADR-039](../adr/ADR-039-machine-model-node-contract.md)에 기록했다. 후속으로 모델/부품 자동 framing,
+orbit·zoom·reset, 접근 가능한 부품 검사와 외함 반투명을
+[ADR-040](../adr/ADR-040-machine-inspection-camera.md)으로 추가했다.
+
 **목적**: procedural CNC 생성과 state binding을 분리하고 향후 검증된 GLB가 같은 최소 node contract를
 구현할 수 있게 한다.
 
@@ -679,7 +687,8 @@ PostgreSQL projection과 versioned REST 조회 계약을 구현했다. 높은 de
 **구현 범위**
 
 - execution/spindle/B-axis/tool/current run의 통합 visual composition
-- orbit/zoom/reset, play/pause/speed/scrub의 접근 가능한 control
+- play/pause/speed/scrub의 접근 가능한 control. orbit/zoom/reset과 부품 검사는 Step 22 후속에서
+  선행 완료했으며 이 Step에서는 통합 회귀를 유지한다.
 - observed/inferred/simulated cue와 현재 binding 근거
 - 외관 고도화와 기능 binding을 독립적으로 교체할 수 있는 visual fixture
 

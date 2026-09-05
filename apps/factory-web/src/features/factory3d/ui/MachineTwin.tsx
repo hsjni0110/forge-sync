@@ -1,6 +1,5 @@
-import { use, type ReactNode } from "react";
+import { use, useMemo, type ReactNode } from "react";
 
-import { loadVerifiedGlbAsset } from "../adapters/verifiedGlbAsset";
 import type { FactoryAsset } from "../domain/factoryAsset";
 import type {
   MachineSceneBinding,
@@ -9,8 +8,9 @@ import type {
 import type { MachineVisualPresentation } from "../domain/machineVisualPresentation";
 import { AssetErrorBoundary } from "./AssetErrorBoundary";
 import { GenericMachinePrimitive } from "./GenericMachinePrimitive";
-import { MachineStatusBeacon } from "./MachineStatusBeacon";
-import { SpindleVisualCue } from "./SpindleVisualCue";
+import { MachineModelView, type MachineInspectionViewProps } from "./MachineModelView";
+import { providerFor } from "./model/machineModelProviders";
+import type { MachineTwinModel } from "./model/machineTwinModel";
 
 export function MachineTwin({
   binding,
@@ -18,7 +18,8 @@ export function MachineTwin({
   visualPresentation,
   onSelectMachine,
   onAssetFallback,
-}: {
+  ...inspectionProps
+}: MachineInspectionViewProps & {
   binding: MachineSceneBinding;
   visualState: MachineVisualState | undefined;
   visualPresentation: MachineVisualPresentation;
@@ -38,17 +39,19 @@ export function MachineTwin({
     >
       <AssetErrorBoundary
         fallback={
-          <GenericMachinePrimitive visualPresentation={visualPresentation} />
+          <GenericMachinePrimitive
+            visualPresentation={visualPresentation}
+            {...inspectionProps}
+          />
         }
         onError={onAssetFallback}
       >
         <FactoryAssetModel
           asset={binding.asset}
           visualPresentation={visualPresentation}
+          {...inspectionProps}
         />
       </AssetErrorBoundary>
-      <SpindleVisualCue visualPresentation={visualPresentation} />
-      <MachineStatusBeacon visualPresentation={visualPresentation} />
       {visualState?.selected && (
         <mesh name="selected-machine-cue" rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
           <ringGeometry args={[2.05, 2.25, 48]} />
@@ -62,21 +65,46 @@ export function MachineTwin({
 function FactoryAssetModel({
   asset,
   visualPresentation,
-}: {
+  ...inspectionProps
+}: MachineInspectionViewProps & {
   asset: FactoryAsset;
   visualPresentation: MachineVisualPresentation;
 }): ReactNode {
   if (asset.representation === "PROCEDURAL") {
-    return <GenericMachinePrimitive visualPresentation={visualPresentation} />;
+    return (
+      <GenericMachinePrimitive
+        visualPresentation={visualPresentation}
+        {...inspectionProps}
+      />
+    );
   }
-  return <GlbMachine asset={asset} />;
+  return (
+    <GlbMachine
+      asset={asset}
+      visualPresentation={visualPresentation}
+      {...inspectionProps}
+    />
+  );
 }
 
 function GlbMachine({
   asset,
-}: {
+  visualPresentation,
+  ...inspectionProps
+}: MachineInspectionViewProps & {
   asset: Extract<FactoryAsset, { representation: "GLB" }>;
+  visualPresentation: MachineVisualPresentation;
 }) {
-  const model = use(loadVerifiedGlbAsset(asset));
-  return <primitive object={model.scene} />;
+  const modelPromise = useMemo(
+    () => providerFor(asset).loadMachine(asset.assetId) as Promise<MachineTwinModel>,
+    [asset],
+  );
+  const model = use(modelPromise);
+  return (
+    <MachineModelView
+      model={model}
+      visualPresentation={visualPresentation}
+      {...inspectionProps}
+    />
+  );
 }

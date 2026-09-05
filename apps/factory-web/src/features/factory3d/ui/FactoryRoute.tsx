@@ -186,6 +186,7 @@ export function FactoryRoute({
                       machineBinding={MAZAK01_SCENE_BINDING}
                       visualState={visualState}
                       visualPresentation={visualPresentation}
+                      isReducedMotion={isReducedMotion}
                       onSelectMachine={selectionStore.selectMachine}
                       onAssetFallback={() => setIsAssetFallback(true)}
                       onUnavailable={setUnavailableReason}
