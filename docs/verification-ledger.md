@@ -49,6 +49,21 @@
 | V-031 | 완료 Machining Run의 Cycle Feature `1.0.0`은 unknown 구간을 채우지 않는 시간 가중 계산과 per-channel provenance를 결정적으로 보존한다 | VERIFIED | 10초 golden/coverage/unit mismatch pure tests, producer와 독립 Python consumer가 schema `70f839...083f` 및 fixture `1c0f09...b107` 검증, 실제 PostgreSQL의 atomic query/reuse/late-version/rollback integration tests. `./scripts/verify`, `./scripts/verify-database`, `./scripts/verify-e2e` 통과. [ADR-035](./adr/ADR-035-versioned-cycle-feature-projection.md), [Cycle Feature contract](../contracts/process-analytics/README.md) | 19 | 2026-09-04 |
 | V-032 | Anomaly Assessment `1.0.0`은 동일 설비·프로그램·Cycle Feature version의 엄격히 이전 run만 사용해 median/IQR 차이를 설명하며 높은 score를 Fault, Alarm, Advisory 또는 command로 승격하지 않는다 | VERIFIED | Pure baseline/assessment와 application ordering/reuse tests, producer와 독립 Python consumer가 schema `e8f832...58174` 및 fixture `57bccf...8fbc` 검증, 실제 PostgreSQL의 V007 atomic query/reuse/source-preservation/rollback integration tests. `./scripts/verify`, `FORGESYNC_DATABASE_PORT=15433 ./scripts/verify-database`, `./scripts/verify-e2e`, `git diff --check` 통과. [ADR-036](./adr/ADR-036-explainable-cycle-baseline-and-anomaly-assessment.md), [Anomaly Assessment contract](../contracts/process-analytics/README.md) | 20 | 2026-09-05 |
 
+## Step 21 공정 UI 검증 (2026-09-05)
+
+- **V-033 — VERIFIED**: Step 21의 실제 seek 이후 2D/3D/공정 분석이 같은 권위 Cursor/TwinVersion에
+  수렴한다. `./scripts/verify-e2e`의 Chromium 시나리오 4개가 통과했으며, 확장 Replay 시나리오는
+  분석 상세, 키보드 근거 탐색, marker seek를 검증한다. 스크립트는 broker drop counter 불변과
+  활성 세션의 0번부터 최종 Twin cursor까지 Canonical history 연속성도 확인한다.
+- RED: cross-DataItem cursor 42→41 회귀, 분석 POST preflight 403, 사람이 읽을 수 있는
+  신뢰도·차이 설명 누락을 각각 실제 실패로 확인했다.
+- GREEN: 해당 PostgreSQL 회귀, CORS allowlist, 공정 설명 테스트를 수정 후 통과했다.
+  `./scripts/verify`의 Python/Java/TypeScript 품질 게이트와 프런트엔드 104개 테스트도 통과했다.
+  Node v23.11.0은 저장소의 선언 범위 `>=22.13 <23` 밖이라는 engine 경고가 남는다.
+- 브라우저의 커서 비교나 실패 assertion을 약화하지 않았다. worker 세대 경합 회귀와 유한
+  60,000건/128 MiB broker queue 경계는 [ADR-038](./adr/ADR-038-seek-delivery-backpressure.md)에
+  기록했다. PUBACK를 DB acceptance 또는 exactly-once로 주장하지 않는다.
+
 ## 갱신 규칙
 
 - 근거에는 가능한 경우 artifact hash, source URI, 확인 날짜, tool/version, test/report 경로를 포함한다.

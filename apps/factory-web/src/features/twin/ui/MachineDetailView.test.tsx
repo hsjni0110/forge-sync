@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -73,6 +73,33 @@ describe("MachineDetailView", () => {
     expect(screen.getByText(/마지막으로 받은 값을 표시합니다/)).toBeTruthy();
     expect(screen.getByRole("alert").textContent).toMatch(/실시간 상태로 판단하지 마세요/);
     expect(screen.getAllByText("오래된 데이터").length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("summarizes many condition signals instead of listing every normal one", () => {
+    const template = snapshot.metrics.spindleSpeeds[0];
+    const conditionSnapshot = structuredClone(snapshot);
+    conditionSnapshot.conditions = [
+      { conditionType: "SYSTEM", level: "NORMAL", observation: template.observation, provenance: template.provenance },
+      { conditionType: "COMMUNICATIONS", level: "NORMAL", observation: template.observation, provenance: template.provenance },
+      { conditionType: "LOGIC_PROGRAM", level: "NORMAL", observation: template.observation, provenance: template.provenance },
+      { conditionType: "HYDRAULIC", level: "WARNING", message: "압력 낮음", observation: template.observation, provenance: template.provenance },
+    ];
+
+    render(
+      <MachineDetailView
+        machineId="Mazak01"
+        state={{ connectionStatus: "LIVE", snapshot: conditionSnapshot, freshness: "FRESH" }}
+        retryNow={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByText("정상 3")).toBeTruthy();
+    expect(screen.getByText("주의 1")).toBeTruthy();
+    expect(screen.getByText("HYDRAULIC")).toBeTruthy();
+    const normalDisclosure = screen.getByText("정상 상태 신호 모두 보기 (3개)").closest("details");
+    expect(normalDisclosure).toBeTruthy();
+    expect(within(normalDisclosure!).getByText("SYSTEM")).toBeTruthy();
+    expect(within(normalDisclosure!).queryByText("HYDRAULIC")).toBeNull();
   });
 
   it("shows unavailable for optional metrics without inventing zero", () => {

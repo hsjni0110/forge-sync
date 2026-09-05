@@ -1,9 +1,10 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import type { TwinSessionFactory } from "../application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
-import type { ReplayStatus } from "../../replay/domain/replay";
+import { useReplayController } from "../../replay/ui/useReplayController";
+import { ProcessAnalysisPanel } from "../../process-analytics/ui/ProcessAnalysisPanel";
 import { ReplayControls } from "../../replay/ui/ReplayControls";
 import { useReplayDrivenTwinBootstrap } from "../../replay/ui/useReplayDrivenTwinBootstrap";
 import { MachineDetailView } from "./MachineDetailView";
@@ -62,10 +63,10 @@ function ConnectedMachineDetail({
   replayControlClient?: ReplayControlClient;
   layout: "FULL" | "COMPACT";
 }) {
-  const [replayStatus, setReplayStatus] = useState<ReplayStatus>();
+  const replay = useReplayController(machineId, replayControlClient);
   const createSession = useCallback(() => sessionFactory(machineId), [machineId, sessionFactory]);
   const { state, retryNow } = useTwinLiveSession(createSession);
-  useReplayDrivenTwinBootstrap(replayStatus, state, retryNow);
+  useReplayDrivenTwinBootstrap(replay.session?.status, state, retryNow);
   return (
     <>
       {replayControlClient && (
@@ -74,7 +75,7 @@ function ConnectedMachineDetail({
           client={replayControlClient}
           snapshot={state.snapshot}
           freshness={state.freshness}
-          onStatusChange={setReplayStatus}
+          controller={replay}
         />
       )}
       <MachineDetailView
@@ -83,6 +84,9 @@ function ConnectedMachineDetail({
         retryNow={retryNow}
         layout={layout}
       />
+      {replayControlClient && <ProcessAnalysisPanel machineId={machineId} session={replay.authoritativeSession} twinState={state}
+        retryTwin={retryNow} reloadReplay={replay.reload} seek={(at) => void replay.run("SEEKING", (current) =>
+          replayControlClient.seek(current.replaySessionId, current.revision, at, current.speedMultiplier))} />}
     </>
   );
 }

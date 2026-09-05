@@ -3,111 +3,40 @@ import { useEffect, useState } from "react";
 import type { ReplayControlClient } from "../application/ports";
 import type { ReplaySessionState, ReplayStatus } from "../domain/replay";
 import type { Freshness, TwinSnapshot } from "../../twin/domain/twin";
+import { useReplayController, type ReplayController } from "./useReplayController";
 
-const SOURCE_SET_ID = "nist-mazak01-20161005";
-
-export function ReplayControls({
-  machineId,
-  client,
-  snapshot,
-  freshness,
-  onStatusChange,
-}: {
+interface ReplayControlsProps {
   machineId: string;
   client: ReplayControlClient;
   snapshot?: TwinSnapshot;
   freshness?: Freshness;
   onStatusChange?: (status: ReplayStatus | undefined) => void;
-}) {
-  const [session, setSession] = useState<ReplaySessionState>();
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string>();
-  const [hasLoadFailure, setHasLoadFailure] = useState(false);
-  const [loadRequest, setLoadRequest] = useState(0);
+  onSessionChange?: (session: ReplaySessionState | undefined) => void;
+  controller?: ReplayController;
+}
+
+export function ReplayControls(props: ReplayControlsProps) {
+  return props.controller ? <ReplayControlsView {...props} controller={props.controller} />
+    : <StandaloneReplayControls {...props} />;
+}
+
+function StandaloneReplayControls(props: ReplayControlsProps) {
+  const controller = useReplayController(props.machineId, props.client);
+  return <ReplayControlsView {...props} controller={controller} />;
+}
+
+function ReplayControlsView({
+  client, snapshot, freshness, onStatusChange, onSessionChange, controller,
+}: ReplayControlsProps & { controller: ReplayController }) {
+  const { session, isLoading, error, hasLoadFailure, run, start, reload, isCommandPending } = controller;
   const [seekMillis, setSeekMillis] = useState(0);
-
-  useEffect(() => {
-    let active = true;
-    setIsLoading(true);
-    client
-      .load(machineId)
-      .then((loaded) => {
-        if (active) {
-          setSession(loaded);
-          setHasLoadFailure(false);
-          setError(undefined);
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setHasLoadFailure(true);
-          setError("Replay 상태를 불러오지 못했습니다. 서버 연결을 확인한 뒤 다시 시도해 주세요.");
-        }
-      })
-      .finally(() => {
-        if (active) setIsLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [client, loadRequest, machineId]);
-
   useEffect(() => {
     onStatusChange?.(session?.status);
-  }, [onStatusChange, session?.status]);
-
+    onSessionChange?.(controller.authoritativeSession);
+  }, [session?.status, controller.authoritativeSession, onStatusChange, onSessionChange]);
   useEffect(() => {
-    if (!session) return;
-    const cursorMillis = Date.parse(
-      snapshot?.replayCursor.sourceObservedAt ?? session.sourceRange.startsAt,
-    );
-    setSeekMillis(cursorMillis);
+    if (session) setSeekMillis(Date.parse(snapshot?.replayCursor.sourceObservedAt ?? session.sourceRange.startsAt));
   }, [session?.replaySessionId, snapshot?.replayCursor.sourceObservedAt]);
-
-  useEffect(() => {
-    if (session?.status !== "SEEKING") return;
-    const timer = window.setTimeout(() => {
-      void client
-        .load(machineId)
-        .then((loaded) => setSession(loaded))
-        .catch(() => setError("재생 상태를 확인할 수 없습니다."));
-    }, 250);
-    return () => window.clearTimeout(timer);
-  }, [client, machineId, session]);
-
-  const run = async (
-    optimisticStatus: ReplayStatus,
-    action: (current: ReplaySessionState) => Promise<ReplaySessionState>,
-  ) => {
-    if (!session) return;
-    const previous = session;
-    setSession({ ...previous, status: optimisticStatus });
-    setError(undefined);
-    try {
-      setSession(await action(previous));
-    } catch {
-      try {
-        const authoritative = await client.load(machineId);
-        setSession(authoritative ?? previous);
-      } catch {
-        setSession(previous);
-      }
-      setError("서버가 명령을 받지 않았습니다. 권위 상태로 되돌렸습니다.");
-    }
-  };
-
-  const start = async () => {
-    setIsLoading(true);
-    setError(undefined);
-    try {
-      setSession(await client.start(machineId, SOURCE_SET_ID, 10));
-    } catch {
-      setError("Replay를 시작할 수 없습니다.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <section className="replay-controls" aria-label="Replay 시간 제어">
       <div className="replay-heading">
@@ -119,7 +48,7 @@ export function ReplayControls({
           type="button"
           disabled={isLoading}
           onClick={() =>
-            hasLoadFailure ? setLoadRequest((request) => request + 1) : void start()
+            hasLoadFailure ? void reload() : void start()
           }
         >
           {isLoading ? "Replay 확인 중" : hasLoadFailure ? "Replay 상태 다시 확인" : "Replay 시작"}
@@ -130,6 +59,7 @@ export function ReplayControls({
             {session.status === "RUNNING" ? (
               <button
                 type="button"
+                disabled={isCommandPending}
                 onClick={() => void run("PAUSED", (current) => client.pause(current.replaySessionId, current.revision))}
               >
                 일시정지
@@ -137,7 +67,7 @@ export function ReplayControls({
             ) : (
               <button
                 type="button"
-                disabled={!(["PAUSED"] as ReplayStatus[]).includes(session.status)}
+                disabled={isCommandPending || !(["PAUSED"] as ReplayStatus[]).includes(session.status)}
                 onClick={() => void run("RUNNING", (current) => client.resume(current.replaySessionId, current.revision))}
               >
                 재생
@@ -149,7 +79,7 @@ export function ReplayControls({
                   type="button"
                   key={speed}
                   aria-pressed={session.speedMultiplier === speed}
-                  disabled={!(["RUNNING", "PAUSED"] as ReplayStatus[]).includes(session.status)}
+                  disabled={isCommandPending || !(["RUNNING", "PAUSED"] as ReplayStatus[]).includes(session.status)}
                   onClick={() => void run(session.status, (current) => client.changeSpeed(current.replaySessionId, current.revision, speed))}
                 >
                   {speed}x
@@ -165,13 +95,13 @@ export function ReplayControls({
               max={Date.parse(session.sourceRange.endsAt)}
               step={1000}
               value={seekMillis}
-              disabled={session.status === "SEEKING"}
+              disabled={isCommandPending || session.status === "SEEKING"}
               onChange={(event) => setSeekMillis(Number(event.currentTarget.value))}
             />
           </label>
           <button
             type="button"
-            disabled={session.status === "SEEKING"}
+            disabled={isCommandPending || session.status === "SEEKING"}
             onClick={() => void run("SEEKING", (current) => client.seek(
               current.replaySessionId,
               current.revision,

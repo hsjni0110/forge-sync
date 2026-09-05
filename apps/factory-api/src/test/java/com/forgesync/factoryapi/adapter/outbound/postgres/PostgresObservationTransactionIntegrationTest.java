@@ -287,6 +287,26 @@ class PostgresObservationTransactionIntegrationTest {
   }
 
   @Test
+  void preservesMachineCursorWhenAnotherDataItemArrivesBehindIt() {
+    var newer = replayedObservation("sample-spindle-speed.json", 42);
+    var older = replayedObservation("event-execution.json", 41);
+    assertThat(transaction.storeObservation(newer, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(transaction.storeObservation(older, INGESTED_AT, PROJECTED_AT.plusSeconds(1)))
+        .isEqualTo(IngestionResult.ACCEPTED);
+
+    var projection = twinProjectionReader.findByMachineId("Mazak01").orElseThrow();
+    assertThat(projection.replayCursor().replaySequence()).isEqualTo(42);
+    assertThat(projection.replayCursor().sourceObservedAt()).isEqualTo(newer.sourceObservedAt());
+    assertThat(projection.replayCursor().replayPublishedAt()).isEqualTo(newer.replayPublishedAt());
+    assertThat(projection.replayCursor().twinVersion()).isEqualTo(projection.twinVersion());
+    assertThat(twinVersion("Mazak01")).isEqualTo(2);
+    assertThat(latestReplaySequence(older)).isEqualTo(41);
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(2);
+    assertThat(equipmentStateValue("Mazak01", "execution_state")).isEqualTo("ACTIVE");
+  }
+
+  @Test
   void storesLateHistoryWithoutRollingBackLatestProjection() {
     ValidatedObservationMessage current =
         replayedEvent(42, REPLAY_SESSION_ID, Instant.parse("2016-10-05T09:01:37Z"), "current");

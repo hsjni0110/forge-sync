@@ -2,8 +2,12 @@ import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import type { TwinLiveState } from "../application/TwinLiveSession";
+import type { MachineDetailCondition } from "../application/machineDetailViewModel";
 import { mapTwinToMachineDetail } from "../application/machineDetailViewModel";
 import { TwinConnectionStatus } from "./TwinConnectionStatus";
+
+const NORMAL_LEVEL = "정상";
+const CONDITION_SEVERITY_ORDER = ["고장", "확인할 수 없음", "주의", NORMAL_LEVEL];
 
 interface MachineDetailViewProps {
   machineId: string;
@@ -121,16 +125,7 @@ export function MachineDetailView({
           {detail.conditions.length === 0 ? (
             <p className="empty-state">현재 들어온 상태 신호가 없습니다.</p>
           ) : (
-            <ul className="condition-list">
-              {detail.conditions.map((condition) => (
-                <li key={condition.key}>
-                  <strong>{condition.conditionType}</strong>
-                  <span>{condition.level}</span>
-                  <small>{condition.componentId}</small>
-                  {condition.message && <p>{condition.message}</p>}
-                </li>
-              ))}
-            </ul>
+            <ConditionSummary conditions={detail.conditions} />
           )}
         </DetailSection>
 
@@ -322,4 +317,47 @@ function consistencyLabel(value: string): string {
     DEGRADED: "품질 저하",
     STALE: "오래된 데이터",
   }[value] ?? value;
+}
+
+function ConditionSummary({ conditions }: { conditions: MachineDetailCondition[] }) {
+  const counts = CONDITION_SEVERITY_ORDER
+    .map((level) => ({ level, count: conditions.filter((condition) => condition.level === level).length }))
+    .filter(({ count }) => count > 0);
+  const attention = conditions.filter((condition) => condition.level !== NORMAL_LEVEL);
+  const normal = conditions.filter((condition) => condition.level === NORMAL_LEVEL);
+  return (
+    <>
+      <ul className="condition-summary">
+        {counts.map(({ level, count }) => (
+          <li key={level} data-level={level}>{level} {count}</li>
+        ))}
+      </ul>
+      {attention.length > 0 ? (
+        <ul className="condition-list">
+          {attention.map((condition) => <ConditionItem key={condition.key} condition={condition} />)}
+        </ul>
+      ) : (
+        <p className="empty-state">주의가 필요한 상태 신호가 없습니다.</p>
+      )}
+      {normal.length > 0 && (
+        <details className="provenance-disclosure">
+          <summary>정상 상태 신호 모두 보기 ({normal.length}개)</summary>
+          <ul className="condition-list">
+            {normal.map((condition) => <ConditionItem key={condition.key} condition={condition} />)}
+          </ul>
+        </details>
+      )}
+    </>
+  );
+}
+
+function ConditionItem({ condition }: { condition: MachineDetailCondition }) {
+  return (
+    <li>
+      <strong>{condition.conditionType}</strong>
+      <span>{condition.level}</span>
+      <small>{condition.componentId}</small>
+      {condition.message && <p>{condition.message}</p>}
+    </li>
+  );
 }

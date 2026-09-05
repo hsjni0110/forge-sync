@@ -159,17 +159,29 @@ public final class PostgresObservationTransaction implements ObservationTransact
 
   private void updateMachineVersion(
       ValidatedObservationMessage observation, TwinVersion twinVersion, Instant projectedAt) {
+    // A new value for one DataItem can arrive behind another DataItem's cursor. Keep the
+    // machine watermark while still versioning that field update in this transaction.
     jdbcClient
         .sql(
             """
-            UPDATE equipment_twin_version
+            WITH cursor_order AS (
+              SELECT replay_session_id = :replay_session_id
+                  AND replay_sequence > :replay_sequence AS keep_cursor
+              FROM equipment_twin_version WHERE machine_id = :machine_id
+            )
+            UPDATE equipment_twin_version version
             SET twin_version = :twin_version,
                 projected_at = :projected_at,
-                replay_session_id = :replay_session_id,
-                replay_sequence = :replay_sequence,
-                source_observed_at = :source_observed_at,
-                replay_published_at = :replay_published_at
-            WHERE machine_id = :machine_id
+                replay_session_id = CASE WHEN cursor_order.keep_cursor
+                  THEN version.replay_session_id ELSE :replay_session_id END,
+                replay_sequence = CASE WHEN cursor_order.keep_cursor
+                  THEN version.replay_sequence ELSE :replay_sequence END,
+                source_observed_at = CASE WHEN cursor_order.keep_cursor
+                  THEN version.source_observed_at ELSE :source_observed_at END,
+                replay_published_at = CASE WHEN cursor_order.keep_cursor
+                  THEN version.replay_published_at ELSE :replay_published_at END
+            FROM cursor_order
+            WHERE version.machine_id = :machine_id
             """)
         .param("twin_version", twinVersion.value())
         .param("projected_at", asUtcOffset(projectedAt))

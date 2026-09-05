@@ -57,3 +57,20 @@ actual contributors, median/Q1/Q3/IQR, difference, direction, nullable percentag
 score, top reasons, source ranges, and `DERIVED -> DERIVED CycleFeature -> REAL:NIST` lineage. A
 high deviation remains a Process Analytics result and does not create a Fault, Alarm, Advisory, or
 command.
+
+## Presentation at a stopped Replay Cursor
+
+Machine Detail and Factory compose these contracts after a confirmed pause, completed seek or replay
+end. They use the matching authoritative Twin cursor's session and sequence for segmentation, then
+pass the returned processing identities into feature and assessment processing. All three responses
+must agree before any bundle is shown. Explicit immutable references reuse the GET endpoints above.
+
+CURRENT RUN describes the derived interval at that cursor. An open end is displayed as unconfirmed
+with its original `INTERRUPTED`/`UNKNOWN` status. Feature/assessment detail is available by selecting
+a completed run; a gap is not filled with a previous run. Recalculation creates/reuses immutable
+results and invalidates the previous selection. During playback the UI displays analysis waiting.
+
+Observation evidence carries a display-only `OBSERVED · REAL:NIST` label; wire provenance continues
+to use its existing values. Processing versions, source locators, feature coverage and baseline
+contributors remain accessible in evidence disclosures. See
+[ADR-037](../../docs/adr/ADR-037-cursor-bound-process-analysis-presentation.md).

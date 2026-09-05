@@ -10,12 +10,35 @@ import type { TwinSession, TwinSessionFactory } from "../../twin/application/por
 import type { TwinSnapshot } from "../../twin/domain/twin";
 import { FactoryRoute } from "./FactoryRoute";
 import type { FactorySceneProps } from "./factorySceneContract";
+import type { ProcessAnalysisClient } from "../../process-analytics/application/ports";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
 
 afterEach(cleanup);
 
 describe("FactoryRoute", () => {
+  it("keeps current process analysis available after WebGL fails", async () => {
+    const processAnalysisClient: ProcessAnalysisClient = { analyze: vi.fn().mockResolvedValue({
+      processingId: "runs", featureProcessingId: "features", assessmentProcessingId: "assessments",
+      runs: [{ id: "open", status: "INTERRUPTED", program: "155", startedAt: snapshot.replayCursor.sourceObservedAt,
+        startSequence: snapshot.replayCursor.replaySequence, confidence: "LOW", reasons: ["END_BOUNDARY_INCOMPLETE"], evidence: [] }],
+    }) };
+    const replayControlClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue({ schemaVersion: "1.0.0", machineId: "Mazak01",
+        replaySessionId: snapshot.replayCursor.replaySessionId, sourceSetId: "nist-mazak01-20161005",
+        status: "PAUSED", revision: 2, speedMultiplier: 10, publicationCursor: snapshot.replayCursor,
+        sourceRange: { startsAt: snapshot.replayCursor.sourceObservedAt, endsAt: "2016-10-05T19:15:07.025Z" } }),
+      start: vi.fn(), pause: vi.fn(), resume: vi.fn(), changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    render(<MemoryRouter><FactoryRoute sessionFactory={createSession} replayControlClient={replayControlClient}
+      processAnalysisClient={processAnalysisClient} sceneLoader={async () => ({ default: WebGlFailureScene })} /></MemoryRouter>);
+    expect(await screen.findByText("3D를 사용할 수 없습니다")).toBeTruthy();
+    expect(await screen.findByText("가공 중단 · 종료 근거 미확정")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "공정 분석 상세 보기" }).getAttribute("href")).toBe("/machines/Mazak01");
+    expect(screen.queryByRole("region", { name: "가공 목록과 상세" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "2D" }));
+    expect(await screen.findByRole("region", { name: "가공 목록과 상세" })).toBeTruthy();
+  });
   it("starts in SPLIT mode and switches between accessible 2D and 3D views", async () => {
     const sceneLoader = vi.fn(async () => ({ default: HealthyScene }));
     const sessionFactory = vi.fn(createSession);

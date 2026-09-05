@@ -70,6 +70,7 @@ class ReplayRuntime:
         self._cursor: ReplayPublicationCursor | None = None
         self._failure: str | None = None
         self._worker: threading.Thread | None = None
+        self._worker_generation = 0
         self._seek_target: datetime | None = None
         self._is_publishing = False
         self._is_preparing = False
@@ -128,6 +129,8 @@ class ReplayRuntime:
             raise ValueError("configured source does not belong to machineId")
         with self._condition:
             self._wait_for_publication()
+            self._worker_generation += 1
+            self._condition.notify_all()
             self._session = ReplaySession(uuid4(), observations, speed, self._clock.now())
             self._session.pause(self._clock.now())
             self._machine_id = machine_id
@@ -155,7 +158,10 @@ class ReplayRuntime:
             self._runtime_status = "SEEKING" if seek_target is not None else "RUNNING"
             session.resume(self._clock.now())
             self._revision += 1
-            self._worker = threading.Thread(target=self._publish_loop, daemon=True)
+            worker_generation = self._worker_generation
+            self._worker = threading.Thread(
+                target=self._publish_loop, args=(worker_generation,), daemon=True
+            )
             self._worker.start()
             return self._view()
 
@@ -202,9 +208,11 @@ class ReplayRuntime:
                 raise ReplayNotFoundError("active replay session was not found")
             return self._view()
 
-    def _publish_loop(self) -> None:
+    def _publish_loop(self, worker_generation: int) -> None:
         while True:
             with self._condition:
+                if worker_generation != self._worker_generation:
+                    return
                 session = self._session
                 if session is None or self._runtime_status in {"FAILED", "COMPLETED"}:
                     return
@@ -235,7 +243,7 @@ class ReplayRuntime:
             with self._condition:
                 self._is_publishing = False
                 self._condition.notify_all()
-                if self._session is not session:
+                if worker_generation != self._worker_generation or self._session is not session:
                     return
                 if self._runtime_status == "SEEKING":
                     session.record_seek_publication(published_at)

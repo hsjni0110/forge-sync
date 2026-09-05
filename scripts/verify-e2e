@@ -92,9 +92,27 @@ web_pid=$!
 wait_for_url "http://127.0.0.1:$api_port/actuator/health" "$runtime_directory/api.log"
 wait_for_url "http://127.0.0.1:$web_port" "$runtime_directory/web.log"
 
+broker_drops_before=$(run_mqtt_compose exec --no-TTY broker \
+  mosquitto_sub -h 127.0.0.1 -t '$SYS/broker/publish/messages/dropped' -C 1 -W 3)
+
 FORGESYNC_REPOSITORY_ROOT="$repository_root" \
 FORGESYNC_API_BASE_URL="http://127.0.0.1:$api_port" \
 FORGESYNC_WEB_BASE_URL="http://127.0.0.1:$web_port" \
 FORGESYNC_MQTT_HOST=127.0.0.1 \
 FORGESYNC_MQTT_PORT="$mqtt_port" \
   npm --prefix "$repository_root/apps/factory-web" run test:e2e
+
+missing_active_sequences=$(run_database_compose exec --no-TTY database \
+  psql --tuples-only --no-align --username forgesync --dbname forgesync --command \
+  "SELECT count(*) FROM generate_series(0, (SELECT replay_sequence FROM equipment_twin_version WHERE machine_id = 'Mazak01')) sequence_number WHERE NOT EXISTS (SELECT 1 FROM canonical_observation_history history JOIN active_replay_projection active ON active.machine_id = history.machine_id AND active.replay_session_id = history.replay_session_id WHERE history.machine_id = 'Mazak01' AND history.replay_sequence = sequence_number);")
+if [ "$missing_active_sequences" -ne 0 ]; then
+  echo "Active Replay history has $missing_active_sequences missing sequences through the Twin cursor" >&2
+  exit 1
+fi
+
+broker_drops_after=$(run_mqtt_compose exec --no-TTY broker \
+  mosquitto_sub -h 127.0.0.1 -t '$SYS/broker/publish/messages/dropped' -C 1 -W 3)
+if [ "$broker_drops_after" -ne "$broker_drops_before" ]; then
+  echo "MQTT broker dropped messages during E2E: $broker_drops_before -> $broker_drops_after" >&2
+  exit 1
+fi

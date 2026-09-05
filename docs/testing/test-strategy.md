@@ -162,6 +162,13 @@ seek 명령을 Edge runtime까지 전달한다.
 
 ### E2E-04 3D Failure Isolation
 
+Step 21 extends `replay-control.spec.ts` with pause, timeline seek, matching 2D/3D/analysis versions,
+keyboard run/evidence selection, and explicit marker navigation. The test remains a required gate:
+unit/component success alone does not establish seek delivery completeness. In particular, compare
+the stopped publisher watermark with the persisted history and inspect broker dropped-message
+counts when the run boundary does not appear. Do not hide a failure by shortening the seek range or
+raising timeouts without establishing its cause.
+
 ```gherkin
 Given GLB load 또는 WebGL 초기화가 실패하고
 When 사용자가 Machine Detail, Replay, Alarm 화면을 사용하면

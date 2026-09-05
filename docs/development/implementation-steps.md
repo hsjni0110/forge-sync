@@ -569,6 +569,11 @@ PostgreSQL projection과 versioned REST 조회 계약을 구현했다. 높은 de
 
 ### Step 21 — Process Timeline과 Current Run UI
 
+**상태**: `DONE` — 기존 분석 v1을 유지하고, 정지된 권위 Replay Cursor에서 분석하는
+범위를 [ADR-037](../adr/ADR-037-cursor-bound-process-analysis-presentation.md)로 확정했다.
+실제 seek E2E에서 드러난 worker 경합과 broker queue 포화는
+[ADR-038](../adr/ADR-038-seek-delivery-backpressure.md)의 유한 경계로 보완했다.
+
 **목적**: replay cursor 기준의 현재 run, process feature, anomaly를 기존 Machine Detail에서 설명한다.
 
 **구현 범위**
@@ -577,6 +582,9 @@ PostgreSQL projection과 versioned REST 조회 계약을 구현했다. 높은 de
 - CURRENT RUN/PROCESS/ANOMALY panel과 timeline marker
 - `OBSERVED` observation과 `DERIVED` run/assessment의 구분
 - loading/insufficient-data/reprocessing/version mismatch 상태
+- 일시정지·seek 완료·재생 종료 후 자동 분석. 재생 중에는 분석 대기 상태를 표시한다.
+- 설비 상세/Factory 2D의 전체 분석과 Factory 분할 보기 우측의 현재 가공 요약
+- 종료 근거 없는 구간은 기존 `INTERRUPTED`/`UNKNOWN`을 유지하고 완료된 가공만 특징·평가를 제공
 
 **테스트**
 
@@ -584,6 +592,8 @@ PostgreSQL projection과 versioned REST 조회 계약을 구현했다. 높은 de
 - run이 없는 시점을 임의 run으로 채우지 않는다.
 - version mismatch에서 혼합 화면을 표시하지 않고 resync한다.
 - keyboard와 screen reader로 run 근거와 anomaly reason을 확인할 수 있다.
+- 서버 승인 전 pause는 분석을 시작하지 않고, 자연 재생 종료도 자동으로 감지한다.
+- 서로 다른 DataItem의 늦은 반영이 동일 session의 machine cursor를 rollback하지 않는다.
 
 **완료 조건**: raw signal을 몰라도 현재 공정과 차이의 근거를 이해할 수 있고 모든 값의 출처를 확인할 수 있다.
 

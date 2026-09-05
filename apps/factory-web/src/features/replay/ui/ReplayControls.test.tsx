@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import twinFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-operational-twin.json";
@@ -21,9 +21,28 @@ const running: ReplaySessionState = {
   },
 };
 
-afterEach(cleanup);
+afterEach(() => { cleanup(); vi.useRealTimers(); });
 
 describe("ReplayControls", () => {
+  it("observes natural replay completion without a browser command", async () => {
+    vi.useFakeTimers();
+    const load = vi.fn().mockResolvedValueOnce(running).mockResolvedValue({ ...running, status: "COMPLETED" });
+    render(<ReplayControls machineId="Mazak01" client={clientWith({ load })} />);
+    await act(async () => undefined);
+    await act(async () => { await vi.advanceTimersByTimeAsync(1000); });
+    expect(screen.getByText("재생 완료")).toBeTruthy();
+  });
+
+  it("does not publish an optimistic pause as an authoritative analysis session", async () => {
+    const onSessionChange = vi.fn();
+    let finishPause: (value: ReplaySessionState) => void = () => undefined;
+    const pause = vi.fn(() => new Promise<ReplaySessionState>((resolve) => { finishPause = resolve; }));
+    render(<ReplayControls machineId="Mazak01" client={clientWith({ pause })} onSessionChange={onSessionChange} />);
+    fireEvent.click(await screen.findByRole("button", { name: "일시정지" }));
+    expect(onSessionChange.mock.calls.at(-1)?.[0]?.status).not.toBe("PAUSED");
+    await act(async () => { finishPause({ ...running, status: "PAUSED", revision: 2 }); });
+    expect(onSessionChange.mock.calls.at(-1)?.[0]?.status).toBe("PAUSED");
+  });
   it("separates source time, replay time, and Twin freshness", async () => {
     const client = clientWith({ load: vi.fn().mockResolvedValue(running) });
     render(

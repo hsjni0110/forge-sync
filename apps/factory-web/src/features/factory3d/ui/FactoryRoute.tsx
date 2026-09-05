@@ -9,7 +9,9 @@ import {
 
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
-import type { ReplayStatus } from "../../replay/domain/replay";
+import { useReplayController } from "../../replay/ui/useReplayController";
+import { ProcessAnalysisPanel } from "../../process-analytics/ui/ProcessAnalysisPanel";
+import type { ProcessAnalysisClient } from "../../process-analytics/application/ports";
 import { ReplayControls } from "../../replay/ui/ReplayControls";
 import { useReplayDrivenTwinBootstrap } from "../../replay/ui/useReplayDrivenTwinBootstrap";
 import { MachineDetailView } from "../../twin/ui/MachineDetailView";
@@ -31,17 +33,18 @@ export function FactoryRoute({
   sessionFactory,
   replayControlClient,
   sceneLoader,
+  processAnalysisClient,
 }: {
   sessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   sceneLoader: FactorySceneLoader;
+  processAnalysisClient?: ProcessAnalysisClient;
 }) {
   const [viewMode, setViewMode] = useState<FactoryViewMode>("SPLIT");
   const [unavailableReason, setUnavailableReason] =
     useState<SceneUnavailableReason>();
   const [isAssetFallback, setIsAssetFallback] = useState(false);
   const [sceneAttempt, setSceneAttempt] = useState(0);
-  const [replayStatus, setReplayStatus] = useState<ReplayStatus>();
   const { isReducedMotion, toggleReducedMotion } = useReducedMotionPreference();
   const selectionStore = useMemo(
     () => new MachineSelectionStore(MAZAK01_SCENE_BINDING.machineId),
@@ -52,6 +55,8 @@ export function FactoryRoute({
     selectionStore.currentSelection,
   );
   const machineId = selectedMachineId ?? MAZAK01_SCENE_BINDING.machineId;
+  const replay = useReplayController(machineId, replayControlClient);
+  const replayStatus = replay.session?.status;
   const createSession = useCallback(
     () => sessionFactory(machineId),
     [machineId, sessionFactory],
@@ -141,7 +146,7 @@ export function FactoryRoute({
           client={replayControlClient}
           snapshot={twinState.snapshot}
           freshness={twinState.freshness}
-          onStatusChange={setReplayStatus}
+          controller={replay}
         />
       )}
       {isAssetFallback && (
@@ -205,6 +210,11 @@ export function FactoryRoute({
               retryNow={retryNow}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}
             />
+            {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
+              session={replay.authoritativeSession} twinState={twinState} client={processAnalysisClient}
+              layout={viewMode === "2D" ? "FULL" : "COMPACT"}
+              retryTwin={retryNow} reloadReplay={replay.reload} seek={(at) => void replay.run("SEEKING", (current) =>
+                replayControlClient.seek(current.replaySessionId, current.revision, at, current.speedMultiplier))} />}
           </section>
         )}
       </div>
