@@ -542,6 +542,11 @@ result로 보존한다.
 
 ### Step 20 — Explainable Cycle Baseline과 AnomalyAssessment
 
+**상태**: `DONE` (2026-09-05) — 동일 설비·프로그램·Cycle Feature version의 엄격히 이전 run으로
+median/IQR baseline을 만들고, coverage/표본 부족을 보존하는 explainable assessment `1.0.0`, immutable
+PostgreSQL projection과 versioned REST 조회 계약을 구현했다. 높은 deviation은 파생 분석으로만
+유지하며 Fault, Alarm, Advisory 또는 command를 만들지 않는다.
+
 **목적**: 같은 program 또는 검증된 grouping의 과거 run과 비교해 공정 차이를 원인과 함께 보여준다.
 
 **구현 범위**

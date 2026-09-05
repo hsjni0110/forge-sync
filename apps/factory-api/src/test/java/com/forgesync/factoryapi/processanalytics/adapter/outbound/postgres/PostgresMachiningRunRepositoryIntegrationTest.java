@@ -5,10 +5,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.forgesync.factoryapi.processanalytics.application.AnomalyAssessmentService;
 import com.forgesync.factoryapi.processanalytics.application.CycleFeatureService;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunService;
+import com.forgesync.factoryapi.processanalytics.application.ProcessAnomalyAssessmentsCommand;
 import com.forgesync.factoryapi.processanalytics.application.ProcessCycleFeaturesCommand;
 import com.forgesync.factoryapi.processanalytics.application.SegmentMachiningRunsCommand;
+import com.forgesync.factoryapi.processanalytics.domain.AnomalyAssessmentPolicy;
+import com.forgesync.factoryapi.processanalytics.domain.CycleBaselinePolicy;
 import com.forgesync.factoryapi.processanalytics.domain.CycleFeatureExtractor;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunSegmentationPolicy;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunStatus;
@@ -38,6 +42,7 @@ class PostgresMachiningRunRepositoryIntegrationTest {
   private static JdbcClient jdbcClient;
   private static MachiningRunService service;
   private static CycleFeatureService cycleFeatureService;
+  private static AnomalyAssessmentService anomalyAssessmentService;
 
   @BeforeAll
   static void migrateDatabase() {
@@ -64,6 +69,17 @@ class PostgresMachiningRunRepositoryIntegrationTest {
             cycleFeatureRepository,
             new CycleFeatureExtractor(),
             Clock.fixed(Instant.parse("2026-09-04T02:02:03Z"), ZoneOffset.UTC));
+    var anomalyRepository =
+        new PostgresAnomalyAssessmentRepository(
+            jdbcClient, OBJECT_MAPPER, new DataSourceTransactionManager(dataSource));
+    anomalyAssessmentService =
+        new AnomalyAssessmentService(
+            cycleFeatureRepository,
+            repository,
+            anomalyRepository,
+            new CycleBaselinePolicy(),
+            new AnomalyAssessmentPolicy(),
+            Clock.fixed(Instant.parse("2026-09-04T03:02:03Z"), ZoneOffset.UTC));
   }
 
   @BeforeEach
@@ -71,12 +87,86 @@ class PostgresMachiningRunRepositoryIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE cycle_feature_projection, cycle_feature_processing_run,
+            TRUNCATE anomaly_assessment_projection, anomaly_assessment_processing_run,
+              cycle_feature_projection, cycle_feature_processing_run,
               machining_run_projection, process_analytics_processing_run,
               active_replay_projection, equipment_state_projection, latest_observation_projection,
               equipment_twin_version, canonical_observation_history, ingestion_inbox
             """)
         .update();
+  }
+
+  @Test
+  void atomicallyPreservesQueriesAndReusesAnomalyAssessmentsWithoutChangingSources() {
+    insertEvent(1, "EXECUTION", "READY");
+    insertEvent(2, "PROGRAM", "155");
+    insertEvent(3, "EXECUTION", "ACTIVE");
+    insertEvent(5, "EXECUTION", "READY");
+    var machining = service.segment(command(5));
+    var cycle = cycleFeatureService.process(cycleCommand(machining.processingRunId()));
+
+    var first = anomalyAssessmentService.process(anomalyCommand(cycle.featureProcessingRunId()));
+    var repeated = anomalyAssessmentService.process(anomalyCommand(cycle.featureProcessingRunId()));
+    insertSample(4, 100);
+    var lateCycle = cycleFeatureService.process(cycleCommand(machining.processingRunId()));
+    var lateAssessment =
+        anomalyAssessmentService.process(anomalyCommand(lateCycle.featureProcessingRunId()));
+    var queried = anomalyAssessmentService.find("Mazak01", first.assessmentProcessingRunId());
+
+    assertThat(first.assessments()).hasSize(1);
+    assertThat(repeated.assessmentProcessingRunId()).isEqualTo(first.assessmentProcessingRunId());
+    assertThat(repeated.isCreated()).isFalse();
+    assertThat(lateAssessment.assessmentProcessingRunId())
+        .isNotEqualTo(first.assessmentProcessingRunId());
+    assertThat(queried.assessments()).isEqualTo(first.assessments());
+    assertThat(rowCount("anomaly_assessment_processing_run")).isEqualTo(2);
+    assertThat(rowCount("anomaly_assessment_projection")).isEqualTo(2);
+    assertThat(rowCount("cycle_feature_projection")).isEqualTo(2);
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(5);
+  }
+
+  @Test
+  void rollsBackAnomalyMetadataWhenAssessmentStorageFails() {
+    insertEvent(1, "EXECUTION", "READY");
+    insertEvent(2, "PROGRAM", "155");
+    insertEvent(3, "EXECUTION", "ACTIVE");
+    insertEvent(4, "EXECUTION", "READY");
+    var machining = service.segment(command(4));
+    var cycle = cycleFeatureService.process(cycleCommand(machining.processingRunId()));
+    jdbcClient
+        .sql(
+            """
+            CREATE FUNCTION reject_anomaly_assessment_projection() RETURNS trigger
+            LANGUAGE plpgsql AS $$
+            BEGIN
+              RAISE EXCEPTION 'forced anomaly assessment failure';
+            END;
+            $$
+            """)
+        .update();
+    jdbcClient
+        .sql(
+            """
+            CREATE TRIGGER reject_anomaly_assessment_projection
+            BEFORE INSERT ON anomaly_assessment_projection
+            FOR EACH ROW EXECUTE FUNCTION reject_anomaly_assessment_projection()
+            """)
+        .update();
+    try {
+      assertThatThrownBy(
+              () ->
+                  anomalyAssessmentService.process(anomalyCommand(cycle.featureProcessingRunId())))
+          .isInstanceOf(RuntimeException.class)
+          .hasMessageContaining("forced anomaly assessment failure");
+      assertThat(rowCount("anomaly_assessment_processing_run")).isZero();
+      assertThat(rowCount("anomaly_assessment_projection")).isZero();
+      assertThat(rowCount("cycle_feature_processing_run")).isEqualTo(1);
+    } finally {
+      jdbcClient
+          .sql("DROP TRIGGER reject_anomaly_assessment_projection ON anomaly_assessment_projection")
+          .update();
+      jdbcClient.sql("DROP FUNCTION reject_anomaly_assessment_projection()").update();
+    }
   }
 
   @Test
@@ -250,6 +340,15 @@ class PostgresMachiningRunRepositoryIntegrationTest {
   private static ProcessCycleFeaturesCommand cycleCommand(String machiningRunProcessingRunId) {
     return new ProcessCycleFeaturesCommand(
         "Mazak01", machiningRunProcessingRunId, CycleFeatureExtractor.FEATURE_VERSION);
+  }
+
+  private static ProcessAnomalyAssessmentsCommand anomalyCommand(
+      String cycleFeatureProcessingRunId) {
+    return new ProcessAnomalyAssessmentsCommand(
+        "Mazak01",
+        cycleFeatureProcessingRunId,
+        CycleBaselinePolicy.POLICY_VERSION,
+        AnomalyAssessmentPolicy.POLICY_VERSION);
   }
 
   private static void insertEvent(long sequence, String eventType, Object value) {

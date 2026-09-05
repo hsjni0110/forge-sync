@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/process-analytics/v1/anomaly-assessments.schema.json",
+  "title": "ForgeSync Anomaly Assessments v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "assessmentProcessingRunId", "cycleFeatureProcessingRunId",
+    "machiningRunProcessingRunId", "machineId", "cycleFeatureVersion",
+    "baselinePolicyVersion", "anomalyAssessmentVersion", "inputHash", "resultHash",
+    "createdAt", "assessments"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "assessmentProcessingRunId": { "$ref": "#/$defs/sha256" },
+    "cycleFeatureProcessingRunId": { "$ref": "#/$defs/sha256" },
+    "machiningRunProcessingRunId": { "$ref": "#/$defs/sha256" },
+    "machineId": { "$ref": "#/$defs/machineId" },
+    "cycleFeatureVersion": { "const": "1.0.0" },
+    "baselinePolicyVersion": { "const": "1.0.0" },
+    "anomalyAssessmentVersion": { "const": "1.0.0" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "resultHash": { "$ref": "#/$defs/sha256" },
+    "createdAt": { "$ref": "#/$defs/timestamp" },
+    "assessments": { "type": "array", "items": { "$ref": "#/$defs/assessment" } }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+    "timestamp": { "type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$" },
+    "decimal": { "type": "number", "multipleOf": 0.000001 },
+    "assessment": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "assessmentId", "machiningRunId", "targetFeatureSetId", "dataStatus",
+        "baseline", "contributions", "topReasons", "lineage", "resultHash"
+      ],
+      "properties": {
+        "assessmentId": { "$ref": "#/$defs/sha256" },
+        "machiningRunId": { "$ref": "#/$defs/sha256" },
+        "targetFeatureSetId": { "$ref": "#/$defs/sha256" },
+        "dataStatus": { "enum": ["UNAVAILABLE", "INSUFFICIENT_DATA", "PARTIAL", "AVAILABLE"] },
+        "classification": { "enum": ["NORMAL", "DEVIATING", "HIGH_DEVIATION", null] },
+        "score": { "anyOf": [{ "type": "number", "minimum": 0, "maximum": 1, "multipleOf": 0.000001 }, { "type": "null" }] },
+        "baseline": { "$ref": "#/$defs/baseline" },
+        "evaluationSourceRange": { "anyOf": [{ "$ref": "#/$defs/range" }, { "type": "null" }] },
+        "contributions": { "type": "array", "items": { "$ref": "#/$defs/contribution" } },
+        "topReasons": { "type": "array", "maxItems": 3, "items": { "$ref": "#/$defs/contribution" } },
+        "lineage": { "$ref": "#/$defs/lineage" },
+        "resultHash": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "baseline": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "baselineGroupId", "machineId", "cycleFeatureVersion", "baselinePolicyVersion",
+        "targetFeatureSetId", "candidateFeatureSetIds", "trainingSourceRanges", "featureBaselines"
+      ],
+      "properties": {
+        "baselineGroupId": { "$ref": "#/$defs/sha256" },
+        "machineId": { "$ref": "#/$defs/machineId" },
+        "programName": { "type": ["string", "null"], "minLength": 1 },
+        "cycleFeatureVersion": { "const": "1.0.0" },
+        "baselinePolicyVersion": { "const": "1.0.0" },
+        "targetFeatureSetId": { "$ref": "#/$defs/sha256" },
+        "candidateFeatureSetIds": { "type": "array", "items": { "$ref": "#/$defs/sha256" } },
+        "trainingStartedAt": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
+        "trainingEndedAt": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
+        "trainingSourceRanges": { "type": "array", "items": { "$ref": "#/$defs/range" } },
+        "featureBaselines": { "type": "array", "items": { "$ref": "#/$defs/featureBaseline" } }
+      }
+    },
+    "featureBaseline": {
+      "type": "object", "additionalProperties": false,
+      "required": ["featureKey", "targetValue", "sampleCount", "contributingFeatureSetIds", "available"],
+      "properties": {
+        "featureKey": { "type": "string", "minLength": 1 },
+        "targetValue": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "median": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "firstQuartile": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "thirdQuartile": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "interquartileRange": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "sampleCount": { "type": "integer", "minimum": 0, "maximum": 30 },
+        "contributingFeatureSetIds": { "type": "array", "maxItems": 30, "items": { "$ref": "#/$defs/sha256" } },
+        "unavailableReason": { "enum": ["MINIMUM_SAMPLE_COUNT_NOT_MET", "TARGET_COVERAGE_BELOW_MINIMUM", "TARGET_VALUE_UNAVAILABLE", null] },
+        "available": { "type": "boolean" }
+      }
+    },
+    "contribution": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "featureKey", "targetValue", "baselineMedian", "difference", "direction", "score",
+        "sampleCount", "contributingFeatureSetIds", "reasonCode"
+      ],
+      "properties": {
+        "featureKey": { "type": "string", "minLength": 1 },
+        "targetValue": { "$ref": "#/$defs/decimal" },
+        "baselineMedian": { "$ref": "#/$defs/decimal" },
+        "difference": { "$ref": "#/$defs/decimal" },
+        "percentageDifference": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "direction": { "enum": ["ABOVE", "BELOW", "SAME"] },
+        "distance": { "anyOf": [{ "$ref": "#/$defs/decimal" }, { "type": "null" }] },
+        "score": { "type": "number", "minimum": 0, "maximum": 1, "multipleOf": 0.000001 },
+        "sampleCount": { "type": "integer", "minimum": 5, "maximum": 30 },
+        "contributingFeatureSetIds": { "type": "array", "minItems": 5, "maxItems": 30, "items": { "$ref": "#/$defs/sha256" } },
+        "reasonCode": { "enum": ["BASELINE_IQR_DISTANCE", "ZERO_IQR_DEVIATION"] }
+      }
+    },
+    "range": {
+      "type": "object", "additionalProperties": false,
+      "required": [
+        "replaySessionId", "firstReplaySequence", "lastReplaySequence",
+        "firstSourceObservedAt", "lastSourceObservedAt", "firstSourceEventKey", "lastSourceEventKey"
+      ],
+      "properties": {
+        "replaySessionId": { "type": "string", "format": "uuid" },
+        "firstReplaySequence": { "type": "integer", "minimum": 0 },
+        "lastReplaySequence": { "type": "integer", "minimum": 0 },
+        "firstSourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "lastSourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "firstSourceEventKey": { "type": "string", "minLength": 1 },
+        "lastSourceEventKey": { "type": "string", "minLength": 1 }
+      }
+    },
+    "lineage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["origin", "inputCycleFeature", "sources"],
+      "properties": {
+        "origin": { "const": "DERIVED" },
+        "inputCycleFeature": {
+          "type": "object", "additionalProperties": false,
+          "required": ["origin", "featureProcessingRunId", "cycleFeatureVersion"],
+          "properties": {
+            "origin": { "const": "DERIVED" },
+            "featureProcessingRunId": { "$ref": "#/$defs/sha256" },
+            "cycleFeatureVersion": { "const": "1.0.0" }
+          }
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["kind", "provider", "sourceSetId", "artifactId", "rawRecordId", "mappingVersion", "sourceDataItemId"],
+            "properties": {
+              "kind": { "const": "REAL" }, "provider": { "const": "NIST" },
+              "sourceSetId": { "type": "string", "minLength": 1 },
+              "artifactId": { "$ref": "#/$defs/sha256" },
+              "rawRecordId": { "type": "string", "minLength": 1 },
+              "mappingVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+              "sourceDataItemId": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

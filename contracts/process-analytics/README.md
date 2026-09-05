@@ -39,3 +39,21 @@ metric, component, source data item, and unit. Mean and population standard devi
 time-weighted; missing intervals remain uncovered rather than becoming zero. Every feature reports
 coverage, calculation, observation range, `DERIVED` transformation provenance, and nested
 `REAL:NIST` source provenance.
+
+`v1/anomaly-assessments.schema.json` describes immutable explainable assessments over one Cycle
+Feature processing result. Create or reuse one with
+`POST /api/v1/machines/{machineId}/anomaly-assessments/processing-runs`, supplying
+`cycleFeatureProcessingRunId`, `baselinePolicyVersion: 1.0.0`, and
+`anomalyAssessmentVersion: 1.0.0`. Read it with
+`GET /api/v1/machines/{machineId}/anomaly-assessments?assessmentProcessingRunId=sha256:...`.
+Responses use `application/vnd.forgesync.anomaly-assessments.v1+json`; first creation returns `201`
+and deterministic reuse returns `200`.
+
+The baseline group is machine, program, and Cycle Feature version. Only strictly earlier runs are
+eligible. Each feature uses the latest 30 values with at least five samples; state and metric
+features require coverage `>= 0.800000`, while duration only requires a value. Metric channel
+identity includes metric, component, source DataItem, and unit. The response preserves candidates,
+actual contributors, median/Q1/Q3/IQR, difference, direction, nullable percentage difference,
+score, top reasons, source ranges, and `DERIVED -> DERIVED CycleFeature -> REAL:NIST` lineage. A
+high deviation remains a Process Analytics result and does not create a Fault, Alarm, Advisory, or
+command.

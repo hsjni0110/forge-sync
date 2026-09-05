@@ -1,10 +1,14 @@
 package com.forgesync.factoryapi.processanalytics.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.forgesync.factoryapi.processanalytics.adapter.outbound.postgres.PostgresAnomalyAssessmentRepository;
 import com.forgesync.factoryapi.processanalytics.adapter.outbound.postgres.PostgresCycleFeatureRepository;
 import com.forgesync.factoryapi.processanalytics.adapter.outbound.postgres.PostgresMachiningRunRepository;
+import com.forgesync.factoryapi.processanalytics.application.AnomalyAssessmentService;
 import com.forgesync.factoryapi.processanalytics.application.CycleFeatureService;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunService;
+import com.forgesync.factoryapi.processanalytics.domain.AnomalyAssessmentPolicy;
+import com.forgesync.factoryapi.processanalytics.domain.CycleBaselinePolicy;
 import com.forgesync.factoryapi.processanalytics.domain.CycleFeatureExtractor;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunSegmentationPolicy;
 import com.forgesync.factoryapi.processanalytics.domain.ProcessFactSourcePolicy;
@@ -59,6 +63,29 @@ public class ProcessAnalyticsConfiguration {
         cycleFeatureRepository,
         cycleFeatureRepository,
         new CycleFeatureExtractor(),
+        applicationClock);
+  }
+
+  @Bean
+  PostgresAnomalyAssessmentRepository anomalyAssessmentRepository(
+      JdbcClient jdbcClient,
+      ObjectMapper objectMapper,
+      PlatformTransactionManager transactionManager) {
+    return new PostgresAnomalyAssessmentRepository(jdbcClient, objectMapper, transactionManager);
+  }
+
+  @Bean
+  AnomalyAssessmentService anomalyAssessmentService(
+      PostgresCycleFeatureRepository cycleFeatureRepository,
+      PostgresMachiningRunRepository machiningRunRepository,
+      PostgresAnomalyAssessmentRepository anomalyAssessmentRepository,
+      Clock applicationClock) {
+    return new AnomalyAssessmentService(
+        cycleFeatureRepository,
+        machiningRunRepository,
+        anomalyAssessmentRepository,
+        new CycleBaselinePolicy(),
+        new AnomalyAssessmentPolicy(),
         applicationClock);
   }
 }

@@ -6,10 +6,13 @@ import static org.mockito.Mockito.mock;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.forgesync.factoryapi.equipmenttwin.adapter.EquipmentTwinConfiguration;
 import com.forgesync.factoryapi.processanalytics.adapter.ProcessAnalyticsConfiguration;
+import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.AnomalyAssessmentController;
+import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.AnomalyAssessmentErrorHandler;
 import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.CycleFeatureController;
 import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.CycleFeatureErrorHandler;
 import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.MachiningRunController;
 import com.forgesync.factoryapi.processanalytics.adapter.inbound.rest.MachiningRunErrorHandler;
+import com.forgesync.factoryapi.processanalytics.application.AnomalyAssessmentService;
 import com.forgesync.factoryapi.processanalytics.application.CycleFeatureService;
 import com.forgesync.factoryapi.processanalytics.application.MachiningRunService;
 import com.forgesync.factoryapi.replay.adapter.ReplayConfiguration;
@@ -59,6 +62,8 @@ class RuntimeRouteConfigurationTest {
             ProcessAnalyticsConfiguration.class,
             CycleFeatureController.class,
             CycleFeatureErrorHandler.class,
+            AnomalyAssessmentController.class,
+            AnomalyAssessmentErrorHandler.class,
             MachiningRunController.class,
             MachiningRunErrorHandler.class)
         .withPropertyValues("forgesync.process-analytics.enabled=true")
@@ -66,6 +71,9 @@ class RuntimeRouteConfigurationTest {
             context -> {
               assertThat(context).hasSingleBean(MachiningRunService.class);
               assertThat(context).hasSingleBean(CycleFeatureService.class);
+              assertThat(context).hasSingleBean(AnomalyAssessmentService.class);
+              assertThat(context).hasSingleBean(AnomalyAssessmentController.class);
+              assertThat(context).hasSingleBean(AnomalyAssessmentErrorHandler.class);
               assertThat(context).hasSingleBean(CycleFeatureController.class);
               assertThat(context).hasSingleBean(CycleFeatureErrorHandler.class);
               assertThat(context).hasSingleBean(MachiningRunController.class);
