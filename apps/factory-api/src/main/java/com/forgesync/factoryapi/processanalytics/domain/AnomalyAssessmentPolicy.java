@@ -2,6 +2,7 @@ package com.forgesync.factoryapi.processanalytics.domain;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +19,17 @@ import java.util.Set;
  * speak.
  */
 public final class AnomalyAssessmentPolicy {
-  public static final String POLICY_VERSION = "2.0.0";
+  public static final String POLICY_VERSION = "3.0.0";
+
+  /**
+   * The cycle feature that carries the classification. A run is compared against a median of thirty
+   * features at once, so taking the most extreme of them made almost every run look deviating: over
+   * the NIST Mazak01 set the top reason was a metric channel in 92 of 94 evaluable runs and in 73
+   * of them the cycle duration was within baseline while a channel carried the label. Cycle
+   * duration is the process outcome an operator acts on, so it sets the grade and the channels are
+   * reported beside it as supporting observations rather than as the verdict.
+   */
+  static final String PRIMARY_FEATURE_KEY = "durationSeconds";
 
   /**
    * Fraction of the baseline median treated as ordinary variation. Cutting cycles move by a few
@@ -61,11 +72,22 @@ public final class AnomalyAssessmentPolicy {
                         || !value.unavailableReason().startsWith("TARGET_"));
     int unavailableCount =
         (int) baseline.featureBaselines().stream().filter(value -> !value.isAvailable()).count();
+    FeatureContribution primary =
+        contributions.stream()
+            .filter(value -> PRIMARY_FEATURE_KEY.equals(value.featureKey()))
+            .findFirst()
+            .orElse(null);
     AssessmentDataStatus dataStatus =
-        status(target, hasComparableTarget, contributions, unavailableCount);
-    BigDecimal score = contributions.isEmpty() ? null : contributions.getFirst().score();
+        status(target, hasComparableTarget, primary, unavailableCount);
+    BigDecimal score = primary == null ? null : primary.score();
     AnomalyClassification classification = score == null ? null : classify(score);
-    List<FeatureContribution> topReasons = contributions.stream().limit(3).toList();
+    int supportingOutlierCount =
+        (int)
+            contributions.stream()
+                .filter(value -> !PRIMARY_FEATURE_KEY.equals(value.featureKey()))
+                .filter(AnomalyAssessmentPolicy::exceedsThreshold)
+                .count();
+    List<FeatureContribution> topReasons = topReasons(contributions, primary);
     String resultHash =
         DeterministicHash.sha256(
             CycleBaselinePolicy.lengthPrefixed(
@@ -74,6 +96,8 @@ public final class AnomalyAssessmentPolicy {
                 dataStatus,
                 classification,
                 score,
+                PRIMARY_FEATURE_KEY,
+                supportingOutlierCount,
                 contributions));
     return new AnomalyAssessment(
         assessmentId,
@@ -82,6 +106,8 @@ public final class AnomalyAssessmentPolicy {
         dataStatus,
         classification,
         score,
+        primary == null ? null : PRIMARY_FEATURE_KEY,
+        supportingOutlierCount,
         baseline,
         target.cycleFeature().startedAt(),
         target.cycleFeature().sourceObservationRange(),
@@ -91,15 +117,36 @@ public final class AnomalyAssessmentPolicy {
         resultHash);
   }
 
+  /** The primary contribution leads, so the reason for the label is always the first one shown. */
+  private static List<FeatureContribution> topReasons(
+      List<FeatureContribution> contributions, FeatureContribution primary) {
+    List<FeatureContribution> others =
+        contributions.stream()
+            .filter(value -> !PRIMARY_FEATURE_KEY.equals(value.featureKey()))
+            .limit(primary == null ? 3 : 2)
+            .toList();
+    if (primary == null) return others;
+    List<FeatureContribution> reasons = new ArrayList<>();
+    reasons.add(primary);
+    reasons.addAll(others);
+    return List.copyOf(reasons);
+  }
+
+  private static boolean exceedsThreshold(FeatureContribution contribution) {
+    return contribution.distance() != null
+        && contribution.distance().compareTo(DEVIATING_DISTANCE) >= 0;
+  }
+
   private static AssessmentDataStatus status(
       CycleFeatureContext target,
       boolean hasTarget,
-      List<FeatureContribution> contributions,
+      FeatureContribution primary,
       int unavailableCount) {
     if (target.programName() == null || target.programName().isBlank() || !hasTarget) {
       return AssessmentDataStatus.UNAVAILABLE;
     }
-    if (contributions.isEmpty()) return AssessmentDataStatus.INSUFFICIENT_DATA;
+    // Without the primary feature there is nothing to classify, whatever the channels show.
+    if (primary == null) return AssessmentDataStatus.INSUFFICIENT_DATA;
     if (unavailableCount > 0) return AssessmentDataStatus.PARTIAL;
     return AssessmentDataStatus.AVAILABLE;
   }

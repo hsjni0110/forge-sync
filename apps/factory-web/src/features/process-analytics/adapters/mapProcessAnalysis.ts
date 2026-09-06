@@ -37,6 +37,8 @@ export function mapProcessAnalysis(runs: RunDocument, features: FeatureDocument,
         assessment: assessment && {
           status: assessment.dataStatus, classification: assessment.classification,
           score: assessment.score, evidence: traceEntries(assessment),
+          primaryFeature: assessment.primaryFeatureKey ?? null,
+          supportingOutlierCount: assessment.supportingOutlierCount ?? 0,
           reasons: assessment.topReasons.map((reason) => ({ feature: reason.featureKey,
             target: reason.targetValue, median: reason.baselineMedian, difference: reason.difference,
             percentage: reason.percentageDifference, direction: reason.direction,

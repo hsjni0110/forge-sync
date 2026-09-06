@@ -51,6 +51,7 @@ export interface FeatureBaselineSummary {
 }
 export interface Assessment {
   status: string; classification?: string | null; score?: number | null;
+  primaryFeature?: string | null; supportingOutlierCount?: number;
   reasons: AssessmentReason[]; evidence: TraceEntry[]; featureBaselines?: FeatureBaselineSummary[];
 }
 

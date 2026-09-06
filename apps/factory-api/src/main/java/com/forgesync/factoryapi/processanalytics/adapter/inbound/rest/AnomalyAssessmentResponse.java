@@ -27,6 +27,8 @@ public record AnomalyAssessmentResponse(
       String dataStatus,
       String classification,
       BigDecimal score,
+      String primaryFeatureKey,
+      int supportingOutlierCount,
       BaselineDto baseline,
       ObservationRangeDto evaluationSourceRange,
       List<ContributionDto> contributions,

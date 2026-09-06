@@ -58,7 +58,32 @@ score, top reasons, source ranges, and `DERIVED -> DERIVED CycleFeature -> REAL:
 high deviation remains a Process Analytics result and does not create a Fault, Alarm, Advisory, or
 command.
 
-### Deviation scale and floors (`anomalyAssessmentVersion: 2.0.0`)
+### Primary feature and supporting channels (`anomalyAssessmentVersion: 3.0.0`)
+
+`classification` and `score` come from one feature, named in `primaryFeatureKey`:
+`durationSeconds`, the cycle outcome an operator acts on. Every other feature is still compared
+and still reported in `contributions`; the count of those that cross the deviating threshold is
+`supportingOutlierCount`, and `topReasons` leads with the primary feature followed by the strongest
+others. Without a primary contribution there is nothing to grade, so `dataStatus` is
+`INSUFFICIENT_DATA` and `classification` is null whatever the channels show.
+
+Version `2.0.0` classified on the maximum over every feature. A run is compared against a median of
+thirty features at once, so the most extreme of them was almost always past the threshold: the top
+reason was a metric channel in 92 of 94 evaluable runs, a median of 5.5 features crossed the
+threshold together, only 4 runs had exactly one crossing, and in 73 runs the cycle duration was
+within baseline while a channel carried the label. Selecting the maximum of thirty simultaneous
+comparisons reports the most extreme channel rather than the state of the process.
+
+| | `NORMAL` | `DEVIATING` | `HIGH_DEVIATION` |
+|---|---:|---:|---:|
+| `2.0.0` | 3 | 46 | 45 |
+| `3.0.0` | 76 | 7 | 11 |
+
+Over the same 94 evaluable runs, 76 (81%) are within baseline, and a median of 5 channels are
+reported beside the grade rather than as it. A high deviation, and any number of channel outliers,
+remains a Process Analytics result and does not create a Fault, Alarm, Advisory, or command.
+
+### Deviation scale and floors (`anomalyAssessmentVersion: 2.0.0` and later)
 
 Each contribution reports the `deviationScale` it was measured against and a `reasonCode` naming
 which input bound that scale:
@@ -91,13 +116,10 @@ Measured over the same full NIST observation set (122 runs, 94 evaluable, 2,820 
 | `2.0.0` | 3 | 46 | 45 |
 | `2.0.0`, `durationSeconds` alone | 76 | 7 | 11 |
 
-The floors bound the scale for 915 relative and 89 absolute of the 2,820 contributions, and the
-cycle-duration comparison they were written for now reads as ordinary variation in 76 of 94 runs.
-The reported classification barely moved because it is the maximum over a median of 30 features
-per run: the top reason is a metric channel in 92 of 94 runs, a median of 5.5 features exceed the
-threshold at once, and in 73 of 94 runs the duration is within baseline while a metric channel
-carries the label. Selecting the most extreme of 30 simultaneous comparisons is a separate problem
-from the deviation scale and is not addressed by this version.
+The floors bound the scale for 915 relative and 89 absolute of the 2,820 contributions. Under
+`2.0.0` the reported classification barely moved because it was the maximum over every feature;
+`3.0.0` grades on the cycle duration these floors were written for, and the two changes together
+take the same runs from 2 within baseline to 76.
 
 ## Presentation at a stopped Replay Cursor
 

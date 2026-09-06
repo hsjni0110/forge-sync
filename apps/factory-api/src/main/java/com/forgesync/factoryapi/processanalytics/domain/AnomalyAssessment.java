@@ -11,6 +11,8 @@ public record AnomalyAssessment(
     AssessmentDataStatus dataStatus,
     AnomalyClassification classification,
     BigDecimal score,
+    String primaryFeatureKey,
+    int supportingOutlierCount,
     CycleBaseline baseline,
     Instant evaluatedStartedAt,
     ObservationRange evaluationSourceRange,

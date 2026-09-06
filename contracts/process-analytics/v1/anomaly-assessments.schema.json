@@ -20,7 +20,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": "1.1.0"
+      "const": "1.2.0"
     },
     "assessmentProcessingRunId": {
       "$ref": "#/$defs/sha256"
@@ -41,7 +41,7 @@
       "const": "1.0.0"
     },
     "anomalyAssessmentVersion": {
-      "const": "2.0.0"
+      "const": "3.0.0"
     },
     "inputHash": {
       "$ref": "#/$defs/sha256"
@@ -89,7 +89,8 @@
         "contributions",
         "topReasons",
         "lineage",
-        "resultHash"
+        "resultHash",
+        "supportingOutlierCount"
       ],
       "properties": {
         "assessmentId": {
@@ -129,6 +130,16 @@
               "type": "null"
             }
           ]
+        },
+        "primaryFeatureKey": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supportingOutlierCount": {
+          "type": "integer",
+          "minimum": 0
         },
         "baseline": {
           "$ref": "#/$defs/baseline"

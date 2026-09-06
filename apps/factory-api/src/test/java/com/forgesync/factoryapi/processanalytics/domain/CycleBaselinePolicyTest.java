@@ -159,7 +159,7 @@ class CycleBaselinePolicyTest {
 
   @Test
   void publishesTheAssessmentPolicyVersionThatProducedTheResult() {
-    assertThat(AnomalyAssessmentPolicy.POLICY_VERSION).isEqualTo("2.0.0");
+    assertThat(AnomalyAssessmentPolicy.POLICY_VERSION).isEqualTo("3.0.0");
     assertThat(CycleBaselinePolicy.POLICY_VERSION).isEqualTo("1.0.0");
   }
 
@@ -260,7 +260,7 @@ class CycleBaselinePolicyTest {
   void appliesClassificationBoundariesAndStableTopReasonTieBreak() {
     var target = context("target", 10, "12", "1.000000");
     var baselines = new ArrayList<FeatureBaseline>();
-    for (String key : List.of("d", "c", "b", "a")) {
+    for (String key : List.of("durationSeconds", "d", "c", "b", "a")) {
       baselines.add(
           new FeatureBaseline(
               key,
@@ -291,9 +291,107 @@ class CycleBaselinePolicyTest {
 
     assertThat(deviating.score()).isEqualByComparingTo("0.500000");
     assertThat(deviating.classification()).isEqualTo(AnomalyClassification.DEVIATING);
+    assertThat(deviating.primaryFeatureKey()).isEqualTo("durationSeconds");
+    // The primary feature leads, then the remaining reasons keep their stable tie-break order.
     assertThat(deviating.topReasons())
         .extracting(FeatureContribution::featureKey)
-        .containsExactly("a", "b", "c");
+        .containsExactly("durationSeconds", "a", "b");
+    assertThat(deviating.supportingOutlierCount()).isEqualTo(4);
+  }
+
+  @Test
+  void letsCycleDurationCarryTheGradeAndCountsChannelsBeside() {
+    var target = context("target", 10, "121", "1.000000");
+    var baselines =
+        new ArrayList<>(
+            List.of(
+                // Cycle duration is ordinary: 121 against a median of 120.
+                new FeatureBaseline(
+                    "durationSeconds",
+                    new BigDecimal("121.000000"),
+                    new BigDecimal("120.000000"),
+                    new BigDecimal("119.000000"),
+                    new BigDecimal("121.000000"),
+                    new BigDecimal("2.000000"),
+                    5,
+                    List.of("1", "2", "3", "4", "5"),
+                    null)));
+    // Two channels are far outside their own baselines.
+    for (String key :
+        List.of(
+            "metric|PATH_FEEDRATE|p|p_7|MM/S|populationStandardDeviation",
+            "metric|LOAD|Mazak01-B|Mazak01-B_1|PERCENT|mean")) {
+      baselines.add(
+          new FeatureBaseline(
+              key,
+              new BigDecimal("500.000000"),
+              new BigDecimal("100.000000"),
+              new BigDecimal("95.000000"),
+              new BigDecimal("105.000000"),
+              new BigDecimal("10.000000"),
+              5,
+              List.of("1", "2", "3", "4", "5"),
+              null));
+    }
+    var assessment =
+        new AnomalyAssessmentPolicy()
+            .assess(
+                "assessment",
+                target,
+                new CycleBaseline(
+                    "group",
+                    "Mazak01",
+                    "PROGRAM-1",
+                    "1.0.0",
+                    "1.0.0",
+                    "target",
+                    List.of(),
+                    null,
+                    null,
+                    List.of(),
+                    baselines));
+
+    assertThat(assessment.classification()).isEqualTo(AnomalyClassification.NORMAL);
+    assertThat(assessment.primaryFeatureKey()).isEqualTo("durationSeconds");
+    assertThat(assessment.supportingOutlierCount()).isEqualTo(2);
+    assertThat(assessment.topReasons().getFirst().featureKey()).isEqualTo("durationSeconds");
+  }
+
+  @Test
+  void withoutTheCycleDurationThereIsNothingToGrade() {
+    var target = context("target", 10, "12", "1.000000");
+    var assessment =
+        new AnomalyAssessmentPolicy()
+            .assess(
+                "assessment",
+                target,
+                new CycleBaseline(
+                    "group",
+                    "Mazak01",
+                    "PROGRAM-1",
+                    "1.0.0",
+                    "1.0.0",
+                    "target",
+                    List.of(),
+                    null,
+                    null,
+                    List.of(),
+                    List.of(
+                        new FeatureBaseline(
+                            "metric|LOAD|c|c_1|PERCENT|mean",
+                            new BigDecimal("500.000000"),
+                            new BigDecimal("100.000000"),
+                            new BigDecimal("95.000000"),
+                            new BigDecimal("105.000000"),
+                            new BigDecimal("10.000000"),
+                            5,
+                            List.of("1", "2", "3", "4", "5"),
+                            null))));
+
+    assertThat(assessment.dataStatus()).isEqualTo(AssessmentDataStatus.INSUFFICIENT_DATA);
+    assertThat(assessment.classification()).isNull();
+    assertThat(assessment.primaryFeatureKey()).isNull();
+    assertThat(assessment.supportingOutlierCount()).isEqualTo(1);
   }
 
   @Test

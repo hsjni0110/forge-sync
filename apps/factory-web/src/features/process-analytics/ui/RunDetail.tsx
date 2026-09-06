@@ -54,6 +54,14 @@ export function RunDetail({ run }: { run: MachiningRun }) {
           <p className="section-note">{assessmentUnavailableExplanation(run.program, run.assessment)}</p>
         )}
         {run.assessment.score != null && <p className="anomaly-score">차이 점수 {run.assessment.score} · {classificationLabel(run.assessment.classification)}<HelpTip text={GLOSSARY.anomalyScore} /></p>}
+        {run.assessment.primaryFeature && (
+          <p className="section-note">
+            등급은 {featureLabel(run.assessment.primaryFeature)} 기준입니다.
+            {(run.assessment.supportingOutlierCount ?? 0) > 0
+              ? ` 이와 별개로 기준선을 벗어난 채널이 ${run.assessment.supportingOutlierCount}건 함께 관측됐습니다.`
+              : " 기준선을 벗어난 채널은 함께 관측되지 않았습니다."}
+          </p>
+        )}
         <p className="section-note">같은 프로그램의 이전 가공과 비교한 분석값(DERIVED)이며 고장 판정이 아닙니다.</p>
         <ol className="anomaly-reasons" aria-label="차이의 상위 이유">{run.assessment.reasons.map((reason) => <li key={reason.feature}>
           {featureLabel(reason.feature)}: 관측 기반 값 {reason.target}, 기준선 중앙값 {reason.median}, 차이 {reason.difference}
