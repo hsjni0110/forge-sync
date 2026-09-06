@@ -43,6 +43,7 @@ export interface AssessmentDocument {
     topReasons: Array<{
       featureKey: string; targetValue: number; baselineMedian: number; difference: number;
       percentageDifference?: number | null; direction: string; score: number;
+      distance?: number | null; deviationScale?: number | null;
       sampleCount: number; contributingFeatureSetIds: string[]; reasonCode: string;
     }>;
   }>;

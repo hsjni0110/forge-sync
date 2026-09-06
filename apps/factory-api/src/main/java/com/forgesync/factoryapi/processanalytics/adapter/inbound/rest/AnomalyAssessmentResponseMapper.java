@@ -10,7 +10,7 @@ import com.forgesync.factoryapi.processanalytics.domain.ObservationRange;
 final class AnomalyAssessmentResponseMapper {
   AnomalyAssessmentResponse map(AnomalyAssessmentProcessingResult result) {
     return new AnomalyAssessmentResponse(
-        "1.0.0",
+        "1.1.0",
         result.assessmentProcessingRunId(),
         result.cycleFeatureProcessingRunId(),
         result.machiningRunProcessingRunId(),
@@ -83,6 +83,7 @@ final class AnomalyAssessmentResponseMapper {
         contribution.percentageDifference(),
         contribution.direction(),
         contribution.distance(),
+        contribution.deviationScale(),
         contribution.score(),
         contribution.sampleCount(),
         contribution.contributingFeatureSetIds(),

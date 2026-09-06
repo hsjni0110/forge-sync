@@ -202,13 +202,19 @@ function formatDuration(seconds: number): string {
   return remainder === 0 ? `${minutes}분` : `${minutes}분 ${remainder}초`;
 }
 
-function durationComparison(run: MachiningRun): { current: number; median: number; percentage: number | null } | undefined {
+function durationComparison(run: MachiningRun): DurationComparison | undefined {
   if (run.assessment?.status !== "AVAILABLE") return undefined;
   const reason = run.assessment.reasons.find((item) => item.feature === "durationSeconds");
-  return reason && { current: reason.target, median: reason.median, percentage: reason.percentage ?? null };
+  return reason && { current: reason.target, median: reason.median, percentage: reason.percentage ?? null,
+    distance: reason.distance ?? null, scale: reason.scale ?? null };
 }
 
-function RunRowCompare({ compare }: { compare: { current: number; median: number; percentage: number | null } }) {
+interface DurationComparison {
+  current: number; median: number; percentage: number | null;
+  distance: number | null; scale: number | null;
+}
+
+function RunRowCompare({ compare }: { compare: DurationComparison }) {
   const scale = Math.max(compare.current, compare.median, 1) * 1.2;
   const barWidth = (compare.current / scale) * 100;
   const markerLeft = (compare.median / scale) * 100;
@@ -221,10 +227,22 @@ function RunRowCompare({ compare }: { compare: { current: number; median: number
       </span>
       <span>
         이번 {formatDuration(compare.current)} · 기준(중앙값) {formatDuration(compare.median)}
-        {compare.percentage != null && <> · <strong>{compare.percentage}%</strong></>}
+        {compare.percentage != null && <> · <strong>{formatPercentage(compare.percentage)}</strong></>}
+        {compare.distance != null && compare.scale != null && (
+          <> · 정상 폭 {formatDuration(compare.scale)}의 <strong>{formatMultiple(compare.distance)}</strong></>
+        )}
       </span>
     </span>
   );
+}
+
+function formatPercentage(value: number): string {
+  return `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+}
+
+// 편차를 정상 폭의 배수로 표시해, 같은 등급 안에서도 크기를 구분할 수 있게 한다.
+function formatMultiple(distance: number): string {
+  return `${distance.toFixed(1)}배`;
 }
 
 function runTimelineBadge(run: MachiningRun): { label: string; tone?: "deviating" | "high_deviation"; detail?: string } {

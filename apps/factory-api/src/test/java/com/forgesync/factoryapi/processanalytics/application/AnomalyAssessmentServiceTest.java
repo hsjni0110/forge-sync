@@ -90,7 +90,7 @@ class AnomalyAssessmentServiceTest {
   }
 
   private static ProcessAnomalyAssessmentsCommand command() {
-    return new ProcessAnomalyAssessmentsCommand("Mazak01", "cycle|source", "1.0.0", "1.0.0");
+    return new ProcessAnomalyAssessmentsCommand("Mazak01", "cycle|source", "1.0.0", "2.0.0");
   }
 
   private static CycleFeatureProcessingResult cycleResult(List<CycleFeatureSet> sets) {

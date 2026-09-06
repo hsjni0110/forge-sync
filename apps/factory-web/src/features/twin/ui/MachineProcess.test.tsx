@@ -206,6 +206,7 @@ describe("Machine Detail process analysis", () => {
       assessment.classification = "DEVIATING";
       assessment.topReasons = [{ featureKey: "durationSeconds", targetValue: 149, baselineMedian: 100,
         difference: 49, percentageDifference: 49, direction: "ABOVE", score: 0.5, sampleCount: 6,
+        distance: 1.633333, deviationScale: 30,
         contributingFeatureSetIds: Array.from({ length: 5 }, (_, i) => `sha256:${String(i + 1).repeat(64)}`),
         reasonCode: "BASELINE_IQR_DISTANCE" }];
     });
@@ -213,7 +214,8 @@ describe("Machine Detail process analysis", () => {
     const compareText = timelineItem.querySelector(".run-row-compare")?.textContent ?? "";
     expect(compareText).toContain("이번 2분 29초");
     expect(compareText).toContain("기준(중앙값) 1분 40초");
-    expect(compareText).toContain("49%");
+    expect(compareText).toContain("+49.0%");
+    expect(compareText).toContain("정상 폭 30초의 1.6배");
   });
 
   it("selects the same run from the timeline overview preview", async () => {

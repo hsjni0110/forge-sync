@@ -35,7 +35,7 @@ export class HttpProcessAnalysisClient implements ProcessAnalysisClient {
     const assessments = decodeAssessments(await this.request(machineId, signal, {
       resource: "anomaly-assessments", existingId: existing?.assessmentProcessingId,
       body: { cycleFeatureProcessingRunId: features.featureProcessingRunId,
-        baselinePolicyVersion: "1.0.0", anomalyAssessmentVersion: "1.0.0" },
+        baselinePolicyVersion: "1.0.0", anomalyAssessmentVersion: "2.0.0" },
     }));
     validateAssessmentIdentity(assessments, features);
     requireMatch(!existing || assessments.assessmentProcessingRunId === existing.assessmentProcessingId);

@@ -108,9 +108,59 @@ class CycleBaselinePolicyTest {
         new AnomalyAssessmentPolicy()
             .assess("a2", target, new CycleBaselinePolicy().build("Mazak01", target, five));
 
-    assertThat(zeroIqr.score()).isEqualByComparingTo("1.000000");
-    assertThat(zeroIqr.classification()).isEqualTo(AnomalyClassification.HIGH_DEVIATION);
-    assertThat(zeroIqr.topReasons().getFirst().reasonCode()).isEqualTo("ZERO_IQR_DEVIATION");
+    // A baseline that never varies leaves no spread, so the ordinary-variation floor sets the
+    // scale instead of turning one second into an extreme distance.
+    assertThat(zeroIqr.topReasons().getFirst().deviationScale()).isEqualByComparingTo("1.000000");
+    assertThat(zeroIqr.topReasons().getFirst().reasonCode()).isEqualTo("RELATIVE_SCALE_FLOOR");
+    assertThat(zeroIqr.topReasons().getFirst().distance()).isEqualByComparingTo("1.000000");
+    assertThat(zeroIqr.score()).isEqualByComparingTo("0.500000");
+    assertThat(zeroIqr.classification()).isEqualTo(AnomalyClassification.DEVIATING);
+  }
+
+  @Test
+  void treatsOrdinaryVariationOfAConsistentCycleAsWithinBaseline() {
+    // The NIST Mazak01 cycle repeats at about two minutes with roughly a second of spread, which
+    // left version 1.0.0 reporting ordinary variation as an extreme distance.
+    var candidates =
+        List.of(
+            context("c1", 1, "120", "1.000000"),
+            context("c2", 2, "121", "1.000000"),
+            context("c3", 3, "121", "1.000000"),
+            context("c4", 4, "122", "1.000000"),
+            context("c5", 5, "121", "1.000000"));
+    var ordinary = context("ordinary", 6, "133", "1.000000");
+    var assessment =
+        new AnomalyAssessmentPolicy()
+            .assess(
+                "ordinary",
+                ordinary,
+                new CycleBaselinePolicy().build("Mazak01", ordinary, candidates));
+
+    assertThat(assessment.topReasons().getFirst().percentageDifference())
+        .isEqualByComparingTo("9.917355");
+    assertThat(assessment.topReasons().getFirst().reasonCode()).isEqualTo("RELATIVE_SCALE_FLOOR");
+    assertThat(assessment.topReasons().getFirst().deviationScale())
+        .isEqualByComparingTo("12.100000");
+    assertThat(assessment.classification()).isEqualTo(AnomalyClassification.NORMAL);
+
+    // A run that stopped after a few seconds is a different grade, not the same label.
+    var aborted = context("aborted", 7, "12", "1.000000");
+    var abortedAssessment =
+        new AnomalyAssessmentPolicy()
+            .assess(
+                "aborted",
+                aborted,
+                new CycleBaselinePolicy().build("Mazak01", aborted, candidates));
+
+    assertThat(abortedAssessment.topReasons().getFirst().distance())
+        .isEqualByComparingTo("9.008264");
+    assertThat(abortedAssessment.classification()).isEqualTo(AnomalyClassification.HIGH_DEVIATION);
+  }
+
+  @Test
+  void publishesTheAssessmentPolicyVersionThatProducedTheResult() {
+    assertThat(AnomalyAssessmentPolicy.POLICY_VERSION).isEqualTo("2.0.0");
+    assertThat(CycleBaselinePolicy.POLICY_VERSION).isEqualTo("1.0.0");
   }
 
   @Test
@@ -174,8 +224,13 @@ class CycleBaselinePolicyTest {
 
     var assessment = new AnomalyAssessmentPolicy().assess("assessment", target, cycleBaseline);
 
+    // Median zero leaves no relative floor, so the seconds resolution floor sets the scale.
     assertThat(assessment.contributions().getFirst().percentageDifference()).isNull();
-    assertThat(assessment.classification()).isEqualTo(AnomalyClassification.HIGH_DEVIATION);
+    assertThat(assessment.contributions().getFirst().reasonCode())
+        .isEqualTo("ABSOLUTE_SCALE_FLOOR");
+    assertThat(assessment.contributions().getFirst().deviationScale())
+        .isEqualByComparingTo("1.000000");
+    assertThat(assessment.classification()).isEqualTo(AnomalyClassification.DEVIATING);
   }
 
   @Test

@@ -67,6 +67,7 @@ public record AnomalyAssessmentResponse(
       BigDecimal percentageDifference,
       String direction,
       BigDecimal distance,
+      BigDecimal deviationScale,
       BigDecimal score,
       int sampleCount,
       List<String> contributingFeatureSetIds,

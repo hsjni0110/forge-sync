@@ -76,7 +76,7 @@ class AnomalyAssessmentControllerTest {
         .content(
             """
             {"cycleFeatureProcessingRunId":"sha256:%s","baselinePolicyVersion":"%s",
-             "anomalyAssessmentVersion":"1.0.0"}
+             "anomalyAssessmentVersion":"2.0.0"}
             """
                 .formatted("2".repeat(64), baselineVersion));
   }

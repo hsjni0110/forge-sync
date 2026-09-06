@@ -44,6 +44,7 @@ export interface CycleFeature {
 export interface AssessmentReason {
   feature: string; target: number; median: number; difference: number;
   percentage?: number | null; direction: string; sampleCount: number; code: string;
+  distance?: number | null; scale?: number | null;
 }
 export interface FeatureBaselineSummary {
   feature: string; sampleCount: number; unavailableReason: string | null;
