@@ -41,6 +41,16 @@ def test_operational_twin_keeps_the_frozen_meaning() -> None:
         snapshot["metrics"]["bAxisAngle"]["provenance"]["transformation"]["sourceDataItemId"]
         == "Mazak01-B_4"
     )
+    axis_positions = {
+        position["axis"]: position for position in snapshot["metrics"]["axisPositions"]
+    }
+    for axis, value in expected["axisPositionsMillimeters"].items():
+        assert axis_positions[axis]["value"] == value
+        assert axis_positions[axis]["unit"] == "MILLIMETER"
+        assert (
+            axis_positions[axis]["provenance"]["transformation"]["sourceDataItemId"]
+            == f"Mazak01-{axis}_1"
+        )
     assert snapshot["spatial"]["provenance"] == expected["spatialProvenance"]
     assert snapshot["spatial"]["positionUnit"] == expected["positionUnit"]
     assert snapshot["spatial"]["rotationUnit"] == expected["rotationUnit"]

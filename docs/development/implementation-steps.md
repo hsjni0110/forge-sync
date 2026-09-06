@@ -927,34 +927,45 @@ Tool Change Timeline `1.0.0` 조회 계약을 추가했다. 최초 값과 공백
 raw locator, mapping version을 보존한다. 3D는 기존 `toolMount` 하나의 label만 갱신하고
 `OBSERVED · 형상 미확인`을 표시하며, 공구 형상을 추측하지 않는다. [ADR-045](../adr/ADR-045-observed-tool-change-timeline.md)
 
-### Step 29 — XYZ Linear Axis Coordinate Binding
+### Step 29 — XYZ Linear Axis Coordinate Binding ✅ DONE
 
-**목적**: 이미 canonical `POSITION`으로 매핑된 X/Y/Z 관측값을 검증된 좌표 변환으로 3D 축 이동에 연결한다.
+**목적**: 이미 canonical `POSITION`으로 매핑된 X/Y/Z 관측값의 변화를 3D 축 이동에 연결하되,
+검증되지 않은 절대 기계 자세나 행정 한계를 주장하지 않는다.
 
 **근거**: `Xabs` 6,868건, `Yabs` 1,538건, `Zabs` 7,380건이 단위 `MILLIMETER`로 매핑 `2.1.0`에서 이미
-`POSITION`으로 변환된다. B축과 달리 선형축은 `Xtravel`/`Ytravel`/`Ztravel` CONDITION과 profile에서
-행정 범위 근거를 확인할 수 있다.
+`POSITION`으로 변환된다. `Xtravel`/`Ytravel`/`Ztravel`은 숫자 한계가 아니라 상태를 나타내는
+CONDITION이므로 행정 범위 근거로 사용할 수 없다. Devices.xml은 X/Y/Z를 machine-coordinate
+`ACTUAL POSITION`으로 설명하지만, 실제 장비의 3D 영점·방향·축척까지 제공하지 않는다.
 
 **구현 범위**
 
 - `POSITION` 관측 → `MachineVisualState` 축별 위치와 field-level provenance ([ADR-041](../adr/ADR-041-observed-b-axis-and-physical-coordinate-evidence.md) 정책 재사용)
-- millimeter → scene unit, 축 방향/부호/영점/행정 한계를 가진 immutable coordinate mapping
+- 고정한 source anchor 대비 millimeter 변화량 → scene unit을 계산하는 immutable coordinate mapping
+- observed source range 검증과 `OBSERVED_DELTA_MAPPING`/`SIMULATED` 표현 경계
 - procedural model의 X/Y/Z 이송 node 바인딩과 out-of-range/missing 표시
 - 축별 관측 주기가 다를 때의 hold/unknown 정책
 
 **테스트**
 
-- 0, 양/음 경계, 행정 한계 밖 값의 node 좌표가 고정 기대치와 일치한다.
+- 기준점, 양/음 observed-range 경계, 범위 밖 값의 node 좌표가 고정 기대치와 일치한다.
 - unknown unit, missing value, 검증 범위 밖 값에서 이동을 추측하지 않는다.
 - 축마다 최신 관측 시각이 다를 때 오래된 축을 live처럼 진행시키지 않는다.
 - stale/gap/version mismatch에서 마지막 위치를 animation으로 이어가지 않는다.
 - replay scrub 후 3D 위치와 2D 숫자가 같은 source observation을 가리킨다.
 - reduced motion에서 보간 없이 즉시 위치를 반영한다.
 
-**완료 조건**: 축 방향과 영점 근거가 Verification Ledger에 기록된 축만 바인딩을 활성화한다. 근거가 없는
-축은 개별적으로 unavailable이며 나머지 축은 계속 동작한다.
+**완료 조건**: source DataItem, anchor와 observed range가 기록된 축만 관측 변화 바인딩을 활성화한다.
+화면은 관측 변화는 `OBSERVED`, authored 기준 자세와 축척은 `SIMULATED`라고 함께 표시한다. 근거가
+없는 축은 개별적으로 unavailable이며 나머지 축은 계속 동작한다.
 
 **선행 조건**: Step 23.
+
+**구현 기록**: Twin `1.5.0`에 X/Y/Z별 optional observed position과 field-level provenance를
+추가했다. 중복, unknown unit, missing은 축별로 격리한다. 버전 관리되는
+`config/visualization/mazak01-observed-delta-mapping-v1.json`은 source anchor와 실제 dataset에서
+확인한 observed range만 검증 경계로 사용한다. Procedural 모델은 명시적 Z→X→Y carriage 참조를
+가지며 renderer는 이름 검색 없이 관측 delta를 바인딩한다. stale, gap, invalid update는 마지막
+검증 자세를 진행시키지 않고 reduced motion에서는 즉시 반영한다. [ADR-046](../adr/ADR-046-observed-linear-axis-delta-visualization.md)
 
 ### Step 30 — Toolpath Trail과 Work Envelope
 

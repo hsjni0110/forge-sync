@@ -32,6 +32,7 @@ public record OperationalTwinSnapshot(
     List<FieldProvenance> executionProvenance,
     List<FieldProvenance> healthProvenance,
     List<SpindleSpeed> spindleSpeeds,
+    List<AxisPosition> axisPositions,
     Optional<ObservedAngle> bAxisAngle,
     Optional<ObservedEvent> toolNumber,
     Optional<ObservedEvent> program,
@@ -80,6 +81,7 @@ public record OperationalTwinSnapshot(
         executionProvenance,
         healthProvenance,
         spindleSpeeds,
+        List.of(),
         bAxisAngle,
         toolNumber,
         program,
@@ -128,6 +130,7 @@ public record OperationalTwinSnapshot(
         executionProvenance,
         healthProvenance,
         spindleSpeeds,
+        List.of(),
         bAxisAngle,
         toolNumber,
         program,
@@ -155,6 +158,7 @@ public record OperationalTwinSnapshot(
     executionProvenance = List.copyOf(executionProvenance);
     healthProvenance = List.copyOf(healthProvenance);
     spindleSpeeds = List.copyOf(spindleSpeeds);
+    axisPositions = List.copyOf(axisPositions);
     Objects.requireNonNull(bAxisAngle, "bAxisAngle");
     Objects.requireNonNull(toolNumber, "toolNumber");
     Objects.requireNonNull(program, "program");
@@ -183,6 +187,21 @@ public record OperationalTwinSnapshot(
       BigDecimal value,
       String unit,
       ObservationMetadata metadata) {}
+
+  public record AxisPosition(
+      String axis,
+      ObservationAvailability availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadata metadata) {
+
+    public AxisPosition {
+      Objects.requireNonNull(axis, "axis");
+      if (!List.of("X", "Y", "Z").contains(axis)) {
+        throw new IllegalArgumentException("axis must be X, Y, or Z");
+      }
+    }
+  }
 
   public record ObservedAngle(
       ObservationAvailability availability,

@@ -7,6 +7,10 @@ import {
 } from "../../domain/machineVisualPresentation";
 import type { MachineTwinModel } from "./machineTwinModel";
 import type { BAxisRotation } from "../../domain/bAxisCoordinateMapping";
+import type {
+  LinearAxis,
+  LinearAxisTranslation,
+} from "../../domain/linearAxisCoordinateMapping";
 
 const SURFACE_COLORS: Record<MachineVisualPresentation["materialTone"], string> = {
   STALE: "#48545a",
@@ -39,12 +43,16 @@ export function MachineModelBinding({
   visualPresentation,
   isEnclosureTransparent = false,
   bAxisRotation,
+  linearAxisTranslations,
   activeToolLabel,
 }: {
   model: MachineTwinModel;
   visualPresentation: MachineVisualPresentation;
   isEnclosureTransparent?: boolean;
   bAxisRotation?: Extract<BAxisRotation, { availability: "AVAILABLE" }>;
+  linearAxisTranslations?: Partial<
+    Record<LinearAxis, Extract<LinearAxisTranslation, { availability: "AVAILABLE" }>>
+  >;
   activeToolLabel?: string;
 }) {
   const beaconElapsedSeconds = useRef(0);
@@ -54,6 +62,13 @@ export function MachineModelBinding({
     to: number;
     elapsedSeconds: number;
   } | undefined>(undefined);
+  const linearTransitions = useRef<Array<{
+    axis: LinearAxis;
+    sceneAxis: "x" | "y" | "z";
+    from: number;
+    to: number;
+    elapsedSeconds: number;
+  }>>([]);
 
   useEffect(() => {
     model.nodes.toolMount.userData.activeToolLabel = activeToolLabel ?? "확인할 수 없음";
@@ -80,6 +95,31 @@ export function MachineModelBinding({
   ]);
 
   useEffect(() => {
+    if (!model.linearMotion || !linearAxisTranslations) return;
+    const available = Object.values(linearAxisTranslations);
+    if (visualPresentation.isReducedMotion || !visualPresentation.isReplayAdvancing) {
+      for (const translation of available) {
+        carriageFor(model, translation.axis).position[translation.sceneAxis] =
+          translation.offsetSceneUnits;
+      }
+      linearTransitions.current = [];
+      return;
+    }
+    linearTransitions.current = available.map((translation) => ({
+      axis: translation.axis,
+      sceneAxis: translation.sceneAxis,
+      from: carriageFor(model, translation.axis).position[translation.sceneAxis],
+      to: translation.offsetSceneUnits,
+      elapsedSeconds: 0,
+    }));
+  }, [
+    linearAxisTranslations,
+    model,
+    visualPresentation.isReducedMotion,
+    visualPresentation.isReplayAdvancing,
+  ]);
+
+  useEffect(() => {
     const isMuted = ["STALE", "OFFLINE"].includes(visualPresentation.materialTone);
     for (const material of model.statusMaterials) {
       if (!(material instanceof MeshStandardMaterial)) continue;
@@ -99,6 +139,13 @@ export function MachineModelBinding({
   }, [isEnclosureTransparent, model, visualPresentation.materialTone, visualPresentation.status]);
 
   useFrame((_state, deltaSeconds) => {
+    linearTransitions.current = linearTransitions.current.filter((transition) => {
+      transition.elapsedSeconds = Math.min(0.25, transition.elapsedSeconds + deltaSeconds);
+      const progress = transition.elapsedSeconds / 0.25;
+      carriageFor(model, transition.axis).position[transition.sceneAxis] =
+        transition.from + (transition.to - transition.from) * progress;
+      return progress < 1;
+    });
     const transition = bAxisTransition.current;
     if (transition) {
       transition.elapsedSeconds = Math.min(0.25, transition.elapsedSeconds + deltaSeconds);
@@ -125,4 +172,13 @@ export function MachineModelBinding({
     );
   });
   return null;
+}
+
+function carriageFor(model: MachineTwinModel, axis: LinearAxis) {
+  if (!model.linearMotion) throw new Error("Linear motion nodes are unavailable");
+  return {
+    X: model.linearMotion.xAxisCarriage,
+    Y: model.linearMotion.yAxisCarriage,
+    Z: model.linearMotion.zAxisCarriage,
+  }[axis];
 }

@@ -38,7 +38,7 @@ describe("MachineDetailView", () => {
     expect(screen.getByText("114")).toBeTruthy();
     expect(screen.getAllByText(/실제 데이터 · NIST/).length).toBeGreaterThan(0);
     expect(screen.getByText(/상세 품질 정보는 아직 제공하지 않습니다/)).toBeTruthy();
-    expect(screen.getByText(/원본 추적 정보 5건 · 1개 출처/)).toBeTruthy();
+    expect(screen.getByText(/원본 추적 정보 8건 · 1개 출처/)).toBeTruthy();
   });
 
   it("renders a compact operational summary without the full provenance list", () => {
@@ -99,9 +99,9 @@ describe("MachineDetailView", () => {
       />,
     );
 
-    const disclosure = screen.getByText(/원본 추적 정보 5건 · 1개 출처/).closest("details");
+    const disclosure = screen.getByText(/원본 추적 정보 8건 · 1개 출처/).closest("details");
     expect(disclosure?.hasAttribute("open")).toBe(false);
-    expect(within(disclosure!).getByRole("heading", { name: /NIST.*5건/ })).toBeTruthy();
+    expect(within(disclosure!).getByRole("heading", { name: /NIST.*8건/ })).toBeTruthy();
   });
 
   it("summarizes many condition signals instead of listing every normal one", () => {

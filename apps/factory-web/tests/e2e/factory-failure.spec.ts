@@ -42,9 +42,24 @@ test("available WebGL keeps the 3D factory scene visible", async ({ page }) => {
   await page.getByText("모델 정보", { exact: true }).click();
   await expect(page.getByText("B축 45° · 좌표 매핑 검증 전 · unavailable", { exact: true }))
     .toBeVisible();
+  await expect(
+    page.getByText("XYZ 이동 · X 80.08 mm · Y -68.79 mm · Z 9.64 mm", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("관측 변화 OBSERVED · 기준 자세·축척 SIMULATED", { exact: true }),
+  ).toBeVisible();
   await expect(page.getByLabel("시뮬레이션 공장 3D 화면").locator("canvas")).toBeVisible();
 
   await page.getByRole("button", { name: "2D" }).click();
+  await expect(
+    page.locator(".metric-card").filter({ hasText: "X축 위치" }).getByText("80.08 mm"),
+  ).toBeVisible();
+  await expect(
+    page.locator(".metric-card").filter({ hasText: "Y축 위치" }).getByText("-68.79 mm"),
+  ).toBeVisible();
+  await expect(
+    page.locator(".metric-card").filter({ hasText: "Z축 위치" }).getByText("9.64 mm"),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "데이터 품질" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "데이터 출처" })).toBeVisible();
 });

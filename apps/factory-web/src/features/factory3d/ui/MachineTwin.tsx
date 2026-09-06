@@ -12,6 +12,11 @@ import { MachineModelView, type MachineInspectionViewProps } from "./MachineMode
 import { providerFor } from "./model/machineModelProviders";
 import type { MachineTwinModel } from "./model/machineTwinModel";
 import { mapBaxisAngleToRotation } from "../domain/bAxisCoordinateMapping";
+import {
+  mapObservedAxisDelta,
+  type LinearAxis,
+  type LinearAxisTranslation,
+} from "../domain/linearAxisCoordinateMapping";
 
 export function MachineTwin({
   binding,
@@ -40,6 +45,7 @@ export function MachineTwin({
       : undefined;
   const availableBaxisRotation =
     bAxisRotation?.availability === "AVAILABLE" ? bAxisRotation : undefined;
+  const linearAxisTranslations = observedAxisTranslations(binding, visualState);
   return (
     <group
       name={binding.sceneNodeId}
@@ -56,6 +62,7 @@ export function MachineTwin({
           <GenericMachinePrimitive
             visualPresentation={visualPresentation}
             bAxisRotation={availableBaxisRotation}
+            linearAxisTranslations={linearAxisTranslations}
             activeToolLabel={toolLabel(visualState)}
             {...inspectionProps}
           />
@@ -66,6 +73,7 @@ export function MachineTwin({
           asset={binding.asset}
           visualPresentation={visualPresentation}
           bAxisRotation={availableBaxisRotation}
+          linearAxisTranslations={linearAxisTranslations}
           activeToolLabel={toolLabel(visualState)}
           {...inspectionProps}
         />
@@ -78,6 +86,26 @@ export function MachineTwin({
       )}
     </group>
   );
+}
+
+function observedAxisTranslations(
+  binding: MachineSceneBinding,
+  visualState: MachineVisualState | undefined,
+): Partial<Record<LinearAxis, Extract<LinearAxisTranslation, { availability: "AVAILABLE" }>>> {
+  if (!binding.linearAxisCoordinateMappings || !visualState || visualState.stale) return {};
+  const translations: Partial<
+    Record<LinearAxis, Extract<LinearAxisTranslation, { availability: "AVAILABLE" }>>
+  > = {};
+  for (const position of visualState.axisPositions ?? []) {
+    const mapped = mapObservedAxisDelta(
+      position.millimeters,
+      position.unit,
+      position.sourceDataItemId,
+      binding.linearAxisCoordinateMappings[position.axis],
+    );
+    if (mapped.availability === "AVAILABLE") translations[position.axis] = mapped;
+  }
+  return translations;
 }
 
 function toolLabel(visualState: MachineVisualState | undefined): string {

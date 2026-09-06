@@ -8,6 +8,7 @@ import type {
   MachineVisualState,
 } from "../domain/machineVisualState";
 import { deriveMachineVisualPresentation } from "../domain/machineVisualPresentation";
+import { MAZAK01_OBSERVED_DELTA_MAPPINGS } from "../adapters/mazak01ObservedDeltaMapping";
 import FactoryScene from "./FactoryScene";
 
 const loadVerifiedGlbAsset = vi.hoisted(() => vi.fn());
@@ -211,6 +212,8 @@ describe("FactoryScene asset isolation", () => {
     expect(screen.getByText(/대표 공작물: SIMULATED/)).toBeTruthy();
     expect(screen.getByText(/공장 배치: SIMULATED_LAYOUT/)).toBeTruthy();
     expect(screen.getByText(/B축 45° · 좌표 매핑 검증 전 · unavailable/)).toBeTruthy();
+    expect(screen.getByText(/XYZ 이동 · X 80.08 mm · Y -68.79 mm · Z 9.64 mm/)).toBeTruthy();
+    expect(screen.getByText(/관측 변화 OBSERVED · 기준 자세·축척 SIMULATED/)).toBeTruthy();
   });
 
   it("keeps camera controls compact while preserving keyboard commands and part focus", async () => {
@@ -301,6 +304,7 @@ function binding(asset: typeof proceduralAsset | GlbFactoryAsset): MachineSceneB
     spatialProvenance: "SIMULATED_LAYOUT",
     spatialAvailability: "TWIN",
     visualSpindleSourceDataItemId: "Mazak01-C_5",
+    linearAxisCoordinateMappings: MAZAK01_OBSERVED_DELTA_MAPPINGS,
   };
 }
 
@@ -316,6 +320,29 @@ const visualState: MachineVisualState = {
   bAxisAngleUnit: "DEGREE",
   bAxisAngleSourceDataItemId: "Mazak01-B_4",
   bAxisAngleSourceObservedAt: "2016-10-05T09:16:39.557Z",
+  axisPositions: [
+    {
+      axis: "X",
+      millimeters: 80.078834,
+      unit: "MILLIMETER",
+      sourceDataItemId: "Mazak01-X_1",
+      sourceObservedAt: "2016-10-05T09:01:41.165Z",
+    },
+    {
+      axis: "Y",
+      millimeters: -68.786629,
+      unit: "MILLIMETER",
+      sourceDataItemId: "Mazak01-Y_1",
+      sourceObservedAt: "2016-10-05T09:01:41.165Z",
+    },
+    {
+      axis: "Z",
+      millimeters: 9.635998,
+      unit: "MILLIMETER",
+      sourceDataItemId: "Mazak01-Z_1",
+      sourceObservedAt: "2016-10-05T08:49:23.254Z",
+    },
+  ],
   tool: "13",
   stale: false,
   selected: true,

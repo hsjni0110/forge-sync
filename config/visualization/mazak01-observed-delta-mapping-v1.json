@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "1.0.0",
+  "machineId": "Mazak01",
+  "sourceSetId": "nist-mazak01-20161005",
+  "classification": "OBSERVED_DELTA_MAPPING",
+  "presentation": {
+    "baseline": "SIMULATED",
+    "scale": "SIMULATED",
+    "absoluteMachinePose": "UNAVAILABLE",
+    "machineTravelLimits": "UNAVAILABLE"
+  },
+  "axes": [
+    {
+      "axis": "X",
+      "sourceDataItemId": "Mazak01-X_1",
+      "inputUnit": "MILLIMETER",
+      "sceneAxis": "y",
+      "directionSign": 1,
+      "referenceMillimeters": -0.00127,
+      "referenceSourceObservedAt": "2016-10-05T08:43:49.514Z",
+      "referenceRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=5328-5366",
+      "observedRangeMillimeters": [-356.686612, 945.964834],
+      "sceneUnitsPerMillimeter": 0.0012,
+      "evidenceReference": "NIST Devices.xml Mazak01-X_1 and pinned Canonical source anchor"
+    },
+    {
+      "axis": "Y",
+      "sourceDataItemId": "Mazak01-Y_1",
+      "inputUnit": "MILLIMETER",
+      "sceneAxis": "x",
+      "directionSign": 1,
+      "referenceMillimeters": 0.0,
+      "referenceSourceObservedAt": "2016-10-05T08:43:49.514Z",
+      "referenceRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=5433-5464",
+      "observedRangeMillimeters": [-68.786629, 0.0],
+      "sceneUnitsPerMillimeter": 0.0012,
+      "evidenceReference": "NIST Devices.xml Mazak01-Y_1 and pinned Canonical source anchor"
+    },
+    {
+      "axis": "Z",
+      "sourceDataItemId": "Mazak01-Z_1",
+      "inputUnit": "MILLIMETER",
+      "sceneAxis": "z",
+      "directionSign": 1,
+      "referenceMillimeters": 9.635617,
+      "referenceSourceObservedAt": "2016-10-05T08:43:49.514Z",
+      "referenceRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=5530-5568",
+      "observedRangeMillimeters": [-98.43516, 470.353898],
+      "sceneUnitsPerMillimeter": 0.0012,
+      "evidenceReference": "NIST Devices.xml Mazak01-Z_1 and pinned Canonical source anchor"
+    }
+  ]
+}

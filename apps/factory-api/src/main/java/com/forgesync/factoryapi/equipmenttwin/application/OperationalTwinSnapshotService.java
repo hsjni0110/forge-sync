@@ -1,5 +1,6 @@
 package com.forgesync.factoryapi.equipmenttwin.application;
 
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.AxisPosition;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.CurrentCondition;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservationMetadata;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedAngle;
@@ -25,7 +26,11 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
 
   private static final String SPINDLE_SPEED = "SPINDLE_SPEED";
   private static final String ANGLE = "ANGLE";
+  private static final String POSITION = "POSITION";
   private static final String DEGREE = "DEGREE";
+  private static final String MILLIMETER = "MILLIMETER";
+  private static final java.util.Map<String, String> AXIS_DATA_ITEMS =
+      java.util.Map.of("X", "Mazak01-X_1", "Y", "Mazak01-Y_1", "Z", "Mazak01-Z_1");
   private static final String EXECUTION = "EXECUTION";
   private static final String TOOL_NUMBER = "TOOL_NUMBER";
   private static final String PROGRAM = "PROGRAM";
@@ -63,11 +68,12 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
 
     List<ProjectedTwinObservation> observations = projection.observations();
     List<SpindleSpeed> spindleSpeeds = spindleSpeeds(observations);
+    List<AxisPosition> axisPositions = axisPositions(observations);
     Optional<ObservedAngle> bAxisAngle = uniqueBaxisAngle(observations);
     Optional<ObservedEvent> toolNumber = uniqueEvent(observations, TOOL_NUMBER);
     Optional<ObservedEvent> program = uniqueEvent(observations, PROGRAM);
     List<String> missingFields =
-        missingFields(projection, spindleSpeeds, bAxisAngle, toolNumber, program);
+        missingFields(projection, spindleSpeeds, axisPositions, bAxisAngle, toolNumber, program);
     TwinConsistencyState consistency = consistency(freshness, missingFields);
 
     return new OperationalTwinSnapshot(
@@ -89,6 +95,7 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         provenanceOf(observations, StateObservationKind.EVENT, EXECUTION),
         provenanceOfKind(observations, StateObservationKind.CONDITION),
         spindleSpeeds,
+        axisPositions,
         bAxisAngle,
         toolNumber,
         program,
@@ -157,6 +164,31 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         new ObservedAngle(item.availability(), item.numericValue(), item.unit(), metadata(item)));
   }
 
+  private static List<AxisPosition> axisPositions(List<ProjectedTwinObservation> observations) {
+    return AXIS_DATA_ITEMS.entrySet().stream()
+        .sorted(java.util.Map.Entry.comparingByKey())
+        .map(entry -> uniqueAxisPosition(observations, entry.getKey(), entry.getValue()))
+        .flatMap(Optional::stream)
+        .toList();
+  }
+
+  private static Optional<AxisPosition> uniqueAxisPosition(
+      List<ProjectedTwinObservation> observations, String axis, String sourceDataItemId) {
+    List<ProjectedTwinObservation> matching =
+        observations.stream()
+            .filter(item -> item.kind() == StateObservationKind.SAMPLE)
+            .filter(item -> item.semanticType().equals(POSITION))
+            .filter(item -> item.provenance().sourceDataItemId().equals(sourceDataItemId))
+            .toList();
+    if (matching.size() != 1 || !MILLIMETER.equals(matching.getFirst().unit())) {
+      return Optional.empty();
+    }
+    ProjectedTwinObservation item = matching.getFirst();
+    return Optional.of(
+        new AxisPosition(
+            axis, item.availability(), item.numericValue(), item.unit(), metadata(item)));
+  }
+
   private static List<CurrentCondition> conditions(List<ProjectedTwinObservation> observations) {
     return observations.stream()
         .filter(item -> item.kind() == StateObservationKind.CONDITION)
@@ -177,6 +209,7 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
   private static List<String> missingFields(
       LoadedTwinProjection projection,
       List<SpindleSpeed> spindleSpeeds,
+      List<AxisPosition> axisPositions,
       Optional<ObservedAngle> bAxisAngle,
       Optional<ObservedEvent> toolNumber,
       Optional<ObservedEvent> program) {
@@ -187,6 +220,13 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
     if (spindleSpeeds.stream()
         .noneMatch(item -> item.availability() == ObservationAvailability.AVAILABLE)) {
       missing.add("metrics.spindleSpeeds");
+    }
+    for (String axis : List.of("X", "Y", "Z")) {
+      if (axisPositions.stream()
+          .filter(item -> item.axis().equals(axis))
+          .noneMatch(OperationalTwinSnapshotService::isAvailable)) {
+        missing.add("metrics.axisPositions." + axis.toLowerCase(java.util.Locale.ROOT));
+      }
     }
     if (projection.equipmentState().execution() == ExecutionState.UNKNOWN) {
       missing.add("state.execution");
@@ -212,6 +252,10 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
 
   private static boolean isAvailable(ObservedAngle angle) {
     return angle.availability() == ObservationAvailability.AVAILABLE && angle.value() != null;
+  }
+
+  private static boolean isAvailable(AxisPosition position) {
+    return position.availability() == ObservationAvailability.AVAILABLE && position.value() != null;
   }
 
   private static TwinConsistencyState consistency(

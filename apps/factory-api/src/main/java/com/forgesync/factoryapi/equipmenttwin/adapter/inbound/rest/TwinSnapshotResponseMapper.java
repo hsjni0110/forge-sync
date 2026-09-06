@@ -1,5 +1,6 @@
 package com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest;
 
+import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.AxisPositionDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ConditionDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ConsistencyDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.DerivedStateDto;
@@ -27,7 +28,7 @@ public final class TwinSnapshotResponseMapper {
 
   public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
-        "1.4.0",
+        "1.5.0",
         new MachineDto(snapshot.machineId()),
         new ConsistencyDto(
             snapshot.consistencyState().name(),
@@ -64,6 +65,17 @@ public final class TwinSnapshotResponseMapper {
                             speed.unit(),
                             metadata(speed.metadata()),
                             provenance(speed.metadata().provenance())))
+                .toList(),
+            snapshot.axisPositions().stream()
+                .map(
+                    position ->
+                        new AxisPositionDto(
+                            position.axis(),
+                            position.availability().name(),
+                            position.value(),
+                            position.unit(),
+                            metadata(position.metadata()),
+                            provenance(position.metadata().provenance())))
                 .toList(),
             snapshot.bAxisAngle().map(TwinSnapshotResponseMapper::bAxisAngle).orElse(null),
             snapshot.toolNumber().map(TwinSnapshotResponseMapper::toolNumber).orElse(null),

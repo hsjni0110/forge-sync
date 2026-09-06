@@ -125,6 +125,7 @@ export default function FactoryScene({
         selectPart={selectPart}
         toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
         bAxisStatus={bAxisStatus(machineBinding, visualState)}
+        linearAxisStatus={linearAxisStatus(machineBinding, visualState, model)}
         toolStatus={toolStatus(visualState)}
       />
     </div>
@@ -139,6 +140,7 @@ function MachineInspectionControls({
   selectPart,
   toggleEnclosure,
   bAxisStatus,
+  linearAxisStatus,
   toolStatus,
 }: {
   model?: MachineTwinModel;
@@ -148,6 +150,7 @@ function MachineInspectionControls({
   selectPart: (partId?: MachineInspectionPartId) => void;
   toggleEnclosure: () => void;
   bAxisStatus: string;
+  linearAxisStatus: string;
   toolStatus: string;
 }) {
   const cameraButtons: Array<[string, string, CameraCommandType]> = [
@@ -214,6 +217,8 @@ function MachineInspectionControls({
         <span>대표 공작물: SIMULATED</span>
         <span>공장 배치: SIMULATED_LAYOUT</span>
         <span>{bAxisStatus}</span>
+        <span>{linearAxisStatus}</span>
+        <span>관측 변화 OBSERVED · 기준 자세·축척 SIMULATED</span>
         <span>{toolStatus}</span>
       </details>
       <span className="visually-hidden" role="status">
@@ -243,6 +248,26 @@ function bAxisStatus(
     return `B축 ${value} · 좌표 매핑 검증 전 · unavailable`;
   }
   return `B축 ${value} · 검증된 좌표 매핑`;
+}
+
+function linearAxisStatus(
+  binding: FactorySceneProps["machineBinding"],
+  visualState: FactorySceneProps["visualState"],
+  model: MachineTwinModel | undefined,
+): string {
+  if (model && !model.linearMotion) {
+    return "XYZ 이동 · 이 모델의 이동 노드 unavailable";
+  }
+  if (!binding.linearAxisCoordinateMappings) {
+    return "XYZ 이동 · 좌표 매핑 unavailable";
+  }
+  const positions = new Map(visualState?.axisPositions?.map((position) => [position.axis, position]));
+  return `XYZ 이동 · ${(["X", "Y", "Z"] as const)
+    .map((axis) => {
+      const position = positions.get(axis);
+      return position ? `${axis} ${position.millimeters.toFixed(2)} mm` : `${axis} unavailable`;
+    })
+    .join(" · ")}`;
 }
 
 function keyboardCameraCommand(key: string): CameraCommandType | "CLEAR_SELECTION" | undefined {

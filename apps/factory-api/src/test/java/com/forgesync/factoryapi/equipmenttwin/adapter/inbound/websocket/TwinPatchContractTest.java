@@ -56,7 +56,7 @@ class TwinPatchContractTest {
     assertThatThrownBy(
             () ->
                 new TwinPatchMessage(
-                    "1.4.0",
+                    "1.5.0",
                     "TWIN_PATCH",
                     "Mazak01",
                     4,

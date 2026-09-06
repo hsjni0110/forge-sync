@@ -7,11 +7,11 @@
   "checkedInFiles": [
     {
       "path": "tests/fixtures/twin/v1/mazak01-operational-twin.json",
-      "sha256": "1d065b1ab7264223bf2b064ee5fa29ae902b740541f57666acbbfa7404f9c46b"
+      "sha256": "1054d78d3571a5af7be4234b1a1cc59719990480bc5b324c90982ec5aeeff578"
     },
     {
       "path": "tests/fixtures/twin/v1/mazak01-twin-patch.json",
-      "sha256": "7db51357104a5a90a0663bd086737f35357584cb56a9867148262405e4302759"
+      "sha256": "c6434f40c0f38a66c8e238266f8e15685f254be36c10237d5932cf2200d578c1"
     },
     {
       "path": "tests/e2e/fixtures/machine-detail-replay.json",
@@ -27,6 +27,7 @@
     "rpm": 49.0,
     "toolNumber": 13,
     "bAxisAngleDegrees": 45.0,
+    "axisPositionsMillimeters": { "X": 80.078834, "Y": -68.786629, "Z": 9.635998 },
     "visualAngularVelocityRadPerSecond": 0.098,
     "spatialProvenance": "SIMULATED_LAYOUT",
     "positionUnit": "SCENE_UNIT",

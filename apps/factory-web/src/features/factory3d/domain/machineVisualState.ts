@@ -9,6 +9,7 @@ export interface MachineVisualState {
   health: "UNKNOWN" | "NORMAL" | "WARNING" | "FAULT";
   rpm?: number;
   rpmSourceDataItemId: string;
+  axisPositions?: MachineVisualAxisPosition[];
   bAxisAngleDegrees?: number;
   bAxisAngleUnit?: "DEGREE";
   bAxisAngleSourceDataItemId?: string;
@@ -22,6 +23,14 @@ export interface MachineVisualState {
   selected: boolean;
   isReplayAdvancing?: boolean;
   spatial?: MachineSpatialLayout;
+}
+
+export interface MachineVisualAxisPosition {
+  axis: "X" | "Y" | "Z";
+  millimeters: number;
+  unit: "MILLIMETER";
+  sourceDataItemId: string;
+  sourceObservedAt: string;
 }
 
 export interface MachineSpatialLayout {
@@ -44,4 +53,8 @@ export interface MachineSceneBinding {
   spatialAvailability: "TWIN" | "FALLBACK";
   visualSpindleSourceDataItemId: string;
   bAxisCoordinateMapping?: BAxisCoordinateMapping;
+  linearAxisCoordinateMappings?: Record<
+    "X" | "Y" | "Z",
+    import("./linearAxisCoordinateMapping").LinearAxisCoordinateMapping
+  >;
 }

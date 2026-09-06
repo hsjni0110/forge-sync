@@ -23,6 +23,20 @@ export function mapTwinToMachineVisualState({
       : undefined;
   const toolNumber = snapshot.metrics.toolNumber;
   const bAxisAngle = snapshot.metrics.bAxisAngle;
+  const axisPositions = snapshot.metrics.axisPositions
+    .filter(
+      (position) =>
+        position.availability === "AVAILABLE" &&
+        position.value !== undefined &&
+        position.unit === "MILLIMETER",
+    )
+    .map((position) => ({
+      axis: position.axis,
+      millimeters: position.value!,
+      unit: "MILLIMETER" as const,
+      sourceDataItemId: position.provenance.transformation.sourceDataItemId,
+      sourceObservedAt: position.observation.sourceObservedAt,
+    }));
   const hasBaxisAngle =
     bAxisAngle?.availability === "AVAILABLE" &&
     bAxisAngle.value !== undefined &&
@@ -40,6 +54,7 @@ export function mapTwinToMachineVisualState({
     health: snapshot.state.health.value,
     rpm,
     rpmSourceDataItemId: visualSpindleSourceDataItemId,
+    axisPositions,
     bAxisAngleDegrees: hasBaxisAngle ? bAxisAngle.value : undefined,
     bAxisAngleUnit: hasBaxisAngle ? bAxisAngle.unit : undefined,
     bAxisAngleSourceDataItemId: hasBaxisAngle

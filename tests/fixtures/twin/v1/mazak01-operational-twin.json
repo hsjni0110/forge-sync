@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.4.0",
+  "schemaVersion": "1.5.0",
   "machine": { "machineId": "Mazak01" },
   "consistency": {
     "status": "PARTIAL",
@@ -46,6 +46,32 @@
     }
   },
   "metrics": {
+    "axisPositions": [
+      {
+        "axis": "X", "availability": "AVAILABLE", "value": 80.078834, "unit": "MILLIMETER",
+        "observation": { "componentId": "Mazak01-X", "sourceObservedAt": "2016-10-05T09:01:41.165Z", "projectedAt": "2026-09-02T01:02:04Z", "twinVersion": 4 },
+        "provenance": {
+          "source": { "kind": "REAL", "provider": "NIST", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf" },
+          "transformation": { "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=65249-65288", "mappingVersion": "2.1.0", "sourceDataItemId": "Mazak01-X_1" }
+        }
+      },
+      {
+        "axis": "Y", "availability": "AVAILABLE", "value": -68.786629, "unit": "MILLIMETER",
+        "observation": { "componentId": "Mazak01-Y", "sourceObservedAt": "2016-10-05T09:01:41.165Z", "projectedAt": "2026-09-02T01:02:04Z", "twinVersion": 4 },
+        "provenance": {
+          "source": { "kind": "REAL", "provider": "NIST", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf" },
+          "transformation": { "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=65289-65329", "mappingVersion": "2.1.0", "sourceDataItemId": "Mazak01-Y_1" }
+        }
+      },
+      {
+        "axis": "Z", "availability": "AVAILABLE", "value": 9.635998, "unit": "MILLIMETER",
+        "observation": { "componentId": "Mazak01-Z", "sourceObservedAt": "2016-10-05T08:49:23.254Z", "projectedAt": "2026-09-02T01:02:04Z", "twinVersion": 4 },
+        "provenance": {
+          "source": { "kind": "REAL", "provider": "NIST", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf" },
+          "transformation": { "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=24786-24824", "mappingVersion": "2.1.0", "sourceDataItemId": "Mazak01-Z_1" }
+        }
+      }
+    ],
     "bAxisAngle": {
       "availability": "AVAILABLE",
       "value": 45,

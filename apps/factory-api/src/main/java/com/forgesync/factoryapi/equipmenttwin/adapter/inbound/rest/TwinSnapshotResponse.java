@@ -65,6 +65,7 @@ public record TwinSnapshotResponse(
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record MetricsDto(
       List<SpindleSpeedDto> spindleSpeeds,
+      List<AxisPositionDto> axisPositions,
       ObservedAngleDto bAxisAngle,
       ObservedIntegerDto toolNumber,
       ObservedTextDto program) {}
@@ -79,6 +80,15 @@ public record TwinSnapshotResponse(
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record ObservedAngleDto(
+      String availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadataDto observation,
+      FieldProvenanceDto provenance) {}
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record AxisPositionDto(
+      String axis,
       String availability,
       BigDecimal value,
       String unit,

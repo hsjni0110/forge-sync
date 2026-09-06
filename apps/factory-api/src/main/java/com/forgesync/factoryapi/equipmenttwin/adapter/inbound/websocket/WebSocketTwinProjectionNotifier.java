@@ -51,7 +51,7 @@ final class WebSocketTwinProjectionNotifier implements TwinProjectionNotifier {
       long targetVersion = snapshot.consistency().twinVersion();
       broadcaster.broadcast(
           new TwinPatchMessage(
-              "1.4.0",
+              "1.5.0",
               "TWIN_PATCH",
               machineId,
               targetVersion - 1,

@@ -34,6 +34,11 @@ describe("mapTwinToMachineVisualState", () => {
       alarmSeverity: undefined,
       stale: false,
       selected: true,
+      axisPositions: [
+        { axis: "X", millimeters: 80.078834, unit: "MILLIMETER", sourceDataItemId: "Mazak01-X_1", sourceObservedAt: "2016-10-05T09:01:41.165Z" },
+        { axis: "Y", millimeters: -68.786629, unit: "MILLIMETER", sourceDataItemId: "Mazak01-Y_1", sourceObservedAt: "2016-10-05T09:01:41.165Z" },
+        { axis: "Z", millimeters: 9.635998, unit: "MILLIMETER", sourceDataItemId: "Mazak01-Z_1", sourceObservedAt: "2016-10-05T08:49:23.254Z" },
+      ],
       spatial: {
         assetId: "cnc-generic-primitive-v1",
         sceneNodeId: "mazak01",

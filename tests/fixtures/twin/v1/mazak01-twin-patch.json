@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "1.4.0",
+  "schemaVersion": "1.5.0",
   "type": "TWIN_PATCH",
   "machineId": "Mazak01",
   "baseVersion": 3,
   "targetVersion": 4,
   "projectedAt": "2026-09-02T01:02:04Z",
   "snapshot": {
-    "schemaVersion": "1.4.0",
+    "schemaVersion": "1.5.0",
     "machine": { "machineId": "Mazak01" },
     "consistency": {
       "status": "PARTIAL",
@@ -53,6 +53,7 @@
       }
     },
     "metrics": {
+      "axisPositions": [],
       "spindleSpeeds": [
         {
           "availability": "AVAILABLE",

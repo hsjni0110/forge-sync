@@ -76,13 +76,14 @@ class TwinSnapshotContractTest {
             .writeValueAsString(new TwinSnapshotResponseMapper().map(snapshot));
 
     assertThat(violations(document)).isEmpty();
+    assertThat(document).contains("\"schemaVersion\":\"1.5.0\"").contains("\"axisPositions\"");
   }
 
   @Test
   void rejectsWrongVersionMissingProvenanceAndUnavailableValue() {
     String valid = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
 
-    assertThat(violations(valid.replace("\"1.4.0\"", "\"2.0.0\""))).isNotEmpty();
+    assertThat(violations(valid.replace("\"1.5.0\"", "\"2.0.0\""))).isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"provenance\": \\{", "\"lineage\": {")))
         .isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"AVAILABLE\"", "\"UNAVAILABLE\""))).isNotEmpty();

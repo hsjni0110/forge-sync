@@ -1,7 +1,7 @@
 # WebSocket Contracts
 
 The raw WebSocket endpoint `/api/v1/ws/machines/{machineId}/twin` emits a versioned
-`TWIN_PATCH` after an Equipment Twin projection commits. Version `1.4.0` is defined by
+`TWIN_PATCH` after an Equipment Twin projection commits. Version `1.5.0` is defined by
 [`v1/twin-patch.schema.json`](./v1/twin-patch.schema.json).
 
 The patch contains a complete authoritative Twin snapshot rather than a partial field mutation.

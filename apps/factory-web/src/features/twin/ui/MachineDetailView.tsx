@@ -133,7 +133,10 @@ export function MachineDetailView({
           <p className="empty-state">채널별 원본 측정값입니다. 요약은 위 "지금 작업"을 참고하세요.</p>
           <div className="metric-grid">
             {detail.metrics
-              .filter((metric) => metric.key.startsWith("spindle-") || metric.key === "b-axis")
+              .filter((metric) =>
+                metric.key.startsWith("spindle-") ||
+                metric.key.startsWith("axis-") ||
+                metric.key === "b-axis")
               .map((metric) => (
               <div className="metric-card" key={metric.key}>
                 <span>{metric.label}</span>

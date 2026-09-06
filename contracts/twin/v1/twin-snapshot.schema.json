@@ -9,7 +9,7 @@
     "production", "productionResult", "alarms", "maintenance", "intelligence", "quality"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.4.0" },
+    "schemaVersion": { "const": "1.5.0" },
     "machine": {
       "type": "object",
       "additionalProperties": false,
@@ -32,7 +32,8 @@
           "items": {
             "enum": [
               "state.connectivity", "state.execution", "state.health",
-              "metrics.spindleSpeeds", "metrics.bAxisAngle", "metrics.toolNumber", "metrics.program"
+              "metrics.spindleSpeeds", "metrics.axisPositions.x", "metrics.axisPositions.y",
+              "metrics.axisPositions.z", "metrics.bAxisAngle", "metrics.toolNumber", "metrics.program"
             ]
           }
         }
@@ -71,11 +72,16 @@
     "metrics": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["spindleSpeeds"],
+      "required": ["spindleSpeeds", "axisPositions"],
       "properties": {
         "spindleSpeeds": {
           "type": "array",
           "items": { "$ref": "#/$defs/spindleSpeed" }
+        },
+        "axisPositions": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/axisPosition" }
         },
         "bAxisAngle": { "$ref": "#/$defs/observedAngle" },
         "toolNumber": { "$ref": "#/$defs/observedInteger" },
@@ -224,6 +230,26 @@
             "value": { "type": "number" },
             "unit": { "const": "DEGREE" }
           }
+        },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value", "unit"] },
+          "else": { "not": { "anyOf": [{ "required": ["value"] }, { "required": ["unit"] }] } }
+        }
+      ]
+    },
+    "axisPosition": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        {
+          "properties": {
+            "axis": { "enum": ["X", "Y", "Z"] },
+            "value": { "type": "number" },
+            "unit": { "const": "MILLIMETER" }
+          },
+          "required": ["axis"]
         },
         {
           "if": { "properties": { "availability": { "const": "AVAILABLE" } } },

@@ -33,6 +33,9 @@ class OperationalTwinSnapshotServiceTest {
             List.of(
                 sample("Mazak01-C2", "Mazak01-C2_2", "2000"),
                 sample("Mazak01-C", "Mazak01-C_5", "6842"),
+                position("X", "Mazak01-X_1", "80.078834", "MILLIMETER"),
+                position("Y", "Mazak01-Y_1", "-68.786629", "MILLIMETER"),
+                position("Z", "Mazak01-Z_1", "9.635998", "MILLIMETER"),
                 angle("Mazak01-B_4", "45", "DEGREE"),
                 event("EXECUTION", "ACTIVE", "Mazak01-path_13"),
                 event("TOOL_NUMBER", "13", "Mazak01-path_10"),
@@ -54,6 +57,15 @@ class OperationalTwinSnapshotServiceTest {
         .get()
         .extracting(item -> item.value().intValue())
         .isEqualTo(45);
+    assertThat(snapshot.axisPositions())
+        .extracting(
+            OperationalTwinSnapshot.AxisPosition::axis,
+            item -> item.value().toPlainString(),
+            item -> item.metadata().provenance().sourceDataItemId())
+        .containsExactly(
+            org.assertj.core.groups.Tuple.tuple("X", "80.078834", "Mazak01-X_1"),
+            org.assertj.core.groups.Tuple.tuple("Y", "-68.786629", "Mazak01-Y_1"),
+            org.assertj.core.groups.Tuple.tuple("Z", "9.635998", "Mazak01-Z_1"));
   }
 
   @Test
@@ -78,6 +90,9 @@ class OperationalTwinSnapshotServiceTest {
         .containsExactly(
             "state.connectivity",
             "metrics.spindleSpeeds",
+            "metrics.axisPositions.x",
+            "metrics.axisPositions.y",
+            "metrics.axisPositions.z",
             "state.execution",
             "state.health",
             "metrics.bAxisAngle",
@@ -126,6 +141,27 @@ class OperationalTwinSnapshotServiceTest {
     assertThat(unknownUnit.bAxisAngle()).isEmpty();
     assertThat(duplicate.missingFields()).contains("metrics.bAxisAngle");
     assertThat(unknownUnit.missingFields()).contains("metrics.bAxisAngle");
+  }
+
+  @Test
+  void rejectsOnlyTheInvalidAxisWithoutDiscardingOtherPositions() {
+    OperationalTwinSnapshot snapshot =
+        service(
+                projection(
+                    List.of(
+                        position("X", "Mazak01-X_1", "10", "MILLIMETER"),
+                        position("X", "Mazak01-X_1", "11", "MILLIMETER"),
+                        position("Y", "Mazak01-Y_1", "20", "INCH"),
+                        position("Z", "Mazak01-Z_1", "30", "MILLIMETER"))),
+                PROJECTED_AT)
+            .getSnapshot("Mazak01");
+
+    assertThat(snapshot.axisPositions())
+        .extracting(OperationalTwinSnapshot.AxisPosition::axis)
+        .containsExactly("Z");
+    assertThat(snapshot.missingFields())
+        .contains("metrics.axisPositions.x", "metrics.axisPositions.y")
+        .doesNotContain("metrics.axisPositions.z");
   }
 
   @Test
@@ -212,6 +248,20 @@ class OperationalTwinSnapshotServiceTest {
         null,
         unit,
         "Mazak01-B",
+        sourceDataItemId);
+  }
+
+  private static ProjectedTwinObservation position(
+      String axis, String sourceDataItemId, String value, String unit) {
+    return observation(
+        StateObservationKind.SAMPLE,
+        "POSITION",
+        ObservationAvailability.AVAILABLE,
+        new BigDecimal(value),
+        null,
+        null,
+        unit,
+        "Mazak01-" + axis,
         sourceDataItemId);
   }
 

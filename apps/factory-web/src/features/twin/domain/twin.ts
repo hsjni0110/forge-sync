@@ -46,6 +46,11 @@ export interface BAxisAngle extends ObservedValue<number> {
   unit?: "DEGREE";
 }
 
+export interface AxisPosition extends ObservedValue<number> {
+  axis: "X" | "Y" | "Z";
+  unit?: "MILLIMETER";
+}
+
 export interface CurrentCondition {
   conditionType: string;
   level: "NORMAL" | "WARNING" | "FAULT" | "UNAVAILABLE";
@@ -58,7 +63,7 @@ export interface CurrentCondition {
 }
 
 export interface TwinSnapshot {
-  schemaVersion: "1.4.0";
+  schemaVersion: "1.5.0";
   machine: { machineId: string };
   consistency: {
     status: "CONSISTENT" | "PARTIAL" | "STALE" | "DEGRADED";
@@ -91,6 +96,7 @@ export interface TwinSnapshot {
   };
   metrics: {
     spindleSpeeds: SpindleSpeed[];
+    axisPositions: AxisPosition[];
     bAxisAngle?: BAxisAngle;
     toolNumber?: ObservedValue<number>;
     program?: ObservedValue<string>;
@@ -117,7 +123,7 @@ export interface SpatialLayout {
 }
 
 export interface TwinPatch {
-  schemaVersion: "1.4.0";
+  schemaVersion: "1.5.0";
   type: "TWIN_PATCH";
   machineId: string;
   baseVersion: number;

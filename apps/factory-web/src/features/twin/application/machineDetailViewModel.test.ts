@@ -32,6 +32,14 @@ describe("mapTwinToMachineDetail", () => {
       availability: "AVAILABLE",
     }));
     expect(detail.provenance.map((item) => item.sourceDataItemId)).toContain("Mazak01-B_4");
+    expect(detail.metrics).toContainEqual(expect.objectContaining({
+      key: "axis-x",
+      label: "X축 위치",
+      value: "80.08 mm",
+      availability: "AVAILABLE",
+    }));
+    expect(detail.provenance.map((item) => item.sourceDataItemId))
+      .toEqual(expect.arrayContaining(["Mazak01-X_1", "Mazak01-Y_1", "Mazak01-Z_1"]));
   });
 
   it("renders missing and unavailable optional metrics without inventing zero", () => {

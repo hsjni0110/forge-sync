@@ -1,6 +1,7 @@
 import defaultManifestDocument from "./defaultFactoryAssetManifest.json";
 import { decodeFactoryAssetManifest } from "./factoryAssetManifest";
 import type { MachineSceneBinding } from "../domain/machineVisualState";
+import { MAZAK01_OBSERVED_DELTA_MAPPINGS } from "./mazak01ObservedDeltaMapping";
 
 const defaultAsset = decodeFactoryAssetManifest(defaultManifestDocument).assets[0];
 
@@ -15,6 +16,7 @@ export const MAZAK01_SCENE_BINDING: MachineSceneBinding = {
   spatialAvailability: "FALLBACK",
   // This is an explicit visual-cue input, not a claim that C_5 is the physical primary spindle.
   visualSpindleSourceDataItemId: "Mazak01-C_5",
+  linearAxisCoordinateMappings: MAZAK01_OBSERVED_DELTA_MAPPINGS,
 };
 
 export function sceneBindingFromTwin(

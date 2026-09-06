@@ -27,6 +27,12 @@ export function createProceduralMachineModel(): MachineTwinModel {
   mainSpindleGroup.add(mainSpindle, mainChuck, workpieceMount);
   const bAxisPivot = group(MACHINE_NODE_NAMES.bAxisPivot);
   bAxisPivot.position.set(0.55, 2.05, 0.55);
+  const zAxisCarriage = group("z-axis-carriage");
+  const xAxisCarriage = group("x-axis-carriage");
+  const yAxisCarriage = group("y-axis-carriage");
+  zAxisCarriage.add(xAxisCarriage);
+  xAxisCarriage.add(yAxisCarriage);
+  yAxisCarriage.add(bAxisPivot);
   const millingHead = createMillingHead();
   const toolSpindle = group(MACHINE_NODE_NAMES.toolSpindle);
   toolSpindle.position.set(0, -0.48, 0);
@@ -51,7 +57,7 @@ export function createProceduralMachineModel(): MachineTwinModel {
   millingHead.add(toolSpindle);
   bAxisPivot.add(millingHead);
   const statusBeacon = createStatusBeacon();
-  root.add(staticBody, mainSpindleGroup, bAxisPivot, statusBeacon);
+  root.add(staticBody, mainSpindleGroup, zAxisCarriage, statusBeacon);
   const nodes = {
     mainSpindle,
     mainChuck,
@@ -63,6 +69,7 @@ export function createProceduralMachineModel(): MachineTwinModel {
   return validateMachineTwinModel({
     root,
     nodes,
+    linearMotion: { xAxisCarriage, yAxisCarriage, zAxisCarriage },
     statusMaterials,
     statusBeacon,
     inspection: createMachineInspectionMetadata(nodes, {

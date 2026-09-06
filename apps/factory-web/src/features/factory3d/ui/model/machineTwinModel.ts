@@ -13,6 +13,12 @@ export const MACHINE_NODE_NAMES = {
   toolMount: "tool-mount",
 } as const;
 
+export const MACHINE_LINEAR_MOTION_NODE_NAMES = {
+  zAxisCarriage: "z-axis-carriage",
+  xAxisCarriage: "x-axis-carriage",
+  yAxisCarriage: "y-axis-carriage",
+} as const;
+
 export interface MachineTwinNodes {
   mainSpindle: Object3D;
   mainChuck: Object3D;
@@ -25,6 +31,7 @@ export interface MachineTwinNodes {
 export interface MachineTwinModel {
   root: Object3D;
   nodes: MachineTwinNodes;
+  linearMotion?: MachineLinearMotionNodes;
   statusMaterials: Material[];
   statusBeacon?: Mesh;
   inspection: MachineInspectionMetadata;
@@ -32,6 +39,12 @@ export interface MachineTwinModel {
     representation: "PROJECT_PROCEDURAL" | "THIRD_PARTY_GLB";
     workpiece: "SIMULATED" | "UNSPECIFIED";
   };
+}
+
+export interface MachineLinearMotionNodes {
+  xAxisCarriage: Object3D;
+  yAxisCarriage: Object3D;
+  zAxisCarriage: Object3D;
 }
 
 export type MachineInspectionPartId = keyof MachineTwinNodes;
@@ -95,7 +108,18 @@ export function validateMachineTwinModel(model: MachineTwinModel): MachineTwinMo
   requireDirectParent(nodes.mainSpindle, MACHINE_NODE_NAMES.mainSpindleGroup);
   requireDirectParent(nodes.mainChuck, MACHINE_NODE_NAMES.mainSpindleGroup);
   requireDirectParent(nodes.workpieceMount, MACHINE_NODE_NAMES.mainSpindleGroup);
-  requireDirectParent(nodes.bAxisPivot, MACHINE_NODE_NAMES.root);
+  if (model.linearMotion) {
+    const { zAxisCarriage, xAxisCarriage, yAxisCarriage } = model.linearMotion;
+    requireNode(zAxisCarriage, MACHINE_LINEAR_MOTION_NODE_NAMES.zAxisCarriage);
+    requireNode(xAxisCarriage, MACHINE_LINEAR_MOTION_NODE_NAMES.xAxisCarriage);
+    requireNode(yAxisCarriage, MACHINE_LINEAR_MOTION_NODE_NAMES.yAxisCarriage);
+    requireDirectObjectParent(zAxisCarriage, root);
+    requireDirectObjectParent(xAxisCarriage, zAxisCarriage);
+    requireDirectObjectParent(yAxisCarriage, xAxisCarriage);
+    requireDirectObjectParent(nodes.bAxisPivot, yAxisCarriage);
+  } else {
+    requireDirectParent(nodes.bAxisPivot, MACHINE_NODE_NAMES.root);
+  }
   requireDirectObjectParent(nodes.millingHead, nodes.bAxisPivot);
   requireDirectParent(nodes.toolMount, MACHINE_NODE_NAMES.toolSpindle);
   requireDirectObjectParent(nodes.toolMount.parent, nodes.millingHead);

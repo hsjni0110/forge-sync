@@ -9,7 +9,13 @@ describe("procedural machine model contract", () => {
     expect(model.nodes.mainSpindle.parent?.name).toBe("main-spindle-group");
     expect(model.nodes.mainChuck.parent?.name).toBe("main-spindle-group");
     expect(model.nodes.workpieceMount.parent?.name).toBe("main-spindle-group");
-    expect(model.nodes.bAxisPivot.parent).toBe(model.root);
+    const zCarriage = model.root.getObjectByName("z-axis-carriage");
+    const xCarriage = model.root.getObjectByName("x-axis-carriage");
+    const yCarriage = model.root.getObjectByName("y-axis-carriage");
+    expect(zCarriage?.parent).toBe(model.root);
+    expect(xCarriage?.parent).toBe(zCarriage);
+    expect(yCarriage?.parent).toBe(xCarriage);
+    expect(model.nodes.bAxisPivot.parent).toBe(yCarriage);
     expect(model.nodes.millingHead.parent).toBe(model.nodes.bAxisPivot);
     expect(model.nodes.toolMount.parent?.name).toBe("tool-spindle");
     expect(model.nodes.toolMount.parent?.parent).toBe(model.nodes.millingHead);

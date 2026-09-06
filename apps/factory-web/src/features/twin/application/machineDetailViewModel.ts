@@ -86,6 +86,20 @@ export function mapTwinToMachineDetail(
       availability: speed.availability,
     } satisfies MachineDetailMetric;
   });
+  const axisPositions = snapshot.metrics.axisPositions.map((position) => {
+    const label = `${position.axis}축 위치`;
+    appendProvenance(provenance, label, [position.provenance]);
+    return {
+      key: `axis-${position.axis.toLowerCase()}`,
+      label,
+      value:
+        position.availability === "AVAILABLE" && position.value !== undefined
+          ? `${formatDecimal(position.value)} mm`
+          : "확인할 수 없음",
+      detail: `${position.provenance.transformation.sourceDataItemId} · ${position.observation.sourceObservedAt}`,
+      availability: position.availability,
+    } satisfies MachineDetailMetric;
+  });
 
   const toolNumber = observedMetric("tool", "공구 번호", snapshot.metrics.toolNumber);
   const program = observedMetric("program", "실행 프로그램", snapshot.metrics.program);
@@ -129,7 +143,7 @@ export function mapTwinToMachineDetail(
     healthState: translateCode(snapshot.state.health.value),
     primaryCondition,
     spindleSummary: summarizeSpindles(snapshot.metrics.spindleSpeeds),
-    metrics: [...spindleSpeeds, bAxisAngle, toolNumber, program],
+    metrics: [...spindleSpeeds, ...axisPositions, bAxisAngle, toolNumber, program],
     conditions,
     provenance,
     provenanceGroups: groupProvenance(provenance),

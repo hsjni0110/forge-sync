@@ -1,4 +1,5 @@
 import { act, cleanup, render } from "@testing-library/react";
+import type { ComponentType } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { deriveMachineVisualPresentation } from "../../domain/machineVisualPresentation";
@@ -138,5 +139,30 @@ describe("machine model runtime binding", () => {
 
     expect(model.nodes.toolMount.children).toHaveLength(childCount);
     expect(model.nodes.toolMount.userData.activeToolLabel).toBe("관측 공구 번호 7 · 형상 미확인");
+  });
+
+  it("applies observed XYZ deltas only to the explicit carriage references", () => {
+    const model = createProceduralMachineModel();
+    const presentation = deriveMachineVisualPresentation(undefined, true);
+    const BindingWithPendingAxisContract = MachineModelBinding as unknown as ComponentType<{
+      model: typeof model;
+      visualPresentation: typeof presentation;
+      linearAxisTranslations: Record<string, unknown>;
+    }>;
+
+    render(<BindingWithPendingAxisContract
+      model={model}
+      visualPresentation={presentation}
+      linearAxisTranslations={{
+        X: { availability: "AVAILABLE", axis: "X", sceneAxis: "y", offsetSceneUnits: 0.2 },
+        Y: { availability: "AVAILABLE", axis: "Y", sceneAxis: "x", offsetSceneUnits: -0.1 },
+        Z: { availability: "AVAILABLE", axis: "Z", sceneAxis: "z", offsetSceneUnits: 0.4 },
+      }}
+    />);
+
+    expect(model.linearMotion?.xAxisCarriage.position.y).toBeCloseTo(0.2);
+    expect(model.linearMotion?.yAxisCarriage.position.x).toBeCloseTo(-0.1);
+    expect(model.linearMotion?.zAxisCarriage.position.z).toBeCloseTo(0.4);
+    expect(model.nodes.bAxisPivot.position.toArray()).toEqual([0.55, 2.05, 0.55]);
   });
 });
