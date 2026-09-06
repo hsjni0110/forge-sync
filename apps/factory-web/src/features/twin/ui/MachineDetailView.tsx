@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
 
 import type { TwinLiveState } from "../application/TwinLiveSession";
-import type { MachineDetailCondition } from "../application/machineDetailViewModel";
+import type { MachineDetailCondition, MachineDetailViewModel } from "../application/machineDetailViewModel";
 import { mapTwinToMachineDetail } from "../application/machineDetailViewModel";
 import { TwinConnectionStatus } from "./TwinConnectionStatus";
 
@@ -77,6 +76,8 @@ export function MachineDetailView({
         </p>
       </header>
 
+      <MachineHero detail={detail} />
+
       <TwinConnectionStatus state={state} />
       {isRecovering && (
         <div className="notice notice-warning" role="status">
@@ -90,28 +91,39 @@ export function MachineDetailView({
       )}
 
       <div className="detail-grid">
-        <DetailSection title="기본 정보">
-          <DefinitionList
-            entries={[
-              ["설비 ID", detail.machineId],
-              ["데이터 버전", String(detail.twinVersion)],
-              ["데이터 형식 버전", state.snapshot.schemaVersion],
-            ]}
-          />
+        <DetailSection title="지금 작업" wide>
+          <div className="metric-grid">
+            {detail.metrics
+              .filter((metric) => metric.key === "program" || metric.key === "tool")
+              .map((metric) => (
+                <div className="metric-card" key={metric.key}>
+                  <span>{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                </div>
+              ))}
+            <div className="metric-card">
+              <span>주축 속도</span>
+              <strong>{detail.spindleSummary.value}</strong>
+              <small>{detail.spindleSummary.detail}</small>
+            </div>
+          </div>
         </DetailSection>
 
         <DetailSection title="현재 상태">
           <DefinitionList
             entries={[
               ...detail.states.map(({ label, value }) => [label, value] as const),
-              ["조회 시 데이터 경과 시간", `${detail.freshness.ageMillis}ms`],
+              ["조회 시 데이터 경과 시간", formatAge(detail.freshness.ageMillis)],
             ]}
           />
         </DetailSection>
 
         <DetailSection title="측정값" wide>
+          <p className="empty-state">채널별 원본 측정값입니다. 요약은 위 "지금 작업"을 참고하세요.</p>
           <div className="metric-grid">
-            {detail.metrics.map((metric) => (
+            {detail.metrics
+              .filter((metric) => metric.key.startsWith("spindle-") || metric.key === "b-axis")
+              .map((metric) => (
               <div className="metric-card" key={metric.key}>
                 <span>{metric.label}</span>
                 <strong>{metric.value}</strong>
@@ -176,9 +188,52 @@ export function MachineDetailView({
             </details>
           )}
         </DetailSection>
+
+        <DetailSection title="기본 정보">
+          <DefinitionList
+            entries={[
+              ["설비 ID", detail.machineId],
+              ["데이터 버전", String(detail.twinVersion)],
+              ["데이터 형식 버전", state.snapshot.schemaVersion],
+            ]}
+          />
+        </DetailSection>
       </div>
     </article>
   );
+}
+
+function MachineHero({ detail }: { detail: MachineDetailViewModel }) {
+  const severity = !detail.primaryCondition
+    ? "normal"
+    : detail.primaryCondition.level === "고장"
+      ? "fault"
+      : "warning";
+  return (
+    <section className="machine-hero" data-severity={severity} aria-label="설비 가동 상태">
+      <p className="eyebrow">설비 상태</p>
+      <div className="machine-hero-top">
+        <span className="machine-hero-dot" aria-hidden="true" />
+        <strong className="machine-hero-title">{detail.executionState}</strong>
+      </div>
+      {detail.primaryCondition && (
+        <p className="machine-hero-condition">
+          동시 관측 · {detail.primaryCondition.conditionType} · {detail.primaryCondition.level}
+          {detail.primaryCondition.message ? ` · ${detail.primaryCondition.message}` : ""}
+        </p>
+      )}
+    </section>
+  );
+}
+
+function formatAge(millis: number): string {
+  const totalSeconds = Math.max(0, Math.round(millis / 1000));
+  if (totalSeconds < 60) return `${totalSeconds}초 전`;
+  const totalMinutes = Math.round(totalSeconds / 60);
+  if (totalMinutes < 60) return `${totalMinutes}분 전`;
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return minutes === 0 ? `${hours}시간 전` : `${hours}시간 ${minutes}분 전`;
 }
 
 function MachineOperationalSummary({
@@ -237,7 +292,7 @@ function MachineOperationalSummary({
 
       <footer className="summary-footer">
         <span>최근 반영 · <UtcTime value={detail.projectedAt} /></span>
-        <Link to={`/machines/${encodeURIComponent(detail.machineId)}`}>전체 설비 상세 보기</Link>
+        <span className="summary-footer-hint">상단 2D 보기에서 전체 상세를 확인할 수 있습니다.</span>
       </footer>
     </article>
   );
@@ -268,7 +323,7 @@ function MachineDetailMessage({
       <h1>{title}</h1>
       <p>{detail}</p>
       {retryNow && (
-        <button type="button" onClick={retryNow}>
+        <button type="button" className="button-quiet" onClick={retryNow}>
           다시 시도
         </button>
       )}

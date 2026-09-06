@@ -172,6 +172,7 @@
       "properties": {
         "metric": {
           "enum": [
+            "ANGLE",
             "SPINDLE_SPEED",
             "PATH_FEEDRATE",
             "TEMPERATURE",
@@ -190,6 +191,7 @@
         },
         "unit": {
           "enum": [
+            "DEGREE",
             "REVOLUTION/MINUTE",
             "MILLIMETER/SECOND",
             "CELSIUS",
@@ -199,6 +201,22 @@
         }
       },
       "allOf": [
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "ANGLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "DEGREE"
+              }
+            }
+          }
+        },
         {
           "if": {
             "properties": {

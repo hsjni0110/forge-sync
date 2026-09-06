@@ -23,12 +23,33 @@ describe("mapTwinToMachineVisualState", () => {
       health: "UNKNOWN",
       rpm: 49,
       rpmSourceDataItemId: "Mazak01-C_5",
+      bAxisAngleDegrees: 45,
+      bAxisAngleUnit: "DEGREE",
+      bAxisAngleSourceDataItemId: "Mazak01-B_4",
+      bAxisAngleSourceObservedAt: "2016-10-05T09:16:39.557Z",
       tool: "13",
       operationProgress: undefined,
       alarmSeverity: undefined,
       stale: false,
       selected: true,
     });
+  });
+
+  it("does not expose an unavailable B-axis observation as an angle", () => {
+    const unavailable = structuredClone(snapshot);
+    if (!unavailable.metrics.bAxisAngle) throw new Error("fixture requires B-axis angle");
+    unavailable.metrics.bAxisAngle.availability = "UNAVAILABLE";
+    delete unavailable.metrics.bAxisAngle.value;
+
+    const visualState = mapTwinToMachineVisualState({
+      snapshot: unavailable,
+      freshness: "FRESH",
+      selectedMachineId: "Mazak01",
+      visualSpindleSourceDataItemId: "Mazak01-C_5",
+    });
+
+    expect(visualState.bAxisAngleDegrees).toBeUndefined();
+    expect(visualState.bAxisAngleSourceDataItemId).toBeUndefined();
   });
 
   it("does not guess another spindle or fabricate optional values", () => {

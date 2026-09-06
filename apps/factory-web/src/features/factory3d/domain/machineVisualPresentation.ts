@@ -23,6 +23,8 @@ export interface MachineVisualPresentation {
   isSpindleAnimating: boolean;
   visualAngularVelocityRadPerSec: number;
   isBeaconPulsing: boolean;
+  isReducedMotion: boolean;
+  isReplayAdvancing: boolean;
 }
 
 export function deriveMachineVisualPresentation(
@@ -47,6 +49,8 @@ export function deriveMachineVisualPresentation(
     visualAngularVelocityRadPerSec: isSpindleAnimating ? normalizedSpeed : 0,
     isBeaconPulsing:
       !isReducedMotion && (status === "WARNING" || status === "FAULT"),
+    isReducedMotion,
+    isReplayAdvancing: visualState?.isReplayAdvancing !== false,
   };
 }
 

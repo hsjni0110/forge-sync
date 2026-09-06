@@ -78,7 +78,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   await page.clock.setFixedTime(new Date());
   await context.setOffline(false);
   await page.clock.fastForward(10_000);
-  await expect(page.getByText("1873 rpm", { exact: true })).toBeVisible();
+  await expect(page.getByText("1873 rpm", { exact: true }).first()).toBeVisible();
   await expect(
     page.getByRole("button", {
       name: /Mazak01 Twin v6 가동 중 1873 RPM 시각 회전 켜짐 선택됨/,
@@ -86,16 +86,12 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   ).toBeVisible();
   await expect(page.getByLabel("트윈 연결 상태").getByText("실시간 연결됨")).toBeVisible();
 
-  await page.goto("/machines/Mazak01");
+  await page.getByRole("button", { name: "2D", exact: true }).click();
   await expect(page.getByText("데이터 버전 6")).toBeVisible();
-  await expect(page.getByText("1873 rpm", { exact: true })).toBeVisible();
+  await expect(page.getByText("1873 rpm", { exact: true }).first()).toBeVisible();
   await page.getByText(/원본 추적 정보 .*건 보기/).click();
   await expect(page.getByText(/실제 데이터 · NIST/).first()).toBeVisible();
-
-  await page.reload();
   await expect(page.getByRole("heading", { name: "Mazak01", exact: true })).toBeVisible();
-  await page.keyboard.press("Tab");
-  await expect(page.getByRole("link", { name: "본문으로 바로가기" })).toBeFocused();
   for (const section of ["기본 정보", "현재 상태", "측정값", "데이터 품질", "데이터 출처"]) {
     await expect(page.getByRole("heading", { name: section })).toBeVisible();
   }

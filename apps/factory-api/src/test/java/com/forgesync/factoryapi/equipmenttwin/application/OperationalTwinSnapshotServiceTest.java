@@ -33,6 +33,7 @@ class OperationalTwinSnapshotServiceTest {
             List.of(
                 sample("Mazak01-C2", "Mazak01-C2_2", "2000"),
                 sample("Mazak01-C", "Mazak01-C_5", "6842"),
+                angle("Mazak01-B_4", "45", "DEGREE"),
                 event("EXECUTION", "ACTIVE", "Mazak01-path_13"),
                 event("TOOL_NUMBER", "13", "Mazak01-path_10"),
                 event("PROGRAM", "114", "Mazak01-path_1")));
@@ -49,6 +50,10 @@ class OperationalTwinSnapshotServiceTest {
         .containsExactly(6842, 2000);
     assertThat(snapshot.freshMaxAgeMillis()).isEqualTo(2_000);
     assertThat(snapshot.laggingMaxAgeMillis()).isEqualTo(10_000);
+    assertThat(snapshot.bAxisAngle())
+        .get()
+        .extracting(item -> item.value().intValue())
+        .isEqualTo(45);
   }
 
   @Test
@@ -75,6 +80,7 @@ class OperationalTwinSnapshotServiceTest {
             "metrics.spindleSpeeds",
             "state.execution",
             "state.health",
+            "metrics.bAxisAngle",
             "metrics.toolNumber",
             "metrics.program");
     assertThat(snapshot.toolNumber())
@@ -100,6 +106,26 @@ class OperationalTwinSnapshotServiceTest {
 
     assertThat(snapshot.consistencyState()).isEqualTo(TwinConsistencyState.STALE);
     assertThat(snapshot.connectivity()).isEqualTo(ConnectivityState.STALE);
+  }
+
+  @Test
+  void doesNotChooseAnAmbiguousOrUnknownUnitBaxisAngle() {
+    OperationalTwinSnapshot duplicate =
+        service(
+                projection(
+                    List.of(
+                        angle("Mazak01-B_4", "45", "DEGREE"),
+                        angle("Mazak01-C_4", "12", "DEGREE"))),
+                PROJECTED_AT)
+            .getSnapshot("Mazak01");
+    OperationalTwinSnapshot unknownUnit =
+        service(projection(List.of(angle("Mazak01-B_4", "45", "RADIAN"))), PROJECTED_AT)
+            .getSnapshot("Mazak01");
+
+    assertThat(duplicate.bAxisAngle()).isEmpty();
+    assertThat(unknownUnit.bAxisAngle()).isEmpty();
+    assertThat(duplicate.missingFields()).contains("metrics.bAxisAngle");
+    assertThat(unknownUnit.missingFields()).contains("metrics.bAxisAngle");
   }
 
   @Test
@@ -173,6 +199,20 @@ class OperationalTwinSnapshotServiceTest {
   private static ProjectedTwinObservation event(
       String eventType, String value, String sourceDataItemId) {
     return event(eventType, value, sourceDataItemId, ObservationAvailability.AVAILABLE);
+  }
+
+  private static ProjectedTwinObservation angle(
+      String sourceDataItemId, String value, String unit) {
+    return observation(
+        StateObservationKind.SAMPLE,
+        "ANGLE",
+        ObservationAvailability.AVAILABLE,
+        new BigDecimal(value),
+        null,
+        null,
+        unit,
+        "Mazak01-B",
+        sourceDataItemId);
   }
 
   private static ProjectedTwinObservation event(

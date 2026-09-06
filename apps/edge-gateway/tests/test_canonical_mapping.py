@@ -69,8 +69,8 @@ def test_maps_component_aware_samples_events_and_conditions() -> None:
     statuses = Counter(result.status for result in results)
     observations = [result.observation for result in results if result.observation is not None]
 
-    assert statuses == {MappingStatus.MAPPED: 31}
-    assert sum(isinstance(item.payload, SamplePayload) for item in observations) == 15
+    assert statuses == {MappingStatus.MAPPED: 32}
+    assert sum(isinstance(item.payload, SamplePayload) for item in observations) == 16
     assert sum(isinstance(item.payload, EventPayload) for item in observations) == 12
     assert sum(isinstance(item.payload, ConditionPayload) for item in observations) == 4
     assert (
@@ -110,7 +110,7 @@ def test_golden_values_preserve_types_units_condition_and_provenance() -> None:
     assert spindle.source.agent_instance_id is None
     assert spindle.source.source_sequence is None
     assert spindle.provenance.transformation.raw_record_id == spindle.source_event_key
-    assert spindle.provenance.transformation.mapping_version == "2.0.0"
+    assert spindle.provenance.transformation.mapping_version == "2.1.0"
     assert spindle.subject.component_id == "Mazak01-C"
     assert spindle.provenance.transformation.source_data_item_id == "Mazak01-C_5"
     assert tool.payload.value == 13
@@ -133,6 +133,17 @@ def test_golden_values_preserve_types_units_condition_and_provenance() -> None:
     )
     assert secondary_spindle.subject.component_id == "Mazak01-C2"
     assert x_position.subject.component_id == "Mazak01-X"
+
+    b_axis_angle = next(
+        item
+        for item in observations
+        if isinstance(item.payload, SamplePayload) and item.payload.metric is SampleMetric.ANGLE
+    )
+    assert b_axis_angle.payload.value == 45
+    assert b_axis_angle.payload.unit.value == "DEGREE"
+    assert b_axis_angle.subject.component_id == "Mazak01-B"
+    assert b_axis_angle.provenance.transformation.source_data_item_id == "Mazak01-B_4"
+    assert b_axis_angle.provenance.transformation.mapping_version == "2.1.0"
 
 
 def test_generated_observations_satisfy_shared_contract() -> None:
@@ -209,9 +220,9 @@ def test_canonical_run_is_deterministic_and_reused(tmp_path: Path) -> None:
 
     assert first.status == "STORED"
     assert second.status == "REUSED_VERIFIED"
-    assert first.observation_count == 31
+    assert first.observation_count == 32
     assert first.report == second.report
     assert first.report["records"]["byStatus"] == {  # type: ignore[index]
-        "MAPPED": 31,
+        "MAPPED": 32,
     }
-    assert len((first.run_directory / "observations.ndjson").read_text().splitlines()) == 31
+    assert len((first.run_directory / "observations.ndjson").read_text().splitlines()) == 32

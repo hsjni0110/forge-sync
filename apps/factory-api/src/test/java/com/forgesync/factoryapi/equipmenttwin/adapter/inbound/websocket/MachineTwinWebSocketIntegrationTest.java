@@ -66,7 +66,7 @@ class MachineTwinWebSocketIntegrationTest {
       snapshot = objectMapper.readValue(stream, TwinSnapshotResponse.class);
     }
     return new TwinPatchMessage(
-        "1.2.0", "TWIN_PATCH", "Mazak01", 3, 4, Instant.parse("2026-09-02T01:02:04Z"), snapshot);
+        "1.3.0", "TWIN_PATCH", "Mazak01", 3, 4, Instant.parse("2026-09-02T01:02:04Z"), snapshot);
   }
 
   private record TextListener(CompletableFuture<String> message) implements WebSocket.Listener {

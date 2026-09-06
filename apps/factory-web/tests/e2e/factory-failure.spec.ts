@@ -39,6 +39,9 @@ test("available WebGL keeps the 3D factory scene visible", async ({ page }) => {
   const enclosureToggle = page.getByRole("checkbox", { name: "외함 반투명" });
   await enclosureToggle.check();
   await expect(enclosureToggle).toBeChecked();
+  await page.getByText("모델 정보", { exact: true }).click();
+  await expect(page.getByText("B축 45° · 좌표 매핑 검증 전 · unavailable", { exact: true }))
+    .toBeVisible();
   await expect(page.getByLabel("시뮬레이션 공장 3D 화면").locator("canvas")).toBeVisible();
 
   await page.getByRole("button", { name: "2D" }).click();

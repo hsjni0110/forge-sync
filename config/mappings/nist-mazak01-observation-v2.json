@@ -1,10 +1,11 @@
 {
-  "mappingVersion": "2.0.0",
+  "mappingVersion": "2.1.0",
   "sourceSetId": "nist-mazak01-20161005",
   "machineId": "Mazak01",
   "devicesArtifactId": "sha256:bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
   "rawArtifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
   "entries": [
+    {"dataItemId":"Mazak01-B_4","componentId":"Mazak01-B","name":"Bdeg","category":"SAMPLE","type":"ANGLE","subType":"ACTUAL","unit":"DEGREE","target":"ANGLE"},
     {"dataItemId":"Mazak01-C_5","componentId":"Mazak01-C","name":"Srpm","category":"SAMPLE","type":"ROTARY_VELOCITY","subType":"ACTUAL","unit":"REVOLUTION/MINUTE","target":"SPINDLE_SPEED"},
     {"dataItemId":"Mazak01-C2_2","componentId":"Mazak01-C2","name":"S2rpm","category":"SAMPLE","type":"ROTARY_VELOCITY","subType":"ACTUAL","unit":"REVOLUTION/MINUTE","target":"SPINDLE_SPEED"},
     {"dataItemId":"Mazak01-path_7","componentId":"Mazak01-path","name":"Fact","category":"SAMPLE","type":"PATH_FEEDRATE","subType":"ACTUAL","unit":"MILLIMETER/SECOND","target":"PATH_FEEDRATE"},

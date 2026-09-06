@@ -10,7 +10,7 @@
     "spatial"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.2.0" },
+    "schemaVersion": { "const": "1.3.0" },
     "machine": {
       "type": "object",
       "additionalProperties": false,
@@ -33,7 +33,7 @@
           "items": {
             "enum": [
               "state.connectivity", "state.execution", "state.health",
-              "metrics.spindleSpeeds", "metrics.toolNumber", "metrics.program"
+              "metrics.spindleSpeeds", "metrics.bAxisAngle", "metrics.toolNumber", "metrics.program"
             ]
           }
         }
@@ -78,6 +78,7 @@
           "type": "array",
           "items": { "$ref": "#/$defs/spindleSpeed" }
         },
+        "bAxisAngle": { "$ref": "#/$defs/observedAngle" },
         "toolNumber": { "$ref": "#/$defs/observedInteger" },
         "program": { "$ref": "#/$defs/observedText" }
       }
@@ -188,6 +189,24 @@
           "properties": {
             "value": { "type": "number" },
             "unit": { "const": "REVOLUTION/MINUTE" }
+          }
+        },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value", "unit"] },
+          "else": { "not": { "anyOf": [{ "required": ["value"] }, { "required": ["unit"] }] } }
+        }
+      ]
+    },
+    "observedAngle": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        {
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "const": "DEGREE" }
           }
         },
         {

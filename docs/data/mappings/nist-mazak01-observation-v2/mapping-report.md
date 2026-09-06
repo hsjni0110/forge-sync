@@ -2,15 +2,15 @@
 
 ## Reproducibility
 
-- Processing run: `sha256:bf5a3342dcfcc896153c5b69059de66479e8e19d9f225caa72477ec1dc6a2416`
-- Mapping / Mapper / Parser: `2.0.0` / `2.0.0` / `1.0.0`
+- Processing run: `sha256:b5709c2f64d2cd15a30b85bd2355bdc7e388ad058d883e7441536c2987c92cc7`
+- Mapping / Mapper / Parser: `2.1.0` / `2.0.0` / `1.0.0`
 - Raw artifact: `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf`
-- Mapping table SHA-256: `179fe21fbec5c7dd88de27c307e97b23c8a80143f8a4e0799d525c1828980212`
+- Mapping table SHA-256: `9378cd4509a184382be4994d39db4b4e23dd2b5b5bf2ebba58ea500cf21848e3`
 
 ## Semantic coverage
 
-- Mapped / parsed: 52996 / 115991 (45.69%)
-- Status counts: `{'MAPPED': 52996, 'UNKNOWN_DATA_ITEM': 22, 'UNSUPPORTED_DATA_ITEM': 62973}`
+- Mapped / parsed: 53939 / 115991 (46.50%)
+- Status counts: `{'MAPPED': 53939, 'UNKNOWN_DATA_ITEM': 22, 'UNSUPPORTED_DATA_ITEM': 62030}`
 
 ## Explicit mappings
 
@@ -18,6 +18,7 @@
 |---|---|---|---|---|---:|---:|---:|
 | `Bload` | `Mazak01-B` | SAMPLE | `LOAD` | `LOAD` | 2077 | 25 | 0 |
 | `Btravel` | `Mazak01-B` | CONDITION | `ANGLE` | `ANGLE` | 49 | 0 | 0 |
+| `Bdeg` | `Mazak01-B` | SAMPLE | `ANGLE` | `ANGLE` | 943 | 25 | 0 |
 | `S2load` | `Mazak01-C2` | SAMPLE | `LOAD` | `LOAD` | 1040 | 25 | 0 |
 | `S2rpm` | `Mazak01-C2` | SAMPLE | `ROTARY_VELOCITY` | `SPINDLE_SPEED` | 1107 | 25 | 0 |
 | `S2temp` | `Mazak01-C2` | SAMPLE | `TEMPERATURE` | `TEMPERATURE` | 7448 | 25 | 0 |
@@ -63,7 +64,6 @@
 | DataItem | Records | First Raw Record |
 |---|---:|---|
 | `Bfrt` | 913 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=46-90` |
-| `Bdeg` | 943 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=143-187` |
 | `Cload` | 85 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1311-1356` |
 | `Cfrt` | 331 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1565-1609` |
 | `Sovr` | 49 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=1655-1699` |

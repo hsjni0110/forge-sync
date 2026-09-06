@@ -1,21 +1,21 @@
 {
   "schemaVersion": "1.0.0",
   "canonicalOutput": {
-    "path": "datasets/canonical/nist-mazak01-20161005/bf5a3342dcfcc896153c5b69059de66479e8e19d9f225caa72477ec1dc6a2416/observations.ndjson",
-    "sha256": "aee293dd19af046087773ccf8d4dde43ff0a8c21df5dcf7b65544e474799b17f"
+    "path": "datasets/canonical/nist-mazak01-20161005/b5709c2f64d2cd15a30b85bd2355bdc7e388ad058d883e7441536c2987c92cc7/observations.ndjson",
+    "sha256": "ff224865d1623f0a95b847f21537abdd1a89968b3369e716abb2ca1afdeefc8c"
   },
   "checkedInFiles": [
     {
       "path": "tests/fixtures/twin/v1/mazak01-operational-twin.json",
-      "sha256": "b7eda522efd48de1021b138228ed3cbe86902d64b14471ceaa3762e4d16fbc83"
+      "sha256": "7cbd5fe72548c320b72dc7e87c9caa8711c6d76cb6bb33e6c33fed764ecb37a3"
     },
     {
       "path": "tests/fixtures/twin/v1/mazak01-twin-patch.json",
-      "sha256": "9796a43b10b217cb3d2982b5cdc84e8b1c5455dc3a73dfa70887851ada82f674"
+      "sha256": "0fce6a9124fe6ad97d9a7f5cd898bc494d2bc946fad910d6588c68e2ee353e9e"
     },
     {
       "path": "tests/e2e/fixtures/machine-detail-replay.json",
-      "sha256": "bc993c44fd56553818f3052eb1515a046ec5b461c6bc9c78c4b34ecce9273863"
+      "sha256": "98355a948a875434ce14c00db9ce8fd36ce251acfa6eb25657ec371e064d136c"
     }
   ],
   "expectedOperationalState": {
@@ -26,6 +26,7 @@
     "visualSpindleSourceDataItemId": "Mazak01-C_5",
     "rpm": 49.0,
     "toolNumber": 13,
+    "bAxisAngleDegrees": 45.0,
     "visualAngularVelocityRadPerSecond": 0.098
   }
 }

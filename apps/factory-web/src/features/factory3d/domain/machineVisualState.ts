@@ -1,4 +1,5 @@
 import type { FactoryAsset } from "./factoryAsset";
+import type { BAxisCoordinateMapping } from "./bAxisCoordinateMapping";
 
 export interface MachineVisualState {
   machineId: string;
@@ -8,6 +9,10 @@ export interface MachineVisualState {
   health: "UNKNOWN" | "NORMAL" | "WARNING" | "FAULT";
   rpm?: number;
   rpmSourceDataItemId: string;
+  bAxisAngleDegrees?: number;
+  bAxisAngleUnit?: "DEGREE";
+  bAxisAngleSourceDataItemId?: string;
+  bAxisAngleSourceObservedAt?: string;
   tool?: string;
   operationProgress?: number;
   alarmSeverity?: "WARNING" | "FAULT";
@@ -25,4 +30,5 @@ export interface MachineSceneBinding {
   scale: readonly [number, number, number];
   spatialProvenance: "SIMULATED_LAYOUT";
   visualSpindleSourceDataItemId: string;
+  bAxisCoordinateMapping?: BAxisCoordinateMapping;
 }

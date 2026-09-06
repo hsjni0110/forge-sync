@@ -7,7 +7,7 @@
     "Cload is deferred because it collides with Sload on the same component LOAD channel."
   ],
   "mapperVersion": "2.0.0",
-  "mappingVersion": "2.0.0",
+  "mappingVersion": "2.1.0",
   "mappings": [
     {
       "category": "SAMPLE",
@@ -34,6 +34,19 @@
       "type": "ANGLE",
       "unavailableRecords": 0,
       "unit": null
+    },
+    {
+      "category": "SAMPLE",
+      "componentId": "Mazak01-B",
+      "dataItemId": "Mazak01-B_4",
+      "invalidValueRecords": 0,
+      "mappedRecords": 943,
+      "name": "Bdeg",
+      "subType": "ACTUAL",
+      "target": "ANGLE",
+      "type": "ANGLE",
+      "unavailableRecords": 25,
+      "unit": "DEGREE"
     },
     {
       "category": "SAMPLE",
@@ -544,28 +557,28 @@
     }
   ],
   "parserVersion": "1.0.0",
-  "processingRunId": "sha256:bf5a3342dcfcc896153c5b69059de66479e8e19d9f225caa72477ec1dc6a2416",
+  "processingRunId": "sha256:b5709c2f64d2cd15a30b85bd2355bdc7e388ad058d883e7441536c2987c92cc7",
   "records": {
     "byStatus": {
-      "MAPPED": 52996,
+      "MAPPED": 53939,
       "UNKNOWN_DATA_ITEM": 22,
-      "UNSUPPORTED_DATA_ITEM": 62973
+      "UNSUPPORTED_DATA_ITEM": 62030
     },
-    "mapped": 52996,
+    "mapped": 53939,
     "syntacticallyParsed": 115991,
     "total": 115991
   },
   "reportSchemaVersion": "2.0.0",
   "semanticCoverage": {
     "definition": "mapped records / syntactically parsed records",
-    "mappedRecords": 52996,
+    "mappedRecords": 53939,
     "parsedRecords": 115991,
-    "ratio": 0.4568975179108724
+    "ratio": 0.4650274590269935
   },
   "source": {
     "devicesArtifactId": "sha256:bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
     "machineId": "Mazak01",
-    "mappingTableSha256": "179fe21fbec5c7dd88de27c307e97b23c8a80143f8a4e0799d525c1828980212",
+    "mappingTableSha256": "9378cd4509a184382be4994d39db4b4e23dd2b5b5bf2ebba58ea500cf21848e3",
     "rawArtifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
     "sourceSetId": "nist-mazak01-20161005"
   },
@@ -692,17 +705,6 @@
       "subType": null,
       "type": "ANGULAR_VELOCITY",
       "unit": "DEGREE/SECOND"
-    },
-    {
-      "category": "SAMPLE",
-      "componentId": "Mazak01-B",
-      "dataItemId": "Mazak01-B_4",
-      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=143-187",
-      "name": "Bdeg",
-      "recordCount": 943,
-      "subType": "ACTUAL",
-      "type": "ANGLE",
-      "unit": "DEGREE"
     },
     {
       "category": "SAMPLE",

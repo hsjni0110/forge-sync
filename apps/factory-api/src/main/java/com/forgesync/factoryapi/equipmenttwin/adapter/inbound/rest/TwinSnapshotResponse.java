@@ -55,11 +55,20 @@ public record TwinSnapshotResponse(
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record MetricsDto(
       List<SpindleSpeedDto> spindleSpeeds,
+      ObservedAngleDto bAxisAngle,
       ObservedIntegerDto toolNumber,
       ObservedTextDto program) {}
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record SpindleSpeedDto(
+      String availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadataDto observation,
+      FieldProvenanceDto provenance) {}
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record ObservedAngleDto(
       String availability,
       BigDecimal value,
       String unit,

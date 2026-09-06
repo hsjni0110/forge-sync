@@ -42,6 +42,10 @@ export interface SpindleSpeed extends ObservedValue<number> {
   unit?: "REVOLUTION/MINUTE";
 }
 
+export interface BAxisAngle extends ObservedValue<number> {
+  unit?: "DEGREE";
+}
+
 export interface CurrentCondition {
   conditionType: string;
   level: "NORMAL" | "WARNING" | "FAULT" | "UNAVAILABLE";
@@ -54,7 +58,7 @@ export interface CurrentCondition {
 }
 
 export interface TwinSnapshot {
-  schemaVersion: "1.2.0";
+  schemaVersion: "1.3.0";
   machine: { machineId: string };
   consistency: {
     status: "CONSISTENT" | "PARTIAL" | "STALE" | "DEGRADED";
@@ -87,6 +91,7 @@ export interface TwinSnapshot {
   };
   metrics: {
     spindleSpeeds: SpindleSpeed[];
+    bAxisAngle?: BAxisAngle;
     toolNumber?: ObservedValue<number>;
     program?: ObservedValue<string>;
   };
@@ -101,7 +106,7 @@ export interface TwinSnapshot {
 }
 
 export interface TwinPatch {
-  schemaVersion: "1.2.0";
+  schemaVersion: "1.3.0";
   type: "TWIN_PATCH";
   machineId: string;
   baseVersion: number;

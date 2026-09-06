@@ -1,8 +1,10 @@
 import type {
   Availability,
+  CurrentCondition,
   FieldProvenance,
   Freshness,
   ObservedValue,
+  SpindleSpeed,
   TwinSnapshot,
 } from "../domain/twin";
 import { effectiveConnectivity, effectiveConsistency } from "../domain/freshness";
@@ -42,6 +44,10 @@ export interface MachineDetailViewModel {
   missingFields: string[];
   freshness: TwinSnapshot["state"]["freshness"];
   states: Array<{ label: string; value: string }>;
+  executionState: string;
+  healthState: string;
+  primaryCondition?: MachineDetailCondition;
+  spindleSummary: { value: string; detail: string };
   metrics: MachineDetailMetric[];
   conditions: MachineDetailCondition[];
   provenance: MachineDetailProvenance[];
@@ -74,25 +80,23 @@ export function mapTwinToMachineDetail(
 
   const toolNumber = observedMetric("tool", "공구 번호", snapshot.metrics.toolNumber);
   const program = observedMetric("program", "실행 프로그램", snapshot.metrics.program);
+  const bAxisAngle = observedMetric("b-axis", "B축 각도", snapshot.metrics.bAxisAngle);
+  if (bAxisAngle.availability === "AVAILABLE") {
+    bAxisAngle.value = `${bAxisAngle.value}°`;
+  }
   if (snapshot.metrics.toolNumber) {
     appendProvenance(provenance, "공구 번호", [snapshot.metrics.toolNumber.provenance]);
   }
   if (snapshot.metrics.program) {
     appendProvenance(provenance, "실행 프로그램", [snapshot.metrics.program.provenance]);
   }
+  if (snapshot.metrics.bAxisAngle) {
+    appendProvenance(provenance, "B축 각도", [snapshot.metrics.bAxisAngle.provenance]);
+  }
 
-  const conditions = snapshot.conditions.map((condition, index) => {
-    appendProvenance(provenance, `상태 신호 · ${condition.conditionType}`, [
-      condition.provenance,
-    ]);
-    return {
-      key: `${condition.provenance.transformation.sourceDataItemId}-${index}`,
-      conditionType: condition.conditionType,
-      level: translateCode(condition.level),
-      message: condition.message,
-      componentId: condition.observation.componentId,
-    };
-  });
+  const conditions = snapshot.conditions.map((condition, index) => mapCondition(condition, index));
+  const primaryIndex = mostSevereConditionIndex(snapshot.conditions);
+  const primaryCondition = primaryIndex === undefined ? undefined : conditions[primaryIndex];
 
   return {
     machineId: snapshot.machine.machineId,
@@ -109,9 +113,73 @@ export function mapTwinToMachineDetail(
       { label: "가동 상태", value: translateCode(snapshot.state.execution.value) },
       { label: "설비 상태", value: translateCode(snapshot.state.health.value) },
     ],
-    metrics: [...spindleSpeeds, toolNumber, program],
+    executionState: translateCode(snapshot.state.execution.value),
+    healthState: translateCode(snapshot.state.health.value),
+    primaryCondition,
+    spindleSummary: summarizeSpindles(snapshot.metrics.spindleSpeeds),
+    metrics: [...spindleSpeeds, bAxisAngle, toolNumber, program],
     conditions,
     provenance,
+  };
+
+  function mapCondition(condition: CurrentCondition, index: number): MachineDetailCondition {
+    appendProvenance(provenance, `상태 신호 · ${condition.conditionType}`, [condition.provenance]);
+    return {
+      key: `${condition.provenance.transformation.sourceDataItemId}-${index}`,
+      conditionType: condition.conditionType,
+      level: translateCode(condition.level),
+      message: condition.message,
+      componentId: condition.observation.componentId,
+    };
+  }
+}
+
+const CONDITION_SEVERITY_RANK: Record<string, number> = {
+  FAULT: 0,
+  UNAVAILABLE: 1,
+  WARNING: 2,
+  NORMAL: 3,
+};
+
+function mostSevereConditionIndex(conditions: CurrentCondition[]): number | undefined {
+  let bestIndex: number | undefined;
+  let bestRank = Infinity;
+  conditions.forEach((condition, index) => {
+    if (condition.level === "NORMAL") return;
+    const rank = CONDITION_SEVERITY_RANK[condition.level] ?? 99;
+    if (rank < bestRank) {
+      bestRank = rank;
+      bestIndex = index;
+    }
+  });
+  return bestIndex;
+}
+
+function summarizeSpindles(speeds: SpindleSpeed[]): { value: string; detail: string } {
+  if (speeds.length === 0) return { value: "확인할 수 없음", detail: "측정값 없음" };
+  const available = speeds.filter((speed) => speed.availability === "AVAILABLE" && speed.value !== undefined);
+  const turning = available.filter((speed) => (speed.value ?? 0) > 0);
+  if (turning.length === 1) {
+    return {
+      value: `${turning[0].value} rpm`,
+      detail: `${turning[0].observation.componentId} 사용 중`,
+    };
+  }
+  if (turning.length > 1) {
+    return {
+      value: `${turning.length}개 채널 동시 회전`,
+      detail: turning.map((speed) => `${speed.observation.componentId} ${speed.value}rpm`).join(" · "),
+    };
+  }
+  if (available.length === 0) {
+    return {
+      value: "확인할 수 없음",
+      detail: speeds.map((speed) => speed.observation.componentId).join(" · "),
+    };
+  }
+  return {
+    value: "0 rpm",
+    detail: `${available.map((speed) => speed.observation.componentId).join(" · ")} 정지`,
   };
 }
 
@@ -180,6 +248,7 @@ function translateMissingField(field: string): string {
     "state.execution": "가동 상태",
     "state.health": "설비 상태",
     "metrics.spindleSpeeds": "주축 속도",
+    "metrics.bAxisAngle": "B축 각도",
     "metrics.toolNumber": "공구 번호",
     "metrics.program": "실행 프로그램",
   };

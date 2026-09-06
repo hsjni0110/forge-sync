@@ -9,6 +9,11 @@
             <DataItem category="CONDITION" id="Mazak01-base_1" name="servo_cond" type="ACTUATOR"/>
           </DataItems>
           <Components>
+            <Rotary id="Mazak01-B" name="B">
+              <DataItems>
+                <DataItem category="SAMPLE" id="Mazak01-B_4" name="Bdeg" nativeUnits="DEGREE" subType="ACTUAL" type="ANGLE" units="DEGREE"/>
+              </DataItems>
+            </Rotary>
             <Linear id="Mazak01-X" name="X">
               <DataItems>
                 <DataItem category="SAMPLE" id="Mazak01-X_1" name="Xabs" subType="ACTUAL" type="POSITION" units="MILLIMETER"/>

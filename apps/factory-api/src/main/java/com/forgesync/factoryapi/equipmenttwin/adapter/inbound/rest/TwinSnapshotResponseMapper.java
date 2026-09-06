@@ -8,6 +8,7 @@ import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotR
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.MachineDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.MetricsDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservationMetadataDto;
+import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedAngleDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedIntegerDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedTextDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.SourceProvenanceDto;
@@ -16,6 +17,7 @@ import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotR
 import com.forgesync.factoryapi.equipmenttwin.application.FieldProvenance;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservationMetadata;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedAngle;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedEvent;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,7 @@ public final class TwinSnapshotResponseMapper {
 
   public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
-        "1.2.0",
+        "1.3.0",
         new MachineDto(snapshot.machineId()),
         new ConsistencyDto(
             snapshot.consistencyState().name(),
@@ -62,6 +64,7 @@ public final class TwinSnapshotResponseMapper {
                             metadata(speed.metadata()),
                             provenance(speed.metadata().provenance())))
                 .toList(),
+            snapshot.bAxisAngle().map(TwinSnapshotResponseMapper::bAxisAngle).orElse(null),
             snapshot.toolNumber().map(TwinSnapshotResponseMapper::toolNumber).orElse(null),
             snapshot.program().map(TwinSnapshotResponseMapper::program).orElse(null)),
         snapshot.conditions().stream()
@@ -92,6 +95,15 @@ public final class TwinSnapshotResponseMapper {
         event.value() == null ? null : Long.valueOf(event.value()),
         metadata(event.metadata()),
         provenance(event.metadata().provenance()));
+  }
+
+  private static ObservedAngleDto bAxisAngle(ObservedAngle angle) {
+    return new ObservedAngleDto(
+        angle.availability().name(),
+        angle.value(),
+        angle.unit(),
+        metadata(angle.metadata()),
+        provenance(angle.metadata().provenance()));
   }
 
   private static ObservedTextDto program(ObservedEvent event) {

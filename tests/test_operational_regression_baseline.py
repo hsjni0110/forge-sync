@@ -36,6 +36,10 @@ def test_operational_twin_keeps_the_frozen_meaning() -> None:
     assert snapshot["state"]["execution"]["value"] == expected["execution"]
     assert visual_spindle["value"] == expected["rpm"]
     assert snapshot["metrics"]["toolNumber"]["value"] == expected["toolNumber"]
+    assert snapshot["metrics"]["bAxisAngle"]["value"] == expected["bAxisAngleDegrees"]
+    assert snapshot["metrics"]["bAxisAngle"]["provenance"]["transformation"][
+        "sourceDataItemId"
+    ] == "Mazak01-B_4"
     assert expected["rpm"] / 500 == expected["visualAngularVelocityRadPerSecond"]
 
 

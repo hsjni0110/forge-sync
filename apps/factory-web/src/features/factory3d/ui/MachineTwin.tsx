@@ -11,6 +11,7 @@ import { GenericMachinePrimitive } from "./GenericMachinePrimitive";
 import { MachineModelView, type MachineInspectionViewProps } from "./MachineModelView";
 import { providerFor } from "./model/machineModelProviders";
 import type { MachineTwinModel } from "./model/machineTwinModel";
+import { mapBaxisAngleToRotation } from "../domain/bAxisCoordinateMapping";
 
 export function MachineTwin({
   binding,
@@ -26,6 +27,19 @@ export function MachineTwin({
   onSelectMachine: (machineId: string) => void;
   onAssetFallback: () => void;
 }) {
+  const bAxisRotation =
+    binding.bAxisCoordinateMapping &&
+    visualState?.bAxisAngleDegrees !== undefined &&
+    !visualState.stale &&
+    visualState.bAxisAngleSourceDataItemId === binding.bAxisCoordinateMapping.sourceDataItemId
+      ? mapBaxisAngleToRotation(
+          visualState.bAxisAngleDegrees,
+          visualState.bAxisAngleUnit,
+          binding.bAxisCoordinateMapping,
+        )
+      : undefined;
+  const availableBaxisRotation =
+    bAxisRotation?.availability === "AVAILABLE" ? bAxisRotation : undefined;
   return (
     <group
       name={binding.sceneNodeId}
@@ -41,6 +55,7 @@ export function MachineTwin({
         fallback={
           <GenericMachinePrimitive
             visualPresentation={visualPresentation}
+            bAxisRotation={availableBaxisRotation}
             {...inspectionProps}
           />
         }
@@ -49,6 +64,7 @@ export function MachineTwin({
         <FactoryAssetModel
           asset={binding.asset}
           visualPresentation={visualPresentation}
+          bAxisRotation={availableBaxisRotation}
           {...inspectionProps}
         />
       </AssetErrorBoundary>

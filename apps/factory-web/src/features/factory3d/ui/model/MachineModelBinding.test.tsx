@@ -94,4 +94,34 @@ describe("machine model runtime binding", () => {
     expect(model.statusMaterials[0].opacity).toBe(0.2);
     expect(model.statusMaterials[0].depthWrite).toBe(false);
   });
+
+  it("applies a validated angle only to the explicit B-axis pivot reference", () => {
+    const model = createProceduralMachineModel();
+    const presentation = deriveMachineVisualPresentation(undefined, false);
+
+    render(
+      <MachineModelBinding
+        model={model}
+        visualPresentation={presentation}
+        bAxisRotation={{ availability: "AVAILABLE", radians: Math.PI / 4, rotationAxis: "z" }}
+      />,
+    );
+    act(() => frameCallbacks[0]({}, 0.25));
+
+    expect(model.nodes.bAxisPivot.rotation.z).toBeCloseTo(Math.PI / 4);
+    expect(model.nodes.millingHead.rotation.z).toBe(0);
+  });
+
+  it("applies a validated B-axis angle immediately when motion is reduced", () => {
+    const model = createProceduralMachineModel();
+    render(
+      <MachineModelBinding
+        model={model}
+        visualPresentation={deriveMachineVisualPresentation(undefined, true)}
+        bAxisRotation={{ availability: "AVAILABLE", radians: -Math.PI / 6, rotationAxis: "x" }}
+      />,
+    );
+
+    expect(model.nodes.bAxisPivot.rotation.x).toBeCloseTo(-Math.PI / 6);
+  });
 });

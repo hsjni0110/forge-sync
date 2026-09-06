@@ -32,6 +32,7 @@ public record OperationalTwinSnapshot(
     List<FieldProvenance> executionProvenance,
     List<FieldProvenance> healthProvenance,
     List<SpindleSpeed> spindleSpeeds,
+    Optional<ObservedAngle> bAxisAngle,
     Optional<ObservedEvent> toolNumber,
     Optional<ObservedEvent> program,
     List<CurrentCondition> conditions) {
@@ -54,6 +55,7 @@ public record OperationalTwinSnapshot(
       List<FieldProvenance> executionProvenance,
       List<FieldProvenance> healthProvenance,
       List<SpindleSpeed> spindleSpeeds,
+      Optional<ObservedAngle> bAxisAngle,
       Optional<ObservedEvent> toolNumber,
       Optional<ObservedEvent> program,
       List<CurrentCondition> conditions) {
@@ -76,6 +78,7 @@ public record OperationalTwinSnapshot(
         executionProvenance,
         healthProvenance,
         spindleSpeeds,
+        bAxisAngle,
         toolNumber,
         program,
         conditions);
@@ -101,6 +104,7 @@ public record OperationalTwinSnapshot(
     executionProvenance = List.copyOf(executionProvenance);
     healthProvenance = List.copyOf(healthProvenance);
     spindleSpeeds = List.copyOf(spindleSpeeds);
+    Objects.requireNonNull(bAxisAngle, "bAxisAngle");
     Objects.requireNonNull(toolNumber, "toolNumber");
     Objects.requireNonNull(program, "program");
     conditions = List.copyOf(conditions);
@@ -123,6 +127,12 @@ public record OperationalTwinSnapshot(
   }
 
   public record SpindleSpeed(
+      ObservationAvailability availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadata metadata) {}
+
+  public record ObservedAngle(
       ObservationAvailability availability,
       BigDecimal value,
       String unit,

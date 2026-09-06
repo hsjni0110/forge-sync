@@ -86,7 +86,11 @@ class WebSocketTwinProjectionNotifierTest {
         projectedAt,
         TwinConsistencyState.PARTIAL,
         List.of(
-            "metrics.spindleSpeeds", "state.execution", "metrics.toolNumber", "metrics.program"),
+            "metrics.spindleSpeeds",
+            "metrics.bAxisAngle",
+            "state.execution",
+            "metrics.toolNumber",
+            "metrics.program"),
         ConnectivityState.UNKNOWN,
         ExecutionState.UNKNOWN,
         HealthState.UNKNOWN,
@@ -99,6 +103,7 @@ class WebSocketTwinProjectionNotifierTest {
         List.of(),
         List.of(),
         List.of(),
+        Optional.empty(),
         Optional.empty(),
         Optional.empty(),
         List.of());

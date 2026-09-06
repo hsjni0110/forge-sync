@@ -8,6 +8,7 @@ import type {
   MachineTwinModel,
 } from "./model/machineTwinModel";
 import type { MachineVisualPresentation } from "../domain/machineVisualPresentation";
+import type { BAxisRotation } from "../domain/bAxisCoordinateMapping";
 
 export interface MachineInspectionViewProps {
   selectedPartId?: MachineInspectionPartId;
@@ -16,6 +17,7 @@ export interface MachineInspectionViewProps {
   onSelectPart: (partId?: MachineInspectionPartId) => void;
   onHoverPart: (partId?: MachineInspectionPartId) => void;
   onModelReady: (model?: MachineTwinModel) => void;
+  bAxisRotation?: Extract<BAxisRotation, { availability: "AVAILABLE" }>;
 }
 
 export function MachineModelView({
@@ -27,6 +29,7 @@ export function MachineModelView({
   onSelectPart,
   onHoverPart,
   onModelReady,
+  bAxisRotation,
 }: MachineInspectionViewProps & {
   model: MachineTwinModel;
   visualPresentation?: MachineVisualPresentation;
@@ -64,6 +67,7 @@ export function MachineModelView({
           model={model}
           visualPresentation={visualPresentation}
           isEnclosureTransparent={isEnclosureTransparent}
+          bAxisRotation={bAxisRotation}
         />
       )}
       <MachineInspectionAppearance

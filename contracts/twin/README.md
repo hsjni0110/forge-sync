@@ -7,7 +7,7 @@ GET /api/v1/machines/{machineId}/twin
 Accept: application/vnd.forgesync.twin.v1+json
 ```
 
-Version `1.2.0` is defined by
+Version `1.3.0` is defined by
 [`v1/twin-snapshot.schema.json`](./v1/twin-snapshot.schema.json). The schema keeps the PRD 27
 sections stable while the MVP populates machine identity, consistency, Replay Cursor, Equipment State, freshness,
 spindle speeds, tool, program, current Conditions, and field-level provenance. Unsupported business

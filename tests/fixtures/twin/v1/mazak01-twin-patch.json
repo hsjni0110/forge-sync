@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "type": "TWIN_PATCH",
   "machineId": "Mazak01",
   "baseVersion": 3,
   "targetVersion": 4,
   "projectedAt": "2026-09-02T01:02:04Z",
   "snapshot": {
-    "schemaVersion": "1.2.0",
+    "schemaVersion": "1.3.0",
     "machine": { "machineId": "Mazak01" },
     "consistency": {
       "status": "PARTIAL",
@@ -35,7 +35,7 @@
             },
             "transformation": {
               "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1526",
-              "mappingVersion": "2.0.0",
+              "mappingVersion": "2.1.0",
               "sourceDataItemId": "Mazak01-path_13"
             }
           }
@@ -73,7 +73,7 @@
             },
             "transformation": {
               "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1530",
-              "mappingVersion": "2.0.0",
+              "mappingVersion": "2.1.0",
               "sourceDataItemId": "Mazak01-C_5"
             }
           }
@@ -97,7 +97,7 @@
           },
           "transformation": {
             "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1555",
-            "mappingVersion": "2.0.0",
+            "mappingVersion": "2.1.0",
             "sourceDataItemId": "Mazak01-path_10"
           }
         }
@@ -120,7 +120,7 @@
           },
           "transformation": {
             "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=131",
-            "mappingVersion": "2.0.0",
+            "mappingVersion": "2.1.0",
             "sourceDataItemId": "Mazak01-path_1"
           }
         }

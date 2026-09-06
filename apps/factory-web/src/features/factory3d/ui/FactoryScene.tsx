@@ -124,6 +124,7 @@ export default function FactoryScene({
         issueCameraCommand={issueCameraCommand}
         selectPart={selectPart}
         toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
+        bAxisStatus={bAxisStatus(machineBinding, visualState)}
       />
     </div>
   );
@@ -136,6 +137,7 @@ function MachineInspectionControls({
   issueCameraCommand,
   selectPart,
   toggleEnclosure,
+  bAxisStatus,
 }: {
   model?: MachineTwinModel;
   selectedPartId?: MachineInspectionPartId;
@@ -143,6 +145,7 @@ function MachineInspectionControls({
   issueCameraCommand: (type: CameraCommandType, partId?: MachineInspectionPartId) => void;
   selectPart: (partId?: MachineInspectionPartId) => void;
   toggleEnclosure: () => void;
+  bAxisStatus: string;
 }) {
   const cameraButtons: Array<[string, string, CameraCommandType]> = [
     ["축소", "−", "ZOOM_OUT"],
@@ -205,6 +208,7 @@ function MachineInspectionControls({
         <span>바닥의 노란 원: 선택된 설비</span>
         <span>대표 공작물: SIMULATED</span>
         <span>공장 배치: SIMULATED_LAYOUT</span>
+        <span>{bAxisStatus}</span>
       </details>
       <span className="visually-hidden" role="status">
         {selectedPartId && model ? `${model.inspection.parts[selectedPartId].label} 선택됨` : "선택한 부품 없음"}
@@ -215,6 +219,18 @@ function MachineInspectionControls({
       </details>
     </aside>
   );
+}
+
+function bAxisStatus(
+  binding: FactorySceneProps["machineBinding"],
+  visualState: FactorySceneProps["visualState"],
+): string {
+  const observed = visualState?.bAxisAngleDegrees;
+  const value = observed === undefined ? "관찰값 없음" : `${observed}°`;
+  if (!binding.bAxisCoordinateMapping) {
+    return `B축 ${value} · 좌표 매핑 검증 전 · unavailable`;
+  }
+  return `B축 ${value} · 검증된 좌표 매핑`;
 }
 
 function keyboardCameraCommand(key: string): CameraCommandType | "CLEAR_SELECTION" | undefined {

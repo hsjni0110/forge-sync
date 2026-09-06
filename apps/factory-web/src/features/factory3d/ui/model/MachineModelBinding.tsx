@@ -6,6 +6,7 @@ import {
   type MachineVisualPresentation,
 } from "../../domain/machineVisualPresentation";
 import type { MachineTwinModel } from "./machineTwinModel";
+import type { BAxisRotation } from "../../domain/bAxisCoordinateMapping";
 
 const SURFACE_COLORS: Record<MachineVisualPresentation["materialTone"], string> = {
   STALE: "#48545a",
@@ -37,12 +38,40 @@ export function MachineModelBinding({
   model,
   visualPresentation,
   isEnclosureTransparent = false,
+  bAxisRotation,
 }: {
   model: MachineTwinModel;
   visualPresentation: MachineVisualPresentation;
   isEnclosureTransparent?: boolean;
+  bAxisRotation?: Extract<BAxisRotation, { availability: "AVAILABLE" }>;
 }) {
   const beaconElapsedSeconds = useRef(0);
+  const bAxisTransition = useRef<{
+    axis: "x" | "y" | "z";
+    from: number;
+    to: number;
+    elapsedSeconds: number;
+  } | undefined>(undefined);
+
+  useEffect(() => {
+    if (!bAxisRotation) return;
+    if (visualPresentation.isReducedMotion || !visualPresentation.isReplayAdvancing) {
+      model.nodes.bAxisPivot.rotation[bAxisRotation.rotationAxis] = bAxisRotation.radians;
+      bAxisTransition.current = undefined;
+      return;
+    }
+    bAxisTransition.current = {
+      axis: bAxisRotation.rotationAxis,
+      from: model.nodes.bAxisPivot.rotation[bAxisRotation.rotationAxis],
+      to: bAxisRotation.radians,
+      elapsedSeconds: 0,
+    };
+  }, [
+    bAxisRotation,
+    model.nodes.bAxisPivot,
+    visualPresentation.isReducedMotion,
+    visualPresentation.isReplayAdvancing,
+  ]);
 
   useEffect(() => {
     const isMuted = ["STALE", "OFFLINE"].includes(visualPresentation.materialTone);
@@ -64,6 +93,14 @@ export function MachineModelBinding({
   }, [isEnclosureTransparent, model, visualPresentation.materialTone, visualPresentation.status]);
 
   useFrame((_state, deltaSeconds) => {
+    const transition = bAxisTransition.current;
+    if (transition) {
+      transition.elapsedSeconds = Math.min(0.25, transition.elapsedSeconds + deltaSeconds);
+      const progress = transition.elapsedSeconds / 0.25;
+      model.nodes.bAxisPivot.rotation[transition.axis] =
+        transition.from + (transition.to - transition.from) * progress;
+      if (progress === 1) bAxisTransition.current = undefined;
+    }
     if (visualPresentation.isSpindleAnimating) {
       model.nodes.mainSpindle.rotation.z = nextVisualSpindleRotation(
         model.nodes.mainSpindle.rotation.z,

@@ -210,6 +210,7 @@ describe("FactoryScene asset isolation", () => {
     expect(container.querySelector('primitive[name="machine-root"]')).toBeTruthy();
     expect(screen.getByText(/대표 공작물: SIMULATED/)).toBeTruthy();
     expect(screen.getByText(/공장 배치: SIMULATED_LAYOUT/)).toBeTruthy();
+    expect(screen.getByText(/B축 45° · 좌표 매핑 검증 전 · unavailable/)).toBeTruthy();
   });
 
   it("keeps camera controls compact while preserving keyboard commands and part focus", async () => {
@@ -310,6 +311,10 @@ const visualState: MachineVisualState = {
   health: "NORMAL",
   rpm: 49,
   rpmSourceDataItemId: "Mazak01-C_5",
+  bAxisAngleDegrees: 45,
+  bAxisAngleUnit: "DEGREE",
+  bAxisAngleSourceDataItemId: "Mazak01-B_4",
+  bAxisAngleSourceObservedAt: "2016-10-05T09:16:39.557Z",
   tool: "13",
   stale: false,
   selected: true,

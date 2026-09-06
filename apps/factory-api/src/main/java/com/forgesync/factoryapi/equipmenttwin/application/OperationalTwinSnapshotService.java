@@ -2,6 +2,7 @@ package com.forgesync.factoryapi.equipmenttwin.application;
 
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.CurrentCondition;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservationMetadata;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedAngle;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedEvent;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.SpindleSpeed;
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
@@ -23,6 +24,8 @@ import java.util.Optional;
 public final class OperationalTwinSnapshotService implements GetOperationalTwinSnapshot {
 
   private static final String SPINDLE_SPEED = "SPINDLE_SPEED";
+  private static final String ANGLE = "ANGLE";
+  private static final String DEGREE = "DEGREE";
   private static final String EXECUTION = "EXECUTION";
   private static final String TOOL_NUMBER = "TOOL_NUMBER";
   private static final String PROGRAM = "PROGRAM";
@@ -50,9 +53,11 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
 
     List<ProjectedTwinObservation> observations = projection.observations();
     List<SpindleSpeed> spindleSpeeds = spindleSpeeds(observations);
+    Optional<ObservedAngle> bAxisAngle = uniqueBaxisAngle(observations);
     Optional<ObservedEvent> toolNumber = uniqueEvent(observations, TOOL_NUMBER);
     Optional<ObservedEvent> program = uniqueEvent(observations, PROGRAM);
-    List<String> missingFields = missingFields(projection, spindleSpeeds, toolNumber, program);
+    List<String> missingFields =
+        missingFields(projection, spindleSpeeds, bAxisAngle, toolNumber, program);
     TwinConsistencyState consistency = consistency(freshness, missingFields);
 
     return new OperationalTwinSnapshot(
@@ -74,6 +79,7 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         provenanceOf(observations, StateObservationKind.EVENT, EXECUTION),
         provenanceOfKind(observations, StateObservationKind.CONDITION),
         spindleSpeeds,
+        bAxisAngle,
         toolNumber,
         program,
         conditions(observations));
@@ -124,6 +130,22 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
     return Optional.of(new ObservedEvent(item.availability(), value, metadata(item)));
   }
 
+  private static Optional<ObservedAngle> uniqueBaxisAngle(
+      List<ProjectedTwinObservation> observations) {
+    List<ProjectedTwinObservation> matching =
+        observations.stream()
+            .filter(item -> item.kind() == StateObservationKind.SAMPLE)
+            .filter(item -> item.semanticType().equals(ANGLE))
+            .sorted(observationOrder())
+            .toList();
+    if (matching.size() != 1 || !DEGREE.equals(matching.getFirst().unit())) {
+      return Optional.empty();
+    }
+    ProjectedTwinObservation item = matching.getFirst();
+    return Optional.of(
+        new ObservedAngle(item.availability(), item.numericValue(), item.unit(), metadata(item)));
+  }
+
   private static List<CurrentCondition> conditions(List<ProjectedTwinObservation> observations) {
     return observations.stream()
         .filter(item -> item.kind() == StateObservationKind.CONDITION)
@@ -144,6 +166,7 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
   private static List<String> missingFields(
       LoadedTwinProjection projection,
       List<SpindleSpeed> spindleSpeeds,
+      Optional<ObservedAngle> bAxisAngle,
       Optional<ObservedEvent> toolNumber,
       Optional<ObservedEvent> program) {
     List<String> missing = new ArrayList<>();
@@ -160,6 +183,9 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
     if (projection.equipmentState().health() == HealthState.UNKNOWN) {
       missing.add("state.health");
     }
+    if (bAxisAngle.filter(OperationalTwinSnapshotService::isAvailable).isEmpty()) {
+      missing.add("metrics.bAxisAngle");
+    }
     if (toolNumber.filter(OperationalTwinSnapshotService::isAvailable).isEmpty()) {
       missing.add("metrics.toolNumber");
     }
@@ -171,6 +197,10 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
 
   private static boolean isAvailable(ObservedEvent event) {
     return event.availability() == ObservationAvailability.AVAILABLE;
+  }
+
+  private static boolean isAvailable(ObservedAngle angle) {
+    return angle.availability() == ObservationAvailability.AVAILABLE && angle.value() != null;
   }
 
   private static TwinConsistencyState consistency(

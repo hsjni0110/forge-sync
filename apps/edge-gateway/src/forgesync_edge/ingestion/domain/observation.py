@@ -20,6 +20,7 @@ class Availability(StrEnum):
 
 
 class SampleMetric(StrEnum):
+    ANGLE = "ANGLE"
     SPINDLE_SPEED = "SPINDLE_SPEED"
     PATH_FEEDRATE = "PATH_FEEDRATE"
     TEMPERATURE = "TEMPERATURE"
@@ -28,6 +29,7 @@ class SampleMetric(StrEnum):
 
 
 class Unit(StrEnum):
+    DEGREE = "DEGREE"
     REVOLUTION_PER_MINUTE = "REVOLUTION/MINUTE"
     MILLIMETER_PER_SECOND = "MILLIMETER/SECOND"
     CELSIUS = "CELSIUS"
@@ -36,6 +38,7 @@ class Unit(StrEnum):
 
 
 EXPECTED_UNITS = {
+    SampleMetric.ANGLE: Unit.DEGREE,
     SampleMetric.SPINDLE_SPEED: Unit.REVOLUTION_PER_MINUTE,
     SampleMetric.PATH_FEEDRATE: Unit.MILLIMETER_PER_SECOND,
     SampleMetric.TEMPERATURE: Unit.CELSIUS,
