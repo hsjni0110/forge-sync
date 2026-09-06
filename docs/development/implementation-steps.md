@@ -850,6 +850,8 @@ procedural 기본 배치와 명시적 안내를 사용한다. [ADR-043](../adr/A
 
 ### Step 27 — 재생 종료 표시와 값 서식 정합성
 
+**상태**: `DONE` (2026-09-06)
+
 **목적**: 정상적으로 끝난 재생을 고장처럼 보이게 하는 표시를 없애고, 원시 값을 사람이 읽을 수 있게 만든다.
 
 **근거**: D-09, D-11. 재생이 끝나면 `연결: 실시간 연결됨`과 `TWIN FRESHNESS: STALE`이 함께 표시되고
@@ -876,6 +878,14 @@ procedural 기본 배치와 명시적 안내를 사용한다. [ADR-043](../adr/A
 서식을 따른다. freshness 자체의 계산 규칙은 바꾸지 않는다.
 
 **선행 조건**: Step 12, Step 17, Step 21.
+
+**구현 기록**: freshness 판정은 변경하지 않고 Replay lifecycle을 표시 정책에 함께 전달해
+`COMPLETED`는 `마지막 재생 데이터`, `PAUSED`는 `선택 시점 데이터`로 구분했다. 실제 `STALE`만
+실시간 오판 위험 경고를 유지하며 세 상태 모두 기존 3D 정지 정책을 보존한다. UTC는 날짜·초 단위
+시각·zone badge로 나누고 원본 ISO 값은 `datetime`과 title에 보존한다. 숫자는 공용 서식으로
+불필요한 자릿수를 줄였고, 관측 공구 번호 `0`은 미장착으로 추측하지 않고
+`0 · 미장착 여부 확인 불가`로 표시한다. provenance는 source/source set별로 묶어 기본 접힘으로
+제공한다. [ADR-044](../adr/ADR-044-replay-lifecycle-presentation-and-value-formatting.md)
 
 ---
 

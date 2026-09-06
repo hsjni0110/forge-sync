@@ -63,7 +63,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   publish("offline-update");
   await page.clock.fastForward(10_001);
   await expect(page.getByRole("alert")).toContainText(
-    "마지막 업데이트가 오래되었습니다",
+    "현재 설비의 실시간 상태로 판단하지 마세요",
   );
   await expect(
     page.getByLabel("트윈 연결 상태").getByText("오래된 데이터"),
@@ -78,7 +78,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   await page.clock.setFixedTime(new Date());
   await context.setOffline(false);
   await page.clock.fastForward(10_000);
-  await expect(page.getByText("1873 rpm", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("1,873 rpm", { exact: true }).first()).toBeVisible();
   await expect(
     page.getByRole("button", {
       name: /Mazak01 Twin v6 가동 중 1873 RPM 시각 회전 켜짐 선택됨/,
@@ -88,8 +88,8 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
 
   await page.getByRole("button", { name: "2D", exact: true }).click();
   await expect(page.getByText("데이터 버전 6")).toBeVisible();
-  await expect(page.getByText("1873 rpm", { exact: true }).first()).toBeVisible();
-  await page.getByText(/원본 추적 정보 .*건 보기/).click();
+  await expect(page.getByText("1,873 rpm", { exact: true }).first()).toBeVisible();
+  await page.getByText(/원본 추적 정보 .*건 · .*개 출처/).click();
   await expect(page.getByText(/실제 데이터 · NIST/).first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mazak01", exact: true })).toBeVisible();
   for (const section of ["기본 정보", "현재 상태", "측정값", "데이터 품질", "데이터 출처"]) {
@@ -103,7 +103,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
     "true",
   );
   await expect(page.locator("canvas")).toBeVisible();
-  await expect(page.getByText("1873 rpm", { exact: true })).toBeVisible();
+  await expect(page.getByText("1,873 rpm", { exact: true })).toBeVisible();
   const selectedMachineLabel = page.getByRole("button", {
     name: /Mazak01 Twin v6 가동 중 1873 RPM 시각 회전 켜짐 선택됨/,
   });
@@ -126,6 +126,6 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   });
   await page.reload();
   await expect(page.getByText("3D를 사용할 수 없습니다")).toBeVisible();
-  await expect(page.getByText("1873 rpm")).toBeVisible();
+  await expect(page.getByText("1,873 rpm")).toBeVisible();
   await expect(page.getByText(/2D 화면에서 계속 확인할 수 있습니다/)).toBeVisible();
 });

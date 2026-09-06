@@ -5,6 +5,7 @@ import type { ReplayControlClient } from "../application/ports";
 import type { ReplaySessionState, ReplayStatus } from "../domain/replay";
 import type { Freshness, TwinSnapshot } from "../../twin/domain/twin";
 import { useReplayController, type ReplayController } from "./useReplayController";
+import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
 
 interface ReplayControlsProps {
   machineId: string;
@@ -172,13 +173,13 @@ function ReplayControlsView({
               style={timelineStyle}
             />
             <div className="replay-timeline-labels">
-              <span>{formatTime(session.sourceRange.startsAt)}</span>
-              <span>{formatTime(session.sourceRange.endsAt)}</span>
+              <UtcTimestamp value={session.sourceRange.startsAt} compact />
+              <UtcTimestamp value={session.sourceRange.endsAt} compact />
             </div>
           </div>
           <dl className="replay-times">
-            <div><dt>Source Time</dt><dd>{formatTime(snapshot?.replayCursor.sourceObservedAt)}</dd></div>
-            <div><dt>Replay Time</dt><dd>{formatTime(snapshot?.replayCursor.replayPublishedAt)}</dd></div>
+            <div><dt>Source Time</dt><dd>{snapshot?.replayCursor.sourceObservedAt ? <UtcTimestamp value={snapshot.replayCursor.sourceObservedAt} /> : "아직 없음"}</dd></div>
+            <div><dt>Replay Time</dt><dd>{snapshot?.replayCursor.replayPublishedAt ? <UtcTimestamp value={snapshot.replayCursor.replayPublishedAt} /> : "아직 없음"}</dd></div>
             <div>
               <dt>Twin Freshness</dt>
               <dd><span className="freshness-chip" data-freshness={freshness ?? "UNKNOWN"}>{freshness ?? "확인 중"}</span></dd>
@@ -200,10 +201,6 @@ function statusLabel(status: ReplayStatus): string {
     COMPLETED: "재생 완료",
     FAILED: "재생 실패",
   }[status];
-}
-
-function formatTime(value: string | undefined): string {
-  return value ? new Date(value).toLocaleString("ko-KR", { timeZone: "UTC" }) : "아직 없음";
 }
 
 function formatElapsed(millis: number): string {

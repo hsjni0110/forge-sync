@@ -3,7 +3,12 @@ import type { ReactNode } from "react";
 import type { TwinLiveState } from "../application/TwinLiveSession";
 import type { MachineDetailCondition, MachineDetailViewModel } from "../application/machineDetailViewModel";
 import { mapTwinToMachineDetail } from "../application/machineDetailViewModel";
+import {
+  deriveTwinPresentation,
+  type ReplayLifecycleStatus,
+} from "../application/twinPresentationPolicy";
 import { TwinConnectionStatus } from "./TwinConnectionStatus";
+import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
 
 const NORMAL_LEVEL = "정상";
 const CONDITION_SEVERITY_ORDER = ["고장", "확인할 수 없음", "주의", NORMAL_LEVEL];
@@ -13,6 +18,7 @@ interface MachineDetailViewProps {
   state: TwinLiveState;
   retryNow: () => void;
   layout?: "FULL" | "COMPACT";
+  replayStatus?: ReplayLifecycleStatus;
 }
 
 export function MachineDetailView({
@@ -20,6 +26,7 @@ export function MachineDetailView({
   state,
   retryNow,
   layout = "FULL",
+  replayStatus,
 }: MachineDetailViewProps) {
   if (!state.snapshot && state.connectionStatus === "LOADING") {
     return <MachineDetailLoading machineId={machineId} />;
@@ -50,7 +57,7 @@ export function MachineDetailView({
     state.connectionStatus === "RECONNECTING" ||
     state.connectionStatus === "RESYNCING" ||
     state.connectionStatus === "UNAVAILABLE";
-  const isStale = state.freshness === "STALE";
+  const presentation = deriveTwinPresentation(state.freshness, replayStatus);
 
   if (layout === "COMPACT") {
     return (
@@ -58,7 +65,8 @@ export function MachineDetailView({
         detail={detail}
         state={state}
         isRecovering={isRecovering}
-        isStale={isStale}
+        replayStatus={replayStatus}
+        presentation={presentation}
       />
     );
   }
@@ -72,21 +80,24 @@ export function MachineDetailView({
           <p className="machine-version">데이터 버전 {detail.twinVersion}</p>
         </div>
         <p>
-          마지막 반영 시각 <UtcTime value={detail.projectedAt} />
+          마지막 반영 시각 <UtcTimestamp value={detail.projectedAt} />
         </p>
       </header>
 
       <MachineHero detail={detail} />
 
-      <TwinConnectionStatus state={state} />
+      <TwinConnectionStatus state={state} replayStatus={replayStatus} />
       {isRecovering && (
         <div className="notice notice-warning" role="status">
           서버에 다시 연결하고 있습니다. 연결되기 전까지 마지막으로 받은 값을 표시합니다.
         </div>
       )}
-      {isStale && (
-        <div className="notice notice-danger" role="alert">
-          오래된 데이터입니다. 현재 설비의 실시간 상태로 판단하지 마세요.
+      {presentation.notice && (
+        <div
+          className={`notice ${presentation.noticeTone === "danger" ? "notice-danger" : "notice-neutral"}`}
+          role={presentation.warnsAgainstRealtimeUse ? "alert" : "status"}
+        >
+          {presentation.notice}
         </div>
       )}
 
@@ -112,7 +123,7 @@ export function MachineDetailView({
         <DetailSection title="현재 상태">
           <DefinitionList
             entries={[
-              ...detail.states.map(({ label, value }) => [label, value] as const),
+              ...presentedStates(detail.states, replayStatus).map(({ label, value }) => [label, value] as const),
               ["조회 시 데이터 경과 시간", formatAge(detail.freshness.ageMillis)],
             ]}
           />
@@ -143,7 +154,7 @@ export function MachineDetailView({
 
         <DetailSection title="데이터 품질">
           <DefinitionList
-            entries={[["데이터 구성", consistencyLabel(detail.consistency)]]}
+            entries={[["데이터 구성", consistencyLabel(detail.consistency, replayStatus)]]}
           />
           <h3>현재 없는 핵심 정보</h3>
           {detail.missingFields.length === 0 ? (
@@ -165,24 +176,28 @@ export function MachineDetailView({
             <p className="empty-state">표시할 데이터 출처가 없습니다.</p>
           ) : (
             <details className="provenance-disclosure">
-              <summary>원본 추적 정보 {detail.provenance.length}건 보기</summary>
-              <div className="provenance-list">
-                {detail.provenance.map((item) => (
-                  <article key={item.key} className="provenance-card">
-                    <header>
-                      <h3>{item.field}</h3>
-                      <span className="source-badge">{item.sourceLabel}</span>
-                    </header>
-                    <DefinitionList
-                      entries={[
-                        ["원본 데이터 묶음", item.sourceSetId],
-                        ["원본 항목 ID", item.sourceDataItemId],
-                        ["변환 규칙 버전", item.mappingVersion],
-                        ["원본 파일 식별자", item.artifactId],
-                        ["원본 레코드 위치", item.rawRecordId],
-                      ]}
-                    />
-                  </article>
+              <summary>
+                원본 추적 정보 {detail.provenance.length}건 · {detail.provenanceGroups.length}개 출처
+              </summary>
+              <div className="provenance-groups">
+                {detail.provenanceGroups.map((group) => (
+                  <section key={group.key} className="provenance-group">
+                    <h3>{group.sourceLabel} · {group.items.length}건</h3>
+                    <p>원본 데이터 묶음 · {group.sourceSetId}</p>
+                    <div className="provenance-list">
+                      {group.items.map((item) => (
+                        <article key={item.key} className="provenance-card">
+                          <header><h4>{item.field}</h4></header>
+                          <DefinitionList entries={[
+                            ["원본 항목 ID", item.sourceDataItemId],
+                            ["변환 규칙 버전", item.mappingVersion],
+                            ["원본 파일 식별자", item.artifactId],
+                            ["원본 레코드 위치", item.rawRecordId],
+                          ]} />
+                        </article>
+                      ))}
+                    </div>
+                  </section>
                 ))}
               </div>
             </details>
@@ -240,12 +255,14 @@ function MachineOperationalSummary({
   detail,
   state,
   isRecovering,
-  isStale,
+  replayStatus,
+  presentation,
 }: {
   detail: ReturnType<typeof mapTwinToMachineDetail>;
   state: TwinLiveState;
   isRecovering: boolean;
-  isStale: boolean;
+  replayStatus?: ReplayLifecycleStatus;
+  presentation: ReturnType<typeof deriveTwinPresentation>;
 }) {
   return (
     <article className="machine-summary">
@@ -257,19 +274,20 @@ function MachineOperationalSummary({
         <span className="machine-version">v{detail.twinVersion}</span>
       </header>
 
-      <TwinConnectionStatus state={state} layout="COMPACT" />
-      {(isRecovering || isStale) && (
-        <div className={`notice ${isStale ? "notice-danger" : "notice-warning"}`} role="alert">
-          {isStale
-            ? "마지막 업데이트가 오래되었습니다. 현재 상태로 판단하지 마세요."
-            : "서버 연결을 복구하는 동안 마지막 값을 표시합니다."}
+      <TwinConnectionStatus state={state} layout="COMPACT" replayStatus={replayStatus} />
+      {(isRecovering || presentation.notice) && (
+        <div
+          className={`notice ${presentation.noticeTone === "danger" ? "notice-danger" : isRecovering ? "notice-warning" : "notice-neutral"}`}
+          role={presentation.warnsAgainstRealtimeUse ? "alert" : "status"}
+        >
+          {presentation.notice ?? "서버 연결을 복구하는 동안 마지막 값을 표시합니다."}
         </div>
       )}
 
       <section className="summary-section" aria-labelledby="summary-state-title">
         <h2 id="summary-state-title">운영 상태</h2>
         <div className="summary-state-grid">
-          {detail.states.map(({ label, value }) => (
+          {presentedStates(detail.states, replayStatus).map(({ label, value }) => (
             <div key={label}>
               <span>{label}</span>
               <strong>{value}</strong>
@@ -291,7 +309,7 @@ function MachineOperationalSummary({
       </section>
 
       <footer className="summary-footer">
-        <span>최근 반영 · <UtcTime value={detail.projectedAt} /></span>
+        <span>최근 반영 · <UtcTimestamp value={detail.projectedAt} compact /></span>
         <span className="summary-footer-hint">상단 2D 보기에서 전체 상세를 확인할 수 있습니다.</span>
       </footer>
     </article>
@@ -361,17 +379,26 @@ function DefinitionList({ entries }: { entries: ReadonlyArray<readonly [string, 
   );
 }
 
-function UtcTime({ value }: { value: string }) {
-  return <time dateTime={value}>{value.replace("T", " ").replace("Z", " UTC")}</time>;
-}
-
-function consistencyLabel(value: string): string {
+function consistencyLabel(value: string, replayStatus?: ReplayLifecycleStatus): string {
+  if ((replayStatus === "COMPLETED" || replayStatus === "PAUSED") && value === "STALE") {
+    return "재생 기준 데이터";
+  }
   return {
     CONSISTENT: "정상",
     PARTIAL: "일부 정보 부족",
     DEGRADED: "품질 저하",
     STALE: "오래된 데이터",
   }[value] ?? value;
+}
+
+function presentedStates(
+  states: Array<{ label: string; value: string }>,
+  replayStatus?: ReplayLifecycleStatus,
+): Array<{ label: string; value: string }> {
+  if (replayStatus !== "COMPLETED" && replayStatus !== "PAUSED") return states;
+  return states.map((state) =>
+    state.label === "네트워크 연결" ? { ...state, value: "Replay 연결됨" } : state,
+  );
 }
 
 function ConditionSummary({ conditions }: { conditions: MachineDetailCondition[] }) {

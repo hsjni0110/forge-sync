@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import type { ReplayControlClient } from "../../replay/application/ports";
@@ -9,6 +9,8 @@ import { mapTwinToMachineDetail } from "../../twin/application/machineDetailView
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import { TwinConnectionStatus } from "../../twin/ui/TwinConnectionStatus";
 import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
+import { deriveTwinPresentation } from "../../twin/application/twinPresentationPolicy";
+import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
 
 const MACHINE_ID = "Mazak01";
 
@@ -88,14 +90,17 @@ function DashboardSummary({
     state.connectionStatus === "RECONNECTING" ||
     state.connectionStatus === "RESYNCING" ||
     state.connectionStatus === "UNAVAILABLE";
-  const isStale = state.freshness === "STALE";
+  const presentation = deriveTwinPresentation(state.freshness, replayStatus);
 
   return (
     <>
-      <TwinConnectionStatus state={state} />
-      {isStale ? (
-        <div className="notice notice-danger" role="alert">
-          오래된 데이터입니다. 현재 설비의 실시간 상태로 판단하지 마세요.
+      <TwinConnectionStatus state={state} replayStatus={replayStatus} />
+      {presentation.notice ? (
+        <div
+          className={`notice ${presentation.noticeTone === "danger" ? "notice-danger" : "notice-neutral"}`}
+          role={presentation.warnsAgainstRealtimeUse ? "alert" : "status"}
+        >
+          {presentation.notice}
         </div>
       ) : isRecovering ? (
         <div className="notice notice-warning" role="status">
@@ -123,7 +128,7 @@ function DashboardSummary({
         <Kpi
           label="트윈 데이터 버전"
           value={`v${detail.twinVersion}`}
-          detail={`마지막 반영 ${formatProjectedAt(detail.projectedAt)}`}
+          detailNode={<span>마지막 반영 <UtcTimestamp value={detail.projectedAt} compact /></span>}
         />
       </div>
     </>
@@ -134,16 +139,18 @@ function Kpi({
   label,
   value,
   detail,
+  detailNode,
 }: {
   label: string;
   value: string;
   detail?: string;
+  detailNode?: ReactNode;
 }) {
   return (
     <div className="metric-card">
       <span>{label}</span>
       <strong>{value}</strong>
-      {detail && <small>{detail}</small>}
+      {(detail || detailNode) && <small>{detailNode ?? detail}</small>}
     </div>
   );
 }
@@ -176,8 +183,4 @@ function DashboardPlaceholder({
       )}
     </section>
   );
-}
-
-function formatProjectedAt(value: string): string {
-  return value.replace("T", " ").replace("Z", " UTC");
 }

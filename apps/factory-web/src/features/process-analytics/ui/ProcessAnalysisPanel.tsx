@@ -9,6 +9,7 @@ import { GLOSSARY } from "../domain/processGlossary";
 import { classificationLabel, confidenceLabel, RunDetail } from "./RunDetail";
 import { HelpTip } from "./HelpTip";
 import { useProcessAnalysis } from "./useProcessAnalysis";
+import { formatDecimal } from "../../../shared/presentation/valueFormatters";
 
 const browserClient = new HttpProcessAnalysisClient(import.meta.env.VITE_API_BASE_URL ?? "");
 
@@ -310,7 +311,7 @@ function RunRowCompare({ compare }: { compare: DurationComparison }) {
 }
 
 function formatPercentage(value: number): string {
-  return `${value > 0 ? "+" : ""}${value.toFixed(1)}%`;
+  return `${value > 0 ? "+" : ""}${formatDecimal(value, { maximumFractionDigits: 1 })}%`;
 }
 
 // 편차를 정상 폭의 배수로 표시해, 같은 등급 안에서도 크기를 구분할 수 있게 한다.

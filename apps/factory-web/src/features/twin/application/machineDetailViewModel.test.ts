@@ -51,6 +51,18 @@ describe("mapTwinToMachineDetail", () => {
     expect(detail.metrics.map((metric) => metric.value)).not.toContain("0");
   });
 
+  it("distinguishes an observed tool zero from a missing tool", () => {
+    const snapshot = snapshotFixture();
+    if (!snapshot.metrics.toolNumber) throw new Error("fixture must include a tool number");
+    snapshot.metrics.toolNumber.value = 0;
+
+    const detail = mapTwinToMachineDetail(snapshot);
+
+    expect(detail.metrics.find((metric) => metric.key === "tool")?.value).toBe(
+      "0 · 미장착 여부 확인 불가",
+    );
+  });
+
   it("summarizes a single turning spindle without claiming the other channels' state", () => {
     const snapshot = snapshotFixture();
     snapshot.metrics.spindleSpeeds[0].value = 49;

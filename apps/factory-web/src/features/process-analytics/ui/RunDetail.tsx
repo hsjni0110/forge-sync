@@ -2,6 +2,8 @@ import type { MachiningRun, TraceEntry } from "../domain/processAnalysis";
 import { assessmentUnavailableExplanation, runStatusLabel } from "../domain/processAnalysis";
 import { GLOSSARY } from "../domain/processGlossary";
 import { HelpTip } from "./HelpTip";
+import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
+import { formatDecimal } from "../../../shared/presentation/valueFormatters";
 
 export function RunDetail({ run }: { run: MachiningRun }) {
   return <article className="run-detail" aria-label="선택한 가공 상세">
@@ -9,8 +11,8 @@ export function RunDetail({ run }: { run: MachiningRun }) {
       <div>
         <h3>선택한 가공 · {run.program ?? "프로그램 미확인"}<HelpTip text={GLOSSARY.program} /></h3>
         <p className="run-detail-time">
-          <span><strong>시작</strong> {formatUtc(run.startedAt)}</span>
-          <span><strong>종료</strong> {run.endedAt ? formatUtc(run.endedAt) : "근거 미확정"}</span>
+          <span><strong>시작</strong> <UtcTimestamp value={run.startedAt} /></span>
+          <span><strong>종료</strong> {run.endedAt ? <UtcTimestamp value={run.endedAt} /> : "근거 미확정"}</span>
         </p>
       </div>
       <div className="run-detail-badges">
@@ -64,8 +66,8 @@ export function RunDetail({ run }: { run: MachiningRun }) {
         )}
         <p className="section-note">같은 프로그램의 이전 가공과 비교한 분석값(DERIVED)이며 고장 판정이 아닙니다.</p>
         <ol className="anomaly-reasons" aria-label="차이의 상위 이유">{run.assessment.reasons.map((reason) => <li key={reason.feature}>
-          {featureLabel(reason.feature)}: 관측 기반 값 {reason.target}, 기준선 중앙값 {reason.median}, 차이 {reason.difference}
-          {reason.percentage != null ? ` (${reason.percentage}%)` : " · 백분율 차이는 계산할 수 없음"} · 비교 표본 {reason.sampleCount}개 · {reasonLabel(reason.code)}
+          {featureLabel(reason.feature)}: 관측 기반 값 {formatDecimal(reason.target)}, 기준선 중앙값 {formatDecimal(reason.median)}, 차이 {formatDecimal(reason.difference)}
+          {reason.percentage != null ? ` (${formatDecimal(reason.percentage, { maximumFractionDigits: 1 })}%)` : " · 백분율 차이는 계산할 수 없음"} · 비교 표본 {reason.sampleCount}개 · {reasonLabel(reason.code)}
           <HelpTip text={GLOSSARY.baselineMedianSpread} />
         </li>)}</ol>
         <TraceDetails title="기준선·비교 구간·기여 항목·출처" helpText={GLOSSARY.rawEvidence} entries={run.assessment.evidence} />
@@ -107,10 +109,10 @@ export function TraceDetails({ title, helpText, entries, observed = false }: {
 }
 
 function quantity(value: number | undefined | null, unit = "단위 미확인"): string {
-  return value == null ? "데이터 없음" : `${value} ${unit}`;
+  return value == null ? "데이터 없음" : `${formatDecimal(value)} ${unit}`;
 }
 function coverage(ratio: number | null): string {
-  return ratio === null ? "확인할 수 없음" : `${Math.round(ratio * 1_000_000) / 10_000}%`;
+  return ratio === null ? "확인할 수 없음" : `${formatDecimal(ratio * 100, { maximumFractionDigits: 1 })}%`;
 }
 function metricLabel(metric: string): string {
   return ({ SPINDLE_SPEED: "회전수", LOAD: "부하", PATH_FEEDRATE: "이송" } as Record<string, string>)[metric] ?? metric;
@@ -118,7 +120,4 @@ function metricLabel(metric: string): string {
 function dataStatusLabel(status: string): string {
   return ({ AVAILABLE: "분석 가능", PARTIAL: "일부 데이터 부족", MISSING: "데이터 없음",
     EMPTY_WINDOW: "빈 분석 구간", INSUFFICIENT_DATA: "비교 표본 부족", UNAVAILABLE: "비교할 수 없음" } as Record<string, string>)[status] ?? status;
-}
-function formatUtc(value: string): string {
-  return value.replace("T", " ").replace("Z", " UTC");
 }

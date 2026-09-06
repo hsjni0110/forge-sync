@@ -137,10 +137,19 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .condition-list small, .condition-list p { grid-column: 1 / -1; margin: 0; }
 .provenance-disclosure > summary { width: fit-content; padding: 0.65rem 0.8rem; border: 1px solid var(--fs-border-strong); border-radius: 0.5rem; color: var(--fs-accent-text); cursor: pointer; font-weight: 700; }
 .provenance-disclosure[open] > summary { margin-bottom: 1rem; }
+.provenance-groups { display: grid; gap: 1rem; }
+.provenance-group { min-width: 0; padding: 0.9rem; border: 1px solid var(--fs-border-strong); border-radius: 0.65rem; }
+.provenance-group > h3 { margin: 0; color: var(--fs-accent-text); }
+.provenance-group > p { margin: 0.3rem 0 0.8rem; color: var(--fs-text-dim); font-size: 0.8rem; overflow-wrap: anywhere; }
 .provenance-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 0.8rem; }
 .provenance-card { min-width: 0; padding: 1rem; border: 1px solid var(--fs-border); border-radius: 0.6rem; background: var(--fs-surface-sunken); }
 .provenance-card header { display: flex; align-items: start; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.9rem; }
-.provenance-card h3 { margin: 0; }
+.provenance-card h3, .provenance-card h4 { margin: 0; }
+.notice-neutral { border-color: var(--fs-accent-strong); color: var(--fs-accent-text); background: var(--fs-accent-surface); }
+.utc-timestamp { display: inline-flex; align-items: baseline; gap: 0.38rem; flex-wrap: wrap; font-variant-numeric: tabular-nums; }
+.utc-clock { font-weight: 700; color: var(--fs-text-soft); }
+.utc-zone { padding: 0.08rem 0.3rem; border: 1px solid var(--fs-border-strong); border-radius: 0.25rem; color: var(--fs-text-dim); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em; }
+.utc-timestamp-compact .utc-date { display: none; }
 .empty-state, .section-note { color: #a5b6be; }
 .section-note { margin-top: 1.2rem; padding-top: 0.8rem; border-top: 1px solid var(--fs-border); font-size: 0.88rem; }
 .page-message { max-width: 680px; padding-top: 12vh; }

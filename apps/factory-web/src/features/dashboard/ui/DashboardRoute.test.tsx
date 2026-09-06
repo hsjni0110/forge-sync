@@ -1,11 +1,13 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import twinFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-operational-twin.json";
 import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { TwinSnapshot } from "../../twin/domain/twin";
+import type { ReplayControlClient } from "../../replay/application/ports";
+import type { ReplaySessionState } from "../../replay/domain/replay";
 import { DashboardRoute } from "./DashboardRoute";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
@@ -25,10 +27,13 @@ function sessionFactoryFor(state: TwinLiveState): TwinSessionFactory {
   });
 }
 
-function renderDashboard(state: TwinLiveState) {
+function renderDashboard(state: TwinLiveState, replayControlClient?: ReplayControlClient) {
   render(
     <MemoryRouter>
-      <DashboardRoute twinSessionFactory={sessionFactoryFor(state)} />
+      <DashboardRoute
+        twinSessionFactory={sessionFactoryFor(state)}
+        replayControlClient={replayControlClient}
+      />
     </MemoryRouter>,
   );
 }
@@ -58,5 +63,33 @@ describe("DashboardRoute", () => {
     renderDashboard({ connectionStatus: "RECONNECTING", snapshot, freshness: "STALE" });
 
     expect(screen.getByRole("alert").textContent).toMatch(/실시간 상태로 판단하지 마세요/);
+  });
+
+  it("presents a completed replay instead of a realtime stale warning", async () => {
+    const completed: ReplaySessionState = {
+      schemaVersion: "1.0.0",
+      replaySessionId: "10000000-0000-4000-8000-000000000001",
+      machineId: "Mazak01",
+      sourceSetId: "nist-mazak01-20161005",
+      status: "COMPLETED",
+      speedMultiplier: 10,
+      revision: 2,
+      sourceRange: {
+        startsAt: "2016-10-05T05:27:55.740Z",
+        endsAt: "2016-10-05T19:15:07.025Z",
+      },
+    };
+    const client: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(completed),
+      start: vi.fn(), pause: vi.fn(), resume: vi.fn(), changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    renderDashboard(
+      { connectionStatus: "LIVE", snapshot, freshness: "STALE" },
+      client,
+    );
+
+    await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/재생이 완료/));
+    expect(screen.queryByRole("alert")).toBeNull();
+    expect(screen.getAllByText("마지막 재생 데이터").length).toBeGreaterThan(0);
   });
 });

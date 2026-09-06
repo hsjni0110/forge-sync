@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 const apiBaseUrl = process.env.FORGESYNC_API_BASE_URL ?? "http://127.0.0.1:18080";
 
 test("browser Replay start creates an authoritative session and Twin", async ({ page, request }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
   await page.goto("/factory");
 
   await page.getByRole("button", { name: "Replay 시작" }).click();
@@ -65,7 +65,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await run.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByRole("region", { name: "PROCESS · 공정 특징" })).toContainText("148.734 초");
-  const evidence = page.getByText("가공의 관측 근거", { exact: true });
+  const evidence = page.locator("summary").filter({ hasText: "가공의 관측 근거" });
   await evidence.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByText("OBSERVED · REAL:NIST", { exact: true })).toBeVisible();

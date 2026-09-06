@@ -38,7 +38,7 @@ describe("MachineDetailView", () => {
     expect(screen.getByText("114")).toBeTruthy();
     expect(screen.getAllByText(/실제 데이터 · NIST/).length).toBeGreaterThan(0);
     expect(screen.getByText(/상세 품질 정보는 아직 제공하지 않습니다/)).toBeTruthy();
-    expect(screen.getByText(/원본 추적 정보 5건 보기/)).toBeTruthy();
+    expect(screen.getByText(/원본 추적 정보 5건 · 1개 출처/)).toBeTruthy();
   });
 
   it("renders a compact operational summary without the full provenance list", () => {
@@ -72,6 +72,36 @@ describe("MachineDetailView", () => {
     expect(screen.getByText(/마지막으로 받은 값을 표시합니다/)).toBeTruthy();
     expect(screen.getByRole("alert").textContent).toMatch(/실시간 상태로 판단하지 마세요/);
     expect(screen.getAllByText("오래된 데이터").length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("shows completed replay without presenting its stopped data as a fault", () => {
+    render(
+      <MachineDetailView
+        machineId="Mazak01"
+        state={{ connectionStatus: "LIVE", snapshot, freshness: "STALE" }}
+        replayStatus="COMPLETED"
+        retryNow={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("status").textContent).toMatch(/재생이 완료되었습니다/);
+    expect(screen.getByText("마지막 재생 데이터")).toBeTruthy();
+    expect(screen.queryByText(/실시간 상태로 판단하지 마세요/)).toBeNull();
+    expect(screen.queryByText("오래된 데이터")).toBeNull();
+  });
+
+  it("groups provenance by source and keeps the collection collapsed initially", () => {
+    render(
+      <MachineDetailView
+        machineId="Mazak01"
+        state={{ connectionStatus: "LIVE", snapshot, freshness: "FRESH" }}
+        retryNow={vi.fn()}
+      />,
+    );
+
+    const disclosure = screen.getByText(/원본 추적 정보 5건 · 1개 출처/).closest("details");
+    expect(disclosure?.hasAttribute("open")).toBe(false);
+    expect(within(disclosure!).getByRole("heading", { name: /NIST.*5건/ })).toBeTruthy();
   });
 
   it("summarizes many condition signals instead of listing every normal one", () => {

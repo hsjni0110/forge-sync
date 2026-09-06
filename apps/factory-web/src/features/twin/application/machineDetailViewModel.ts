@@ -8,6 +8,7 @@ import type {
   TwinSnapshot,
 } from "../domain/twin";
 import { effectiveConnectivity, effectiveConsistency } from "../domain/freshness";
+import { formatDecimal } from "../../../shared/presentation/valueFormatters";
 
 export interface MachineDetailMetric {
   key: string;
@@ -36,6 +37,13 @@ export interface MachineDetailProvenance {
   sourceDataItemId: string;
 }
 
+export interface MachineDetailProvenanceGroup {
+  key: string;
+  sourceLabel: string;
+  sourceSetId: string;
+  items: MachineDetailProvenance[];
+}
+
 export interface MachineDetailViewModel {
   machineId: string;
   twinVersion: number;
@@ -51,6 +59,7 @@ export interface MachineDetailViewModel {
   metrics: MachineDetailMetric[];
   conditions: MachineDetailCondition[];
   provenance: MachineDetailProvenance[];
+  provenanceGroups: MachineDetailProvenanceGroup[];
 }
 
 export function mapTwinToMachineDetail(
@@ -71,7 +80,7 @@ export function mapTwinToMachineDetail(
       label: `주축 속도 · ${speed.observation.componentId}`,
       value:
         speed.availability === "AVAILABLE" && speed.value !== undefined
-          ? `${speed.value} rpm`
+          ? `${formatDecimal(speed.value)} rpm`
           : "확인할 수 없음",
       detail: speed.provenance.transformation.sourceDataItemId,
       availability: speed.availability,
@@ -83,6 +92,9 @@ export function mapTwinToMachineDetail(
   const bAxisAngle = observedMetric("b-axis", "B축 각도", snapshot.metrics.bAxisAngle);
   if (bAxisAngle.availability === "AVAILABLE") {
     bAxisAngle.value = `${bAxisAngle.value}°`;
+  }
+  if (toolNumber.availability === "AVAILABLE" && toolNumber.value === "0") {
+    toolNumber.value = "0 · 미장착 여부 확인 불가";
   }
   if (snapshot.metrics.toolNumber) {
     appendProvenance(provenance, "공구 번호", [snapshot.metrics.toolNumber.provenance]);
@@ -120,6 +132,7 @@ export function mapTwinToMachineDetail(
     metrics: [...spindleSpeeds, bAxisAngle, toolNumber, program],
     conditions,
     provenance,
+    provenanceGroups: groupProvenance(provenance),
   };
 
   function mapCondition(condition: CurrentCondition, index: number): MachineDetailCondition {
@@ -132,6 +145,22 @@ export function mapTwinToMachineDetail(
       componentId: condition.observation.componentId,
     };
   }
+}
+
+function groupProvenance(items: MachineDetailProvenance[]): MachineDetailProvenanceGroup[] {
+  const groups = new Map<string, MachineDetailProvenanceGroup>();
+  for (const item of items) {
+    const key = `${item.sourceLabel}|${item.sourceSetId}`;
+    const group = groups.get(key) ?? {
+      key,
+      sourceLabel: item.sourceLabel,
+      sourceSetId: item.sourceSetId,
+      items: [],
+    };
+    group.items.push(item);
+    groups.set(key, group);
+  }
+  return [...groups.values()];
 }
 
 const CONDITION_SEVERITY_RANK: Record<string, number> = {
@@ -161,14 +190,14 @@ function summarizeSpindles(speeds: SpindleSpeed[]): { value: string; detail: str
   const turning = available.filter((speed) => (speed.value ?? 0) > 0);
   if (turning.length === 1) {
     return {
-      value: `${turning[0].value} rpm`,
+      value: `${formatDecimal(turning[0].value ?? 0)} rpm`,
       detail: `${turning[0].observation.componentId} 사용 중`,
     };
   }
   if (turning.length > 1) {
     return {
       value: `${turning.length}개 채널 동시 회전`,
-      detail: turning.map((speed) => `${speed.observation.componentId} ${speed.value}rpm`).join(" · "),
+      detail: turning.map((speed) => `${speed.observation.componentId} ${formatDecimal(speed.value ?? 0)}rpm`).join(" · "),
     };
   }
   if (available.length === 0) {
@@ -196,7 +225,7 @@ function observedMetric(
     label,
     value:
       observed.availability === "AVAILABLE" && observed.value !== undefined
-        ? String(observed.value)
+        ? typeof observed.value === "number" ? formatDecimal(observed.value) : observed.value
         : "확인할 수 없음",
     detail: observed.provenance.transformation.sourceDataItemId,
     availability: observed.availability,

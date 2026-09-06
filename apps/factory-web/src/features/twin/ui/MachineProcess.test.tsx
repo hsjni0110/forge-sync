@@ -214,7 +214,7 @@ describe("Machine Detail process analysis", () => {
     const compareText = timelineItem.querySelector(".run-row-compare")?.textContent ?? "";
     expect(compareText).toContain("이번 2분 29초");
     expect(compareText).toContain("기준(중앙값) 1분 40초");
-    expect(compareText).toContain("+49.0%");
+    expect(compareText).toContain("+49%");
     expect(compareText).toContain("정상 폭 30초의 1.6배");
   });
 

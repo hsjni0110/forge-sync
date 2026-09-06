@@ -217,6 +217,7 @@ export function FactoryRoute({
               machineId={machineId}
               state={twinState}
               retryNow={retryNow}
+              replayStatus={replayStatus}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}
             />
             {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
