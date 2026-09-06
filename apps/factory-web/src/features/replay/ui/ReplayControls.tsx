@@ -6,6 +6,8 @@ import type { ReplaySessionState, ReplayStatus } from "../domain/replay";
 import type { Freshness, TwinSnapshot } from "../../twin/domain/twin";
 import { useReplayController, type ReplayController } from "./useReplayController";
 import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
+import type { ToolChangeClient } from "../../tool-change/application/ports";
+import type { ToolChange } from "../../tool-change/domain/toolChange";
 
 interface ReplayControlsProps {
   machineId: string;
@@ -15,6 +17,7 @@ interface ReplayControlsProps {
   onStatusChange?: (status: ReplayStatus | undefined) => void;
   onSessionChange?: (session: ReplaySessionState | undefined) => void;
   controller?: ReplayController;
+  toolChangeClient?: ToolChangeClient;
 }
 
 export function ReplayControls(props: ReplayControlsProps) {
@@ -28,10 +31,11 @@ function StandaloneReplayControls(props: ReplayControlsProps) {
 }
 
 function ReplayControlsView({
-  client, snapshot, freshness, onStatusChange, onSessionChange, controller,
+  machineId, client, snapshot, freshness, onStatusChange, onSessionChange, controller, toolChangeClient,
 }: ReplayControlsProps & { controller: ReplayController }) {
   const { session, isLoading, error, hasLoadFailure, run, start, reload, isCommandPending } = controller;
   const [seekMillis, setSeekMillis] = useState(0);
+  const [toolChanges, setToolChanges] = useState<ToolChange[]>([]);
   const rangeRef = useRef<HTMLInputElement>(null);
   const commitSeekRef = useRef<(millis: number) => void>(() => undefined);
 
@@ -42,6 +46,18 @@ function ReplayControlsView({
   useEffect(() => {
     if (session) setSeekMillis(Date.parse(snapshot?.replayCursor.sourceObservedAt ?? session.sourceRange.startsAt));
   }, [session?.replaySessionId, snapshot?.replayCursor.sourceObservedAt]);
+  useEffect(() => {
+    let isCurrent = true;
+    const cursor = snapshot?.replayCursor;
+    if (!toolChangeClient || !session || !cursor) {
+      setToolChanges([]);
+      return () => { isCurrent = false; };
+    }
+    void toolChangeClient.find(machineId, cursor.replaySessionId, cursor.replaySequence)
+      .then((timeline) => { if (isCurrent) setToolChanges(timeline.toolChanges); })
+      .catch(() => { if (isCurrent) setToolChanges([]); });
+    return () => { isCurrent = false; };
+  }, [machineId, session?.replaySessionId, snapshot?.replayCursor.replaySequence, toolChangeClient]);
 
   commitSeekRef.current = (millis: number) => {
     if (!session) return;
@@ -172,6 +188,18 @@ function ReplayControlsView({
               onChange={(event) => setSeekMillis(Number(event.currentTarget.value))}
               style={timelineStyle}
             />
+            <div className="tool-change-markers" aria-label={`공구 교체 ${toolChanges.length}건`}>
+              {toolChanges.map((change) => {
+                const position = totalMs > 0
+                  ? ((Date.parse(change.sourceObservedAt) - startMs) / totalMs) * 100 : 0;
+                return <span
+                  key={change.replaySequence}
+                  className="tool-change-marker"
+                  style={{ left: `${Math.min(100, Math.max(0, position))}%` }}
+                  title={`공구 ${change.fromToolNumber} → ${change.toToolNumber}`}
+                ><span className="visually-hidden">공구 {change.fromToolNumber}에서 {change.toToolNumber}로 변경</span></span>;
+              })}
+            </div>
             <div className="replay-timeline-labels">
               <UtcTimestamp value={session.sourceRange.startsAt} compact />
               <UtcTimestamp value={session.sourceRange.endsAt} compact />

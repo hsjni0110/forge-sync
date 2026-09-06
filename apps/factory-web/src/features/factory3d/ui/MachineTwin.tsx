@@ -56,6 +56,7 @@ export function MachineTwin({
           <GenericMachinePrimitive
             visualPresentation={visualPresentation}
             bAxisRotation={availableBaxisRotation}
+            activeToolLabel={toolLabel(visualState)}
             {...inspectionProps}
           />
         }
@@ -65,6 +66,7 @@ export function MachineTwin({
           asset={binding.asset}
           visualPresentation={visualPresentation}
           bAxisRotation={availableBaxisRotation}
+          activeToolLabel={toolLabel(visualState)}
           {...inspectionProps}
         />
       </AssetErrorBoundary>
@@ -76,6 +78,12 @@ export function MachineTwin({
       )}
     </group>
   );
+}
+
+function toolLabel(visualState: MachineVisualState | undefined): string {
+  return visualState?.tool === undefined
+    ? "관측 공구 번호 · 확인할 수 없음"
+    : `관측 공구 번호 ${visualState.tool} · 형상 미확인`;
 }
 
 function FactoryAssetModel({

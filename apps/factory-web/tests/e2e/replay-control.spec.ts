@@ -59,6 +59,8 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(page.locator(".floating-machine-label")).toContainText(`Twin v${twin.consistency.twinVersion}`);
   await expect(page.locator(".machine-summary .machine-version")).toHaveText(`v${twin.consistency.twinVersion}`);
   await expect(page.getByRole("region", { name: "CURRENT RUN · 현재 가공" })).toContainText("현재 가공 없음");
+  await expect(page.getByRole("option", { name: /Tool Mount · 활성 공구 4 · OBSERVED · 형상 미확인/ }))
+    .toHaveCount(1);
 
   await page.getByRole("button", { name: "2D", exact: true }).click();
   const run = page.getByRole("button", { name: /가공 선택 · 155 · 2016-10-05T09:18:30\.447Z/ });
@@ -79,4 +81,10 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(analysis).not.toHaveAttribute("data-process-session", twin.replayCursor.replaySessionId);
   await expect(page.getByRole("region", { name: "CURRENT RUN · 현재 가공" })).toContainText("종료 근거 미확정", { timeout: 60_000 });
   await expect(page.getByRole("region", { name: "PROCESS · 공정 특징" })).toContainText("완료된 가공만 분석 가능");
+
+  // The reviewed 09:21 cursor still has the initial observed tool, so it correctly has
+  // no transition marker. At the source-range end, the full observed history contains
+  // changes and exercises marker resynchronization against the new seek session.
+  await page.getByRole("button", { name: "끝으로 이동", exact: true }).click();
+  await expect(page.locator(".tool-change-marker").first()).toBeVisible({ timeout: 60_000 });
 });

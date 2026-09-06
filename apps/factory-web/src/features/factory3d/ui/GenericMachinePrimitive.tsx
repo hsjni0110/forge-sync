@@ -22,6 +22,7 @@ export function GenericMachinePrimitive({
       onHoverPart={inspectionProps.onHoverPart ?? (() => undefined)}
       onModelReady={inspectionProps.onModelReady ?? (() => undefined)}
       bAxisRotation={inspectionProps.bAxisRotation}
+      activeToolLabel={inspectionProps.activeToolLabel}
     />
   );
 }

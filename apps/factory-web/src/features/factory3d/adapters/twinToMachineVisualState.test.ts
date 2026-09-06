@@ -28,6 +28,8 @@ describe("mapTwinToMachineVisualState", () => {
       bAxisAngleSourceDataItemId: "Mazak01-B_4",
       bAxisAngleSourceObservedAt: "2016-10-05T09:16:39.557Z",
       tool: "13",
+      toolSourceDataItemId: "Mazak01-path_10",
+      toolSourceObservedAt: "2016-10-05T09:01:44.430Z",
       operationProgress: undefined,
       alarmSeverity: undefined,
       stale: false,

@@ -23,6 +23,8 @@ describe("procedural machine model contract", () => {
     }
     expect(model.root.getObjectByName("representative-workpiece")?.userData.provenance).toBe("SIMULATED");
     expect(model.provenance).toEqual({ representation: "PROJECT_PROCEDURAL", workpiece: "SIMULATED" });
+    expect(model.nodes.toolMount.userData.representation).toBe("SHAPE_UNVERIFIED");
+    expect(model.nodes.toolMount.getObjectByName("tool-identity-placeholder")).toBeTruthy();
   });
 
   it("provides explicit inspection references and enclosure materials", () => {

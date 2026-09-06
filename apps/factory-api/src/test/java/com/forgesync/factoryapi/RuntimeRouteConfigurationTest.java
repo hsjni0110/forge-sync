@@ -19,6 +19,9 @@ import com.forgesync.factoryapi.replay.adapter.ReplayConfiguration;
 import com.forgesync.factoryapi.replay.adapter.inbound.rest.ReplayController;
 import com.forgesync.factoryapi.replay.adapter.inbound.rest.ReplayErrorHandler;
 import com.forgesync.factoryapi.replay.application.ControlReplay;
+import com.forgesync.factoryapi.toolchange.adapter.ToolChangeConfiguration;
+import com.forgesync.factoryapi.toolchange.adapter.inbound.rest.ToolChangeTimelineController;
+import com.forgesync.factoryapi.toolchange.application.ToolChangeService;
 import java.time.Clock;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.convert.ApplicationConversionService;
@@ -29,6 +32,20 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.PlatformTransactionManager;
 
 class RuntimeRouteConfigurationTest {
+
+  @Test
+  void registersToolChangeTimelineRuntimeAndControllerTogether() {
+    new ApplicationContextRunner()
+        .withUserConfiguration(
+            RuntimeDependencies.class,
+            ToolChangeConfiguration.class,
+            ToolChangeTimelineController.class)
+        .run(
+            context -> {
+              assertThat(context).hasSingleBean(ToolChangeService.class);
+              assertThat(context).hasSingleBean(ToolChangeTimelineController.class);
+            });
+  }
 
   @Test
   void registersReplayRuntimeAndControllerTogetherWhenEnabled() {

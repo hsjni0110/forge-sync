@@ -39,11 +39,13 @@ export function MachineModelBinding({
   visualPresentation,
   isEnclosureTransparent = false,
   bAxisRotation,
+  activeToolLabel,
 }: {
   model: MachineTwinModel;
   visualPresentation: MachineVisualPresentation;
   isEnclosureTransparent?: boolean;
   bAxisRotation?: Extract<BAxisRotation, { availability: "AVAILABLE" }>;
+  activeToolLabel?: string;
 }) {
   const beaconElapsedSeconds = useRef(0);
   const bAxisTransition = useRef<{
@@ -52,6 +54,10 @@ export function MachineModelBinding({
     to: number;
     elapsedSeconds: number;
   } | undefined>(undefined);
+
+  useEffect(() => {
+    model.nodes.toolMount.userData.activeToolLabel = activeToolLabel ?? "확인할 수 없음";
+  }, [activeToolLabel, model.nodes.toolMount]);
 
   useEffect(() => {
     if (!bAxisRotation) return;

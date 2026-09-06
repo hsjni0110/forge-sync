@@ -14,6 +14,8 @@ export interface MachineVisualState {
   bAxisAngleSourceDataItemId?: string;
   bAxisAngleSourceObservedAt?: string;
   tool?: string;
+  toolSourceDataItemId?: string;
+  toolSourceObservedAt?: string;
   operationProgress?: number;
   alarmSeverity?: "WARNING" | "FAULT";
   stale: boolean;

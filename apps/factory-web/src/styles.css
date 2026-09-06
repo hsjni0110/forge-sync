@@ -150,6 +150,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .utc-clock { font-weight: 700; color: var(--fs-text-soft); }
 .utc-zone { padding: 0.08rem 0.3rem; border: 1px solid var(--fs-border-strong); border-radius: 0.25rem; color: var(--fs-text-dim); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.05em; }
 .utc-timestamp-compact .utc-date { display: none; }
+.replay-timeline { position: relative; }
+.tool-change-markers { position: relative; height: 0.8rem; margin-inline: 0.4rem; }
+.tool-change-marker { position: absolute; top: 0; width: 0.5rem; height: 0.5rem; transform: translateX(-50%) rotate(45deg); border: 1px solid var(--fs-accent-strong); background: var(--fs-focus); }
 .empty-state, .section-note { color: #a5b6be; }
 .section-note { margin-top: 1.2rem; padding-top: 0.8rem; border-top: 1px solid var(--fs-border); font-size: 0.88rem; }
 .page-message { max-width: 680px; padding-top: 12vh; }

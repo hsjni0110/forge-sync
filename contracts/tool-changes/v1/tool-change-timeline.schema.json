@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/tool-changes/v1/tool-change-timeline.schema.json",
+  "title": "ForgeSync Tool Change Timeline v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "machineId", "replaySessionId", "throughReplaySequence", "toolChanges"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "toolChanges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["replaySequence", "sourceObservedAt", "fromToolNumber", "toToolNumber", "provenance"],
+        "properties": {
+          "replaySequence": { "type": "integer", "minimum": 0 },
+          "sourceObservedAt": { "type": "string", "format": "date-time" },
+          "fromToolNumber": { "type": "integer", "minimum": 0 },
+          "toToolNumber": { "type": "integer", "minimum": 0 },
+          "provenance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "transformation"],
+            "properties": {
+              "source": {
+                "type": "object", "additionalProperties": false,
+                "required": ["kind", "provider", "sourceSetId", "artifactId"],
+                "properties": {
+                  "kind": { "const": "REAL" }, "provider": { "const": "NIST" },
+                  "sourceSetId": { "type": "string", "minLength": 1 },
+                  "artifactId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+                }
+              },
+              "transformation": {
+                "type": "object", "additionalProperties": false,
+                "required": ["rawRecordId", "mappingVersion", "sourceDataItemId"],
+                "properties": {
+                  "rawRecordId": { "type": "string", "minLength": 1 },
+                  "mappingVersion": { "type": "string", "minLength": 1 },
+                  "sourceDataItemId": { "type": "string", "minLength": 1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -66,6 +66,9 @@ tasks.processResources {
     from("../../contracts/process-analytics/v1/anomaly-assessments.schema.json") {
         into("contracts/process-analytics/v1")
     }
+    from("../../contracts/tool-changes/v1/tool-change-timeline.schema.json") {
+        into("contracts/tool-changes/v1")
+    }
 }
 
 tasks.processTestResources {
@@ -80,6 +83,9 @@ tasks.processTestResources {
     }
     from("../../tests/fixtures/process-analytics/v1") {
         into("fixtures/process-analytics/v1")
+    }
+    from("../../tests/fixtures/tool-changes/v1") {
+        into("fixtures/tool-changes/v1")
     }
 }
 

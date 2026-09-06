@@ -124,4 +124,19 @@ describe("machine model runtime binding", () => {
 
     expect(model.nodes.bAxisPivot.rotation.x).toBeCloseTo(-Math.PI / 6);
   });
+
+  it("updates one explicit tool mount without growing its node hierarchy", () => {
+    const model = createProceduralMachineModel();
+    const childCount = model.nodes.toolMount.children.length;
+    const presentation = deriveMachineVisualPresentation(undefined, false);
+    const { rerender } = render(
+      <MachineModelBinding model={model} visualPresentation={presentation}
+        activeToolLabel="관측 공구 번호 4 · 형상 미확인" />,
+    );
+    rerender(<MachineModelBinding model={model} visualPresentation={presentation}
+      activeToolLabel="관측 공구 번호 7 · 형상 미확인" />);
+
+    expect(model.nodes.toolMount.children).toHaveLength(childCount);
+    expect(model.nodes.toolMount.userData.activeToolLabel).toBe("관측 공구 번호 7 · 형상 미확인");
+  });
 });

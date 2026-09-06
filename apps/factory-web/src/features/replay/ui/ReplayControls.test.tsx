@@ -6,6 +6,7 @@ import type { TwinSnapshot } from "../../twin/domain/twin";
 import type { ReplayControlClient } from "../application/ports";
 import type { ReplaySessionState } from "../domain/replay";
 import { ReplayControls } from "./ReplayControls";
+import type { ToolChangeClient } from "../../tool-change/application/ports";
 
 const running: ReplaySessionState = {
   schemaVersion: "1.0.0",
@@ -59,6 +60,25 @@ describe("ReplayControls", () => {
     expect(screen.getByText("Twin Freshness")).toBeTruthy();
     expect(screen.getByRole("slider", { name: "Replay timeline" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "일시정지" })).toBeTruthy();
+  });
+
+  it("renders observed tool transitions from the cursor-bound timeline contract", async () => {
+    const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
+    snapshot.replayCursor.replaySessionId = running.replaySessionId;
+    const toolChangeClient: ToolChangeClient = { find: vi.fn().mockResolvedValue({
+      schemaVersion: "1.0.0", machineId: "Mazak01", replaySessionId: running.replaySessionId,
+      throughReplaySequence: snapshot.replayCursor.replaySequence,
+      toolChanges: [{ replaySequence: 3, sourceObservedAt: "2016-10-05T09:01:44.430Z",
+        fromToolNumber: 4, toToolNumber: 7, provenance: snapshot.metrics.toolNumber!.provenance }],
+    }) };
+    render(<ReplayControls machineId="Mazak01" client={clientWith({})}
+      snapshot={snapshot} toolChangeClient={toolChangeClient} />);
+
+    expect(await screen.findByLabelText("공구 교체 1건")).toBeTruthy();
+    expect(screen.getByText("공구 4에서 7로 변경")).toBeTruthy();
+    expect(toolChangeClient.find).toHaveBeenCalledWith(
+      "Mazak01", running.replaySessionId, snapshot.replayCursor.replaySequence,
+    );
   });
 
   it("restores authoritative state when an optimistic pause is rejected", async () => {

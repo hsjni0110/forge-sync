@@ -49,6 +49,10 @@ export function mapTwinToMachineVisualState({
       ? bAxisAngle.observation.sourceObservedAt
       : undefined,
     tool,
+    toolSourceDataItemId: tool === undefined
+      ? undefined : toolNumber?.provenance.transformation.sourceDataItemId,
+    toolSourceObservedAt: tool === undefined
+      ? undefined : toolNumber?.observation.sourceObservedAt,
     operationProgress: undefined,
     alarmSeverity: undefined,
     stale: freshness === "STALE",

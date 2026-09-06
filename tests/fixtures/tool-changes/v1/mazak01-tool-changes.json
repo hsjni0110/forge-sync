@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "machineId": "Mazak01",
+  "replaySessionId": "10000000-0000-4000-8000-000000000001",
+  "throughReplaySequence": 42,
+  "toolChanges": [
+    {
+      "replaySequence": 3,
+      "sourceObservedAt": "2016-10-05T09:01:44.430Z",
+      "fromToolNumber": 4,
+      "toToolNumber": 7,
+      "provenance": {
+        "source": {
+          "kind": "REAL",
+          "provider": "NIST",
+          "sourceSetId": "nist-mazak01-20161005",
+          "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
+        },
+        "transformation": {
+          "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=1555",
+          "mappingVersion": "2.1.0",
+          "sourceDataItemId": "Mazak01-path_10"
+        }
+      }
+    }
+  ]
+}

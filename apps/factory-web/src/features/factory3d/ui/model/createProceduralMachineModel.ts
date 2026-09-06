@@ -41,11 +41,12 @@ export function createProceduralMachineModel(): MachineTwinModel {
   toolMount.position.set(0, -0.28, 0);
   toolMount.add(
     mesh(
-      "representative-tool-holder",
+      "tool-identity-placeholder",
       new CylinderGeometry(0.09, 0.06, 0.22, 20),
       material("#9aa9ae"),
     ),
   );
+  toolMount.userData.representation = "SHAPE_UNVERIFIED";
   toolSpindle.add(toolMount);
   millingHead.add(toolSpindle);
   bAxisPivot.add(millingHead);

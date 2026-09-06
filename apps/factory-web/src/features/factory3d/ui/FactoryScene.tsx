@@ -125,6 +125,7 @@ export default function FactoryScene({
         selectPart={selectPart}
         toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
         bAxisStatus={bAxisStatus(machineBinding, visualState)}
+        toolStatus={toolStatus(visualState)}
       />
     </div>
   );
@@ -138,6 +139,7 @@ function MachineInspectionControls({
   selectPart,
   toggleEnclosure,
   bAxisStatus,
+  toolStatus,
 }: {
   model?: MachineTwinModel;
   selectedPartId?: MachineInspectionPartId;
@@ -146,6 +148,7 @@ function MachineInspectionControls({
   selectPart: (partId?: MachineInspectionPartId) => void;
   toggleEnclosure: () => void;
   bAxisStatus: string;
+  toolStatus: string;
 }) {
   const cameraButtons: Array<[string, string, CameraCommandType]> = [
     ["축소", "−", "ZOOM_OUT"],
@@ -181,7 +184,9 @@ function MachineInspectionControls({
         >
           <option value="">부품을 선택하세요</option>
           {model && Object.entries(model.inspection.parts).map(([id, part]) => (
-            <option value={id} key={id}>{part.label}</option>
+            <option value={id} key={id}>
+              {id === "toolMount" ? `${part.label} · ${toolStatus}` : part.label}
+            </option>
           ))}
         </select>
       </label>
@@ -209,6 +214,7 @@ function MachineInspectionControls({
         <span>대표 공작물: SIMULATED</span>
         <span>공장 배치: SIMULATED_LAYOUT</span>
         <span>{bAxisStatus}</span>
+        <span>{toolStatus}</span>
       </details>
       <span className="visually-hidden" role="status">
         {selectedPartId && model ? `${model.inspection.parts[selectedPartId].label} 선택됨` : "선택한 부품 없음"}
@@ -219,6 +225,12 @@ function MachineInspectionControls({
       </details>
     </aside>
   );
+}
+
+function toolStatus(visualState: FactorySceneProps["visualState"]): string {
+  return visualState?.tool === undefined
+    ? "활성 공구 · 확인할 수 없음"
+    : `활성 공구 ${visualState.tool} · OBSERVED · 형상 미확인`;
 }
 
 function bAxisStatus(

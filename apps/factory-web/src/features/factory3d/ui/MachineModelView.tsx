@@ -18,6 +18,7 @@ export interface MachineInspectionViewProps {
   onHoverPart: (partId?: MachineInspectionPartId) => void;
   onModelReady: (model?: MachineTwinModel) => void;
   bAxisRotation?: Extract<BAxisRotation, { availability: "AVAILABLE" }>;
+  activeToolLabel?: string;
 }
 
 export function MachineModelView({
@@ -30,6 +31,7 @@ export function MachineModelView({
   onHoverPart,
   onModelReady,
   bAxisRotation,
+  activeToolLabel,
 }: MachineInspectionViewProps & {
   model: MachineTwinModel;
   visualPresentation?: MachineVisualPresentation;
@@ -68,6 +70,7 @@ export function MachineModelView({
           visualPresentation={visualPresentation}
           isEnclosureTransparent={isEnclosureTransparent}
           bAxisRotation={bAxisRotation}
+          activeToolLabel={activeToolLabel}
         />
       )}
       <MachineInspectionAppearance

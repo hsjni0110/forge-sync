@@ -5,6 +5,7 @@ import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
 import type { FactorySceneLoader } from "../../factory3d/ui/factorySceneContract";
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
+import type { ToolChangeClient } from "../../tool-change/application/ports";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -13,10 +14,12 @@ export function App({
   twinSessionFactory,
   replayControlClient,
   factorySceneLoader = loadFactoryScene,
+  toolChangeClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   factorySceneLoader?: FactorySceneLoader;
+  toolChangeClient?: ToolChangeClient;
 }) {
   return (
     <div className="site-shell">
@@ -50,6 +53,7 @@ export function App({
                 sessionFactory={twinSessionFactory}
                 replayControlClient={replayControlClient}
                 sceneLoader={factorySceneLoader}
+                toolChangeClient={toolChangeClient}
               />
             }
           />

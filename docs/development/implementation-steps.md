@@ -893,6 +893,8 @@ procedural 기본 배치와 명시적 안내를 사용한다. [ADR-043](../adr/A
 
 ### Step 28 — Tool Number Binding과 Tool Change 표현
 
+**상태**: `DONE` (2026-09-06)
+
 **목적**: 관측된 `Tool_number`를 `ToolMount`의 활성 공구 identity로 연결하고 교체 시점을 replay
 타임라인에서 추적할 수 있게 한다. 공구 형상은 추정하지 않는다.
 
@@ -918,6 +920,12 @@ procedural 기본 배치와 명시적 안내를 사용한다. [ADR-043](../adr/A
 공구나 PHM cutter로 주장하지 않는다.
 
 **선행 조건**: Step 22, Step 23.
+
+**구현 기록**: Canonical `TOOL_NUMBER` 이력을 machine, Replay session, cursor sequence로 제한하는
+Tool Change Timeline `1.0.0` 조회 계약을 추가했다. 최초 값과 공백 뒤 첫 값은 기준점이며, 같은 번호
+반복과 `UNAVAILABLE`은 marker를 만들지 않는다. 각 전이는 source time, sequence, DataItem, artifact,
+raw locator, mapping version을 보존한다. 3D는 기존 `toolMount` 하나의 label만 갱신하고
+`OBSERVED · 형상 미확인`을 표시하며, 공구 형상을 추측하지 않는다. [ADR-045](../adr/ADR-045-observed-tool-change-timeline.md)
 
 ### Step 29 — XYZ Linear Axis Coordinate Binding
 

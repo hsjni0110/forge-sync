@@ -26,6 +26,7 @@ import type {
   SceneUnavailableReason,
 } from "./factorySceneContract";
 import { useReducedMotionPreference } from "./useReducedMotionPreference";
+import type { ToolChangeClient } from "../../tool-change/application/ports";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
@@ -34,11 +35,13 @@ export function FactoryRoute({
   replayControlClient,
   sceneLoader,
   processAnalysisClient,
+  toolChangeClient,
 }: {
   sessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   sceneLoader: FactorySceneLoader;
   processAnalysisClient?: ProcessAnalysisClient;
+  toolChangeClient?: ToolChangeClient;
 }) {
   const [viewMode, setViewMode] = useState<FactoryViewMode>("SPLIT");
   const [unavailableReason, setUnavailableReason] =
@@ -155,6 +158,7 @@ export function FactoryRoute({
           snapshot={twinState.snapshot}
           freshness={twinState.freshness}
           controller={replay}
+          toolChangeClient={toolChangeClient}
         />
       )}
       {isAssetFallback && (
