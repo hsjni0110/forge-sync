@@ -77,6 +77,56 @@ describe("ReplayControls", () => {
     expect(load).toHaveBeenCalledTimes(2);
   });
 
+  it("retries a rejected command once against the refreshed revision on a conflict", async () => {
+    const conflict = Object.assign(new Error("revision conflict"), {
+      status: 409,
+      code: "REPLAY_STATE_CONFLICT",
+    });
+    const load = vi
+      .fn()
+      .mockResolvedValueOnce(running)
+      .mockResolvedValueOnce({ ...running, revision: 2 });
+    const pause = vi
+      .fn()
+      .mockRejectedValueOnce(conflict)
+      .mockResolvedValueOnce({ ...running, status: "PAUSED", revision: 3 });
+    render(<ReplayControls machineId="Mazak01" client={clientWith({ load, pause })} />);
+
+    fireEvent.click(await screen.findByRole("button", { name: "일시정지" }));
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "재생" })).toBeTruthy());
+    expect(pause).toHaveBeenCalledTimes(2);
+    expect(pause).toHaveBeenLastCalledWith(running.replaySessionId, 2);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("keeps reading the session briefly after a seek settles into PAUSED", async () => {
+    vi.useFakeTimers();
+    const onSessionChange = vi.fn();
+    const load = vi
+      .fn()
+      .mockResolvedValueOnce(running)
+      .mockResolvedValueOnce({ ...running, status: "PAUSED", revision: 2 })
+      .mockResolvedValue({ ...running, status: "PAUSED", revision: 3 });
+    const seek = vi.fn().mockResolvedValue({ ...running, status: "SEEKING", revision: 2 });
+    render(
+      <ReplayControls
+        machineId="Mazak01"
+        client={clientWith({ load, seek })}
+        onSessionChange={onSessionChange}
+      />,
+    );
+    await act(async () => undefined);
+
+    fireEvent.click(screen.getByRole("button", { name: "처음으로 이동" }));
+    await act(async () => undefined);
+    await act(async () => { await vi.advanceTimersByTimeAsync(250); });
+    await act(async () => { await vi.advanceTimersByTimeAsync(650); });
+
+    expect(load.mock.calls.length).toBeGreaterThanOrEqual(4);
+    expect(onSessionChange.mock.calls.at(-1)?.[0]?.revision).toBe(3);
+  });
+
   it("does not offer Replay start when the current session could not be checked", async () => {
     const load = vi.fn().mockRejectedValue(new Error("service unavailable"));
     const start = vi.fn();
