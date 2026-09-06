@@ -43,9 +43,9 @@ geometry would overstate its provenance.
 
 - Camera and inspection state remain inside the lazy renderer and do not change Twin, Replay, REST,
   or WebSocket contracts. WebGL failure still preserves the authoritative 2D view.
-- B-axis observation, tool registry, tool change, cutting, doors, and physical coordinate claims
-  remain outside this decision. Camera navigation completes that portion of Step 25 early without
-  claiming the rest of Step 25 complete.
+- B-axis observation, tool binding, tool change, cutting, doors, and physical coordinate claims
+  remain outside this decision. Camera navigation completes that portion of the functional twin
+  acceptance roadmap step early without claiming the rest of that step complete.
 
 ## Verification
 

@@ -51,6 +51,55 @@ Step 01~15에서 만든 NIST ingestion, 권위 Twin, 2D, 격리된 3D scene과 `
 - PHM archive, channel, wear label, 라이선스가 실제로 검증되기 전에는 model 구현으로 넘어가지 않는다.
   RUL은 wear baseline과 leakage 검증 이후의 선택 범위이며 v1 완료를 막지 않는다.
 
+### Step 23 이후 재계획 기준
+
+Step 01~23에서 만든 ingestion, 권위 Twin, 2D, 격리된 3D scene, replay cursor, 관측 공정 분석을 회귀
+기준으로 유지한다. Step 24 이후는 **이미 확보한 NIST 원천 관측값에서 운영 지표를 만드는 범위를 우선**하고,
+외부 dataset과 시뮬레이션 도메인은 그 뒤의 선택 범위로 내린다.
+
+- 원천 profile에 근거가 있는 관측값을 먼저 canonical contract, Twin snapshot, 화면에 반영한다.
+  적재되었으나 표출되지 않는 지표를 남겨둔 채 새 데이터 원천을 추가하지 않는다.
+- 가동률 계열 지표는 `execution`/`mode`/`power` 상태 구간과 기계 자체 누적 카운터(`total_time`,
+  `auto_time`, `cut_time`)의 두 경로로 계산한다. 두 값이 다를 때 하나를 임의로 선택해 숨기지 않는다.
+- 원천에 품질(양품/불량) 구분 데이터가 없으므로 **종합 OEE 수치를 만들지 않는다.** Availability와
+  Performance만 근거와 함께 제시하고 Quality는 명시적 `UNAVAILABLE`로 남긴다.
+- 3D 바인딩은 좌표 근거가 확인된 축만 활성화한다. 근거가 없는 축과 공구 형상은 개별적으로 unavailable이며
+  다른 축이나 2D의 동작을 막지 않는다.
+- 생산 문맥은 관측된 `program`, `PartCountAct`, `MachiningRun`의 시간 정렬로 표현한다. 원천에 없는
+  생산 지시/작업 지시 aggregate를 만들지 않는다.
+- PHM/NASA reference health는 P1 선택 범위이며 v1 완료를 막지 않는다. 어떤 경우에도 Mazak01의 상태나
+  잔여 수명으로 표시하지 않는다.
+
+#### Step 24 이후에서 제외한 항목
+
+| 제외 항목 | 원래 위치 | 근거 |
+|---|---|---|
+| 절차형 공구 형상 factory (`TURNING_TOOL`/`DRILL`/`END_MILL`/`FACE_MILL`) | 구 Step 24 | 공구 형상 식별 근거가 원천에 없어 항상 `UNKNOWN`으로 렌더된다. tool number 바인딩만 남긴다 |
+| XYZ/C축을 완료 조건에서 제외 | 구 Step 25 | XYZ는 이미 canonical `POSITION`으로 매핑된 15,786건이 있어 근거가 충분하다. Step 25~26으로 승격한다. C축은 계속 제외 |
+| PHM raw/feature/model/serving/view 5단계 분리 | 구 Step 27~31 | 정책상 Mazak01과 연결이 금지된 reference 채널에 잔여 노력의 상당 부분이 배분되어 있었다. Step 39~41 P1로 압축 |
+| Cut-based RUL baseline | 구 Step 32 | wear baseline 검증 이후의 선택 범위였고 reference 채널 자체가 P1로 내려갔다 |
+| `ProductionRequest`/`WorkOrder`/`OperationExecution`/`ProductionResult` 시뮬레이션 aggregate | 구 Step 33~34 | PRD 8의 Non-Goal "단순 MES CRUD"와 충돌하며 원천에 없는 사실을 만든다. 관측 기반 Step 37로 대체 |
+| Maintenance workflow | 구 Step 36 | 또 하나의 시뮬레이션 CRUD이며 Alarm aggregate가 증명하는 범위를 넘지 않는다 |
+
+#### Step 24 이후가 사용하는 관측 근거
+
+| 신호 | 건수 | 현재 상태 | 사용처 |
+|---|---:|---|---|
+| `total_time` / `auto_time` / `cut_time` | 32,471 / 10,111 / 3,516 | 미매핑 | Step 28 → 30 가동률·절삭비 |
+| `execution` / `mode` / `power` | 329 / 79 / 49 | 매핑됨 | Step 29 상태 구간 |
+| `estop` | 51 | 미매핑 | Step 28 → 31 정지 사유 |
+| `Xabs` / `Yabs` / `Zabs` | 6,868 / 1,538 / 7,380 | 매핑됨, 미표출 | Step 25~26 축·툴패스 |
+| 축·주축 `LOAD` | 14,473 | 매핑됨, 미표출 | Step 33, 38 |
+| `Fact` PATH_FEEDRATE | 7,633 | 매핑됨, 미표출 | Step 33 |
+| `Stemp` / `S2temp` | 10,203 | 매핑됨, 미표출 | Step 33 |
+| `PartCountAct` | 49 | 매핑됨, 미표출 | Step 32, 37 |
+| `Tool_number` | 593 | 매핑됨 | Step 24, 38 |
+| CONDITION 전체 | 1,052 | 매핑됨 | Step 31, 35 |
+| 오버라이드 `Sovr`/`Fovr`/`Frapidovr` | 184 | 미매핑 | Step 28 |
+| `line` / `sequenceNum` | 1,372 | 미매핑 | Step 28 |
+
+Step 28 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이다.
+
 ---
 
 ## Phase A — Data Truth Foundation
@@ -636,6 +685,12 @@ orbit·zoom·reset, 접근 가능한 부품 검사와 외함 반투명을
 
 ### Step 23 — B-axis와 Physical Coordinate Binding
 
+**상태**: `DONE` (2026-09-06) — NIST `Mazak01-B_4`의 `ANGLE/DEGREE` 관찰을 canonical
+mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenance와 함께 표시한다.
+실제 회전축·부호·영점·한계의 근거는 확인되지 않아 Mazak01 3D binding은 명시적으로 unavailable이며,
+검증된 설정만 explicit pivot reference에 적용하는 정책은
+[ADR-041](../adr/ADR-041-observed-b-axis-and-physical-coordinate-evidence.md)에 기록했다.
+
 **목적**: 검증된 NIST B-axis 관찰값을 명시적 좌표 변환으로 head orientation에 연결한다.
 
 **구현 범위**
@@ -657,261 +712,299 @@ orbit·zoom·reset, 접근 가능한 부품 검사와 외함 반투명을
 
 **선행 조건**: Step 17, Step 22.
 
-### Step 24 — Tool Registry, Procedural Tool과 Tool Change
+### Step 24 — Tool Number Binding과 Tool Change 표현
 
-**목적**: 관측된 tool number와 공구 형상 추정을 분리하면서 `ToolMount`의 active tool을 교체한다.
+**목적**: 관측된 `Tool_number`를 `ToolMount`의 활성 공구 identity로 연결하고 교체 시점을 replay
+타임라인에서 추적할 수 있게 한다. 공구 형상은 추정하지 않는다.
 
 **구현 범위**
 
-- machine ID + tool number identity와 identification source가 있는 registry
-- `TURNING_TOOL/DRILL/END_MILL/FACE_MILL/UNKNOWN` 최소 procedural factory
-- holder/cutter를 가진 tool node contract와 dynamic mount binding
-- unknown/same-tool/missing-tool 전환 정책
+- `Tool_number` EVENT(593건) → `MachineVisualState`의 활성 공구 번호와 provenance
+- `ToolMount` node에 부착되는 형상 중립 placeholder와 접근 가능한 label
+- 이전 번호에서 새 번호로의 전이 감지와 타임라인 tool change marker
+- 같은 번호 재수신, `UNAVAILABLE`, missing, replay seek 후 재동기화 정책
+
+**의도적으로 제외**: `TURNING_TOOL/DRILL/END_MILL/FACE_MILL` 절차형 형상 factory와 tool type registry.
+`Tool_group`/`Tool_suffix`가 형상을 식별한다는 근거가 profile에서 확인되기 전에는 만들지 않는다.
 
 **테스트**
 
-- tool number 변경 시 mount의 active model과 접근 가능한 label이 함께 바뀐다.
-- 같은 번호 재수신은 object를 증식시키지 않는다.
-- 근거 없는 tool type은 `UNKNOWN`이며 PHM cutter나 실제 Mazak geometry로 표시되지 않는다.
-- registry/model load 실패가 spindle/B-axis/2D 상태를 중단시키지 않는다.
+- tool number 변경 시 mount label과 접근 가능한 텍스트가 함께 바뀌고 node가 증식하지 않는다.
+- 같은 번호 재수신이 change marker를 만들지 않는다.
+- `UNAVAILABLE`/missing tool number는 `확인할 수 없음`이며 마지막 번호를 유지하지 않는다.
+- replay seek 후 활성 공구가 cursor 시점 관측과 일치한다.
+- tool 표현 실패가 spindle, 축, 2D 상태를 중단시키지 않는다.
 
-**완료 조건**: tool number는 `OBSERVED`, tool type/geometry는 각 identification provenance로 따로
-표시되고 binding은 registry 내부 저장 모델을 직접 알지 않는다.
+**완료 조건**: tool number는 `OBSERVED` provenance로 표시되고 형상은 명시적으로 미확인이며 실제 Mazak
+공구나 PHM cutter로 주장하지 않는다.
 
 **선행 조건**: Step 22, Step 23.
 
-### Step 25 — Functional Twin Replay Acceptance
+### Step 25 — XYZ Linear Axis Coordinate Binding
 
-**목적**: spindle, B-axis, tool과 process timeline이 하나의 replay 상태로 물리적 의미를 설명하게 한다.
+**목적**: 이미 canonical `POSITION`으로 매핑된 X/Y/Z 관측값을 검증된 좌표 변환으로 3D 축 이동에 연결한다.
+
+**근거**: `Xabs` 6,868건, `Yabs` 1,538건, `Zabs` 7,380건이 단위 `MILLIMETER`로 매핑 `2.1.0`에서 이미
+`POSITION`으로 변환된다. B축과 달리 선형축은 `Xtravel`/`Ytravel`/`Ztravel` CONDITION과 profile에서
+행정 범위 근거를 확인할 수 있다.
 
 **구현 범위**
 
-- execution/spindle/B-axis/tool/current run의 통합 visual composition
-- play/pause/speed/scrub의 접근 가능한 control. orbit/zoom/reset과 부품 검사는 Step 22 후속에서
-  선행 완료했으며 이 Step에서는 통합 회귀를 유지한다.
-- observed/inferred/simulated cue와 현재 binding 근거
-- 외관 고도화와 기능 binding을 독립적으로 교체할 수 있는 visual fixture
+- `POSITION` 관측 → `MachineVisualState` 축별 위치와 field-level provenance ([ADR-041](../adr/ADR-041-observed-b-axis-and-physical-coordinate-evidence.md) 정책 재사용)
+- millimeter → scene unit, 축 방향/부호/영점/행정 한계를 가진 immutable coordinate mapping
+- procedural model의 X/Y/Z 이송 node 바인딩과 out-of-range/missing 표시
+- 축별 관측 주기가 다를 때의 hold/unknown 정책
 
 **테스트**
 
-- replay에서 ACTIVE/RPM, B-axis, tool number, current run 변화가 같은 cursor 순서로 재현된다.
-- unsupported axis/tool 정보는 정지/UNKNOWN이며 가짜 animation을 만들지 않는다.
+- 0, 양/음 경계, 행정 한계 밖 값의 node 좌표가 고정 기대치와 일치한다.
+- unknown unit, missing value, 검증 범위 밖 값에서 이동을 추측하지 않는다.
+- 축마다 최신 관측 시각이 다를 때 오래된 축을 live처럼 진행시키지 않는다.
+- stale/gap/version mismatch에서 마지막 위치를 animation으로 이어가지 않는다.
+- replay scrub 후 3D 위치와 2D 숫자가 같은 source observation을 가리킨다.
+- reduced motion에서 보간 없이 즉시 위치를 반영한다.
+
+**완료 조건**: 축 방향과 영점 근거가 Verification Ledger에 기록된 축만 바인딩을 활성화한다. 근거가 없는
+축은 개별적으로 unavailable이며 나머지 축은 계속 동작한다.
+
+**선행 조건**: Step 23.
+
+### Step 26 — Toolpath Trail과 Work Envelope
+
+**목적**: replay 구간의 X/Y/Z 궤적을 유한한 시각 자산으로 누적해 실제 이동 경로를 공간에서 설명한다.
+
+**구현 범위**
+
+- replay cursor 진행에 따른 궤적 polyline 누적과 점 개수/메모리 상한 정책
+- 시간 기반 decimation과, `Fact` PATH_FEEDRATE로 구분 근거가 확인되는 범위에서의 rapid/feed 구분
+- seek, session 변경, 속도 변경 시 궤적 재설정 규칙
+- 궤적 on/off, 현재 `MachiningRun` 구간만 보기, work envelope 경계 표시
+
+**테스트**
+
+- 같은 replay 구간을 두 번 재생하면 같은 궤적 점 집합이 나온다.
+- 상한 초과 시 오래된 점부터 버리고 frame 시간이 Step 43 예산 안에 유지된다.
+- seek 후 이전 cursor 구간의 궤적이 현재 위치를 잘못 설명하도록 남지 않는다.
+- 축 하나가 unavailable이면 궤적을 만들지 않고 이유를 표시한다.
+- 보간으로 만든 점을 관측값으로 표시하지 않는다.
+
+**완료 조건**: 궤적의 모든 점이 source observation으로 역추적되고, 궤적은 관측된 위치의 연결선일 뿐 실제
+절삭이나 재료 제거가 아니라고 화면에서 밝힌다.
+
+**선행 조건**: Step 25.
+
+### Step 27 — Functional Twin Replay Acceptance
+
+**목적**: execution, spindle, XYZ, tool, current run이 하나의 replay cursor에서 일관된 물리적 의미를
+설명하게 한다.
+
+**구현 범위**
+
+- execution/spindle/축 위치/궤적/tool/current run의 통합 visual composition
+- observed/derived/unavailable cue와 현재 바인딩 근거 표시
+- orbit/zoom/reset과 부품 검사([ADR-040](../adr/ADR-040-machine-inspection-camera.md))의 통합 회귀
+- 외관 고도화와 기능 바인딩을 독립적으로 교체할 수 있는 visual fixture
+
+**테스트**
+
+- replay에서 ACTIVE/RPM, XYZ, tool number, current run 변화가 같은 cursor 순서로 재현된다.
+- 미지원 축(B, C)과 공구 형상은 정지/`UNKNOWN`이며 가짜 animation을 만들지 않는다.
 - reduced motion, stale, pause, disconnect/resync 경계를 검증한다.
 - procedural model과 실패 fallback 모두 2D 권위 값을 유지한다.
 
-**완료 조건**: Three.js 가이드의 v1 기능 완료 조건 중 검증 가능한 NIST 항목이 자동화된다. XYZ/C-axis,
-실제 cutting, coolant/chip, OEM CAD fidelity는 완료 조건이 아니다.
+**완료 조건**: PRD 117의 3D 인수 조건과 Three.js 가이드 v1 중 NIST 근거가 있는 항목이 자동화된다.
+C축, 실제 절삭 시뮬레이션, coolant/chip, OEM CAD fidelity는 완료 조건이 아니다.
 
-**선행 조건**: Step 21, Step 24.
-
----
-
-## Phase F — Reference Tool Health
-
-### Step 26 — PHM Dataset Verification과 Immutable Acquisition
-
-**목적**: PHM2010을 우선 검증하고 불가하면 NASA Milling fallback을 같은 원천 보존 규칙으로 결정한다.
-
-**구현 범위**
-
-- download URI, archive/file hash, integrity, license/redistribution evidence
-- immutable SourceArtifact/manifest와 재현 가능한 sensor/label profile
-- cutter/cut/channel/wear label identity와 train/evaluation group 후보
-- dataset decision과 Verification Ledger
-
-**테스트**
-
-- archive/file checksum과 profile의 실제 file/channel/cut count가 일치한다.
-- truncated archive, missing channel/label, duplicate cut identity가 완료 artifact로 등록되지 않는다.
-- 같은 artifact/parser version에서 volatile 수집 시간을 제외한 profile이 결정적이다.
-- 실제 timestamp가 없는 record에 임의 wall-clock을 생성하지 않는다.
-
-**완료 조건**: dataset이 `VERIFIED`되거나 fallback/`BLOCKED` 상태와 근거가 명확하다. 검증 전에는
-channel 수, sample rate, model 적합성을 완료 사실로 주장하지 않는다.
-
-**선행 조건**: Step 01의 artifact 규칙.
-
-### Step 27 — PHMCut Raw Adapter와 Versioned Contract
-
-**목적**: PHM 원본을 MTConnect parser와 분리된 Adapter로 읽어 cut와 wear measurement를 추적한다.
-
-**구현 범위**
-
-- `PHMCut`, sensor channel reference, `ToolWearMeasurement`의 versioned contract
-- source locator, sample order/rate evidence, cutter/cut/flute identity
-- parse reject/unknown channel 보존과 processing run metadata
-- Source Acquisition이 제공한 immutable artifact를 받는 Intelligence consumer Port와 PHM/NASA decoder Adapter
-
-**테스트**
-
-- valid cutter/cut/channel/wear fixture가 source locator까지 round-trip된다.
-- malformed numeric, length mismatch, unknown channel, missing wear가 원본과 함께 구분된다.
-- PHM parser가 Ingestion/MTConnect package를 import하지 않는다.
-- cut number를 Mazak tool number나 실제 시간으로 변환하지 않는다.
-
-**완료 조건**: 원본에서 cut와 측정값까지 역추적할 수 있고 MTConnect contract를 재사용해 의미를 섞지 않는다.
-
-**선행 조건**: Step 26.
-
-### Step 28 — Deterministic PHM Feature Extraction
-
-**목적**: 고주파 sensor record를 재현 가능한 cut-level feature로 변환한다.
-
-**구현 범위**
-
-- validation 후 mean/std/RMS/peak 계열의 작은 P0 feature set
-- versioned feature schema, channel/unit/order와 dataset hash
-- NaN/overflow/constant/missing channel policy
-- FFT feature는 근거가 생길 때 별도 확장
-
-**테스트**
-
-- 작은 golden signal의 feature가 수동 계산과 tolerance 안에서 일치한다.
-- NaN, overflow, empty/constant signal, channel length mismatch를 명시적으로 처리한다.
-- 같은 artifact/schema version에서 feature hash가 결정적이다.
-- feature order/type/unit mismatch가 model 입력 전에 거절된다.
-
-**완료 조건**: 모든 feature vector가 schema, extractor version, source cut와 dataset hash를 가진다.
-
-**선행 조건**: Step 27.
-
-### Step 29 — Tool Wear Baseline과 Model Card
-
-**목적**: cutter 단위 데이터 누수 없이 측정 wear를 추정하는 설명 가능한 baseline을 만든다.
-
-**구현 범위**
-
-- dummy와 최소 두 개의 단순 regression baseline 비교
-- cutter/group split, seed, preprocessing, evaluation configuration
-- MAE/RMSE와 적용 가능한 경우 R², limitation, intended use
-- versioned model artifact/registry와 feature schema compatibility
-
-**테스트**
-
-- 같은 cutter/group이 train과 evaluation에 동시에 있으면 pipeline이 실패한다.
-- 동일 artifact/config/seed에서 split, prediction, metric이 재현된다.
-- incompatible feature schema/model artifact가 inference 전에 거절된다.
-- model metric이 dummy 결과와 dataset/split 근거 없이 게시되지 않는다.
-
-**완료 조건**: 각 수치가 dataset hash와 split에 연결되고 NIST Mazak 실제 wear/RUL 예측이 아니라
-PHM reference model임을 model card에 명시한다.
-
-**선행 조건**: Step 28.
-
-### Step 30 — HealthAssessment와 Advisory Serving
-
-**목적**: model 출력을 출처가 명확한 HealthAssessment/Advisory로 제공하고 operational Twin과 격리한다.
-
-**구현 범위**
-
-- wear value/unit, health score, threshold source, confidence, model/provenance contract
-- AI Adapter input/output와 Factory API의 versioned public query
-- unavailable/timeout/incompatible-model fallback
-- Advisory는 조언만 제공하고 Equipment/Alarm/Production에 직접 쓰지 않는 Port 경계
-
-**테스트**
-
-- valid/invalid feature vector와 model metadata contract를 검증한다.
-- threshold source가 없으면 임의 health score를 생성하지 않는다.
-- AI down/timeout에서도 핵심 Twin API가 동작하고 health는 unavailable/UNKNOWN이다.
-- HIGH Advisory가 Machine FAULT, Alarm, command를 직접 만들지 않는다.
-
-**완료 조건**: measured wear와 estimated wear, model, dataset, limitation을 구분해 조회할 수 있다.
-
-**선행 조건**: Step 29, Step 10.
-
-### Step 31 — Reference Tool Twin과 Health UI
-
-**목적**: PHM cutter의 wear/health를 Mazak active tool과 혼동하지 않는 별도 reference view로 설명한다.
-
-**구현 범위**
-
-- holder/cutter/flute/wear-zone procedural node와 reference cutter identity
-- measured/estimated wear와 health provenance overlay
-- Machine Detail의 `REFERENCE MODEL AVAILABLE` 링크/summary
-- wear zone highlight만 사용하고 실제 파손/재료 제거 형상은 생성하지 않음
-
-**테스트**
-
-- cutter/cut/flute identity와 UI/3D wear zone 위치가 일치한다.
-- measured와 estimated 값의 label/provenance를 서로 바꿀 수 없다.
-- Mazak tool number와 PHM cutter 사이 근거 없는 직접 mapping이 contract/architecture test에서 거절된다.
-- Health 3D/WebGL/AI 실패가 Mazak 2D operational view를 중단하지 않는다.
-
-**완료 조건**: 사용자가 NIST operational state와 PHM reference health를 별도 사실로 이해할 수 있다.
-
-**선행 조건**: Step 24, Step 30.
-
-### Step 32 — Cut-based RUL Baseline (P1, 선택)
-
-**목적**: wear baseline이 검증된 뒤에만 남은 수명을 source sequence와 같은 cut 단위로 평가한다.
-
-**구현 범위**
-
-- replacement threshold와 censoring/target 정의 및 근거
-- remaining cuts 예측, error metric, uncertainty/unknown
-- wear model과 독립 version을 가진 RUL model card
-- 시간 환산 금지와 v1 feature-complete 판단에서의 선택 범위 표시
-
-**테스트**
-
-- threshold/label 정의가 없는 dataset에서는 학습을 시작하지 않는다.
-- cutter/group leakage와 미래 cut feature 사용을 탐지한다.
-- 음수 remaining cuts와 unsupported time-unit 변환을 거절한다.
-- model unavailable 시 wear/operational 기능은 계속 동작한다.
-
-**완료 조건**: remaining cuts의 정의, 근거, split, metric이 검증된 경우에만 UI에 `ESTIMATED`로 표시한다.
-
-**선행 조건**: Step 29. Step 33 이후 진행과 출시의 필수 선행 조건은 아니다.
+**선행 조건**: Step 21, Step 24, Step 26.
 
 ---
 
-## Phase G — Manufacturing Operations
+## Phase F — Observed Utilization and Operational KPI
 
-### Step 33 — Production Aggregate와 상태 전이
+### Step 28 — Accumulated Time과 운전 신호 Canonical Mapping 확장
 
-**목적**: simulated production의 `ProductionRequest → WorkOrder → OperationExecution → ProductionResult`
-생명주기를 observation과 `MachiningRun`에서 분리해 모델링한다.
+**목적**: 가동률 KPI의 원천인 누적 시간 카운터와 운전 신호를 canonical contract에 추가해 의미 커버리지를
+올린다.
 
-**구현 범위**
-
-- Entity/Value Object/Aggregate와 repository ports
-- Routing, P0 PROCESS_TYPE capability
-- Operation 상태 전이와 `SIMULATED` provenance
-- observed run/telemetry PartCount와 ProductionResult의 명시적 분리
-
-**테스트**
-
-- 모든 허용 상태 전이와 완료 후 ACTIVE 같은 금지 전이.
-- quantity 음수/불일치, dueAt/identity validation.
-- capability 없는 machine assign 거절.
-- NIST PartCount나 `MachiningRun` 완료가 ProductionResult를 자동 갱신하지 않는다.
-
-**완료 조건**: framework 없는 domain unit test로 생산 lifecycle 전체를 표현하며 관측 공정과 구분된다.
-
-**선행 조건**: Step 16의 Context 결정.
-
-### Step 34 — Operation Application/API와 Twin Progress
-
-**목적**: 생산 작업을 machine에 할당하고 진행/결과를 Twin과 2D/3D에 `SIMULATED`로 표시한다.
+**근거**: `total_time` 32,471건, `auto_time` 10,111건, `cut_time` 3,516건, `estop` 51건,
+오버라이드 184건, `line`/`sequenceNum` 1,372건이 현재 `UNSUPPORTED_DATA_ITEM`이다. `total_time`은
+원본에서 가장 빈번한 DataItem이며 현재 coverage는 46.50%다.
 
 **구현 범위**
 
-- create/assign/start/pause/complete use case와 API
-- transaction + business Outbox events
-- Twin production context projection
-- right panel과 spatial progress label
+- `ACCUMULATED_TIME` SAMPLE의 canonical target과 단위 정책. 원본 unit이 `-`이므로 실제 단위를 profile
+  근거로 확인하고, 확인 전에는 단위 미확정 상태로 값을 보존한다
+- `EMERGENCY_STOP`, `PATH_FEEDRATE_OVERRIDE`, `ROTARY_VELOCITY_OVERRIDE`, `LINE`,
+  `x:SEQUENCE_NUMBER` 매핑
+- observation envelope schema와 mapping table version 증가 및 호환성 정책
+- 갱신된 mapping report와 semantic coverage 재생성
 
 **테스트**
 
-- API integration에서 assign→start→complete 정상 흐름.
-- 동일 command 재시도 시 상태와 Outbox side effect 중복 없음.
-- Twin/2D/3D progress 값과 provenance 일치.
-- 실제 equipment command Adapter가 호출되지 않고 current run과 operation이 혼합되지 않는다.
+- 각 신규 DataItem의 golden mapping과 category 보존.
+- 누적 카운터의 단조 증가 위반, 리셋, 역행을 보정하지 않고 그대로 보존한다.
+- 단위가 확인되지 않은 값을 임의 단위로 표기하지 않는다.
+- mapping/schema version 증가 후에도 Step 01~23 회귀 baseline이 통과한다.
+- 갱신된 semantic coverage와 미매핑 목록이 결정적으로 재생성된다.
 
-**완료 조건**: simulated operation 전체 흐름과 결과가 이력/Twin에 남고 실제 제어와 연결되지 않는다.
+**완료 조건**: 신규 매핑마다 profile 근거가 있고 근거 없는 매핑이 0개이며 커버리지 변화가 mapping report와
+Verification Ledger에 기록된다.
 
-**선행 조건**: Step 25, Step 33.
+**선행 조건**: Step 04, Step 16.
+
+### Step 29 — Equipment State Interval Projection
+
+**목적**: 시점별 상태 관측을 시간 구간으로 재구성해 체류시간을 계산할 수 있게 한다.
+
+**구현 범위**
+
+- `execution`, `mode`, `power`, `estop`의 구간화 policy와 rule version
+- 구간 projection: 시작/종료 source time, 상태 값, 근거 observation, confidence
+- 열린 구간, 관측 공백, `UNAVAILABLE` 구간의 명시적 보존
+- 재처리 시 기존 결과를 덮어쓰지 않는 immutable versioned processing result (Step 18 패턴 재사용)
+
+**테스트**
+
+- 같은 ordered observation과 rule version에서 구간 경계와 결과 hash가 결정적이다.
+- 관측 공백을 직전 상태로 채우지 않고 `UNKNOWN` 구간으로 보존한다.
+- 종료 관측이 없는 마지막 구간은 열린 구간으로 남고 임의 종료 시각을 만들지 않는다.
+- 구간 합계가 원천 관측 시간 범위를 넘지 않는다.
+- late observation 재처리가 기존 구간을 수정하지 않고 새 processing version으로 남는다.
+
+**완료 조건**: 각 구간을 시작/종료 근거 observation까지 추적할 수 있고 구간 합과 원천 시간 범위의 차이를
+설명할 수 있다.
+
+**선행 조건**: Step 08, Step 28.
+
+### Step 30 — Utilization KPI Projection
+
+**목적**: 상태 구간과 기계 자체 누적 카운터로 가동률 계열 지표를 두 경로로 산출하고 근거를 구분한다.
+
+**구현 범위**
+
+- 구간 기반 상태별 체류시간과 비율: ACTIVE/READY/STOPPED/INTERRUPTED/UNKNOWN
+- 카운터 기반 지표: 자동운전 비율 `auto_time`/`total_time`, 절삭 비율 `cut_time`/`auto_time`
+- 두 산출 경로의 불일치를 숨기지 않고 함께 표시하는 정책
+- 집계 구간 identity(원천 시간 범위 또는 replay cursor까지), version, coverage
+
+**테스트**
+
+- 고정 fixture에서 체류시간과 비율이 수동 계산과 일치한다.
+- 카운터 리셋/역행 구간에서 음수나 100% 초과 비율을 만들지 않는다.
+- `UNKNOWN` 구간이 분모에서 조용히 사라지지 않는다.
+- 두 경로의 값이 다를 때 하나를 임의로 선택하지 않고 차이를 노출한다.
+- 계획 정지 데이터가 없으므로 계획시간 기준 Availability를 주장하지 않는다.
+
+**완료 조건**: 각 지표의 계산식, 분모 정의, 원천, coverage, version을 조회할 수 있고 관측 기반 지표와
+파생 지표가 구분된다.
+
+**선행 조건**: Step 29.
+
+### Step 31 — Downtime과 정지 사유 Pareto
+
+**목적**: 비가동 구간을 길이순으로 정렬하고 동시 관측된 근거를 인과 주장 없이 함께 제시한다.
+
+**구현 범위**
+
+- STOPPED/INTERRUPTED/UNKNOWN 구간의 지속시간 순위와 누적 비율
+- 구간과 시간적으로 겹치는 `estop`, CONDITION(WARNING/FAULT), `mode` 변화의 근거 link
+- 사유가 확인되지 않은 구간의 명시적 `사유 미확인` 분류
+- Pareto 항목 선택 시 replay cursor 이동
+
+**테스트**
+
+- 정지 구간 순위와 누적 비율이 고정 fixture에서 결정적이다.
+- 시간적으로 겹치지 않는 condition을 사유로 연결하지 않는다.
+- 사유가 없는 구간을 최빈 사유로 채우지 않는다.
+- 겹치는 근거가 여러 개일 때 하나를 인과로 단정하지 않고 모두 제시한다.
+- Pareto 항목에서 cursor를 이동하면 2D, 3D, current run이 같은 version으로 수렴한다.
+
+**완료 조건**: 상위 정지 구간마다 시작/종료 근거와 동시 관측 근거를 확인할 수 있고 인과를 주장하지 않는다.
+
+**선행 조건**: Step 21, Step 30.
+
+### Step 32 — Cycle 기준 Performance와 OEE 공개 정책
+
+**목적**: 자체 사이클 baseline 대비 성능 지표를 제공하되 품질 데이터 부재를 이유로 OEE 종합 수치를
+주장하지 않는다.
+
+**구현 범위**
+
+- Step 19/20의 CycleFeature median을 기준 사이클로 사용하는 Performance 정의와 provenance
+- `PartCountAct` 기반 throughput과 카운터 리셋/공백 처리
+- OEE 구성요소 상태 모델: Availability `OBSERVED`/`DERIVED`, Performance `DERIVED`,
+  Quality `UNAVAILABLE`
+- 종합 OEE 수치를 계산하지도 표시하지도 않는 정책과 그 근거 문구
+
+**테스트**
+
+- 기준 사이클 표본이 부족하면 Performance를 `표본 부족`으로 남기고 숫자를 만들지 않는다.
+- `PartCountAct` 리셋과 역행을 음수 생산량으로 만들지 않는다.
+- Quality 입력이 없는 상태에서 OEE 종합 수치를 만들지 않는 policy test.
+- 이상적 사이클 시간을 외부에서 가정해 넣으면 provenance가 `ASSUMED`로 구분된다.
+
+**완료 조건**: 사용자가 무엇이 관측이고 무엇이 파생이며 무엇이 원천에 없어 제공 불가인지 화면과 문서에서
+구분할 수 있다.
+
+**선행 조건**: Step 20, Step 30.
+
+### Step 33 — Twin Snapshot 관측 지표 확장
+
+**목적**: 이미 canonical로 적재되지만 Twin snapshot에 노출되지 않는 지표를 권위 계약에 추가한다.
+
+**근거**: `POSITION` 15,786건, `LOAD` 14,473건, `PATH_FEEDRATE` 7,633건, `TEMPERATURE` 10,203건,
+`PART_COUNT`, `CONTROLLER_MODE`, `POWER_STATE`가 매핑되었으나 snapshot에 없다.
+
+**구현 범위**
+
+- Twin snapshot schema version 증가와 신규 metric: 축 위치, 축/주축 부하, 경로 이송속도, 온도,
+  부품 수, 제어 모드, 전원 상태
+- 각 필드의 availability와 field-level provenance, missing 정책
+- WebSocket patch 계약과 frontend version guard 정합
+- 2D 상세의 신규 지표 표시와 채널별 원본 추적
+
+**테스트**
+
+- golden Twin DTO contract test와 patch 계약 정합.
+- 신규 optional field가 없는 이전 snapshot에서도 기존 화면이 동일하게 동작한다.
+- 축/부하 채널이 컴포넌트별로 섞이지 않는다.
+- 값이 없는 채널을 0으로 표시하지 않는다.
+- snapshot 크기 증가가 Step 43의 patch rate 예산 안에 있다.
+
+**완료 조건**: 한 응답에서 위치, 부하, 이송속도, 온도, 부품 수, 제어 모드를 provenance와 함께 사람이
+해석할 수 있다.
+
+**선행 조건**: Step 10, Step 28.
+
+### Step 34 — Shift Overview 화면
+
+**목적**: cursor 시점 상태에 더해 관측 구간 전체에서 무슨 일이 있었는지 한 화면에서 보여준다.
+
+**구현 범위**
+
+- 상단 KPI 밴드: 가동률, 절삭 비율, 정지 시간, 가공 건수, 데이터 최신성. 각 값에 provenance chip
+- replay 타임라인 위 상태 띠(ACTIVE/READY/STOPPED/UNKNOWN)와 정지·알람·공구 교체 marker
+- 정지 사유 Pareto와 항목 선택 시 cursor 이동
+- 대시보드(`/`)는 구간 요약, 운영 뷰(`/factory`)는 시점 상세로 역할 분리
+- loading, insufficient-data, version mismatch 상태
+
+**테스트**
+
+- 상태 띠 구간 경계가 Step 29 projection과 일치한다.
+- KPI 값이 Step 30/32의 계산 결과와 같은 version을 가리킨다.
+- marker와 Pareto 선택 시 2D, 3D, current run이 같은 cursor/version으로 수렴한다.
+- 원천에 없는 Quality를 100%나 NORMAL로 표시하지 않는다.
+- keyboard와 screen reader로 KPI, 구간, 정지 사유를 확인할 수 있다.
+- 색 이외의 cue로 상태 구간을 구분할 수 있다.
+
+**완료 조건**: 사용자가 raw signal을 몰라도 관측 구간 전체의 가동 상태와 주요 손실을 이해하고 각 숫자의
+출처를 확인할 수 있다.
+
+**선행 조건**: Step 31, Step 32, Step 33.
+
+---
+
+## Phase G — Operational Semantics and Quality
 
 ### Step 35 — Condition에서 Alarm으로의 명시적 규칙
 
@@ -919,138 +1012,252 @@ PHM reference model임을 model card에 명시한다.
 
 **구현 범위**
 
-- Condition projection과 `ConditionToAlarmPolicy`
+- Condition projection과 `ConditionToAlarmPolicy` (관측 CONDITION 1,052건)
 - Alarm aggregate: OPEN/ACKNOWLEDGED/RESOLVED
-- machine ID 공간 연결과 warning/fault marker
+- machine ID 공간 연결, 3D warning/fault marker, Step 34 타임라인 알람 marker
 - business Outbox event
 
 **테스트**
 
-- Condition 자체 저장과 Alarm 생성이 별도임을 검증.
-- rule 비대상 Condition과 Anomaly/Advisory는 자동 Alarm을 만들지 않음.
-- 중복 Condition이 같은 열린 Alarm을 증식시키지 않음.
-- ACK/RESOLVE 허용/금지 전이와 idempotency.
-- 2D 목록과 3D marker가 같은 alarm ID/machine ID를 사용하고 색 외 cue를 제공.
+- Condition 저장과 Alarm 생성이 별도임을 검증한다.
+- rule 비대상 Condition과 `AnomalyAssessment`는 자동 Alarm을 만들지 않는다.
+- 중복 Condition이 같은 열린 Alarm을 증식시키지 않는다.
+- ACK/RESOLVE 허용·금지 전이와 idempotency.
+- 2D 목록, 3D marker, 타임라인 marker가 같은 alarm ID와 machine ID를 사용하고 색 외 cue를 제공한다.
 
 **완료 조건**: PRD 118 Alarm Spatial Acceptance가 자동화된다.
 
-**선행 조건**: Step 25.
+**선행 조건**: Step 27, Step 34.
 
-### Step 36 — Maintenance Workflow
-
-**목적**: Alarm과 선택적으로 연결되는 독립 Maintenance 생명주기를 구현한다.
-
-**구현 범위**
-
-- request/assign/start/complete/cancel domain behavior
-- Alarm/Machine ID 참조, audit, API/UI 최소 흐름
-- `MAINTENANCE_REQUESTED` Outbox
-
-**테스트**
-
-- 허용/금지 전이와 actor/time audit.
-- 없는/resolved alarm 연결 정책 검증.
-- command retry에서 요청과 Outbox 중복 없음.
-- Alarm resolve나 HIGH Advisory가 진행 중 Maintenance를 암묵적으로 완료/생성하지 않음.
-
-**완료 조건**: Maintenance 상태가 Alarm과 독립적으로 추적되고 Twin 상세에서 보인다.
-
-**선행 조건**: Step 35.
-
-### Step 37 — Data Quality Projection과 UI
+### Step 36 — Data Quality Projection과 UI
 
 **목적**: Validity, Completeness, Ordering, Duplication, Freshness, Semantic Coverage를 숨기지 않고
 운영자에게 노출한다.
 
 **구현 범위**
 
-- 차원별 계산 policy와 machine/session 집계
-- `/data-quality`와 Twin quality section
+- 차원별 계산 policy와 machine/replay session 집계
+- Twin quality section과 전용 데이터 품질 화면
+- Step 28 이후의 semantic coverage 변화와 미매핑 DataItem 목록 공개
 - run segmentation/feature coverage와 원천 품질의 별도 지표
-- 임계값 설정 및 provenance/evidence link
+- 임계값 설정과 provenance/evidence link
 
 **테스트**
 
 - invalid/unknown/duplicate/out-of-order fixture별 지표 증가.
-- semantic/feature coverage 분모/분자 0 및 partial mapping 경계.
-- replay session, processing run, PHM dataset 지표가 잘못 합쳐지지 않음.
-- UI가 missing을 100% quality나 NORMAL로 표현하지 않음.
+- semantic/feature coverage의 분모·분자 0과 partial mapping 경계.
+- replay session, processing run 지표가 잘못 합쳐지지 않는다.
+- UI가 missing을 100% quality나 NORMAL로 표현하지 않는다.
+- 미매핑 DataItem 목록에서 원본 locator로 이동할 수 있다.
 
-**완료 조건**: source profile, runtime, derived process, model quality의 정의 차이가 문서화되고 추적 가능하다.
+**완료 조건**: source profile, runtime, derived process 품질의 정의 차이가 문서화되고 추적 가능하며
+실제 커버리지 수치가 화면에서 정직하게 공개된다.
 
-**선행 조건**: Step 07~09, Step 19.
+**선행 조건**: Step 07~09, Step 19, Step 28.
+
+### Step 37 — 관측 기반 Production Context
+
+**목적**: 프로그램, 부품 수, 가공 run을 연결해 관측만으로 설명 가능한 생산 문맥을 제공한다.
+
+**구현 범위**
+
+- `program`/`subprogram` 실행 구간과 `MachiningRun`, `PartCountAct` 증가의 시간 정렬
+- 프로그램별 가공 건수, 중앙/평균 사이클, 총 가공시간
+- 부품 수 증가와 run 완료의 관계를 인과로 단정하지 않는 표시 정책
+- Twin production context 섹션과 2D 표시
+
+**의도적으로 제외**: `ProductionRequest`/`WorkOrder`/`OperationExecution`/`ProductionResult`
+aggregate, 작업 할당 CRUD, `SIMULATED` 생산 흐름. PRD 8의 Non-Goal과 일치하며 원천에 없는 사실을
+만들지 않는다.
+
+**테스트**
+
+- 프로그램 구간과 run 경계가 같은 관측에서 결정적으로 도출된다.
+- `PartCountAct` 증가를 특정 run의 결과로 자동 확정하지 않는다.
+- 카운터 리셋 구간에서 생산량을 음수나 급증으로 만들지 않는다.
+- 프로그램이 `UNAVAILABLE`인 run을 임의 프로그램에 귀속시키지 않는다.
+
+**완료 조건**: 생산 문맥의 모든 값이 관측으로 역추적되고 시뮬레이션 값이 섞이지 않는다.
+
+**선행 조건**: Step 21, Step 32.
+
+### Step 38 — Tool별 Load Trend와 마모 대리지표
+
+**목적**: 같은 프로그램과 공구 조합의 부하 추세를 비교해 이 기계의 관측값에 근거한 마모 대리지표를 만든다.
+
+**구현 범위**
+
+- (machine, program, tool number) 그룹의 부하 통계 시계열과 최소 표본 정책
+- 그룹 내 추세와 baseline 대비 편차, 표본 부족/coverage 부족 상태
+- `DERIVED` provenance, 계산식, version
+- 마모량이나 잔여 수명으로 환산하지 않는 표시 정책
+
+**테스트**
+
+- 고정 fixture의 그룹 통계가 수동 계산과 일치한다.
+- 다른 program/tool 그룹의 run이 섞이지 않는다.
+- 표본이 부족하면 추세를 만들지 않는다.
+- 부하 추세를 마모량, 잔여 수명, Machine FAULT, Alarm으로 변환하지 않는다.
+
+**완료 조건**: 실제 Mazak01 관측값으로 계산되며 마모 물리량이 아니라 부하 추세 지표임을 화면에서 명시한다.
+
+**선행 조건**: Step 24, Step 33.
 
 ---
 
-## Phase H — Release Reliability
+## Phase H — Reference Tool Health (P1, 선택)
 
-### Step 38 — End-to-end Reliability and Recovery
+이 Phase는 v1 완료와 출시의 필수 선행 조건이 아니다. 어떤 산출물도 Mazak01의 상태, 마모량, 잔여 수명으로
+표시하지 않는다.
+
+### Step 39 — PHM Dataset 검증과 Immutable Acquisition (P1, 선택)
+
+**목적**: PHM2010을 우선 검증하고 불가하면 NASA Milling fallback을 Step 01과 같은 원천 보존 규칙으로
+결정한다.
+
+**구현 범위**
+
+- download URI, archive/file hash, integrity, license/redistribution evidence
+- immutable `SourceArtifact`/manifest와 재현 가능한 sensor/label profile
+- cutter/cut/channel/wear label identity와 train/evaluation group 후보
+- dataset decision과 Verification Ledger 기록
+
+**테스트**
+
+- archive/file checksum과 profile의 실제 file/channel/cut count가 일치한다.
+- truncated archive, missing channel/label, duplicate cut identity가 완료 artifact로 등록되지 않는다.
+- 같은 artifact/parser version에서 volatile 수집 시간을 제외한 profile이 결정적이다.
+- 실제 timestamp가 없는 record에 임의 wall-clock을 만들지 않는다.
+
+**완료 조건**: dataset이 `VERIFIED`되거나 fallback/`BLOCKED` 상태와 근거가 명확하다. 검증 전에는 channel
+수, sample rate, model 적합성을 완료 사실로 주장하지 않는다.
+
+**선행 조건**: Step 01의 artifact 규칙.
+
+### Step 40 — PHM Feature와 Wear Baseline Model Card (P1, 선택)
+
+**목적**: 검증된 PHM 원본을 cut 단위 feature로 바꾸고 데이터 누수 없이 측정 wear를 추정하는 설명 가능한
+baseline을 만든다.
+
+**구현 범위**
+
+- MTConnect parser와 분리된 PHM decoder Adapter, `PHMCut`/channel/`ToolWearMeasurement` 계약
+- validation 후 mean/std/RMS/peak 계열의 작은 P0 feature set과 versioned feature schema
+- dummy와 최소 두 개의 단순 regression baseline, cutter/group split, seed, evaluation configuration
+- MAE/RMSE, limitation, intended use를 담은 versioned model card와 registry
+
+**테스트**
+
+- valid cutter/cut/channel/wear fixture가 source locator까지 round-trip된다.
+- PHM parser가 Ingestion/MTConnect package를 import하지 않는다.
+- 같은 cutter/group이 train과 evaluation에 동시에 있으면 pipeline이 실패한다.
+- 동일 artifact/config/seed에서 split, prediction, metric이 재현된다.
+- model metric이 dummy 결과와 split 근거 없이 게시되지 않는다.
+
+**완료 조건**: 각 수치가 dataset hash와 split에 연결되고 NIST Mazak 실제 wear/RUL 예측이 아니라 PHM
+reference model임을 model card에 명시한다. cut number를 Mazak tool number나 실제 시간으로 변환하지
+않는다.
+
+**선행 조건**: Step 39.
+
+### Step 41 — HealthAssessment Serving과 Reference Tool View (P1, 선택)
+
+**목적**: model 출력을 출처가 명확한 reference health로 제공하고 operational Twin과 격리한다.
+
+**구현 범위**
+
+- wear value/unit, health score, threshold source, confidence, model provenance 계약
+- AI Adapter와 Factory API의 versioned public query, unavailable/timeout/incompatible-model fallback
+- Advisory는 조언만 제공하고 Equipment/Alarm에 직접 쓰지 않는 Port 경계
+- holder/cutter/flute/wear-zone reference view와 measured/estimated 구분 overlay
+- Machine Detail의 `REFERENCE MODEL AVAILABLE` 링크와 요약
+
+**테스트**
+
+- threshold source가 없으면 임의 health score를 만들지 않는다.
+- AI down/timeout에서도 핵심 Twin API가 동작하고 health는 unavailable/`UNKNOWN`이다.
+- measured와 estimated 값의 label/provenance를 서로 바꿀 수 없다.
+- Mazak tool number와 PHM cutter 사이 근거 없는 직접 mapping이 contract/architecture test에서 거절된다.
+- HIGH Advisory가 Machine FAULT, Alarm, command를 직접 만들지 않는다.
+- Health view/WebGL/AI 실패가 Mazak 2D operational view를 중단하지 않는다.
+
+**완료 조건**: 사용자가 NIST operational state와 PHM reference health를 별도 사실로 이해할 수 있다.
+
+**선행 조건**: Step 38, Step 40.
+
+---
+
+## Phase I — Release Reliability
+
+### Step 42 — End-to-end Reliability and Recovery
 
 **목적**: PRD의 신뢰성 보장 경계와 주요 장애 복구를 하나의 자동화 suite로 고정한다.
 
 **구현 범위**
 
-- duplicate/out-of-order, MQTT/DB restart, WebSocket disconnect, AI down, asset/WebGL failure 시나리오
-- replay에서 run/anomaly/3D가 다시 권위 version으로 수렴하는 시나리오
+- duplicate/out-of-order, MQTT/DB restart, WebSocket disconnect, asset/WebGL failure 시나리오
+- replay에서 run, anomaly, KPI, 상태 구간, 기능 3D가 다시 권위 version으로 수렴하는 시나리오
 - 관찰 가능한 metric/log/correlation ID와 운영 runbook
 - 제한된 retry/backoff와 부분 실패 상태
 
 **테스트**
 
-- [테스트 전략](../testing/test-strategy.md)의 E2E-01~04와 출시 범위의 process/health 흐름.
-- MQTT/DB restart 후 재처리에서 business side effect 중복 없음.
-- REST resync 후 UI/Twin/run/functional 3D version이 권위 상태에 수렴.
-- AI/Health 3D 장애가 2D operational flow를 중단하지 않음.
+- [테스트 전략](../testing/test-strategy.md)의 E2E-01~04와 출시 범위의 process/KPI 흐름.
+- MQTT/DB restart 후 재처리에서 business side effect 중복이 없다.
+- REST resync 후 UI, Twin, run, KPI, 기능 3D version이 권위 상태에 수렴한다.
+- 선택 Phase H가 없거나 실패해도 2D operational flow가 중단되지 않는다.
 
 **완료 조건**: 각 장애의 기대 상태, 자동/수동 복구, 데이터 유실 여부가 테스트와 runbook에 기록된다.
 
-**선행 조건**: Step 17~37 중 실제 출시 범위. 선택 Step 32는 제외할 수 있다.
+**선행 조건**: Step 27, Step 34~38. 선택 Phase H는 제외할 수 있다.
 
-### Step 39 — 성능, 보안, 접근성, Visual Baseline
+### Step 43 — 성능, 보안, 접근성, Visual Baseline
 
 **목적**: 기능 완료를 측정 가능한 비기능 baseline과 안전한 기본값으로 마무리한다.
 
 **구현 범위**
 
-- 5/20 machine FPS, frame time, heap, asset load, patch rate, React commit 측정
-- 100 lightweight machine은 P2 실험으로 별도 표기
+- 축 이동과 toolpath trail을 포함한 FPS, frame time, heap, asset load, patch rate, React commit 측정
+- 궤적 점 상한과 KPI 집계 쿼리의 응답시간 예산
 - schema validation, CORS explicit, parameter binding, secret/dependency scan, container non-root 검토
-- normal/warning/fault/stale/selected/replay-paused/reference-health visual baseline
-- keyboard, screen-reader cue, reduced motion 검토
+- normal/warning/fault/stale/selected/replay-paused/shift-overview visual baseline
+- keyboard, screen reader cue, reduced motion 검토
 
 **테스트**
 
 - 반복 가능한 browser performance script와 환경 metadata.
 - 대표 visual regression과 asset fallback screenshot.
-- automated accessibility scan + 핵심 흐름 수동 keyboard checklist.
+- automated accessibility scan과 핵심 흐름 수동 keyboard checklist.
 - dependency/secret/security configuration test.
-- 입력 payload size/invalid command allowlist 경계 테스트.
+- 입력 payload size와 invalid command allowlist 경계 테스트.
 
 **완료 조건**: 수치를 산업 SLA로 과장하지 않고 측정 환경과 함께 기록하며 실패 기준에는 후속 작업이 있다.
 
-**선행 조건**: Step 38.
+**선행 조건**: Step 42.
 
-### Step 40 — Final Traceability and Demo Acceptance
+### Step 44 — Final Traceability and Demo Acceptance
 
 **목적**: PRD Definition of Done, 두 수정 가이드의 채택 범위, 구현, 테스트, 데모 사이 추적성을 완성한다.
 
 **구현 범위**
 
-- PRD 117~121, 131, 140과 process/functional 3D/reference health acceptance 연결
-- Verification Ledger 최종 검토
-- README 주장, architecture diagrams, 실행/복구 절차
-- 미채택 guide 항목과 P1/P2/known limitation backlog
+- PRD 117~121, 131, 140과 process/KPI/functional 3D acceptance 연결
+- Verification Ledger 최종 검토와 미채택 guide 항목 정리
+- README 주장, architecture diagram, 실행/복구 절차
+- P1/P2와 known limitation backlog
 
 **테스트**
 
-- 깨끗한 환경에서 raw verify→replay→run/anomaly→functional 3D→operation/alarm→reference health smoke test.
+- 깨끗한 환경에서 raw verify → replay → run/anomaly → KPI/shift overview → functional 3D → alarm
+  smoke test.
 - 모든 contract와 문서 내부 link 검사.
 - PRD/채택 guide 항목마다 test ID 또는 수동 근거 존재 여부 검사.
-- NIST/PHM, observed/derived/estimated/simulated를 혼동하는 claim이 없는지 검토한다.
+- observed/derived/estimated/simulated와 NIST/PHM을 혼동하는 claim이 없는지 검토한다.
+- 종합 OEE 수치나 계획시간 기준 Availability를 주장하는 문구가 없는지 검토한다.
 
-**완료 조건**: PRD 140과 채택한 범위마다 근거가 있고 미완료/선택 항목은 완료로 표시하지 않는다.
+**완료 조건**: PRD 140과 채택한 범위마다 근거가 있고 미완료/선택 항목을 완료로 표시하지 않는다.
 
-**선행 조건**: Step 39.
+**선행 조건**: Step 43.
 
 ---
 
@@ -1082,33 +1289,50 @@ flowchart TD
   S16 --> S22[22 Model Node Contract]
   S17 --> S23[23 B-axis]
   S22 --> S23
-  S23 --> S24[24 Tool Change]
-  S21 --> S25[25 Functional Twin]
-  S24 --> S25
-  S01 --> S26[26 PHM Verify]
-  S26 --> S27[27 PHM Raw]
-  S27 --> S28[28 PHM Feature]
-  S28 --> S29[29 Wear Model]
-  S29 --> S30[30 Health Serving]
-  S10 --> S30
-  S24 --> S31[31 Reference Tool Twin]
+
+  S23 --> S24[24 Tool Number Binding]
+  S23 --> S25[25 XYZ Axis Binding]
+  S25 --> S26[26 Toolpath Trail]
+  S21 --> S27[27 Functional Twin Acceptance]
+  S24 --> S27
+  S26 --> S27
+
+  S04 --> S28[28 Mapping 확장]
+  S16 --> S28
+  S08 --> S29[29 State Interval]
+  S28 --> S29
+  S29 --> S30[30 Utilization KPI]
+  S21 --> S31[31 Downtime Pareto]
   S30 --> S31
-  S29 -. optional .-> S32[32 RUL]
-  S16 --> S33[33 Production Domain]
-  S25 --> S34[34 Twin Progress]
+  S20 --> S32[32 Performance + OEE 정책]
+  S30 --> S32
+  S10 --> S33[33 Snapshot 지표 확장]
+  S28 --> S33
+  S31 --> S34[34 Shift Overview]
+  S32 --> S34
   S33 --> S34
-  S25 --> S35[35 Alarm]
-  S35 --> S36[36 Maintenance]
-  S07 --> S37[37 Data Quality]
-  S19 --> S37
-  S17 --> S38[38 Reliability]
-  S25 --> S38
-  S31 --> S38
-  S34 --> S38
-  S36 --> S38
-  S37 --> S38
-  S38 --> S39[39 Non-functional]
-  S39 --> S40[40 Final Acceptance]
+
+  S27 --> S35[35 Alarm]
+  S34 --> S35
+  S19 --> S36[36 Data Quality]
+  S28 --> S36
+  S21 --> S37[37 Production Context]
+  S32 --> S37
+  S24 --> S38[38 Tool Load Trend]
+  S33 --> S38
+
+  S01 -. P1 .-> S39[39 PHM Verify]
+  S39 -. P1 .-> S40[40 PHM Wear Model]
+  S40 -. P1 .-> S41[41 Health Serving/View]
+  S38 -. P1 .-> S41
+
+  S34 --> S42[42 Reliability]
+  S35 --> S42
+  S36 --> S42
+  S37 --> S42
+  S38 --> S42
+  S42 --> S43[43 Non-functional]
+  S43 --> S44[44 Final Acceptance]
 ```
 
 ## 3. Step 분할 기준
