@@ -16,7 +16,7 @@ import { ReplayControls } from "../../replay/ui/ReplayControls";
 import { useReplayDrivenTwinBootstrap } from "../../replay/ui/useReplayDrivenTwinBootstrap";
 import { MachineDetailView } from "../../twin/ui/MachineDetailView";
 import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
-import { MAZAK01_SCENE_BINDING } from "../adapters/defaultMachineSceneBinding";
+import { MAZAK01_SCENE_BINDING, sceneBindingFromTwin } from "../adapters/defaultMachineSceneBinding";
 import { mapTwinToMachineVisualState } from "../adapters/twinToMachineVisualState";
 import { MachineSelectionStore } from "../application/MachineSelectionStore";
 import { deriveMachineVisualPresentation } from "../domain/machineVisualPresentation";
@@ -82,6 +82,10 @@ export function FactoryRoute({
     () => deriveMachineVisualPresentation(visualState, isReducedMotion),
     [isReducedMotion, visualState],
   );
+  const machineBinding = useMemo(
+    () => sceneBindingFromTwin(visualState?.spatial),
+    [visualState?.spatial],
+  );
   const staleAfterSeconds =
     (twinState.snapshot?.state.freshness.laggingMaxAgeMillis ?? 10_000) / 1_000;
   const LazyFactoryScene = useMemo(
@@ -136,7 +140,10 @@ export function FactoryRoute({
 
       <details className="scene-disclaimer">
         <summary>이 화면에 대하여</summary>
-        <p>Layout provenance · {MAZAK01_SCENE_BINDING.spatialProvenance}</p>
+        <p>Layout provenance · {machineBinding.spatialProvenance}</p>
+        {machineBinding.spatialAvailability === "FALLBACK" && (
+          <p>배치 정보 사용 불가 · 기본 배치를 표시합니다.</p>
+        )}
         <p>
           RPM 기반 회전은 상태 변화를 보여주는 시각 효과이며 실제 물리 회전 속도가 아닙니다.
         </p>
@@ -184,7 +191,7 @@ export function FactoryRoute({
                 >
                   <Suspense fallback={<SceneLoading />}>
                     <LazyFactoryScene
-                      machineBinding={MAZAK01_SCENE_BINDING}
+                      machineBinding={machineBinding}
                       visualState={visualState}
                       visualPresentation={visualPresentation}
                       isReducedMotion={isReducedMotion}

@@ -12,6 +12,22 @@ export const MAZAK01_SCENE_BINDING: MachineSceneBinding = {
   rotation: [0, -0.35, 0],
   scale: [1, 1, 1],
   spatialProvenance: "SIMULATED_LAYOUT",
+  spatialAvailability: "FALLBACK",
   // This is an explicit visual-cue input, not a claim that C_5 is the physical primary spindle.
   visualSpindleSourceDataItemId: "Mazak01-C_5",
 };
+
+export function sceneBindingFromTwin(
+  spatial: import("../domain/machineVisualState").MachineSpatialLayout | undefined,
+): MachineSceneBinding {
+  if (!spatial || spatial.assetId !== defaultAsset.assetId) return MAZAK01_SCENE_BINDING;
+  return {
+    ...MAZAK01_SCENE_BINDING,
+    sceneNodeId: spatial.sceneNodeId,
+    position: spatial.position,
+    rotation: spatial.rotation,
+    scale: spatial.scale,
+    spatialProvenance: spatial.provenance,
+    spatialAvailability: "TWIN",
+  };
+}

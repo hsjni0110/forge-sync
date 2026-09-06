@@ -12,6 +12,7 @@ import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotR
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedIntegerDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedTextDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.SourceProvenanceDto;
+import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.SpatialDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.SpindleSpeedDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.TransformationProvenanceDto;
 import com.forgesync.factoryapi.equipmenttwin.application.FieldProvenance;
@@ -26,7 +27,7 @@ public final class TwinSnapshotResponseMapper {
 
   public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
-        "1.3.0",
+        "1.4.0",
         new MachineDto(snapshot.machineId()),
         new ConsistencyDto(
             snapshot.consistencyState().name(),
@@ -86,7 +87,20 @@ public final class TwinSnapshotResponseMapper {
         Map.of(),
         Map.of(),
         Map.of(),
-        Map.of());
+        snapshot
+            .spatial()
+            .map(
+                layout ->
+                    new SpatialDto(
+                        layout.assetId(),
+                        layout.sceneNodeId(),
+                        layout.position(),
+                        layout.positionUnit(),
+                        layout.rotation(),
+                        layout.rotationUnit(),
+                        layout.scale(),
+                        layout.provenance()))
+            .orElse(null));
   }
 
   private static ObservedIntegerDto toolNumber(ObservedEvent event) {

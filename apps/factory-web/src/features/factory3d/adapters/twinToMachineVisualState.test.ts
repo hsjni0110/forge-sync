@@ -32,6 +32,14 @@ describe("mapTwinToMachineVisualState", () => {
       alarmSeverity: undefined,
       stale: false,
       selected: true,
+      spatial: {
+        assetId: "cnc-generic-primitive-v1",
+        sceneNodeId: "mazak01",
+        position: [0, 0.2, 0],
+        rotation: [0, -0.35, 0],
+        scale: [1, 1, 1],
+        provenance: "SIMULATED_LAYOUT",
+      },
     });
   });
 

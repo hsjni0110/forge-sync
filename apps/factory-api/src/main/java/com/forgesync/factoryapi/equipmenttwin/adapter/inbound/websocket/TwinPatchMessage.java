@@ -13,7 +13,7 @@ public record TwinPatchMessage(
     TwinSnapshotResponse snapshot) {
 
   public TwinPatchMessage {
-    if (!"1.3.0".equals(schemaVersion) || !"TWIN_PATCH".equals(type)) {
+    if (!"1.4.0".equals(schemaVersion) || !"TWIN_PATCH".equals(type)) {
       throw new IllegalArgumentException("Unsupported Twin patch contract");
     }
     if (!machineId.equals(snapshot.machine().machineId())

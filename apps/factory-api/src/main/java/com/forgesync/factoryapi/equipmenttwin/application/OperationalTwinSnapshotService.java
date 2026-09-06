@@ -33,12 +33,22 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
   private final TwinProjectionReader projectionReader;
   private final FreshnessPolicy freshnessPolicy;
   private final Clock clock;
+  private final SpatialLayoutProvider spatialLayoutProvider;
 
   public OperationalTwinSnapshotService(
       TwinProjectionReader projectionReader, FreshnessPolicy freshnessPolicy, Clock clock) {
+    this(projectionReader, freshnessPolicy, clock, machineId -> Optional.empty());
+  }
+
+  public OperationalTwinSnapshotService(
+      TwinProjectionReader projectionReader,
+      FreshnessPolicy freshnessPolicy,
+      Clock clock,
+      SpatialLayoutProvider spatialLayoutProvider) {
     this.projectionReader = Objects.requireNonNull(projectionReader);
     this.freshnessPolicy = Objects.requireNonNull(freshnessPolicy);
     this.clock = Objects.requireNonNull(clock);
+    this.spatialLayoutProvider = Objects.requireNonNull(spatialLayoutProvider);
   }
 
   @Override
@@ -82,7 +92,8 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         bAxisAngle,
         toolNumber,
         program,
-        conditions(observations));
+        conditions(observations),
+        spatialLayoutProvider.findByMachineId(projection.machineId()));
   }
 
   private static void requireConsistentVersion(LoadedTwinProjection projection) {

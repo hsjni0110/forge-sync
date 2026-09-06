@@ -36,6 +36,9 @@ dependencies {
 }
 
 tasks.processResources {
+    from("../../config/spatial/machine-layout-v1.json") {
+        into("config/spatial")
+    }
     from("../../contracts/observation-envelope/v2/observation-envelope.schema.json") {
         into("contracts/observation-envelope/v2")
     }

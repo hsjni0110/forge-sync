@@ -53,5 +53,13 @@ export function mapTwinToMachineVisualState({
     alarmSeverity: undefined,
     stale: freshness === "STALE",
     selected: selectedMachineId === snapshot.machine.machineId,
+    spatial: snapshot.spatial ? {
+      assetId: snapshot.spatial.assetId,
+      sceneNodeId: snapshot.spatial.sceneNodeId,
+      position: snapshot.spatial.position,
+      rotation: snapshot.spatial.rotation,
+      scale: snapshot.spatial.scale,
+      provenance: snapshot.spatial.provenance,
+    } : undefined,
   };
 }

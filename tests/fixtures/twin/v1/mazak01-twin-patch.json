@@ -1,12 +1,12 @@
 {
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "1.4.0",
   "type": "TWIN_PATCH",
   "machineId": "Mazak01",
   "baseVersion": 3,
   "targetVersion": 4,
   "projectedAt": "2026-09-02T01:02:04Z",
   "snapshot": {
-    "schemaVersion": "1.3.0",
+    "schemaVersion": "1.4.0",
     "machine": { "machineId": "Mazak01" },
     "consistency": {
       "status": "PARTIAL",
@@ -133,6 +133,15 @@
     "maintenance": {},
     "intelligence": {},
     "quality": {},
-    "spatial": {}
+    "spatial": {
+      "assetId": "cnc-generic-primitive-v1",
+      "sceneNodeId": "mazak01",
+      "position": [0, 0.2, 0],
+      "positionUnit": "SCENE_UNIT",
+      "rotation": [0, -0.35, 0],
+      "rotationUnit": "RADIAN",
+      "scale": [1, 1, 1],
+      "provenance": "SIMULATED_LAYOUT"
+    }
   }
 }

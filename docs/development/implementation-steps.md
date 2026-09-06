@@ -815,7 +815,7 @@ IQR 퇴화만 원인으로 봤으나, 실제로는 30개 동시 비교의 최댓
 
 **선행 조건**: Step 21, Step 24.
 
-### Step 26 — Spatial Metadata를 Twin 계약으로 이관
+### Step 26 — Spatial Metadata를 Twin 계약으로 이관 `DONE`
 
 **목적**: 3D 배치를 frontend 상수가 아니라 권위 Twin 계약에서 받는다.
 
@@ -838,6 +838,13 @@ renderer 코드를 고쳐야 한다. PRD 28은 spatial을 Twin에 두도록 정�
 - 설정만 바꿔 배치가 이동하며 renderer 코드 변경이 필요하지 않다.
 
 **완료 조건**: 배치가 데이터에서 오고, 실제 NIST 물리 위치라고 주장하지 않는 provenance가 함께 전달된다.
+
+**결과**: Twin `1.4.0`의 optional `spatial`에 asset/node identity, 3축 position/rotation/scale와
+`SIMULATED_LAYOUT` provenance를 추가했다. position은 물리 단위가 아닌 `SCENE_UNIT`, rotation은
+`RADIAN`, scale은 양수 무단위 배율이다. Mazak01 배치는
+`config/spatial/machine-layout-v1.json`에서 읽으며 불완전한 항목은 전체를 unavailable로 처리한다.
+frontend는 Twin adapter를 거쳐서만 renderer binding을 만들고, 누락 또는 알 수 없는 asset이면 기존
+procedural 기본 배치와 명시적 안내를 사용한다. [ADR-043](../adr/ADR-043-versioned-simulated-spatial-layout.md)
 
 **선행 조건**: Step 10, Step 14.
 

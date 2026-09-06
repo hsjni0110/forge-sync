@@ -21,9 +21,19 @@ public record TwinSnapshotResponse(
     Map<String, Object> maintenance,
     Map<String, Object> intelligence,
     Map<String, Object> quality,
-    Map<String, Object> spatial) {
+    SpatialDto spatial) {
 
   public record MachineDto(String machineId) {}
+
+  public record SpatialDto(
+      String assetId,
+      String sceneNodeId,
+      List<Double> position,
+      String positionUnit,
+      List<Double> rotation,
+      String rotationUnit,
+      List<Double> scale,
+      String provenance) {}
 
   public record ConsistencyDto(
       String status, long twinVersion, Instant projectedAt, List<String> missingFields) {}

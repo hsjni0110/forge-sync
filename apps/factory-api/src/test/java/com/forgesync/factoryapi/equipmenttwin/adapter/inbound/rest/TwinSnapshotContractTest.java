@@ -82,7 +82,7 @@ class TwinSnapshotContractTest {
   void rejectsWrongVersionMissingProvenanceAndUnavailableValue() {
     String valid = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
 
-    assertThat(violations(valid.replace("\"1.3.0\"", "\"2.0.0\""))).isNotEmpty();
+    assertThat(violations(valid.replace("\"1.4.0\"", "\"2.0.0\""))).isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"provenance\": \\{", "\"lineage\": {")))
         .isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"AVAILABLE\"", "\"UNAVAILABLE\""))).isNotEmpty();

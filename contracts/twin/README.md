@@ -7,7 +7,7 @@ GET /api/v1/machines/{machineId}/twin
 Accept: application/vnd.forgesync.twin.v1+json
 ```
 
-Version `1.3.0` is defined by
+Version `1.4.0` is defined by
 [`v1/twin-snapshot.schema.json`](./v1/twin-snapshot.schema.json). The schema keeps the PRD 27
 sections stable while the MVP populates machine identity, consistency, Replay Cursor, Equipment State, freshness,
 spindle speeds, tool, program, current Conditions, and field-level provenance. Unsupported business
@@ -40,3 +40,6 @@ The reader uses one repeatable-read transaction. A missing machine returns `404`
 `MACHINE_TWIN_NOT_FOUND`. A missing Equipment State, a mismatched state/Twin version, or a failed
 projection query returns `503` with `TWIN_SNAPSHOT_UNAVAILABLE`; no mixed-version snapshot is
 returned. Problem responses use `application/problem+json`.
+`spatial` is optional and atomic. Position uses non-physical `SCENE_UNIT`, rotation uses
+`RADIAN`, scale is a positive dimensionless multiplier, and current layouts retain
+`SIMULATED_LAYOUT` provenance.

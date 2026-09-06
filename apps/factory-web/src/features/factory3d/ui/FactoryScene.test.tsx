@@ -299,6 +299,7 @@ function binding(asset: typeof proceduralAsset | GlbFactoryAsset): MachineSceneB
     rotation: [0, 0, 0],
     scale: [1, 1, 1],
     spatialProvenance: "SIMULATED_LAYOUT",
+    spatialAvailability: "TWIN",
     visualSpindleSourceDataItemId: "Mazak01-C_5",
   };
 }

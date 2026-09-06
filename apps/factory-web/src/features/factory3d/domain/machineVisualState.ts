@@ -19,6 +19,16 @@ export interface MachineVisualState {
   stale: boolean;
   selected: boolean;
   isReplayAdvancing?: boolean;
+  spatial?: MachineSpatialLayout;
+}
+
+export interface MachineSpatialLayout {
+  assetId: string;
+  sceneNodeId: string;
+  position: readonly [number, number, number];
+  rotation: readonly [number, number, number];
+  scale: readonly [number, number, number];
+  provenance: "SIMULATED_LAYOUT";
 }
 
 export interface MachineSceneBinding {
@@ -29,6 +39,7 @@ export interface MachineSceneBinding {
   rotation: readonly [number, number, number];
   scale: readonly [number, number, number];
   spatialProvenance: "SIMULATED_LAYOUT";
+  spatialAvailability: "TWIN" | "FALLBACK";
   visualSpindleSourceDataItemId: string;
   bAxisCoordinateMapping?: BAxisCoordinateMapping;
 }

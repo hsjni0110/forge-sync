@@ -58,4 +58,14 @@ describe("Twin contract decoders", () => {
       new AjvTwinPatchDecoder().decode(JSON.stringify(invalidPatch), "Mazak01"),
     ).toThrow(/freshness/);
   });
+
+  it("accepts missing spatial metadata but rejects a partial layout", () => {
+    const missing = structuredClone(twinFixture);
+    delete (missing as Partial<typeof missing>).spatial;
+    expect(decodeTwinSnapshot(missing, "Mazak01").spatial).toBeUndefined();
+
+    const partial = structuredClone(twinFixture);
+    delete (partial.spatial as Partial<typeof partial.spatial>).rotationUnit;
+    expect(() => decodeTwinSnapshot(partial, "Mazak01")).toThrow(/contract/);
+  });
 });

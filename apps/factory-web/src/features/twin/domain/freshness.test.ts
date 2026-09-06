@@ -9,7 +9,7 @@ import {
 } from "./freshness";
 
 function snapshotFixture(): TwinSnapshot {
-  return structuredClone(twinFixture) as TwinSnapshot;
+  return structuredClone(twinFixture) as unknown as TwinSnapshot;
 }
 
 describe("browser freshness projection", () => {

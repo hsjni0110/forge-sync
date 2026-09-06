@@ -58,7 +58,7 @@ export interface CurrentCondition {
 }
 
 export interface TwinSnapshot {
-  schemaVersion: "1.3.0";
+  schemaVersion: "1.4.0";
   machine: { machineId: string };
   consistency: {
     status: "CONSISTENT" | "PARTIAL" | "STALE" | "DEGRADED";
@@ -102,11 +102,22 @@ export interface TwinSnapshot {
   maintenance: Record<string, never>;
   intelligence: Record<string, never>;
   quality: Record<string, never>;
-  spatial: Record<string, never>;
+  spatial?: SpatialLayout;
+}
+
+export interface SpatialLayout {
+  assetId: string;
+  sceneNodeId: string;
+  position: [number, number, number];
+  positionUnit: "SCENE_UNIT";
+  rotation: [number, number, number];
+  rotationUnit: "RADIAN";
+  scale: [number, number, number];
+  provenance: "SIMULATED_LAYOUT";
 }
 
 export interface TwinPatch {
-  schemaVersion: "1.3.0";
+  schemaVersion: "1.4.0";
   type: "TWIN_PATCH";
   machineId: string;
   baseVersion: number;

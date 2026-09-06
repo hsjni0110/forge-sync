@@ -35,7 +35,57 @@ public record OperationalTwinSnapshot(
     Optional<ObservedAngle> bAxisAngle,
     Optional<ObservedEvent> toolNumber,
     Optional<ObservedEvent> program,
-    List<CurrentCondition> conditions) {
+    List<CurrentCondition> conditions,
+    Optional<SpatialLayout> spatial) {
+
+  public OperationalTwinSnapshot(
+      String machineId,
+      TwinVersion twinVersion,
+      Instant projectedAt,
+      ReplayCursor replayCursor,
+      TwinConsistencyState consistencyState,
+      List<String> missingFields,
+      ConnectivityState connectivity,
+      ExecutionState execution,
+      HealthState health,
+      FreshnessState freshness,
+      Instant evaluatedAt,
+      Duration age,
+      long freshMaxAgeMillis,
+      long laggingMaxAgeMillis,
+      List<FieldProvenance> connectivityProvenance,
+      List<FieldProvenance> executionProvenance,
+      List<FieldProvenance> healthProvenance,
+      List<SpindleSpeed> spindleSpeeds,
+      Optional<ObservedAngle> bAxisAngle,
+      Optional<ObservedEvent> toolNumber,
+      Optional<ObservedEvent> program,
+      List<CurrentCondition> conditions) {
+    this(
+        machineId,
+        twinVersion,
+        projectedAt,
+        replayCursor,
+        consistencyState,
+        missingFields,
+        connectivity,
+        execution,
+        health,
+        freshness,
+        evaluatedAt,
+        age,
+        freshMaxAgeMillis,
+        laggingMaxAgeMillis,
+        connectivityProvenance,
+        executionProvenance,
+        healthProvenance,
+        spindleSpeeds,
+        bAxisAngle,
+        toolNumber,
+        program,
+        conditions,
+        Optional.empty());
+  }
 
   public OperationalTwinSnapshot(
       String machineId,
@@ -81,7 +131,8 @@ public record OperationalTwinSnapshot(
         bAxisAngle,
         toolNumber,
         program,
-        conditions);
+        conditions,
+        Optional.empty());
   }
 
   public OperationalTwinSnapshot {
@@ -108,6 +159,7 @@ public record OperationalTwinSnapshot(
     Objects.requireNonNull(toolNumber, "toolNumber");
     Objects.requireNonNull(program, "program");
     conditions = List.copyOf(conditions);
+    Objects.requireNonNull(spatial, "spatial");
   }
 
   public record ObservationMetadata(
