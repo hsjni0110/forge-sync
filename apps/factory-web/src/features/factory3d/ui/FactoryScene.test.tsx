@@ -10,6 +10,7 @@ import type {
 import { deriveMachineVisualPresentation } from "../domain/machineVisualPresentation";
 import { MAZAK01_OBSERVED_DELTA_MAPPINGS } from "../adapters/mazak01ObservedDeltaMapping";
 import FactoryScene from "./FactoryScene";
+import type { SceneToolpath } from "../../toolpath/domain/observedToolpath";
 
 const loadVerifiedGlbAsset = vi.hoisted(() => vi.fn());
 const canvasBehavior = vi.hoisted(() => ({ rendersScene: true }));
@@ -196,6 +197,13 @@ describe("FactoryScene asset isolation", () => {
   });
 
   it("provides the complete functional node hierarchy and simulated workpiece provenance", async () => {
+    const toolpath: SceneToolpath = {
+      points: [
+        { replaySequence: 10, position: [0, 0, 0] },
+        { replaySequence: 12, position: [0.2, 0.1, -0.1] },
+      ],
+      envelope: { minimum: [0, 0, -0.1], maximum: [0.2, 0.1, 0] },
+    };
     const { container } = render(
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
@@ -204,6 +212,8 @@ describe("FactoryScene asset isolation", () => {
         onSelectMachine={vi.fn()}
         onAssetFallback={vi.fn()}
         onUnavailable={vi.fn()}
+        observedToolpath={toolpath}
+        selectedRunLabel="PGM 114"
       />,
     );
 
@@ -214,6 +224,12 @@ describe("FactoryScene asset isolation", () => {
     expect(screen.getByText(/B축 45° · 좌표 매핑 검증 전 · unavailable/)).toBeTruthy();
     expect(screen.getByText(/XYZ 이동 · X 80.08 mm · Y -68.79 mm · Z 9.64 mm/)).toBeTruthy();
     expect(screen.getByText(/관측 변화 OBSERVED · 기준 자세·축척 SIMULATED/)).toBeTruthy();
+    expect(container.querySelector('primitive[name="observed-toolpath-trail"]')).toBeTruthy();
+    expect(container.querySelector('primitive[name="observed-toolpath-envelope"]')).toBeTruthy();
+    expect(screen.getByText(/PGM 114의 관측 위치 2점을 연결한 경로/)).toBeTruthy();
+    expect(screen.getByText(/실제 절삭 흔적이나 기계 이동 한계가 아닙니다/)).toBeTruthy();
+    fireEvent.click(screen.getByRole("checkbox", { name: "관측 경로" }));
+    expect(container.querySelector('primitive[name="observed-toolpath-trail"]')).toBeNull();
   });
 
   it("keeps camera controls compact while preserving keyboard commands and part focus", async () => {

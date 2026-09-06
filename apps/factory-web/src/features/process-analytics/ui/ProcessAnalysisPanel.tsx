@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ReplaySessionState } from "../../replay/domain/replay";
 import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
 import { HttpProcessAnalysisClient } from "../adapters/httpProcessAnalysisClient";
@@ -15,11 +15,13 @@ const browserClient = new HttpProcessAnalysisClient(import.meta.env.VITE_API_BAS
 
 export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin, reloadReplay, seek,
   client = browserClient, layout = "FULL",
+  onSelectedRunChange,
 }: {
   machineId: string; session?: ReplaySessionState; twinState: TwinLiveState;
   retryTwin: () => void; reloadReplay: () => Promise<void>; seek: (sourceObservedAt: string) => void;
   client?: ProcessAnalysisClient;
   layout?: "FULL" | "COMPACT";
+  onSelectedRunChange?: (run: MachiningRun | undefined) => void;
 }) {
   const { analysis, message, canRetry, retry } = useProcessAnalysis({
     machineId, session, twinState, client, retryTwin, reloadReplay,
@@ -32,6 +34,7 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
   const current = analysis && cursor ? currentRun(analysis.runs, cursor) : undefined;
   const selected = selection?.analysis === analysis
     ? analysis?.runs.find((run) => run.id === selection?.runId) : current;
+  useEffect(() => onSelectedRunChange?.(selected), [onSelectedRunChange, selected]);
   const filtered = useMemo(
     () => filterAndGroupRuns(analysis?.runs ?? [], filters),
     [analysis, filters],

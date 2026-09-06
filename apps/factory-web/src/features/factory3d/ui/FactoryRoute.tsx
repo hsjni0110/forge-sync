@@ -27,6 +27,10 @@ import type {
 } from "./factorySceneContract";
 import { useReducedMotionPreference } from "./useReducedMotionPreference";
 import type { ToolChangeClient } from "../../tool-change/application/ports";
+import type { ObservedToolpathClient } from "../../toolpath/application/ports";
+import type { MachiningRun } from "../../process-analytics/domain/processAnalysis";
+import { useObservedToolpath } from "../../toolpath/ui/useObservedToolpath";
+import { mapObservedToolpathToScene } from "../../toolpath/domain/observedToolpath";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
@@ -36,18 +40,21 @@ export function FactoryRoute({
   sceneLoader,
   processAnalysisClient,
   toolChangeClient,
+  observedToolpathClient,
 }: {
   sessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   sceneLoader: FactorySceneLoader;
   processAnalysisClient?: ProcessAnalysisClient;
   toolChangeClient?: ToolChangeClient;
+  observedToolpathClient?: ObservedToolpathClient;
 }) {
   const [viewMode, setViewMode] = useState<FactoryViewMode>("SPLIT");
   const [unavailableReason, setUnavailableReason] =
     useState<SceneUnavailableReason>();
   const [isAssetFallback, setIsAssetFallback] = useState(false);
   const [sceneAttempt, setSceneAttempt] = useState(0);
+  const [selectedRun, setSelectedRun] = useState<MachiningRun>();
   const { isReducedMotion, toggleReducedMotion } = useReducedMotionPreference();
   const selectionStore = useMemo(
     () => new MachineSelectionStore(MAZAK01_SCENE_BINDING.machineId),
@@ -88,6 +95,27 @@ export function FactoryRoute({
   const machineBinding = useMemo(
     () => sceneBindingFromTwin(visualState?.spatial),
     [visualState?.spatial],
+  );
+  const toolpathRequest = useMemo(() => {
+    const cursor = twinState.snapshot?.replayCursor;
+    if (!selectedRun || !cursor) return undefined;
+    return {
+      machineId,
+      replaySessionId: cursor.replaySessionId,
+      startSequence: selectedRun.startSequence,
+      endSequence: selectedRun.endSequence ?? cursor.replaySequence,
+      throughReplaySequence: cursor.replaySequence,
+      resetKey: replay.authoritativeSession
+        ? `${replay.authoritativeSession.revision}:${replay.authoritativeSession.speedMultiplier}`
+        : undefined,
+    };
+  }, [machineId, replay.authoritativeSession, selectedRun, twinState.snapshot?.replayCursor]);
+  const observedPath = useObservedToolpath(observedToolpathClient, toolpathRequest);
+  const sceneToolpath = useMemo(
+    () => observedPath.document && machineBinding.linearAxisCoordinateMappings
+      ? mapObservedToolpathToScene(observedPath.document, machineBinding.linearAxisCoordinateMappings)
+      : undefined,
+    [machineBinding.linearAxisCoordinateMappings, observedPath.document],
   );
   const staleAfterSeconds =
     (twinState.snapshot?.state.freshness.laggingMaxAgeMillis ?? 10_000) / 1_000;
@@ -199,6 +227,9 @@ export function FactoryRoute({
                       visualState={visualState}
                       visualPresentation={visualPresentation}
                       isReducedMotion={isReducedMotion}
+                      observedToolpath={sceneToolpath}
+                      selectedRunLabel={selectedRun?.program ? `PGM ${selectedRun.program}` : "선택한 가공"}
+                      toolpathStatus={observedPath.message}
                       onSelectMachine={selectionStore.selectMachine}
                       onAssetFallback={() => setIsAssetFallback(true)}
                       onUnavailable={setUnavailableReason}
@@ -227,8 +258,10 @@ export function FactoryRoute({
             {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
               session={replay.authoritativeSession} twinState={twinState} client={processAnalysisClient}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}
+              onSelectedRunChange={setSelectedRun}
               retryTwin={retryNow} reloadReplay={replay.reload} seek={(at) => void replay.run("SEEKING", (current) =>
                 replayControlClient.seek(current.replaySessionId, current.revision, at, current.speedMultiplier))} />}
+            {showsScene && <p className="section-note" role="status">{observedPath.message}</p>}
           </section>
         )}
       </div>

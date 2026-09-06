@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0.0",
+  "machineId": "Mazak01",
+  "replaySessionId": "10000000-0000-4000-8000-000000000001",
+  "startSequence": 10,
+  "endSequence": 12,
+  "availability": "AVAILABLE",
+  "classification": "OBSERVED_PATH",
+  "points": [
+    {
+      "replaySequence": 10,
+      "sourceObservedAt": "2016-10-05T09:00:00Z",
+      "coordinatesMillimeters": [1.0, 2.0, 3.0],
+      "sourceObservations": [
+        { "axis": "X", "replaySequence": 10, "sourceObservedAt": "2016-10-05T09:00:00Z", "sourceDataItemId": "Mazak01-X_1", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:artifact", "rawRecordId": "sha256:artifact#line=10", "mappingVersion": "2.1.0" },
+        { "axis": "Y", "replaySequence": 8, "sourceObservedAt": "2016-10-05T08:59:59Z", "sourceDataItemId": "Mazak01-Y_1", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:artifact", "rawRecordId": "sha256:artifact#line=8", "mappingVersion": "2.1.0" },
+        { "axis": "Z", "replaySequence": 9, "sourceObservedAt": "2016-10-05T08:59:59.500Z", "sourceDataItemId": "Mazak01-Z_1", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:artifact", "rawRecordId": "sha256:artifact#line=9", "mappingVersion": "2.1.0" }
+      ]
+    },
+    {
+      "replaySequence": 12,
+      "sourceObservedAt": "2016-10-05T09:00:00.100Z",
+      "coordinatesMillimeters": [1.5, 2.5, 3.5],
+      "sourceObservations": [
+        { "axis": "X", "replaySequence": 10, "sourceObservedAt": "2016-10-05T09:00:00Z", "sourceDataItemId": "Mazak01-X_1", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:artifact", "rawRecordId": "sha256:artifact#line=10", "mappingVersion": "2.1.0" },
+        { "axis": "Y", "replaySequence": 11, "sourceObservedAt": "2016-10-05T09:00:00.050Z", "sourceDataItemId": "Mazak01-Y_1", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:artifact", "rawRecordId": "sha256:artifact#line=11", "mappingVersion": "2.1.0" },
+        { "axis": "Z", "replaySequence": 12, "sourceObservedAt": "2016-10-05T09:00:00.100Z", "sourceDataItemId": "Mazak01-Z_1", "sourceSetId": "nist-mazak01-20161005", "artifactId": "sha256:artifact", "rawRecordId": "sha256:artifact#line=12", "mappingVersion": "2.1.0" }
+      ]
+    }
+  ],
+  "observedEnvelope": { "minimumMillimeters": [1.0, 2.0, 3.0], "maximumMillimeters": [1.5, 2.5, 3.5] }
+}

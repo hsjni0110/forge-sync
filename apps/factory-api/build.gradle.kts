@@ -69,6 +69,9 @@ tasks.processResources {
     from("../../contracts/tool-changes/v1/tool-change-timeline.schema.json") {
         into("contracts/tool-changes/v1")
     }
+    from("../../contracts/toolpath/v1/observed-toolpath.schema.json") {
+        into("contracts/toolpath/v1")
+    }
 }
 
 tasks.processTestResources {
@@ -86,6 +89,9 @@ tasks.processTestResources {
     }
     from("../../tests/fixtures/tool-changes/v1") {
         into("fixtures/tool-changes/v1")
+    }
+    from("../../tests/fixtures/toolpath/v1") {
+        into("fixtures/toolpath/v1")
     }
 }
 

@@ -6,12 +6,16 @@ import type { FactorySceneProps } from "./factorySceneContract";
 import { MachineTwin } from "./MachineTwin";
 import { CameraNavigationRig, type CameraCommand, type CameraCommandType } from "./CameraNavigationRig";
 import type { MachineInspectionPartId, MachineTwinModel } from "./model/machineTwinModel";
+import { ObservedToolpathTrail } from "./ObservedToolpathTrail";
 
 export default function FactoryScene({
   machineBinding,
   visualState,
   visualPresentation,
   isReducedMotion = false,
+  observedToolpath,
+  selectedRunLabel,
+  toolpathStatus,
   onSelectMachine,
   onAssetFallback,
   onUnavailable,
@@ -24,6 +28,7 @@ export default function FactoryScene({
   const [selectedPartId, setSelectedPartId] = useState<MachineInspectionPartId>();
   const [hoveredPartId, setHoveredPartId] = useState<MachineInspectionPartId>();
   const [isEnclosureTransparent, setIsEnclosureTransparent] = useState(false);
+  const [isToolpathVisible, setIsToolpathVisible] = useState(true);
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>();
   const cameraSequence = useRef(0);
   const handleModelReady = useCallback((readyModel?: MachineTwinModel) => {
@@ -103,6 +108,15 @@ export default function FactoryScene({
           onHoverPart={setHoveredPartId}
           onModelReady={handleModelReady}
         />
+        {isToolpathVisible && observedToolpath && (
+          <group
+            position={machineBinding.position}
+            rotation={machineBinding.rotation}
+            scale={machineBinding.scale}
+          >
+            <ObservedToolpathTrail toolpath={observedToolpath} />
+          </group>
+        )}
         <CameraNavigationRig
           model={model}
           command={cameraCommand}
@@ -127,6 +141,11 @@ export default function FactoryScene({
         bAxisStatus={bAxisStatus(machineBinding, visualState)}
         linearAxisStatus={linearAxisStatus(machineBinding, visualState, model)}
         toolStatus={toolStatus(visualState)}
+        observedToolpath={observedToolpath}
+        selectedRunLabel={selectedRunLabel}
+        toolpathStatus={toolpathStatus}
+        isToolpathVisible={isToolpathVisible}
+        toggleToolpath={() => setIsToolpathVisible((current) => !current)}
       />
     </div>
   );
@@ -142,6 +161,11 @@ function MachineInspectionControls({
   bAxisStatus,
   linearAxisStatus,
   toolStatus,
+  observedToolpath,
+  selectedRunLabel,
+  toolpathStatus,
+  isToolpathVisible,
+  toggleToolpath,
 }: {
   model?: MachineTwinModel;
   selectedPartId?: MachineInspectionPartId;
@@ -152,6 +176,11 @@ function MachineInspectionControls({
   bAxisStatus: string;
   linearAxisStatus: string;
   toolStatus: string;
+  observedToolpath: FactorySceneProps["observedToolpath"];
+  selectedRunLabel?: string;
+  toolpathStatus?: string;
+  isToolpathVisible: boolean;
+  toggleToolpath: () => void;
 }) {
   const cameraButtons: Array<[string, string, CameraCommandType]> = [
     ["축소", "−", "ZOOM_OUT"],
@@ -204,6 +233,15 @@ function MachineInspectionControls({
           />
           외함 반투명
         </label>
+        <label>
+          <input
+            type="checkbox"
+            checked={isToolpathVisible}
+            disabled={!observedToolpath}
+            onChange={toggleToolpath}
+          />
+          관측 경로
+        </label>
         {!model?.inspection.enclosure && model && (
           <span className="inspection-capability-note">이 모델은 외함 투명화를 지원하지 않습니다.</span>
         )}
@@ -220,6 +258,11 @@ function MachineInspectionControls({
         <span>{linearAxisStatus}</span>
         <span>관측 변화 OBSERVED · 기준 자세·축척 SIMULATED</span>
         <span>{toolStatus}</span>
+        {observedToolpath && <>
+          <span>{selectedRunLabel ?? "선택한 가공"}의 관측 위치 {observedToolpath.points.length}점을 연결한 경로</span>
+          <span>관측 범위 상자는 실제 절삭 흔적이나 기계 이동 한계가 아닙니다.</span>
+        </>}
+        {!observedToolpath && toolpathStatus && <span>{toolpathStatus}</span>}
       </details>
       <span className="visually-hidden" role="status">
         {selectedPartId && model ? `${model.inspection.parts[selectedPartId].label} 선택됨` : "선택한 부품 없음"}

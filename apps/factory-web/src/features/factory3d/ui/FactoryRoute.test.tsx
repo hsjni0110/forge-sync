@@ -11,12 +11,50 @@ import type { TwinSnapshot } from "../../twin/domain/twin";
 import { FactoryRoute } from "./FactoryRoute";
 import type { FactorySceneProps } from "./factorySceneContract";
 import type { ProcessAnalysisClient } from "../../process-analytics/application/ports";
+import type { ObservedToolpathClient } from "../../toolpath/application/ports";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
 
 afterEach(cleanup);
 
 describe("FactoryRoute", () => {
+  it("loads only the selected machining run path at the authoritative cursor", async () => {
+    const processAnalysisClient: ProcessAnalysisClient = { analyze: vi.fn().mockResolvedValue({
+      processingId: "runs", featureProcessingId: "features", assessmentProcessingId: "assessments",
+      runs: [{ id: "selected", status: "INTERRUPTED", program: "114",
+        startedAt: "2016-10-05T09:00:00Z",
+        startSequence: 1, confidence: "HIGH", reasons: [], evidence: [] }],
+    }) };
+    const observedToolpathClient: ObservedToolpathClient = { find: vi.fn().mockResolvedValue({
+      schemaVersion: "1.0.0", machineId: "Mazak01",
+      replaySessionId: snapshot.replayCursor.replaySessionId,
+      startSequence: 1, endSequence: 4, availability: "AVAILABLE", classification: "OBSERVED_PATH",
+      points: [
+        { replaySequence: 1, sourceObservedAt: "2016-10-05T09:00:00Z",
+          coordinatesMillimeters: [0, 0, 10], sourceObservations: [] },
+        { replaySequence: 4, sourceObservedAt: snapshot.replayCursor.sourceObservedAt,
+          coordinatesMillimeters: [10, -5, 20], sourceObservations: [] },
+      ],
+      observedEnvelope: { minimumMillimeters: [0, -5, 10], maximumMillimeters: [10, 0, 20] },
+    }) };
+    const replayControlClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue({ schemaVersion: "1.0.0", machineId: "Mazak01",
+        replaySessionId: snapshot.replayCursor.replaySessionId, sourceSetId: "nist-mazak01-20161005",
+        status: "PAUSED", revision: 2, speedMultiplier: 10, publicationCursor: snapshot.replayCursor,
+        sourceRange: { startsAt: "2016-10-05T05:27:55.740Z", endsAt: "2016-10-05T19:15:07.025Z" } }),
+      start: vi.fn(), pause: vi.fn(), resume: vi.fn(), changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    render(<MemoryRouter><FactoryRoute sessionFactory={createSession} replayControlClient={replayControlClient}
+      processAnalysisClient={processAnalysisClient} observedToolpathClient={observedToolpathClient}
+      sceneLoader={async () => ({ default: HealthyScene })} /></MemoryRouter>);
+
+    expect(await screen.findByText("3D observed path · 2 points · PGM 114")).toBeTruthy();
+    expect(observedToolpathClient.find).toHaveBeenCalledWith(expect.objectContaining({
+      replaySessionId: snapshot.replayCursor.replaySessionId,
+      startSequence: 1, endSequence: 4, throughReplaySequence: 4,
+    }), expect.any(AbortSignal));
+  });
+
   it("keeps current process analysis available after WebGL fails", async () => {
     const processAnalysisClient: ProcessAnalysisClient = { analyze: vi.fn().mockResolvedValue({
       processingId: "runs", featureProcessingId: "features", assessmentProcessingId: "assessments",
@@ -222,6 +260,8 @@ function HealthyScene({
   visualState,
   visualPresentation,
   onSelectMachine,
+  observedToolpath,
+  selectedRunLabel,
 }: FactorySceneProps) {
   return (
     <div>
@@ -237,6 +277,7 @@ function HealthyScene({
         3D visual · {visualPresentation.status} · animation{" "}
         {visualPresentation.isSpindleAnimating ? "on" : "off"}
       </span>
+      {observedToolpath && <span>3D observed path · {observedToolpath.points.length} points · {selectedRunLabel}</span>}
     </div>
   );
 }

@@ -59,4 +59,15 @@ describe("ProcessAnalysisPanel scale controls", () => {
     expect(screen.getByText(/현재 필터에서 제외/)).toBeTruthy();
     expect(screen.queryByRole("button", { name: "가공 시작 시점으로 이동" })).toBeNull();
   });
+
+  it("publishes the selected run for the 3D observed path", () => {
+    const onSelectedRunChange = vi.fn();
+    render(<ProcessAnalysisPanel machineId="Mazak01" session={session} twinState={twinState}
+      retryTwin={vi.fn()} reloadReplay={vi.fn()} seek={vi.fn()}
+      onSelectedRunChange={onSelectedRunChange} />);
+
+    fireEvent.click(screen.getAllByRole("button", { name: /가공 선택 · 1001/ })[0]);
+
+    expect(onSelectedRunChange).toHaveBeenLastCalledWith(analysis.runs[0]);
+  });
 });

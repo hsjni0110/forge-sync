@@ -967,7 +967,7 @@ CONDITION이므로 행정 범위 근거로 사용할 수 없다. Devices.xml은 
 가지며 renderer는 이름 검색 없이 관측 delta를 바인딩한다. stale, gap, invalid update는 마지막
 검증 자세를 진행시키지 않고 reduced motion에서는 즉시 반영한다. [ADR-046](../adr/ADR-046-observed-linear-axis-delta-visualization.md)
 
-### Step 30 — Toolpath Trail과 Work Envelope
+### Step 30 — Toolpath Trail과 Work Envelope ✅ DONE
 
 **목적**: replay 구간의 X/Y/Z 궤적을 유한한 시각 자산으로 누적해 실제 이동 경로를 공간에서 설명한다.
 
@@ -990,6 +990,13 @@ CONDITION이므로 행정 범위 근거로 사용할 수 없다. Devices.xml은 
 절삭이나 재료 제거가 아니라고 화면에서 밝힌다.
 
 **선행 조건**: Step 29.
+
+**구현 기록**: Observed Toolpath `1.0.0` 조회 계약은 선택한 `MachiningRun`의 sequence 범위와 현재
+Replay watermark까지만 읽는다. X/Y/Z가 모두 유효한 source observation 조합만 점으로 만들고,
+`UNAVAILABLE` gap에서는 해당 축을 비워 세 축이 다시 확인될 때까지 선을 잇지 않는다. 100ms 간격으로
+결정적으로 decimation하고 최신 2,048점으로 제한하며 모든 점에 세 축의 provenance를 보존한다.
+3D는 차분한 단색 선과 반환된 점의 observed envelope만 표시한다. 화면은 이를 실제 절삭 흔적, 소재 제거,
+충돌 안전 범위 또는 기계 행정 한계라고 주장하지 않는다. [ADR-047](../adr/ADR-047-selected-run-observed-toolpath.md)
 
 ### Step 31 — Functional Twin Replay Acceptance
 

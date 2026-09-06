@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/toolpath/v1/observed-toolpath.schema.json",
+  "title": "Observed Toolpath v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "machineId", "replaySessionId", "startSequence", "endSequence", "availability", "classification", "points"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "startSequence": { "type": "integer", "minimum": 0 },
+    "endSequence": { "type": "integer", "minimum": 0 },
+    "availability": { "enum": ["AVAILABLE", "UNAVAILABLE"] },
+    "reason": { "type": "string", "minLength": 1 },
+    "classification": { "const": "OBSERVED_PATH" },
+    "points": { "type": "array", "maxItems": 2048, "items": { "$ref": "#/$defs/point" } },
+    "observedEnvelope": { "$ref": "#/$defs/envelope" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+      "then": { "required": ["observedEnvelope"], "properties": { "observedEnvelope": true, "points": { "minItems": 2 } } },
+      "else": { "required": ["reason"], "properties": { "reason": true, "points": { "maxItems": 0 } } }
+    }
+  ],
+  "$defs": {
+    "vector3": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": { "type": "number" }
+    },
+    "point": {
+      "type": "object", "additionalProperties": false,
+      "required": ["replaySequence", "sourceObservedAt", "coordinatesMillimeters", "sourceObservations"],
+      "properties": {
+        "replaySequence": { "type": "integer", "minimum": 0 },
+        "sourceObservedAt": { "type": "string", "format": "date-time" },
+        "coordinatesMillimeters": { "$ref": "#/$defs/vector3" },
+        "sourceObservations": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["axis", "replaySequence", "sourceObservedAt", "sourceDataItemId", "sourceSetId", "artifactId", "rawRecordId", "mappingVersion"],
+            "properties": {
+              "axis": { "enum": ["X", "Y", "Z"] },
+              "replaySequence": { "type": "integer", "minimum": 0 },
+              "sourceObservedAt": { "type": "string", "format": "date-time" },
+              "sourceDataItemId": { "type": "string", "minLength": 1 },
+              "sourceSetId": { "type": "string", "minLength": 1 },
+              "artifactId": { "type": "string", "minLength": 1 },
+              "rawRecordId": { "type": "string", "minLength": 1 },
+              "mappingVersion": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "envelope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["minimumMillimeters", "maximumMillimeters"],
+      "properties": {
+        "minimumMillimeters": { "$ref": "#/$defs/vector3" },
+        "maximumMillimeters": { "$ref": "#/$defs/vector3" }
+      }
+    }
+  }
+}

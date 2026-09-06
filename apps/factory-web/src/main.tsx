@@ -6,6 +6,7 @@ import { App } from "./features/shell/ui/App";
 import { createBrowserTwinSessionFactory } from "./features/twin/adapters/browserTwinSessionFactory";
 import { HttpReplayControlClient } from "./features/replay/adapters/httpReplayControlClient";
 import { HttpToolChangeClient } from "./features/tool-change/adapters/httpToolChangeClient";
+import { HttpObservedToolpathClient } from "./features/toolpath/adapters/httpObservedToolpathClient";
 import "./styles.css";
 
 const root = document.getElementById("root");
@@ -16,6 +17,7 @@ const replayControlClient = new HttpReplayControlClient(
   import.meta.env.VITE_API_BASE_URL ?? "",
 );
 const toolChangeClient = new HttpToolChangeClient(import.meta.env.VITE_API_BASE_URL ?? "");
+const observedToolpathClient = new HttpObservedToolpathClient(import.meta.env.VITE_API_BASE_URL ?? "");
 
 if (root === null) {
   throw new Error("ForgeSync root element is missing");
@@ -25,7 +27,7 @@ createRoot(root).render(
   <StrictMode>
     <BrowserRouter>
       <App twinSessionFactory={twinSessionFactory} replayControlClient={replayControlClient}
-        toolChangeClient={toolChangeClient} />
+        toolChangeClient={toolChangeClient} observedToolpathClient={observedToolpathClient} />
     </BrowserRouter>
   </StrictMode>,
 );

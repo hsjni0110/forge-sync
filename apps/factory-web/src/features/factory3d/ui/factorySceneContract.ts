@@ -5,6 +5,7 @@ import type {
   MachineVisualState,
 } from "../domain/machineVisualState";
 import type { MachineVisualPresentation } from "../domain/machineVisualPresentation";
+import type { SceneToolpath } from "../../toolpath/domain/observedToolpath";
 
 export type SceneUnavailableReason = "BUNDLE_OR_SCENE" | "WEBGL";
 
@@ -13,6 +14,9 @@ export interface FactorySceneProps {
   visualState: MachineVisualState | undefined;
   visualPresentation: MachineVisualPresentation;
   isReducedMotion?: boolean;
+  observedToolpath?: SceneToolpath;
+  selectedRunLabel?: string;
+  toolpathStatus?: string;
   onSelectMachine: (machineId: string) => void;
   onAssetFallback: () => void;
   onUnavailable: (reason: SceneUnavailableReason) => void;
