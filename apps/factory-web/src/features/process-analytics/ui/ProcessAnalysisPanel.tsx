@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ReplaySessionState } from "../../replay/domain/replay";
 import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
 import { HttpProcessAnalysisClient } from "../adapters/httpProcessAnalysisClient";
 import type { ProcessAnalysisClient } from "../application/ports";
 import { currentRun, runStatusLabel, sampleProgressLabel, type MachiningRun, type RunAnalysis } from "../domain/processAnalysis";
+import { filterAndGroupRuns, layoutTimeline, runDurationSeconds, type RunClassification, type RunFilters } from "../domain/processTimeline";
 import { GLOSSARY } from "../domain/processGlossary";
 import { classificationLabel, confidenceLabel, RunDetail } from "./RunDetail";
 import { HelpTip } from "./HelpTip";
@@ -23,10 +24,28 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
     machineId, session, twinState, client, retryTwin, reloadReplay,
   });
   const [selection, setSelection] = useState<{ analysis: RunAnalysis; runId: string }>();
+  const [filters, setFilters] = useState<RunFilters>({ programs: [], classifications: [] });
+  const [excludedSelection, setExcludedSelection] = useState(false);
+  const [visibleRunCount, setVisibleRunCount] = useState(40);
   const cursor = twinState.snapshot?.replayCursor;
   const current = analysis && cursor ? currentRun(analysis.runs, cursor) : undefined;
   const selected = selection?.analysis === analysis
     ? analysis?.runs.find((run) => run.id === selection?.runId) : current;
+  const filtered = useMemo(
+    () => filterAndGroupRuns(analysis?.runs ?? [], filters),
+    [analysis, filters],
+  );
+  const updateFilters = (next: RunFilters) => {
+    const selectedRunId = selection && selection.analysis === analysis ? selection.runId : undefined;
+    if (selectedRunId && !filterAndGroupRuns(analysis?.runs ?? [], next).runs.some((run) => run.id === selectedRunId)) {
+      setSelection(undefined);
+      setExcludedSelection(true);
+    } else {
+      setExcludedSelection(false);
+    }
+    setVisibleRunCount(40);
+    setFilters(next);
+  };
   return <div className="process-analysis" data-process-version={analysis ? cursor?.twinVersion : undefined}
     data-process-session={analysis ? cursor?.replaySessionId : undefined}>
     {layout === "FULL" && <div className="process-glossary">
@@ -62,11 +81,14 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
     {analysis && layout === "FULL" && <section className="detail-section" aria-label="가공 목록과 상세">
       <h2>Process Timeline · 가공 목록</h2>
       <p className="section-note">가공을 하나 선택하면 근거와 이전 가공과의 차이를 볼 수 있습니다. 선택만으로는 재생 위치가 바뀌지 않습니다.</p>
-      <RunTimelineOverview runs={analysis.runs} selectedId={selected?.id} cursorAt={cursor?.sourceObservedAt}
+      <RunFiltersPanel runs={analysis.runs} filters={filters} onChange={updateFilters} />
+      {excludedSelection && <p className="notice notice-warning" role="status">선택한 가공이 현재 필터에서 제외되어 선택을 해제했습니다.</p>}
+      <ProgramGroupSummary groups={filtered.groups} />
+      <RunTimelineOverview runs={filtered.runs} range={session?.sourceRange} selectedId={selected?.id} cursorAt={cursor?.sourceObservedAt}
         onSelect={(runId) => setSelection({ analysis, runId })} />
       <p className="section-note">막대는 실제 가공 시간, 막대 사이 빈 공간은 유휴 시간입니다. 노란 선은 현재 재생 위치입니다.</p>
       <ol className="run-timeline" aria-label="가공 타임라인">
-        {analysis.runs.map((run) => {
+        {filtered.runs.slice(0, visibleRunCount).map((run) => {
           const badge = runTimelineBadge(run);
           const duration = run.endedAt ? (Date.parse(run.endedAt) - Date.parse(run.startedAt)) / 1000 : undefined;
           const compare = durationComparison(run);
@@ -91,6 +113,11 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
           </li>;
         })}
       </ol>
+      {filtered.runs.length > visibleRunCount && <button type="button" className="button-quiet"
+        onClick={() => setVisibleRunCount((count) => count + 40)}>
+        더 보기 · {filtered.runs.length - visibleRunCount}건 남음
+      </button>}
+      {filtered.runs.length === 0 && <p className="empty-state">조건에 맞는 가공이 없습니다.</p>}
       {selected && <div className="run-seek-actions" role="group" aria-label="선택한 가공 시점으로 재생 이동">
         <button type="button" className="button-quiet" onClick={() => seek(selected.startedAt)}>가공 시작 시점으로 이동</button>
         {selected.endedAt && <button type="button" className="button-quiet" onClick={() => seek(selected.endedAt!)}>가공 종료 시점으로 이동</button>}
@@ -105,20 +132,60 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
   </div>;
 }
 
-const OVERVIEW_MIN_WIDTH_PERCENT = 2;
 const OVERVIEW_TICK_COUNT = 4;
 const OVERVIEW_LABEL_MIN_WIDTH_PERCENT = 12;
+const CLASSIFICATION_OPTIONS: Array<{ value: RunClassification; label: string }> = [
+  { value: "NORMAL", label: "정상" },
+  { value: "DEVIATING", label: "차이 있음" },
+  { value: "HIGH_DEVIATION", label: "큰 차이" },
+  { value: "UNAVAILABLE", label: "평가 불가" },
+];
 
-function RunTimelineOverview({ runs, selectedId, onSelect, cursorAt }: {
-  runs: MachiningRun[]; selectedId?: string; onSelect: (runId: string) => void; cursorAt?: string;
+function RunFiltersPanel({ runs, filters, onChange }: {
+  runs: MachiningRun[]; filters: RunFilters; onChange: (filters: RunFilters) => void;
 }) {
-  if (runs.length === 0) return null;
+  const programs = [...new Set(runs.map((run) => run.program ?? "미확인"))].sort();
+  const parseDuration = (value: string) => value === "" ? undefined : Number(value);
+  return <fieldset className="run-filters">
+    <legend>가공 목록 필터</legend>
+    <label>프로그램 필터<select value={filters.programs[0] ?? ""}
+      onChange={(event) => onChange({ ...filters, programs: event.target.value ? [event.target.value] : [] })}>
+      <option value="">전체 프로그램</option>
+      {programs.map((program) => <option key={program}>{program}</option>)}
+    </select></label>
+    <label>판정 필터<select value={filters.classifications[0] ?? ""}
+      onChange={(event) => onChange({ ...filters, classifications: event.target.value ? [event.target.value as RunClassification] : [] })}>
+      <option value="">전체 판정</option>
+      {CLASSIFICATION_OPTIONS.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
+    </select></label>
+    <label>최소 가공시간(초)<input type="number" min="0" value={filters.minimumDurationSeconds ?? ""}
+      onChange={(event) => onChange({ ...filters, minimumDurationSeconds: parseDuration(event.target.value) })} /></label>
+    <label>최대 가공시간(초)<input type="number" min="0" value={filters.maximumDurationSeconds ?? ""}
+      onChange={(event) => onChange({ ...filters, maximumDurationSeconds: parseDuration(event.target.value) })} /></label>
+    <button type="button" className="button-quiet" onClick={() => onChange({ programs: [], classifications: [] })}>필터 초기화</button>
+  </fieldset>;
+}
+
+function ProgramGroupSummary({ groups }: { groups: ReturnType<typeof filterAndGroupRuns>["groups"] }) {
+  return <div className="run-group-summaries" aria-label="프로그램별 요약">
+    {groups.map((group) => <div className="run-group-summary" role="group" aria-label={`프로그램 ${group.program} 요약`} key={group.program}>
+      <strong>PGM {group.program}</strong><span>{group.count}건</span>
+      <span>중앙 {group.medianDurationSeconds === null ? "확인 불가" : formatDuration(group.medianDurationSeconds)}</span>
+      <span>총 {formatDuration(group.totalDurationSeconds)}</span>
+      <small>정상 {group.classifications.NORMAL} · 차이 있음 {group.classifications.DEVIATING} · 큰 차이 {group.classifications.HIGH_DEVIATION} · 평가 불가 {group.classifications.UNAVAILABLE}</small>
+    </div>)}
+  </div>;
+}
+
+function RunTimelineOverview({ runs, range, selectedId, onSelect, cursorAt }: {
+  runs: MachiningRun[]; range?: { startsAt: string; endsAt: string }; selectedId?: string;
+  onSelect: (runId: string) => void; cursorAt?: string;
+}) {
+  if (runs.length === 0 || !range) return null;
+  const layout = layoutTimeline(runs, range);
   const cursorTime = cursorAt ? Date.parse(cursorAt) : undefined;
-  const startTimes = runs.map((run) => Date.parse(run.startedAt));
-  const endTimes = runs.map((run) => Date.parse(run.endedAt ?? run.startedAt));
-  const knownTimes = cursorTime === undefined ? [...startTimes, ...endTimes] : [...startTimes, ...endTimes, cursorTime];
-  const rangeStart = Math.min(...knownTimes);
-  const rangeEnd = Math.max(...knownTimes, rangeStart + 60_000);
+  const rangeStart = Date.parse(range.startsAt);
+  const rangeEnd = Date.parse(range.endsAt);
   const span = rangeEnd - rangeStart;
   const percent = (time: number) => ((time - rangeStart) / span) * 100;
   const ticks = Array.from({ length: OVERVIEW_TICK_COUNT + 1 }, (_, index) => rangeStart + (span * index) / OVERVIEW_TICK_COUNT);
@@ -126,6 +193,9 @@ function RunTimelineOverview({ runs, selectedId, onSelect, cursorAt }: {
   const cursorLabelLeft = cursorLeft !== undefined ? Math.min(94, Math.max(6, cursorLeft)) : undefined;
   return (
     <div className="run-overview" role="group" aria-label="가공 시간대 개요 · 미리보기">
+      {layout.mode === "AGGREGATED" && <p className="section-note" role="status">
+        {runs.length}건을 시간 구간 {layout.items.length}개로 묶어 표시합니다. 개별 가공은 아래 목록에서 확인할 수 있습니다.
+      </p>}
       {cursorTime !== undefined && cursorLabelLeft !== undefined && (
         <div className="run-overview-now-row" aria-hidden="true">
           <span className="run-overview-now-label" style={{ left: `${cursorLabelLeft}%` }}>
@@ -143,17 +213,20 @@ function RunTimelineOverview({ runs, selectedId, onSelect, cursorAt }: {
         {ticks.map((time, index) => (
           <span key={`tick-${index}`} className="run-overview-tick" aria-hidden="true" style={{ left: `${percent(time)}%` }} />
         ))}
-        {runs.map((run) => {
+        {layout.items.map((item) => {
+          if (layout.mode === "AGGREGATED") return <span key={item.runIds.join("-")} className="run-overview-cluster"
+            style={{ left: `${item.startPercent}%`, width: `${item.endPercent - item.startPercent}%` }}
+            role="img" aria-label={`${formatClockShort(rangeStart + (span * item.startPercent) / 100)} 시간 구간 · 가공 ${item.runIds.length}건`}>
+            {item.runIds.length}
+          </span>;
+          const run = item.runs[0];
           const badge = runTimelineBadge(run);
-          const start = Date.parse(run.startedAt);
-          const end = run.endedAt ? Date.parse(run.endedAt) : rangeEnd;
-          const left = percent(start);
-          const width = Math.max(OVERVIEW_MIN_WIDTH_PERCENT, percent(end) - left);
-          const durationSeconds = run.endedAt ? (end - start) / 1000 : undefined;
+          const width = item.endPercent - item.startPercent;
+          const durationSeconds = runDurationSeconds(run);
           return (
             <button type="button" key={run.id} className="run-overview-bar"
               data-classification={badge.tone} aria-pressed={selectedId === run.id}
-              style={{ left: `${left}%`, width: `${width}%` }}
+              style={{ left: `${item.startPercent}%`, width: `${width}%` }}
               title={`미리보기 · ${run.program ?? "프로그램 미확인"} · ${badge.label}`}
               aria-label={`가공 미리보기 · ${run.program ?? "프로그램 미확인"} · ${badge.label}`}
               onClick={() => onSelect(run.id)}>
