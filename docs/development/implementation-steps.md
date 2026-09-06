@@ -54,7 +54,7 @@ Step 01~15에서 만든 NIST ingestion, 권위 Twin, 2D, 격리된 3D scene과 `
 ### Step 23 이후 재계획 기준
 
 Step 01~23에서 만든 ingestion, 권위 Twin, 2D, 격리된 3D scene, replay cursor, 관측 공정 분석을 회귀
-기준으로 유지한다. Step 24 이후는 **이미 확보한 NIST 원천 관측값에서 운영 지표를 만드는 범위를 우선**하고,
+기준으로 유지한다. Step 28 이후는 **이미 확보한 NIST 원천 관측값에서 운영 지표를 만드는 범위를 우선**하고,
 외부 dataset과 시뮬레이션 도메인은 그 뒤의 선택 범위로 내린다.
 
 - 원천 profile에 근거가 있는 관측값을 먼저 canonical contract, Twin snapshot, 화면에 반영한다.
@@ -70,35 +70,60 @@ Step 01~23에서 만든 ingestion, 권위 Twin, 2D, 격리된 3D scene, replay c
 - PHM/NASA reference health는 P1 선택 범위이며 v1 완료를 막지 않는다. 어떤 경우에도 Mazak01의 상태나
   잔여 수명으로 표시하지 않는다.
 
-#### Step 24 이후에서 제외한 항목
+#### Step 28 이후에서 제외한 항목
 
 | 제외 항목 | 원래 위치 | 근거 |
 |---|---|---|
 | 절차형 공구 형상 factory (`TURNING_TOOL`/`DRILL`/`END_MILL`/`FACE_MILL`) | 구 Step 24 | 공구 형상 식별 근거가 원천에 없어 항상 `UNKNOWN`으로 렌더된다. tool number 바인딩만 남긴다 |
-| XYZ/C축을 완료 조건에서 제외 | 구 Step 25 | XYZ는 이미 canonical `POSITION`으로 매핑된 15,786건이 있어 근거가 충분하다. Step 25~26으로 승격한다. C축은 계속 제외 |
-| PHM raw/feature/model/serving/view 5단계 분리 | 구 Step 27~31 | 정책상 Mazak01과 연결이 금지된 reference 채널에 잔여 노력의 상당 부분이 배분되어 있었다. Step 39~41 P1로 압축 |
+| XYZ/C축을 완료 조건에서 제외 | 구 Step 25 | XYZ는 이미 canonical `POSITION`으로 매핑된 15,786건이 있어 근거가 충분하다. Step 29~30으로 승격한다. C축은 계속 제외 |
+| PHM raw/feature/model/serving/view 5단계 분리 | 구 Step 27~31 | 정책상 Mazak01과 연결이 금지된 reference 채널에 잔여 노력의 상당 부분이 배분되어 있었다. Step 43~45 P1로 압축 |
 | Cut-based RUL baseline | 구 Step 32 | wear baseline 검증 이후의 선택 범위였고 reference 채널 자체가 P1로 내려갔다 |
-| `ProductionRequest`/`WorkOrder`/`OperationExecution`/`ProductionResult` 시뮬레이션 aggregate | 구 Step 33~34 | PRD 8의 Non-Goal "단순 MES CRUD"와 충돌하며 원천에 없는 사실을 만든다. 관측 기반 Step 37로 대체 |
+| `ProductionRequest`/`WorkOrder`/`OperationExecution`/`ProductionResult` 시뮬레이션 aggregate | 구 Step 33~34 | PRD 8의 Non-Goal "단순 MES CRUD"와 충돌하며 원천에 없는 사실을 만든다. 관측 기반 Step 41로 대체 |
 | Maintenance workflow | 구 Step 36 | 또 하나의 시뮬레이션 CRUD이며 Alarm aggregate가 증명하는 범위를 넘지 않는다 |
 
-#### Step 24 이후가 사용하는 관측 근거
+#### Step 28 이후가 사용하는 관측 근거
 
 | 신호 | 건수 | 현재 상태 | 사용처 |
 |---|---:|---|---|
-| `total_time` / `auto_time` / `cut_time` | 32,471 / 10,111 / 3,516 | 미매핑 | Step 28 → 30 가동률·절삭비 |
-| `execution` / `mode` / `power` | 329 / 79 / 49 | 매핑됨 | Step 29 상태 구간 |
-| `estop` | 51 | 미매핑 | Step 28 → 31 정지 사유 |
-| `Xabs` / `Yabs` / `Zabs` | 6,868 / 1,538 / 7,380 | 매핑됨, 미표출 | Step 25~26 축·툴패스 |
-| 축·주축 `LOAD` | 14,473 | 매핑됨, 미표출 | Step 33, 38 |
-| `Fact` PATH_FEEDRATE | 7,633 | 매핑됨, 미표출 | Step 33 |
-| `Stemp` / `S2temp` | 10,203 | 매핑됨, 미표출 | Step 33 |
-| `PartCountAct` | 49 | 매핑됨, 미표출 | Step 32, 37 |
-| `Tool_number` | 593 | 매핑됨 | Step 24, 38 |
-| CONDITION 전체 | 1,052 | 매핑됨 | Step 31, 35 |
-| 오버라이드 `Sovr`/`Fovr`/`Frapidovr` | 184 | 미매핑 | Step 28 |
-| `line` / `sequenceNum` | 1,372 | 미매핑 | Step 28 |
+| `total_time` / `auto_time` / `cut_time` | 32,471 / 10,111 / 3,516 | 미매핑 | Step 32 → 34 가동률·절삭비 |
+| `execution` / `mode` / `power` | 329 / 79 / 49 | 매핑됨 | Step 33 상태 구간 |
+| `estop` | 51 | 미매핑 | Step 32 → 35 정지 사유 |
+| `Xabs` / `Yabs` / `Zabs` | 6,868 / 1,538 / 7,380 | 매핑됨, 미표출 | Step 29~30 축·툴패스 |
+| 축·주축 `LOAD` | 14,473 | 매핑됨, 미표출 | Step 37, 42 |
+| `Fact` PATH_FEEDRATE | 7,633 | 매핑됨, 미표출 | Step 37 |
+| `Stemp` / `S2temp` | 10,203 | 매핑됨, 미표출 | Step 37 |
+| `PartCountAct` | 49 | 매핑됨, 미표출 | Step 36, 41 |
+| `Tool_number` | 593 | 매핑됨 | Step 28, 42 |
+| CONDITION 전체 | 1,052 | 매핑됨 | Step 35, 39 |
+| 오버라이드 `Sovr`/`Fovr`/`Frapidovr` | 184 | 미매핑 | Step 32 |
+| `line` / `sequenceNum` | 1,372 | 미매핑 | Step 32 |
 
-Step 28 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이다.
+Step 32 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이다.
+
+#### Step 01~23 실측 점검 결과
+
+전량 NIST 관측(machining run 122건, source 13시간 47분)으로 실행한 점검 결과다. 소수 run fixture에서는
+드러나지 않았고 Step 01~23이 `DONE`으로 표시된 뒤에 확인되었다. 각 결함은 아래 Step에서 처리한다.
+
+| ID | 결함 | 실측 근거 | 처리 |
+|---|---|---|---|
+| D-01 | 이상 평가가 정상 변동을 과분류한다 | 평가 가능한 94건 중 92건(98%)이 `DEVIATING` 이상, `기준선 범위`는 2건(1.6%). 실제 편차는 8.8~10.8% 구간 | Step 24 |
+| D-02 | 편차 크기의 해상도가 없다 | 6초 run과 2분 13초 run이 같은 `큰 차이`로 표시된다 | Step 24 |
+| D-03 | 타임라인 개요가 규모에서 붕괴한다 | 막대 122개가 전부 최소폭 2%(22.9px)에 걸려 합계 244%, 116개(95%)가 겹치고 폭 라벨은 0개 | Step 25 |
+| D-04 | 가공 목록에 탐색 수단이 없다 | 352px 스크롤 영역에 7,603px 콘텐츠(약 21.6화면), 필터·검색·그룹 요소 0개 | Step 25 |
+| D-05 | 가동률 계열 지표가 없다 | source 49,632초 중 가공 11,681초(23.5%), 첫 가공 전 공백 3시간 34분이 어느 화면에도 없다 | Step 32~38 |
+| D-06 | 상태 구간과 체류시간 projection이 없다 | Equipment State가 시점 값만 투영해 KPI 산출의 전제가 빠져 있다 | Step 33 |
+| D-07 | spatial이 Twin 계약이 아니라 frontend 상수에 있다 | Twin 응답의 `spatial`이 `{}`인데 배치는 `MAZAK01_SCENE_BINDING` 상수에서 온다 | Step 26 |
+| D-08 | 적재된 지표가 Twin에 노출되지 않는다 | Twin metric 4종. POSITION 15,786 / LOAD 14,473 / TEMPERATURE 10,203 / PATH_FEEDRATE 7,633 / PART_COUNT / CONTROLLER_MODE / POWER_STATE 미노출 | Step 37 |
+| D-09 | 정상 종료된 재생이 고장처럼 표시된다 | 완료 시 `실시간 연결됨`과 `STALE`이 함께 뜨고 실시간 오판 경고가 표시된다 | Step 27 |
+| D-10 | 두 타임라인의 시간축이 다르다 | Replay는 `05:27:55~19:15:07`, 가공 개요는 `09:01~19:13`. 앞 3시간 34분 공백이 개요에서 사라진다 | Step 25, Step 38 |
+| D-11 | 원시 값이 그대로 표시된다 | 편차 `8.807549%`, 시각 `…04:44:39.496965 UTC`, 공구 번호 `0`, provenance 90건 평면 나열 | Step 27 |
+| D-12 | 짧은 run과 종료 근거 미확정 구간 | 30초 미만 13건, 종료 근거 미확정 20건(16%) | Step 24의 등급 분리와 Step 25의 필터로 완화한다. segmentation rule 자체의 변경은 근거 확인 후 별도로 판단한다 |
+
+**결정이 필요한 항목**: [ADR-037](../adr/ADR-037-cursor-bound-process-analysis-presentation.md)은 공정
+분석을 정지된 replay cursor 시점으로 한정한다. Step 33~38의 구간 집계 KPI는 cursor 시점이 아니라 관측
+구간 전체를 대상으로 하므로 이 결정의 확장 또는 별도 집계 경로가 필요하다. Step 33 착수 전에 ADR을
+갱신한다.
 
 ---
 
@@ -712,7 +737,130 @@ mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenan
 
 **선행 조건**: Step 17, Step 22.
 
-### Step 24 — Tool Number Binding과 Tool Change 표현
+## Phase F — 실측 회귀 보정
+
+Step 01~23은 소수 run fixture로 검증되었고, 전량 관측에서 처음 드러난 결함이 남아 있다. 새 기능을
+추가하기 전에 이미 `DONE`인 기능이 실제 규모에서 동작하도록 보정한다. 각 Step은 기존 계약과 회귀
+baseline을 깨지 않고 policy version 또는 표현 계층만 올린다.
+
+### Step 24 — 이상 평가 임계 재정의와 편차 등급
+
+**목적**: 사이클이 매우 일정한 설비에서 IQR baseline이 정상 변동을 이상으로 분류하는 문제를 없애고,
+편차 크기를 구분해 표시한다.
+
+**근거**: D-01, D-02. 전량 122 run 실측에서 평가 가능한 94건 중 92건(98%)이 `DEVIATING` 이상으로
+분류되었고 `기준선 범위`는 2건(1.6%)이었다. 실제 편차는 8.8~10.8% 구간이다. 사이클이 2분 0~1초로
+일정해 IQR이 1~2초에 그치고, 12초 차이가 IQR의 6~12배로 계산된 결과다.
+
+**구현 범위**
+
+- `AnomalyAssessmentPolicy` version 상승. IQR 기반 거리에 절대 하한과 중앙값 대비 상대 하한을 함께
+  적용하는 임계
+- 편차 크기 등급 분리와 등급별 label. 기존 `AVAILABLE`/표본 부족 상태 모델은 유지
+- 새 version으로 재처리하되 기존 assessment version을 덮어쓰지 않는 기존 규칙 유지
+- 적용된 임계, 하한, 그 선택 근거를 assessment와 함께 조회 가능하게 노출
+
+**테스트**
+
+- 사이클이 거의 일정한 golden fixture에서 정상 변동이 `기준선 범위`로 분류된다.
+- IQR이 0이거나 극히 작은 경우 하한이 적용되어 과분류가 발생하지 않는다.
+- 편차 10%와 90%가 서로 다른 등급으로 분류된다.
+- 새 policy version이 기존 version의 결과를 수정하지 않는다.
+- 높은 편차가 여전히 Machine FAULT, Alarm, command를 만들지 않는다.
+
+**완료 조건**: 전량 관측 기준 분류 분포가 근거와 함께 문서화되고, 임계와 하한의 선택 이유를 조회할 수
+있다. 과분류를 줄이기 위해 실제 이상을 숨기지 않았음을 fixture로 보인다.
+
+**선행 조건**: Step 20.
+
+### Step 25 — 가공 목록과 타임라인 개요의 스케일
+
+**목적**: run 수가 많은 실제 구간에서도 목록과 개요가 정보를 잃지 않게 한다.
+
+**근거**: D-03, D-04, D-10. 122 run에서 개요 막대가 전부 최소폭 2%(22.9px)에 걸려 합계 244%가 되고
+116개(95%)가 겹쳤으며 폭 라벨은 하나도 표시되지 않았다. 목록은 352px 영역에 7,603px 콘텐츠이고 필터,
+검색, 그룹화 요소가 없다. 개요의 시간축이 첫 run부터 시작해 앞선 공백 구간이 사라진다.
+
+**구현 범위**
+
+- 개요의 밀도 기반 표현. 최소폭 강제 대신 구간 집계 또는 겹침 해소를 사용하고, 축소로 생략된 정보를 표시
+- 개요 시간축을 replay source 범위와 일치시키고 가공이 없는 구간을 공백으로 유지
+- 목록의 프로그램·분류·기간 필터와 그룹 요약: 건수, 중앙 사이클, 총 가공시간
+- 대량 항목의 렌더 예산과 가상 스크롤 필요 여부 판단
+
+**테스트**
+
+- 100건 이상 fixture에서 개요 막대가 겹치지 않거나 겹침이 명시적 집계 표현으로 대체된다.
+- 개요 시간축이 replay 타임라인과 같은 시작·종료를 가진다.
+- 필터 적용 후에도 선택된 run과 cursor 동기화가 유지된다.
+- 그룹 요약 값이 필터된 목록 항목의 합과 일치한다.
+- keyboard와 screen reader로 필터와 목록을 모두 조작할 수 있다.
+- 대량 항목에서 frame 시간이 Step 47 예산 안에 유지된다.
+
+**완료 조건**: 122건 규모에서 개별 run과 구간 분포를 모두 읽을 수 있고, 화면이 무엇을 생략했는지 표시한다.
+
+**선행 조건**: Step 21, Step 24.
+
+### Step 26 — Spatial Metadata를 Twin 계약으로 이관
+
+**목적**: 3D 배치를 frontend 상수가 아니라 권위 Twin 계약에서 받는다.
+
+**근거**: D-07. Twin 응답의 `spatial`이 빈 객체인데도 3D가 동작한다. position, rotation, scale과
+`SIMULATED_LAYOUT` provenance가 frontend 상수에 있어, 두 번째 설비를 추가하려면 데이터가 아니라
+renderer 코드를 고쳐야 한다. PRD 28은 spatial을 Twin에 두도록 정한다.
+
+**구현 범위**
+
+- Twin snapshot의 `spatial` 채우기: `assetId`, `sceneNodeId`, position/rotation/scale, provenance
+- 설비별 spatial 설정의 저장 위치와 기본값 정책
+- renderer는 Twin에서 온 spatial을 기존 `MachineVisualState` 경로로만 소비
+- spatial이 없거나 불완전할 때의 fallback과 명시적 표시
+
+**테스트**
+
+- golden Twin DTO에 spatial이 포함되고 provenance가 `SIMULATED_LAYOUT`으로 유지된다.
+- spatial 없는 snapshot에서 renderer가 안전한 기본 배치와 명시적 표시를 사용한다.
+- renderer가 backend response type을 직접 import하지 않는 기존 boundary가 유지된다.
+- 설정만 바꿔 배치가 이동하며 renderer 코드 변경이 필요하지 않다.
+
+**완료 조건**: 배치가 데이터에서 오고, 실제 NIST 물리 위치라고 주장하지 않는 provenance가 함께 전달된다.
+
+**선행 조건**: Step 10, Step 14.
+
+### Step 27 — 재생 종료 표시와 값 서식 정합성
+
+**목적**: 정상적으로 끝난 재생을 고장처럼 보이게 하는 표시를 없애고, 원시 값을 사람이 읽을 수 있게 만든다.
+
+**근거**: D-09, D-11. 재생이 끝나면 `연결: 실시간 연결됨`과 `TWIN FRESHNESS: STALE`이 함께 표시되고
+실시간으로 판단하지 말라는 경고가 뜬다. 재생 종료를 구분하는 안내는 3D 패널 안에만 있다. 그 밖에 편차가
+`8.807549%`, 반영 시각이 `2026-09-06 04:44:39.496965 UTC`로 표시되고, 공구 번호 `0`이 미장착과
+구분되지 않으며, 원본 추적 정보가 90건 평면 나열된다.
+
+**구현 범위**
+
+- 재생 완료와 데이터 지연의 표시 분리. 2D 상세와 대시보드에도 같은 구분을 적용
+- 소수 자릿수, 시각 정밀도, 단위 표기 규칙과 공용 서식 함수
+- 값 없음과 0의 구분 표시 정책
+- provenance 목록의 그룹화와 기본 접힘
+
+**테스트**
+
+- 재생 완료 상태에서 실시간 오판 경고를 표시하지 않고 완료 상태를 표시한다.
+- 실제 지연으로 인한 STALE에서는 기존 경고와 animation 정지가 그대로 유지된다.
+- 서식 함수의 반올림, 자릿수, 시각 정밀도 경계 테스트.
+- 값이 없는 채널과 0인 채널이 서로 다르게 표시된다.
+- provenance 항목 수가 많아도 화면 진입 시 기본 접힘 상태다.
+
+**완료 조건**: 정상 종료를 오류로 오인하게 하는 표시가 없고, 화면의 수치가 원시 출력이 아니라 정의된
+서식을 따른다. freshness 자체의 계산 규칙은 바꾸지 않는다.
+
+**선행 조건**: Step 12, Step 17, Step 21.
+
+---
+
+## Phase G — Functional Twin 완성
+
+### Step 28 — Tool Number Binding과 Tool Change 표현
 
 **목적**: 관측된 `Tool_number`를 `ToolMount`의 활성 공구 identity로 연결하고 교체 시점을 replay
 타임라인에서 추적할 수 있게 한다. 공구 형상은 추정하지 않는다.
@@ -740,7 +888,7 @@ mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenan
 
 **선행 조건**: Step 22, Step 23.
 
-### Step 25 — XYZ Linear Axis Coordinate Binding
+### Step 29 — XYZ Linear Axis Coordinate Binding
 
 **목적**: 이미 canonical `POSITION`으로 매핑된 X/Y/Z 관측값을 검증된 좌표 변환으로 3D 축 이동에 연결한다.
 
@@ -769,7 +917,7 @@ mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenan
 
 **선행 조건**: Step 23.
 
-### Step 26 — Toolpath Trail과 Work Envelope
+### Step 30 — Toolpath Trail과 Work Envelope
 
 **목적**: replay 구간의 X/Y/Z 궤적을 유한한 시각 자산으로 누적해 실제 이동 경로를 공간에서 설명한다.
 
@@ -783,7 +931,7 @@ mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenan
 **테스트**
 
 - 같은 replay 구간을 두 번 재생하면 같은 궤적 점 집합이 나온다.
-- 상한 초과 시 오래된 점부터 버리고 frame 시간이 Step 43 예산 안에 유지된다.
+- 상한 초과 시 오래된 점부터 버리고 frame 시간이 Step 47 예산 안에 유지된다.
 - seek 후 이전 cursor 구간의 궤적이 현재 위치를 잘못 설명하도록 남지 않는다.
 - 축 하나가 unavailable이면 궤적을 만들지 않고 이유를 표시한다.
 - 보간으로 만든 점을 관측값으로 표시하지 않는다.
@@ -791,9 +939,9 @@ mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenan
 **완료 조건**: 궤적의 모든 점이 source observation으로 역추적되고, 궤적은 관측된 위치의 연결선일 뿐 실제
 절삭이나 재료 제거가 아니라고 화면에서 밝힌다.
 
-**선행 조건**: Step 25.
+**선행 조건**: Step 29.
 
-### Step 27 — Functional Twin Replay Acceptance
+### Step 31 — Functional Twin Replay Acceptance
 
 **목적**: execution, spindle, XYZ, tool, current run이 하나의 replay cursor에서 일관된 물리적 의미를
 설명하게 한다.
@@ -815,13 +963,13 @@ mapping `2.1.0`과 Operational Twin `1.3.0`으로 전달하고 2D에서 provenan
 **완료 조건**: PRD 117의 3D 인수 조건과 Three.js 가이드 v1 중 NIST 근거가 있는 항목이 자동화된다.
 C축, 실제 절삭 시뮬레이션, coolant/chip, OEM CAD fidelity는 완료 조건이 아니다.
 
-**선행 조건**: Step 21, Step 24, Step 26.
+**선행 조건**: Step 21, Step 28, Step 30.
 
 ---
 
-## Phase F — Observed Utilization and Operational KPI
+## Phase H — Observed Utilization and Operational KPI
 
-### Step 28 — Accumulated Time과 운전 신호 Canonical Mapping 확장
+### Step 32 — Accumulated Time과 운전 신호 Canonical Mapping 확장
 
 **목적**: 가동률 KPI의 원천인 누적 시간 카운터와 운전 신호를 canonical contract에 추가해 의미 커버리지를
 올린다.
@@ -852,7 +1000,7 @@ Verification Ledger에 기록된다.
 
 **선행 조건**: Step 04, Step 16.
 
-### Step 29 — Equipment State Interval Projection
+### Step 33 — Equipment State Interval Projection
 
 **목적**: 시점별 상태 관측을 시간 구간으로 재구성해 체류시간을 계산할 수 있게 한다.
 
@@ -874,9 +1022,9 @@ Verification Ledger에 기록된다.
 **완료 조건**: 각 구간을 시작/종료 근거 observation까지 추적할 수 있고 구간 합과 원천 시간 범위의 차이를
 설명할 수 있다.
 
-**선행 조건**: Step 08, Step 28.
+**선행 조건**: Step 08, Step 32.
 
-### Step 30 — Utilization KPI Projection
+### Step 34 — Utilization KPI Projection
 
 **목적**: 상태 구간과 기계 자체 누적 카운터로 가동률 계열 지표를 두 경로로 산출하고 근거를 구분한다.
 
@@ -898,9 +1046,9 @@ Verification Ledger에 기록된다.
 **완료 조건**: 각 지표의 계산식, 분모 정의, 원천, coverage, version을 조회할 수 있고 관측 기반 지표와
 파생 지표가 구분된다.
 
-**선행 조건**: Step 29.
+**선행 조건**: Step 33.
 
-### Step 31 — Downtime과 정지 사유 Pareto
+### Step 35 — Downtime과 정지 사유 Pareto
 
 **목적**: 비가동 구간을 길이순으로 정렬하고 동시 관측된 근거를 인과 주장 없이 함께 제시한다.
 
@@ -921,9 +1069,9 @@ Verification Ledger에 기록된다.
 
 **완료 조건**: 상위 정지 구간마다 시작/종료 근거와 동시 관측 근거를 확인할 수 있고 인과를 주장하지 않는다.
 
-**선행 조건**: Step 21, Step 30.
+**선행 조건**: Step 21, Step 34.
 
-### Step 32 — Cycle 기준 Performance와 OEE 공개 정책
+### Step 36 — Cycle 기준 Performance와 OEE 공개 정책
 
 **목적**: 자체 사이클 baseline 대비 성능 지표를 제공하되 품질 데이터 부재를 이유로 OEE 종합 수치를
 주장하지 않는다.
@@ -946,9 +1094,9 @@ Verification Ledger에 기록된다.
 **완료 조건**: 사용자가 무엇이 관측이고 무엇이 파생이며 무엇이 원천에 없어 제공 불가인지 화면과 문서에서
 구분할 수 있다.
 
-**선행 조건**: Step 20, Step 30.
+**선행 조건**: Step 20, Step 34.
 
-### Step 33 — Twin Snapshot 관측 지표 확장
+### Step 37 — Twin Snapshot 관측 지표 확장
 
 **목적**: 이미 canonical로 적재되지만 Twin snapshot에 노출되지 않는 지표를 권위 계약에 추가한다.
 
@@ -969,14 +1117,14 @@ Verification Ledger에 기록된다.
 - 신규 optional field가 없는 이전 snapshot에서도 기존 화면이 동일하게 동작한다.
 - 축/부하 채널이 컴포넌트별로 섞이지 않는다.
 - 값이 없는 채널을 0으로 표시하지 않는다.
-- snapshot 크기 증가가 Step 43의 patch rate 예산 안에 있다.
+- snapshot 크기 증가가 Step 47의 patch rate 예산 안에 있다.
 
 **완료 조건**: 한 응답에서 위치, 부하, 이송속도, 온도, 부품 수, 제어 모드를 provenance와 함께 사람이
 해석할 수 있다.
 
-**선행 조건**: Step 10, Step 28.
+**선행 조건**: Step 10, Step 32.
 
-### Step 34 — Shift Overview 화면
+### Step 38 — Shift Overview 화면
 
 **목적**: cursor 시점 상태에 더해 관측 구간 전체에서 무슨 일이 있었는지 한 화면에서 보여준다.
 
@@ -990,8 +1138,8 @@ Verification Ledger에 기록된다.
 
 **테스트**
 
-- 상태 띠 구간 경계가 Step 29 projection과 일치한다.
-- KPI 값이 Step 30/32의 계산 결과와 같은 version을 가리킨다.
+- 상태 띠 구간 경계가 Step 33 projection과 일치한다.
+- KPI 값이 Step 34/36의 계산 결과와 같은 version을 가리킨다.
 - marker와 Pareto 선택 시 2D, 3D, current run이 같은 cursor/version으로 수렴한다.
 - 원천에 없는 Quality를 100%나 NORMAL로 표시하지 않는다.
 - keyboard와 screen reader로 KPI, 구간, 정지 사유를 확인할 수 있다.
@@ -1000,13 +1148,13 @@ Verification Ledger에 기록된다.
 **완료 조건**: 사용자가 raw signal을 몰라도 관측 구간 전체의 가동 상태와 주요 손실을 이해하고 각 숫자의
 출처를 확인할 수 있다.
 
-**선행 조건**: Step 31, Step 32, Step 33.
+**선행 조건**: Step 35, Step 36, Step 37.
 
 ---
 
-## Phase G — Operational Semantics and Quality
+## Phase I — Operational Semantics and Quality
 
-### Step 35 — Condition에서 Alarm으로의 명시적 규칙
+### Step 39 — Condition에서 Alarm으로의 명시적 규칙
 
 **목적**: Source Condition을 보존하고 별도 정책으로 처리 가능한 Business Alarm을 만든다.
 
@@ -1014,7 +1162,7 @@ Verification Ledger에 기록된다.
 
 - Condition projection과 `ConditionToAlarmPolicy` (관측 CONDITION 1,052건)
 - Alarm aggregate: OPEN/ACKNOWLEDGED/RESOLVED
-- machine ID 공간 연결, 3D warning/fault marker, Step 34 타임라인 알람 marker
+- machine ID 공간 연결, 3D warning/fault marker, Step 38 타임라인 알람 marker
 - business Outbox event
 
 **테스트**
@@ -1027,9 +1175,9 @@ Verification Ledger에 기록된다.
 
 **완료 조건**: PRD 118 Alarm Spatial Acceptance가 자동화된다.
 
-**선행 조건**: Step 27, Step 34.
+**선행 조건**: Step 31, Step 38.
 
-### Step 36 — Data Quality Projection과 UI
+### Step 40 — Data Quality Projection과 UI
 
 **목적**: Validity, Completeness, Ordering, Duplication, Freshness, Semantic Coverage를 숨기지 않고
 운영자에게 노출한다.
@@ -1038,7 +1186,7 @@ Verification Ledger에 기록된다.
 
 - 차원별 계산 policy와 machine/replay session 집계
 - Twin quality section과 전용 데이터 품질 화면
-- Step 28 이후의 semantic coverage 변화와 미매핑 DataItem 목록 공개
+- Step 32 이후의 semantic coverage 변화와 미매핑 DataItem 목록 공개
 - run segmentation/feature coverage와 원천 품질의 별도 지표
 - 임계값 설정과 provenance/evidence link
 
@@ -1053,9 +1201,9 @@ Verification Ledger에 기록된다.
 **완료 조건**: source profile, runtime, derived process 품질의 정의 차이가 문서화되고 추적 가능하며
 실제 커버리지 수치가 화면에서 정직하게 공개된다.
 
-**선행 조건**: Step 07~09, Step 19, Step 28.
+**선행 조건**: Step 07~09, Step 19, Step 32.
 
-### Step 37 — 관측 기반 Production Context
+### Step 41 — 관측 기반 Production Context
 
 **목적**: 프로그램, 부품 수, 가공 run을 연결해 관측만으로 설명 가능한 생산 문맥을 제공한다.
 
@@ -1079,9 +1227,9 @@ aggregate, 작업 할당 CRUD, `SIMULATED` 생산 흐름. PRD 8의 Non-Goal과 �
 
 **완료 조건**: 생산 문맥의 모든 값이 관측으로 역추적되고 시뮬레이션 값이 섞이지 않는다.
 
-**선행 조건**: Step 21, Step 32.
+**선행 조건**: Step 21, Step 36.
 
-### Step 38 — Tool별 Load Trend와 마모 대리지표
+### Step 42 — Tool별 Load Trend와 마모 대리지표
 
 **목적**: 같은 프로그램과 공구 조합의 부하 추세를 비교해 이 기계의 관측값에 근거한 마모 대리지표를 만든다.
 
@@ -1101,16 +1249,16 @@ aggregate, 작업 할당 CRUD, `SIMULATED` 생산 흐름. PRD 8의 Non-Goal과 �
 
 **완료 조건**: 실제 Mazak01 관측값으로 계산되며 마모 물리량이 아니라 부하 추세 지표임을 화면에서 명시한다.
 
-**선행 조건**: Step 24, Step 33.
+**선행 조건**: Step 28, Step 37.
 
 ---
 
-## Phase H — Reference Tool Health (P1, 선택)
+## Phase J — Reference Tool Health (P1, 선택)
 
 이 Phase는 v1 완료와 출시의 필수 선행 조건이 아니다. 어떤 산출물도 Mazak01의 상태, 마모량, 잔여 수명으로
 표시하지 않는다.
 
-### Step 39 — PHM Dataset 검증과 Immutable Acquisition (P1, 선택)
+### Step 43 — PHM Dataset 검증과 Immutable Acquisition (P1, 선택)
 
 **목적**: PHM2010을 우선 검증하고 불가하면 NASA Milling fallback을 Step 01과 같은 원천 보존 규칙으로
 결정한다.
@@ -1134,7 +1282,7 @@ aggregate, 작업 할당 CRUD, `SIMULATED` 생산 흐름. PRD 8의 Non-Goal과 �
 
 **선행 조건**: Step 01의 artifact 규칙.
 
-### Step 40 — PHM Feature와 Wear Baseline Model Card (P1, 선택)
+### Step 44 — PHM Feature와 Wear Baseline Model Card (P1, 선택)
 
 **목적**: 검증된 PHM 원본을 cut 단위 feature로 바꾸고 데이터 누수 없이 측정 wear를 추정하는 설명 가능한
 baseline을 만든다.
@@ -1158,9 +1306,9 @@ baseline을 만든다.
 reference model임을 model card에 명시한다. cut number를 Mazak tool number나 실제 시간으로 변환하지
 않는다.
 
-**선행 조건**: Step 39.
+**선행 조건**: Step 43.
 
-### Step 41 — HealthAssessment Serving과 Reference Tool View (P1, 선택)
+### Step 45 — HealthAssessment Serving과 Reference Tool View (P1, 선택)
 
 **목적**: model 출력을 출처가 명확한 reference health로 제공하고 operational Twin과 격리한다.
 
@@ -1183,13 +1331,13 @@ reference model임을 model card에 명시한다. cut number를 Mazak tool numbe
 
 **완료 조건**: 사용자가 NIST operational state와 PHM reference health를 별도 사실로 이해할 수 있다.
 
-**선행 조건**: Step 38, Step 40.
+**선행 조건**: Step 42, Step 44.
 
 ---
 
-## Phase I — Release Reliability
+## Phase K — Release Reliability
 
-### Step 42 — End-to-end Reliability and Recovery
+### Step 46 — End-to-end Reliability and Recovery
 
 **목적**: PRD의 신뢰성 보장 경계와 주요 장애 복구를 하나의 자동화 suite로 고정한다.
 
@@ -1209,9 +1357,9 @@ reference model임을 model card에 명시한다. cut number를 Mazak tool numbe
 
 **완료 조건**: 각 장애의 기대 상태, 자동/수동 복구, 데이터 유실 여부가 테스트와 runbook에 기록된다.
 
-**선행 조건**: Step 27, Step 34~38. 선택 Phase H는 제외할 수 있다.
+**선행 조건**: Step 31, Step 38~42. 선택 Phase H는 제외할 수 있다.
 
-### Step 43 — 성능, 보안, 접근성, Visual Baseline
+### Step 47 — 성능, 보안, 접근성, Visual Baseline
 
 **목적**: 기능 완료를 측정 가능한 비기능 baseline과 안전한 기본값으로 마무리한다.
 
@@ -1233,9 +1381,9 @@ reference model임을 model card에 명시한다. cut number를 Mazak tool numbe
 
 **완료 조건**: 수치를 산업 SLA로 과장하지 않고 측정 환경과 함께 기록하며 실패 기준에는 후속 작업이 있다.
 
-**선행 조건**: Step 42.
+**선행 조건**: Step 46.
 
-### Step 44 — Final Traceability and Demo Acceptance
+### Step 48 — Final Traceability and Demo Acceptance
 
 **목적**: PRD Definition of Done, 두 수정 가이드의 채택 범위, 구현, 테스트, 데모 사이 추적성을 완성한다.
 
@@ -1257,7 +1405,7 @@ reference model임을 model card에 명시한다. cut number를 Mazak tool numbe
 
 **완료 조건**: PRD 140과 채택한 범위마다 근거가 있고 미완료/선택 항목을 완료로 표시하지 않는다.
 
-**선행 조건**: Step 43.
+**선행 조건**: Step 47.
 
 ---
 
@@ -1290,49 +1438,61 @@ flowchart TD
   S17 --> S23[23 B-axis]
   S22 --> S23
 
-  S23 --> S24[24 Tool Number Binding]
-  S23 --> S25[25 XYZ Axis Binding]
-  S25 --> S26[26 Toolpath Trail]
-  S21 --> S27[27 Functional Twin Acceptance]
-  S24 --> S27
-  S26 --> S27
+  S20 --> S24[24 Anomaly Threshold Fix]
+  S21 --> S25[25 Run List/Overview Scale]
+  S24 --> S25
+  S10 --> S26[26 Spatial to Twin]
+  S14 --> S26
+  S12 --> S27[27 Completion vs Stale + Format]
+  S17 --> S27
+  S21 --> S27
 
-  S04 --> S28[28 Mapping 확장]
-  S16 --> S28
-  S08 --> S29[29 State Interval]
-  S28 --> S29
-  S29 --> S30[30 Utilization KPI]
-  S21 --> S31[31 Downtime Pareto]
+  S22 --> S28[28 Tool Number Binding]
+  S23 --> S28
+  S23 --> S29[29 XYZ Axis Binding]
+  S29 --> S30[30 Toolpath Trail]
+  S21 --> S31[31 Functional Twin Acceptance]
+  S28 --> S31
   S30 --> S31
-  S20 --> S32[32 Performance + OEE 정책]
-  S30 --> S32
-  S10 --> S33[33 Snapshot 지표 확장]
-  S28 --> S33
-  S31 --> S34[34 Shift Overview]
-  S32 --> S34
-  S33 --> S34
 
-  S27 --> S35[35 Alarm]
+  S04 --> S32[32 Mapping 확장]
+  S16 --> S32
+  S08 --> S33[33 State Interval]
+  S32 --> S33
+  S33 --> S34[34 Utilization KPI]
+  S21 --> S35[35 Downtime Pareto]
   S34 --> S35
-  S19 --> S36[36 Data Quality]
-  S28 --> S36
-  S21 --> S37[37 Production Context]
+  S20 --> S36[36 Performance + OEE 정책]
+  S34 --> S36
+  S10 --> S37[37 Snapshot 지표 확장]
   S32 --> S37
-  S24 --> S38[38 Tool Load Trend]
-  S33 --> S38
+  S35 --> S38[38 Shift Overview]
+  S36 --> S38
+  S37 --> S38
 
-  S01 -. P1 .-> S39[39 PHM Verify]
-  S39 -. P1 .-> S40[40 PHM Wear Model]
-  S40 -. P1 .-> S41[41 Health Serving/View]
-  S38 -. P1 .-> S41
-
-  S34 --> S42[42 Reliability]
-  S35 --> S42
-  S36 --> S42
+  S31 --> S39[39 Alarm]
+  S38 --> S39
+  S09 --> S40[40 Data Quality]
+  S19 --> S40
+  S32 --> S40
+  S21 --> S41[41 Production Context]
+  S36 --> S41
+  S28 --> S42[42 Tool Load Trend]
   S37 --> S42
-  S38 --> S42
-  S42 --> S43[43 Non-functional]
-  S43 --> S44[44 Final Acceptance]
+
+  S01 -. P1 .-> S43[43 PHM Verify]
+  S43 -. P1 .-> S44[44 PHM Wear Model]
+  S44 -. P1 .-> S45[45 Health Serving/View]
+  S42 -. P1 .-> S45
+
+  S31 --> S46[46 Reliability]
+  S38 --> S46
+  S39 --> S46
+  S40 --> S46
+  S41 --> S46
+  S42 --> S46
+  S46 --> S47[47 Non-functional]
+  S47 --> S48[48 Final Acceptance]
 ```
 
 ## 3. Step 분할 기준
