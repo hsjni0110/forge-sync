@@ -18,6 +18,11 @@ describe("mapTwinToMachineVisualState", () => {
     expect(visualState).toEqual({
       machineId: "Mazak01",
       twinVersion: 4,
+      replayCursor: {
+        replaySessionId: "10000000-0000-4000-8000-000000000001",
+        replaySequence: 4,
+        sourceObservedAt: "2016-10-05T09:01:44.430Z",
+      },
       connectivity: "ONLINE",
       execution: "ACTIVE",
       health: "UNKNOWN",

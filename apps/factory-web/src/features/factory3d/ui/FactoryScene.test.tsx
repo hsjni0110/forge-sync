@@ -214,12 +214,28 @@ describe("FactoryScene asset isolation", () => {
         onUnavailable={vi.fn()}
         observedToolpath={toolpath}
         selectedRunLabel="PGM 114"
+        functionalPresentation={{
+          cursorLabel: "Replay #12 · Twin v4",
+          execution: "가동 중",
+          rpm: "1,200 rpm · OBSERVED",
+          axes: "X 80.08 · Y -68.79 · Z 9.64 mm · OBSERVED",
+          tool: "공구 13 · OBSERVED · 형상 미확인",
+          currentRun: "현재 재생 가공 · PGM 114 · DERIVED",
+          selectedPath: "선택 경로 · PGM 155 · 2점 · OBSERVED_PATH",
+          bAxis: "B축 · 좌표 매핑 검증 전",
+          cAxis: "C축 위치 · unavailable",
+          isLiveMotionAllowed: true,
+        }}
       />,
     );
 
     await screen.findByText("Twin v4");
     expect(container.querySelector('primitive[name="machine-root"]')).toBeTruthy();
     expect(screen.getByText(/대표 공작물: SIMULATED/)).toBeTruthy();
+    expect(screen.getByRole("region", { name: "현재 동작" })).toBeTruthy();
+    expect(screen.getByText("현재 재생 가공 · PGM 114 · DERIVED")).toBeTruthy();
+    expect(screen.getByText("선택 경로 · PGM 155 · 2점 · OBSERVED_PATH")).toBeTruthy();
+    expect(screen.getByText("C축 위치 · unavailable")).toBeTruthy();
     expect(screen.getByText(/공장 배치: SIMULATED_LAYOUT/)).toBeTruthy();
     expect(screen.getByText(/B축 45° · 좌표 매핑 검증 전 · unavailable/)).toBeTruthy();
     expect(screen.getByText(/XYZ 이동 · X 80.08 mm · Y -68.79 mm · Z 9.64 mm/)).toBeTruthy();

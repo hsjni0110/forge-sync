@@ -192,6 +192,11 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .scene-viewport { position: relative; min-height: 36rem; overflow: hidden; border: 1px solid var(--fs-border); border-radius: 0.6rem; background: var(--fs-scene-bg); }
 .scene-viewport > div { min-height: inherit; }
 .scene-canvas-root { display: grid; min-height: 36rem; background: var(--fs-scene-bg); }
+.functional-twin-summary { display: grid; gap: 0.35rem; padding: 0.7rem 0.8rem; border-top: 1px solid #30393e; color: #d5dcdf; background: #182126; }
+.functional-twin-summary header { display: flex; justify-content: space-between; gap: 0.75rem; color: #eef1f2; }
+.functional-twin-summary header span, .functional-twin-summary small { color: #96a3a9; font-size: 0.72rem; }
+.functional-twin-values { display: flex; flex-wrap: wrap; gap: 0.3rem 0.9rem; font-size: 0.78rem; }
+.functional-twin-summary p { margin: 0; color: #bbc5c9; font-size: 0.76rem; }
 .scene-canvas-stage { position: relative; height: 30rem; }
 .scene-canvas-stage:focus-visible { outline: 2px solid #8b969c; outline-offset: -2px; }
 .machine-inspection-panel { z-index: 3; display: flex; align-items: end; gap: 0.6rem; padding: 0.65rem 0.75rem; border-top: 1px solid #30393e; background: #141b1f; }

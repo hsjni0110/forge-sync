@@ -49,6 +49,11 @@ export function mapTwinToMachineVisualState({
   return {
     machineId: snapshot.machine.machineId,
     twinVersion: snapshot.consistency.twinVersion,
+    replayCursor: {
+      replaySessionId: snapshot.replayCursor.replaySessionId,
+      replaySequence: snapshot.replayCursor.replaySequence,
+      sourceObservedAt: snapshot.replayCursor.sourceObservedAt,
+    },
     connectivity: effectiveConnectivity(snapshot, freshness),
     execution: snapshot.state.execution.value,
     health: snapshot.state.health.value,

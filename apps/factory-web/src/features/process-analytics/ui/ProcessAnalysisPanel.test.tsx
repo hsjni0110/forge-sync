@@ -61,10 +61,15 @@ describe("ProcessAnalysisPanel scale controls", () => {
   });
 
   it("publishes the selected run for the 3D observed path", () => {
+    const onCurrentRunChange = vi.fn();
     const onSelectedRunChange = vi.fn();
     render(<ProcessAnalysisPanel machineId="Mazak01" session={session} twinState={twinState}
       retryTwin={vi.fn()} reloadReplay={vi.fn()} seek={vi.fn()}
+      onCurrentRunChange={onCurrentRunChange}
       onSelectedRunChange={onSelectedRunChange} />);
+
+    expect(onCurrentRunChange).toHaveBeenLastCalledWith(undefined);
+    expect(onSelectedRunChange).toHaveBeenLastCalledWith(undefined);
 
     fireEvent.click(screen.getAllByRole("button", { name: /가공 선택 · 1001/ })[0]);
 

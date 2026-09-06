@@ -4,6 +4,11 @@ import type { BAxisCoordinateMapping } from "./bAxisCoordinateMapping";
 export interface MachineVisualState {
   machineId: string;
   twinVersion: number;
+  replayCursor?: {
+    replaySessionId: string;
+    replaySequence: number;
+    sourceObservedAt: string;
+  };
   connectivity: "UNKNOWN" | "ONLINE" | "STALE" | "OFFLINE";
   execution: "UNKNOWN" | "READY" | "ACTIVE" | "IDLE" | "HOLD" | "STOPPED";
   health: "UNKNOWN" | "NORMAL" | "WARNING" | "FAULT";

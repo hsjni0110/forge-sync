@@ -12,6 +12,7 @@ export default function FactoryScene({
   machineBinding,
   visualState,
   visualPresentation,
+  functionalPresentation,
   isReducedMotion = false,
   observedToolpath,
   selectedRunLabel,
@@ -131,6 +132,9 @@ export default function FactoryScene({
         />
         {isSceneReady && <span className="visually-hidden">3D 장면 준비됨</span>}
       </div>
+      {functionalPresentation && (
+        <FunctionalTwinSummary presentation={functionalPresentation} />
+      )}
       <MachineInspectionControls
         model={model}
         selectedPartId={selectedPartId}
@@ -255,6 +259,7 @@ function MachineInspectionControls({
         <span>대표 공작물: SIMULATED</span>
         <span>공장 배치: SIMULATED_LAYOUT</span>
         <span>{bAxisStatus}</span>
+        <span>C축 위치 · unavailable</span>
         <span>{linearAxisStatus}</span>
         <span>관측 변화 OBSERVED · 기준 자세·축척 SIMULATED</span>
         <span>{toolStatus}</span>
@@ -272,6 +277,32 @@ function MachineInspectionControls({
         <span>드래그 회전 · 휠 확대 · 방향키 회전 · +/- 확대 · Home 전체 보기 · Esc 선택 해제</span>
       </details>
     </aside>
+  );
+}
+
+function FunctionalTwinSummary({
+  presentation,
+}: {
+  presentation: NonNullable<FactorySceneProps["functionalPresentation"]>;
+}) {
+  return (
+    <section className="functional-twin-summary" aria-label="현재 동작">
+      <header>
+        <strong>현재 동작</strong>
+        <span>{presentation.cursorLabel}</span>
+      </header>
+      <div className="functional-twin-values">
+        <span>{presentation.execution}</span>
+        <span>{presentation.rpm}</span>
+        <span>{presentation.axes}</span>
+        <span>{presentation.tool}</span>
+      </div>
+      <p>{presentation.currentRun}</p>
+      {presentation.selectedPath && <p>{presentation.selectedPath}</p>}
+      <small>
+        동작 표현 · {presentation.isLiveMotionAllowed ? "재생 중" : "안전 정지"}
+      </small>
+    </section>
   );
 }
 

@@ -31,6 +31,7 @@ import type { ObservedToolpathClient } from "../../toolpath/application/ports";
 import type { MachiningRun } from "../../process-analytics/domain/processAnalysis";
 import { useObservedToolpath } from "../../toolpath/ui/useObservedToolpath";
 import { mapObservedToolpathToScene } from "../../toolpath/domain/observedToolpath";
+import { composeFunctionalTwinPresentation } from "../domain/functionalTwinPresentation";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
@@ -54,7 +55,8 @@ export function FactoryRoute({
     useState<SceneUnavailableReason>();
   const [isAssetFallback, setIsAssetFallback] = useState(false);
   const [sceneAttempt, setSceneAttempt] = useState(0);
-  const [selectedRun, setSelectedRun] = useState<MachiningRun>();
+  const [currentRun, setCurrentRun] = useState<MachiningRun>();
+  const [selectedPathRun, setSelectedPathRun] = useState<MachiningRun>();
   const { isReducedMotion, toggleReducedMotion } = useReducedMotionPreference();
   const selectionStore = useMemo(
     () => new MachineSelectionStore(MAZAK01_SCENE_BINDING.machineId),
@@ -98,18 +100,20 @@ export function FactoryRoute({
   );
   const toolpathRequest = useMemo(() => {
     const cursor = twinState.snapshot?.replayCursor;
-    if (!selectedRun || !cursor) return undefined;
+    const pathRun = selectedPathRun ?? currentRun;
+    if (!pathRun || !cursor) return undefined;
     return {
       machineId,
       replaySessionId: cursor.replaySessionId,
-      startSequence: selectedRun.startSequence,
-      endSequence: selectedRun.endSequence ?? cursor.replaySequence,
+      startSequence: pathRun.startSequence,
+      endSequence: pathRun.endSequence ?? cursor.replaySequence,
       throughReplaySequence: cursor.replaySequence,
       resetKey: replay.authoritativeSession
         ? `${replay.authoritativeSession.revision}:${replay.authoritativeSession.speedMultiplier}`
         : undefined,
     };
-  }, [machineId, replay.authoritativeSession, selectedRun, twinState.snapshot?.replayCursor]);
+  }, [currentRun, machineId, replay.authoritativeSession, selectedPathRun,
+    twinState.snapshot?.replayCursor]);
   const observedPath = useObservedToolpath(observedToolpathClient, toolpathRequest);
   const sceneToolpath = useMemo(
     () => observedPath.document && machineBinding.linearAxisCoordinateMappings
@@ -117,6 +121,17 @@ export function FactoryRoute({
       : undefined,
     [machineBinding.linearAxisCoordinateMappings, observedPath.document],
   );
+  const functionalPresentation = useMemo(() => composeFunctionalTwinPresentation(
+    visualState,
+    currentRun,
+    selectedPathRun,
+    observedPath.document ? {
+      replaySessionId: observedPath.document.replaySessionId,
+      startSequence: observedPath.document.startSequence,
+      endSequence: observedPath.document.endSequence,
+      pointCount: observedPath.document.points.length,
+    } : undefined,
+  ), [currentRun, observedPath.document, selectedPathRun, visualState]);
   const staleAfterSeconds =
     (twinState.snapshot?.state.freshness.laggingMaxAgeMillis ?? 10_000) / 1_000;
   const LazyFactoryScene = useMemo(
@@ -226,9 +241,11 @@ export function FactoryRoute({
                       machineBinding={machineBinding}
                       visualState={visualState}
                       visualPresentation={visualPresentation}
+                      functionalPresentation={functionalPresentation}
                       isReducedMotion={isReducedMotion}
                       observedToolpath={sceneToolpath}
-                      selectedRunLabel={selectedRun?.program ? `PGM ${selectedRun.program}` : "선택한 가공"}
+                      selectedRunLabel={(selectedPathRun ?? currentRun)?.program
+                        ? `PGM ${(selectedPathRun ?? currentRun)?.program}` : "선택한 가공"}
                       toolpathStatus={observedPath.message}
                       onSelectMachine={selectionStore.selectMachine}
                       onAssetFallback={() => setIsAssetFallback(true)}
@@ -258,7 +275,8 @@ export function FactoryRoute({
             {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
               session={replay.authoritativeSession} twinState={twinState} client={processAnalysisClient}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}
-              onSelectedRunChange={setSelectedRun}
+              onCurrentRunChange={setCurrentRun}
+              onSelectedRunChange={setSelectedPathRun}
               retryTwin={retryNow} reloadReplay={replay.reload} seek={(at) => void replay.run("SEEKING", (current) =>
                 replayControlClient.seek(current.replaySessionId, current.revision, at, current.speedMultiplier))} />}
             {showsScene && <p className="section-note" role="status">{observedPath.message}</p>}

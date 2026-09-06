@@ -6,6 +6,7 @@ import type {
 } from "../domain/machineVisualState";
 import type { MachineVisualPresentation } from "../domain/machineVisualPresentation";
 import type { SceneToolpath } from "../../toolpath/domain/observedToolpath";
+import type { FunctionalTwinPresentation } from "../domain/functionalTwinPresentation";
 
 export type SceneUnavailableReason = "BUNDLE_OR_SCENE" | "WEBGL";
 
@@ -13,6 +14,7 @@ export interface FactorySceneProps {
   machineBinding: MachineSceneBinding;
   visualState: MachineVisualState | undefined;
   visualPresentation: MachineVisualPresentation;
+  functionalPresentation?: FunctionalTwinPresentation;
   isReducedMotion?: boolean;
   observedToolpath?: SceneToolpath;
   selectedRunLabel?: string;

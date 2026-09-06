@@ -998,7 +998,7 @@ Replay watermark까지만 읽는다. X/Y/Z가 모두 유효한 source observatio
 3D는 차분한 단색 선과 반환된 점의 observed envelope만 표시한다. 화면은 이를 실제 절삭 흔적, 소재 제거,
 충돌 안전 범위 또는 기계 행정 한계라고 주장하지 않는다. [ADR-047](../adr/ADR-047-selected-run-observed-toolpath.md)
 
-### Step 31 — Functional Twin Replay Acceptance
+### Step 31 — Functional Twin Replay Acceptance ✅ DONE
 
 **목적**: execution, spindle, XYZ, tool, current run이 하나의 replay cursor에서 일관된 물리적 의미를
 설명하게 한다.
@@ -1021,6 +1021,19 @@ Replay watermark까지만 읽는다. X/Y/Z가 모두 유효한 source observatio
 C축, 실제 절삭 시뮬레이션, coolant/chip, OEM CAD fidelity는 완료 조건이 아니다.
 
 **선행 조건**: Step 21, Step 28, Step 30.
+
+**구현 기록 (2026-09-06)**
+
+- Replay cursor 하나에서 execution, RPM, XYZ, tool, 현재 가공을 조합하는 순수 presentation policy와
+  작은 상시 노출 `현재 동작` 요약을 추가했다. 관측값은 `OBSERVED`, 가공 구간은 `DERIVED`, 관측
+  경로는 `OBSERVED_PATH`로 구분한다.
+- 현재 cursor가 포함된 가공과 사용자가 따로 고른 과거 가공 경로를 별도 상태로 유지한다. 과거 경로를
+  골라도 `현재 재생 가공` 표시는 바뀌지 않으며, 경로는 session/run 범위가 일치할 때만 표시한다.
+- ACTIVE/RPM만으로 애니메이션을 켜지 않고 online, fresh, Replay advancing 조건을 함께 요구한다.
+  STOPPED, pause, stale에서는 안전 정지하며 B/C축과 공구 형상은 검증 전 상태를 그대로 표시한다.
+- production route가 아닌 `SIMULATED_TEST_FIXTURE`로 ACTIVE/STOPPED/pause/stale frame을 고정했다.
+  결정 근거는 [ADR-048](../adr/ADR-048-functional-twin-replay-composition.md), 검증 상태는
+  Verification Ledger `V-043`에 기록했다.
 
 ---
 

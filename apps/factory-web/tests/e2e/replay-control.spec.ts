@@ -73,6 +73,11 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(page.getByText("OBSERVED · REAL:NIST", { exact: true })).toBeVisible();
   await expect(page.getByRole("region", { name: "ANOMALY · 이전 가공과의 차이" })).toContainText("고장 판정이 아닙니다");
   await page.getByRole("button", { name: "SPLIT", exact: true }).click();
+  const currentAction = page.getByRole("region", { name: "현재 동작" });
+  await expect(currentAction).toContainText("현재 재생 가공 · 없음");
+  await expect(currentAction).toContainText(/선택 경로 · PGM 155 · \d+점 · OBSERVED_PATH/, {
+    timeout: 60_000,
+  });
   await page.getByText("모델 정보", { exact: true }).click();
   await expect(page.getByText(/PGM 155의 관측 위치 \d+점을 연결한 경로/)).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText(/실제 절삭 흔적이나 기계 이동 한계가 아닙니다/)).toBeVisible();

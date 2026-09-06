@@ -15,12 +15,14 @@ const browserClient = new HttpProcessAnalysisClient(import.meta.env.VITE_API_BAS
 
 export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin, reloadReplay, seek,
   client = browserClient, layout = "FULL",
+  onCurrentRunChange,
   onSelectedRunChange,
 }: {
   machineId: string; session?: ReplaySessionState; twinState: TwinLiveState;
   retryTwin: () => void; reloadReplay: () => Promise<void>; seek: (sourceObservedAt: string) => void;
   client?: ProcessAnalysisClient;
   layout?: "FULL" | "COMPACT";
+  onCurrentRunChange?: (run: MachiningRun | undefined) => void;
   onSelectedRunChange?: (run: MachiningRun | undefined) => void;
 }) {
   const { analysis, message, canRetry, retry } = useProcessAnalysis({
@@ -32,9 +34,14 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
   const [visibleRunCount, setVisibleRunCount] = useState(40);
   const cursor = twinState.snapshot?.replayCursor;
   const current = analysis && cursor ? currentRun(analysis.runs, cursor) : undefined;
-  const selected = selection?.analysis === analysis
-    ? analysis?.runs.find((run) => run.id === selection?.runId) : current;
-  useEffect(() => onSelectedRunChange?.(selected), [onSelectedRunChange, selected]);
+  const explicitlySelected = selection?.analysis === analysis
+    ? analysis?.runs.find((run) => run.id === selection?.runId) : undefined;
+  const selected = explicitlySelected ?? current;
+  useEffect(() => onCurrentRunChange?.(current), [current, onCurrentRunChange]);
+  useEffect(
+    () => onSelectedRunChange?.(explicitlySelected),
+    [explicitlySelected, onSelectedRunChange],
+  );
   const filtered = useMemo(
     () => filterAndGroupRuns(analysis?.runs ?? [], filters),
     [analysis, filters],

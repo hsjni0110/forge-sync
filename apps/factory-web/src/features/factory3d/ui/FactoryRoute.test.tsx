@@ -49,6 +49,8 @@ describe("FactoryRoute", () => {
       sceneLoader={async () => ({ default: HealthyScene })} /></MemoryRouter>);
 
     expect(await screen.findByText("3D observed path · 2 points · PGM 114")).toBeTruthy();
+    expect(screen.getByText("현재 재생 가공 · PGM 114 · DERIVED")).toBeTruthy();
+    expect(screen.queryByText(/선택 경로 · PGM 114/)).toBeNull();
     expect(observedToolpathClient.find).toHaveBeenCalledWith(expect.objectContaining({
       replaySessionId: snapshot.replayCursor.replaySessionId,
       startSequence: 1, endSequence: 4, throughReplaySequence: 4,
@@ -262,6 +264,7 @@ function HealthyScene({
   onSelectMachine,
   observedToolpath,
   selectedRunLabel,
+  functionalPresentation,
 }: FactorySceneProps) {
   return (
     <div>
@@ -278,6 +281,10 @@ function HealthyScene({
         {visualPresentation.isSpindleAnimating ? "on" : "off"}
       </span>
       {observedToolpath && <span>3D observed path · {observedToolpath.points.length} points · {selectedRunLabel}</span>}
+      {functionalPresentation && <>
+        <span>{functionalPresentation.currentRun}</span>
+        {functionalPresentation.selectedPath && <span>{functionalPresentation.selectedPath}</span>}
+      </>}
     </div>
   );
 }

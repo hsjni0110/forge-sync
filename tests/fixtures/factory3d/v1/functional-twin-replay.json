@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0.0",
+  "machineId": "Mazak01",
+  "provenance": "SIMULATED_TEST_FIXTURE",
+  "frames": [
+    { "sequence": 100, "execution": "ACTIVE", "rpm": 1200, "isReplayAdvancing": true, "stale": false, "expectsMotion": true },
+    { "sequence": 101, "execution": "STOPPED", "rpm": 1200, "isReplayAdvancing": true, "stale": false, "expectsMotion": false },
+    { "sequence": 102, "execution": "ACTIVE", "rpm": 1200, "isReplayAdvancing": false, "stale": false, "expectsMotion": false },
+    { "sequence": 103, "execution": "ACTIVE", "rpm": 1200, "isReplayAdvancing": true, "stale": true, "expectsMotion": false }
+  ]
+}
