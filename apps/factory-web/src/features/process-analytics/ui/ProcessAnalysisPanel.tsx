@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import type { ReplaySessionState } from "../../replay/domain/replay";
 import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
 import { HttpProcessAnalysisClient } from "../adapters/httpProcessAnalysisClient";
@@ -53,12 +52,12 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
           <div><dt>신뢰도<HelpTip text={GLOSSARY.confidence} /></dt><dd>{confidenceLabel(current.confidence)}</dd></div>
         </dl>
       </> : <p>현재 가공 없음</p>}
-      <button type="button" disabled={!canRetry} onClick={retry}>{analysis ? "분석 다시 계산" : "분석 다시 시도"}</button>
+      <button type="button" className="button-quiet" disabled={!canRetry} onClick={retry}>{analysis ? "분석 다시 계산" : "분석 다시 시도"}</button>
       {analysis && <p className="section-note">분석 기준 · {cursor?.sourceObservedAt} · Twin v{cursor?.twinVersion}</p>}
     </section>
     {layout === "COMPACT" && <div className="process-summary">
       <p>PROCESS / ANOMALY · {current ? "완료된 가공만 분석 가능" : "현재 가공의 분석 없음"}</p>
-      <Link to={`/machines/${encodeURIComponent(machineId)}`}>공정 분석 상세 보기</Link>
+      <p className="section-note">상단 2D 보기에서 가공 목록과 이상 근거를 확인할 수 있습니다.</p>
     </div>}
     {analysis && layout === "FULL" && <section className="detail-section" aria-label="가공 목록과 상세">
       <h2>Process Timeline · 가공 목록</h2>
@@ -93,8 +92,8 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
         })}
       </ol>
       {selected && <div className="run-seek-actions" role="group" aria-label="선택한 가공 시점으로 재생 이동">
-        <button type="button" onClick={() => seek(selected.startedAt)}>가공 시작 시점으로 이동</button>
-        {selected.endedAt && <button type="button" onClick={() => seek(selected.endedAt!)}>가공 종료 시점으로 이동</button>}
+        <button type="button" className="button-quiet" onClick={() => seek(selected.startedAt)}>가공 시작 시점으로 이동</button>
+        {selected.endedAt && <button type="button" className="button-quiet" onClick={() => seek(selected.endedAt!)}>가공 종료 시점으로 이동</button>}
       </div>}
       {selected ? <RunDetail run={selected} /> : <p className="empty-state">위 목록에서 가공을 선택해 분석 근거를 확인하세요.</p>}
       <details className="provenance-disclosure"><summary>분석 처리 버전</summary><dl className="definition-list">

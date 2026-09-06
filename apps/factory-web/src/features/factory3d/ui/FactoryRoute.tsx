@@ -134,12 +134,13 @@ export function FactoryRoute({
         </div>
       </header>
 
-      <p className="layout-provenance">
-        Layout provenance · {MAZAK01_SCENE_BINDING.spatialProvenance}
-      </p>
-      <p className="visual-cue-note">
-        RPM 기반 회전은 상태 변화를 보여주는 시각 효과이며 실제 물리 회전 속도가 아닙니다.
-      </p>
+      <details className="scene-disclaimer">
+        <summary>이 화면에 대하여</summary>
+        <p>Layout provenance · {MAZAK01_SCENE_BINDING.spatialProvenance}</p>
+        <p>
+          RPM 기반 회전은 상태 변화를 보여주는 시각 효과이며 실제 물리 회전 속도가 아닙니다.
+        </p>
+      </details>
       {replayControlClient && (
         <ReplayControls
           machineId={machineId}
@@ -247,7 +248,7 @@ function SceneUnavailableNotice({
           : "3D 코드를 불러오거나 실행하지 못했습니다."}
       </span>
       <span>설비 상태는 2D 화면에서 계속 확인할 수 있습니다.</span>
-      <button type="button" onClick={retryScene}>3D 다시 시도</button>
+      <button type="button" className="button-quiet" onClick={retryScene}>3D 다시 시도</button>
     </div>
   );
 }

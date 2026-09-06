@@ -1,10 +1,10 @@
 import { Link, Route, Routes } from "react-router-dom";
 
+import { DashboardRoute } from "../../dashboard/ui/DashboardRoute";
 import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
 import type { FactorySceneLoader } from "../../factory3d/ui/factorySceneContract";
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
-import { MachineDetailRoute } from "../../twin/ui/MachineDetailRoute";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -28,16 +28,20 @@ export function App({
           ForgeSync
         </Link>
         <nav aria-label="주요 메뉴">
-          <Link to="/machines/Mazak01">설비 상세</Link>
+          <Link to="/">대시보드</Link>
           <Link to="/factory">공장 보기</Link>
         </nav>
       </header>
       <main id="main-content" className="app-shell">
         <Routes>
-          <Route path="/" element={<Home />} />
           <Route
-            path="/machines/:machineId"
-            element={<MachineDetailRoute sessionFactory={twinSessionFactory} replayControlClient={replayControlClient} />}
+            path="/"
+            element={
+              <DashboardRoute
+                twinSessionFactory={twinSessionFactory}
+                replayControlClient={replayControlClient}
+              />
+            }
           />
           <Route
             path="/factory"
@@ -53,19 +57,6 @@ export function App({
         </Routes>
       </main>
     </div>
-  );
-}
-
-function Home() {
-  return (
-    <section className="home-page">
-      <p className="eyebrow">제조 운영 디지털 트윈</p>
-      <h1>ForgeSync</h1>
-      <p>설비의 현재 상태와 데이터 출처를 한눈에 확인하세요.</p>
-      <Link className="primary-link" to="/machines/Mazak01">
-        Mazak01 설비 상세 보기
-      </Link>
-    </section>
   );
 }
 

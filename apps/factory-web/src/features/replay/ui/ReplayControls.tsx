@@ -83,6 +83,7 @@ function ReplayControlsView({
       {!session ? (
         <button
           type="button"
+          className="button-quiet"
           disabled={isLoading}
           onClick={() =>
             hasLoadFailure ? void reload() : void start()

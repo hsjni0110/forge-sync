@@ -7,9 +7,10 @@ import featureFixture from "../../../../../../tests/fixtures/process-analytics/v
 import assessmentFixture from "../../../../../../tests/fixtures/process-analytics/v1/mazak01-anomaly-assessments.json";
 import twinFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-operational-twin.json";
 import type { TwinSnapshot } from "../domain/twin";
+import type { TwinSessionFactory } from "../application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { AssessmentDocument } from "../../process-analytics/adapters/processDocuments";
-import { MachineDetailPanel } from "./MachineDetailRoute";
+import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
@@ -63,9 +64,13 @@ function showProcess(document: typeof runFixture, mismatch: boolean | "recover" 
   };
   const state = { connectionStatus: "LIVE" as const, snapshot, freshness: "FRESH" as const };
   const retryTwin = vi.fn();
-  render(<MemoryRouter><MachineDetailPanel machineId="Mazak01" replayControlClient={replayControlClient}
-    sessionFactory={() => ({ start() {}, dispose() {}, retryNow: retryTwin, currentState: () => state,
-      subscribe(listener) { listener(state); return () => undefined; } })} /></MemoryRouter>);
+  const sessionFactory: TwinSessionFactory = () => ({
+    start() {}, dispose() {}, retryNow: retryTwin, currentState: () => state,
+    subscribe(listener) { listener(state); return () => undefined; },
+  });
+  render(<MemoryRouter><FactoryRoute sessionFactory={sessionFactory} replayControlClient={replayControlClient}
+    sceneLoader={async () => ({ default: () => null })} /></MemoryRouter>);
+  fireEvent.click(screen.getByRole("button", { name: "2D" }));
   return Object.assign(fetch, { retryTwin, replayControlClient });
 }
 

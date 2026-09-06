@@ -34,7 +34,8 @@ describe("FactoryRoute", () => {
       processAnalysisClient={processAnalysisClient} sceneLoader={async () => ({ default: WebGlFailureScene })} /></MemoryRouter>);
     expect(await screen.findByText("3D를 사용할 수 없습니다")).toBeTruthy();
     expect(await screen.findByText("가공 중단 · 종료 근거 미확정")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "공정 분석 상세 보기" }).getAttribute("href")).toBe("/machines/Mazak01");
+    expect(screen.queryByRole("link", { name: "공정 분석 상세 보기" })).toBeNull();
+    expect(screen.getByText(/상단 2D 보기에서 가공 목록과 이상 근거/)).toBeTruthy();
     expect(screen.queryByRole("region", { name: "가공 목록과 상세" })).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "2D" }));
     expect(await screen.findByRole("region", { name: "가공 목록과 상세" })).toBeTruthy();
