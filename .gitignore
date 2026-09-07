@@ -22,3 +22,6 @@ datasets/raw/**
 # Generated L2 observations are reproducible derivatives, separate from immutable raw artifacts.
 datasets/canonical/**
 !datasets/canonical/README.md
+
+# Per-developer Claude Code permission grants, unlike the shared launch configuration.
+.claude/settings.local.json
