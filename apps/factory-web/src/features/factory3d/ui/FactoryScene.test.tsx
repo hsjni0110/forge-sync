@@ -16,13 +16,19 @@ const loadVerifiedGlbAsset = vi.hoisted(() => vi.fn());
 const canvasBehavior = vi.hoisted(() => ({ rendersScene: true }));
 const cameraCommands = vi.hoisted(() => [] as unknown[]);
 const reducedMotionValues = vi.hoisted(() => [] as boolean[]);
+const bottomObstructions = vi.hoisted(() => [] as unknown[]);
 
 vi.mock("../adapters/verifiedGlbAsset", () => ({ loadVerifiedGlbAsset }));
 vi.mock("./MachineInspectionOverlay", () => ({ MachineInspectionOverlay: () => null }));
 vi.mock("./CameraNavigationRig", () => ({
-  CameraNavigationRig: ({ command, isReducedMotion }: { command?: unknown; isReducedMotion: boolean }) => {
+  CameraNavigationRig: ({ command, isReducedMotion, bottomObstructionFraction }: {
+    command?: unknown;
+    isReducedMotion: boolean;
+    bottomObstructionFraction?: number;
+  }) => {
     if (command) cameraCommands.push(command);
     reducedMotionValues.push(isReducedMotion);
+    bottomObstructions.push(bottomObstructionFraction);
     return null;
   },
 }));
@@ -62,6 +68,7 @@ afterEach(() => {
   canvasBehavior.rendersScene = true;
   cameraCommands.length = 0;
   reducedMotionValues.length = 0;
+  bottomObstructions.length = 0;
   vi.restoreAllMocks();
 });
 
@@ -344,6 +351,27 @@ describe("FactoryScene asset isolation", () => {
     expect(hidden.some((text) => text?.includes("시각 회전"))).toBe(true);
     expect(hidden).toContain("선택됨");
     expect(container.querySelector(".floating-machine-label")?.textContent).toContain("Twin v4");
+  });
+
+  it("tells the camera how much of the viewport the overlays cover", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+    await screen.findByText("Twin v4");
+
+    const reported = bottomObstructions.at(-1);
+
+    expect(typeof reported).toBe("number");
+    expect(reported as number).toBeGreaterThanOrEqual(0);
+    expect(reported as number).toBeLessThanOrEqual(0.8);
   });
 
   it("renders textual warning and stale cues without relying on color", async () => {

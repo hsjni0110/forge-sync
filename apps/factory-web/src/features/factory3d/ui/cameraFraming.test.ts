@@ -23,6 +23,28 @@ describe("camera framing policy", () => {
     expect(small.visibleFraction).toBe(0.7);
   });
 
+  it("lifts the machine clear of an overlay covering the lower viewport", () => {
+    const bounds = new Box3(new Vector3(-1, 0, -1), new Vector3(1, 2, 1));
+
+    const unobstructed = calculateCameraFrame(bounds, 42, 16 / 9);
+    const overlaid = calculateCameraFrame(bounds, 42, 16 / 9, 0.4);
+
+    // The subject has to sit above the overlay, so the aim point drops below the model centre.
+    expect(overlaid.target.y).toBeLessThan(unobstructed.target.y);
+    // And it has to fit in a shorter band, so the camera stands further back.
+    expect(overlaid.distance).toBeGreaterThan(unobstructed.distance);
+  });
+
+  it("leaves framing untouched when nothing covers the viewport", () => {
+    const bounds = new Box3(new Vector3(-1, 0, -1), new Vector3(1, 2, 1));
+
+    const implicit = calculateCameraFrame(bounds, 42, 16 / 9);
+    const explicitZero = calculateCameraFrame(bounds, 42, 16 / 9, 0);
+
+    expect(explicitZero.target.toArray()).toEqual(implicit.target.toArray());
+    expect(explicitZero.distance).toBeCloseTo(implicit.distance);
+  });
+
   it("centers a selected part and keeps portrait layouts inside the viewport", () => {
     const frame = calculateCameraFrame(
       new Box3(new Vector3(2, 1, 4), new Vector3(4, 3, 8)),

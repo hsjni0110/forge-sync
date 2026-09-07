@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "jsdom",
+    setupFiles: ["./tests/setup-dom.ts"],
     exclude: [...configDefaults.exclude, "tests/e2e/**"],
   },
 });

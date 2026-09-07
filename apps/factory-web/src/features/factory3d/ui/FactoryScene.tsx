@@ -31,8 +31,10 @@ export default function FactoryScene({
   const [isEnclosureTransparent, setIsEnclosureTransparent] = useState(false);
   const [isToolpathVisible, setIsToolpathVisible] = useState(true);
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>();
+  const [bottomObstructionFraction, setBottomObstructionFraction] = useState(0);
   const cameraSequence = useRef(0);
   const stageRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const handleModelReady = useCallback((readyModel?: MachineTwinModel) => {
     setModel(readyModel);
   }, []);
@@ -74,6 +76,32 @@ export default function FactoryScene({
     // The stage only exists once WebGL is known to be available, so this must run again then.
   }, [onUnavailable, webGlAvailability]);
 
+  // The summary and the inspection strip float over the canvas, so the camera has to know how much
+  // of the viewport they hide or it frames the machine behind them.
+  useEffect(() => {
+    const stage = stageRef.current;
+    const overlay = overlayRef.current;
+    if (!stage || !overlay) {
+      setBottomObstructionFraction(0);
+      return;
+    }
+    const measure = () => {
+      const stageBox = stage.getBoundingClientRect();
+      const overlayBox = overlay.getBoundingClientRect();
+      if (stageBox.height <= 0 || overlayBox.height <= 0) {
+        setBottomObstructionFraction(0);
+        return;
+      }
+      const covered = stageBox.bottom - overlayBox.top;
+      setBottomObstructionFraction(Math.min(Math.max(covered / stageBox.height, 0), 0.8));
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(stage);
+    observer.observe(overlay);
+    return () => observer.disconnect();
+  }, [webGlAvailability, functionalPresentation, model]);
+
   if (webGlAvailability !== "AVAILABLE") {
     return <div className="scene-loading" role="status">3D 그래픽 환경을 확인하는 중입니다.</div>;
   }
@@ -86,6 +114,10 @@ export default function FactoryScene({
         aria-label="3D 조작 영역"
         tabIndex={0}
         onKeyDown={(event) => {
+        // The strip inside the stage owns its own keys; only the stage itself drives the camera.
+        if (event.target !== event.currentTarget) {
+          return;
+        }
         const command = keyboardCameraCommand(event.key);
         if (command === "CLEAR_SELECTION") {
           selectPart(undefined);
@@ -141,6 +173,7 @@ export default function FactoryScene({
           model={model}
           command={cameraCommand}
           isReducedMotion={isReducedMotion}
+          bottomObstructionFraction={bottomObstructionFraction}
         />
         </Canvas>
         <FloatingMachineLabel
@@ -150,26 +183,30 @@ export default function FactoryScene({
           onSelectMachine={onSelectMachine}
         />
         {isSceneReady && <span className="visually-hidden">3D 장면 준비됨</span>}
+        <div className="scene-hud" ref={overlayRef}>
+          <MachineInspectionControls
+            model={model}
+            selectedPartId={selectedPartId}
+            isEnclosureTransparent={isEnclosureTransparent}
+            issueCameraCommand={issueCameraCommand}
+            selectPart={selectPart}
+            toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
+            bAxisStatus={bAxisStatus(machineBinding, visualState)}
+            linearAxisStatus={linearAxisStatus(machineBinding, visualState, model)}
+            toolStatus={toolStatus(visualState)}
+            observedToolpath={observedToolpath}
+            selectedRunLabel={selectedRunLabel}
+            toolpathStatus={toolpathStatus}
+            isToolpathVisible={isToolpathVisible}
+            toggleToolpath={() => setIsToolpathVisible((current) => !current)}
+          />
+        </div>
       </div>
+      {/* The summary grows with the data, so it stays in the flow. Only the fixed control strip
+          floats, keeping the hidden band predictable. */}
       {functionalPresentation && (
         <FunctionalTwinSummary presentation={functionalPresentation} />
       )}
-      <MachineInspectionControls
-        model={model}
-        selectedPartId={selectedPartId}
-        isEnclosureTransparent={isEnclosureTransparent}
-        issueCameraCommand={issueCameraCommand}
-        selectPart={selectPart}
-        toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
-        bAxisStatus={bAxisStatus(machineBinding, visualState)}
-        linearAxisStatus={linearAxisStatus(machineBinding, visualState, model)}
-        toolStatus={toolStatus(visualState)}
-        observedToolpath={observedToolpath}
-        selectedRunLabel={selectedRunLabel}
-        toolpathStatus={toolpathStatus}
-        isToolpathVisible={isToolpathVisible}
-        toggleToolpath={() => setIsToolpathVisible((current) => !current)}
-      />
     </div>
   );
 }

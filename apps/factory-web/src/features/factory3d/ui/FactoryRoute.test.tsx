@@ -89,6 +89,20 @@ describe("FactoryRoute", () => {
     expect(screen.getByRole("button", { name: "3D 다시 시도" })).toBeTruthy();
   });
 
+  it("keeps every explanation of the screen in one place instead of above the machine", async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <FactoryRoute sessionFactory={createSession} sceneLoader={async () => ({ default: HealthyScene })} />
+      </MemoryRouter>,
+    );
+    await screen.findByRole("button", { name: "SPLIT" });
+
+    const disclosure = container.querySelector(".scene-disclaimer");
+
+    expect(disclosure?.textContent).toContain("무엇을 보고 있나요?");
+    expect(container.querySelector(".scene-panel .scene-introduction")).toBeNull();
+  });
+
   it("gives the spatial views a viewport console and keeps 2D a scrolling document", async () => {
     const { container } = render(
       <MemoryRouter>

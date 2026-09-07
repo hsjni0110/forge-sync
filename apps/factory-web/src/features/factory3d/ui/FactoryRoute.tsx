@@ -184,8 +184,17 @@ export function FactoryRoute({
         </div>
       </header>
 
+      {/* One place explains the screen. Above the machine this prose cost the canvas 73px. */}
       <details className="scene-disclaimer">
         <summary>이 화면에 대하여</summary>
+        <p>
+          <strong>무엇을 보고 있나요?</strong> 실제 Mazak 외형이 아니라 외함, 가공실, 작업대,
+          스핀들, 조작반을 구분한 범용 수직형 CNC를 단순화한 모습입니다.
+        </p>
+        <p>
+          {staleAfterSeconds}초 동안 새 값이 없으면 안전하게 오래된 데이터로 표시합니다.
+          데이터 재생이 끝났다는 뜻은 아닙니다.
+        </p>
         <p>Layout provenance · {machineBinding.spatialProvenance}</p>
         {machineBinding.spatialAvailability === "FALLBACK" && (
           <p>배치 정보 사용 불가 · 기본 배치를 표시합니다.</p>
@@ -204,17 +213,6 @@ export function FactoryRoute({
         {showsScene && (
           <section className="scene-panel" aria-labelledby="factory-scene-title">
             <h2 id="factory-scene-title">3D 공장</h2>
-            <div className="scene-introduction">
-              <strong>무엇을 보고 있나요?</strong>
-              <span>
-                실제 Mazak 외형이 아니라 외함, 가공실, 작업대, 스핀들, 조작반을 구분한
-                범용 수직형 CNC를 단순화한 모습입니다.
-              </span>
-              <span>
-                {staleAfterSeconds}초 동안 새 값이 없으면 안전하게 오래된 데이터로 표시합니다.
-                데이터 재생이 끝났다는 뜻은 아닙니다.
-              </span>
-            </div>
             <div className="scene-viewport">
               {unavailableReason === undefined ? (
                 <SceneErrorBoundary

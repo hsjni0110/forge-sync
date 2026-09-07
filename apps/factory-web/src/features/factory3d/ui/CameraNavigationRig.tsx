@@ -16,10 +16,16 @@ export interface CameraCommand {
   partId?: MachineInspectionPartId;
 }
 
-export function CameraNavigationRig({ model, command, isReducedMotion }: {
+export function CameraNavigationRig({
+  model,
+  command,
+  isReducedMotion,
+  bottomObstructionFraction = 0,
+}: {
   model?: MachineTwinModel;
   command?: CameraCommand;
   isReducedMotion: boolean;
+  bottomObstructionFraction?: number;
 }) {
   const { camera, gl, size } = useThree();
   const controlsRef = useRef<OrbitControls | undefined>(undefined);
@@ -52,7 +58,10 @@ export function CameraNavigationRig({ model, command, isReducedMotion }: {
       ? model.inspection.parts[command.partId].node
       : model.root;
     const frame = calculateCameraFrame(
-      new Box3().setFromObject(target), camera.fov, size.width / size.height,
+      new Box3().setFromObject(target),
+      camera.fov,
+      size.width / size.height,
+      bottomObstructionFraction,
     );
     controls.minDistance = frame.minDistance;
     controls.maxDistance = frame.maxDistance;
@@ -82,7 +91,15 @@ export function CameraNavigationRig({ model, command, isReducedMotion }: {
     if (command.type === "ROTATE_UP") controls.rotateUp(angle);
     if (command.type === "ROTATE_DOWN") controls.rotateUp(-angle);
     controls.update(0);
-  }, [camera, command, isReducedMotion, model, size.height, size.width]);
+  }, [
+    bottomObstructionFraction,
+    camera,
+    command,
+    isReducedMotion,
+    model,
+    size.height,
+    size.width,
+  ]);
 
   useFrame((_state, delta) => {
     const controls = controlsRef.current;

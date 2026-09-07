@@ -229,18 +229,21 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
  * 900px viewport. They read as instrument overlays, so the canvas takes the whole column and they
  * float over its lower edge, the way a viewport HUD does.
  */
-.factory-console .scene-canvas-root { position: relative; min-height: 0; height: 100%; grid-template-rows: minmax(0, 1fr); }
+.factory-console .scene-canvas-root { min-height: 0; height: 100%; grid-template-rows: minmax(0, 1fr) auto; }
+.scene-canvas-root { grid-template-rows: auto auto auto; }
 .factory-console .scene-canvas-stage { height: auto; min-height: 14rem; }
-.factory-console .functional-twin-summary,
-.factory-console .machine-inspection-panel {
+.factory-console .scene-hud {
   position: absolute;
   right: 0;
+  bottom: 0;
   left: 0;
-  border-top: 0;
   background: rgb(11 20 25 / 88%);
 }
-.factory-console .functional-twin-summary { bottom: 3.5rem; }
-.factory-console .machine-inspection-panel { bottom: 0; }
+.factory-console .scene-hud .machine-inspection-panel {
+  padding: var(--fs-space-2xs) var(--fs-space-sm);
+  border-top: 0;
+  background: transparent;
+}
 
 /* In the console the page title is a strip, not a hero, so the height goes to the machine. */
 .factory-console .factory-header { align-items: center; }
@@ -343,6 +346,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
   .factory-console { height: auto; min-height: 0; }
   .factory-console .scene-panel,
   .factory-console .factory-detail-panel { overflow-y: visible; }
+  /* With room to scroll there is no reason to cover the machine, so the HUD returns to the flow. */
+  .factory-console .scene-hud { position: static; background: transparent; }
+  .factory-console .scene-canvas-root { height: auto; grid-template-rows: auto auto; }
   .factory-layout-split { grid-template-columns: 1fr; }
   .scene-viewport, .scene-loading, .scene-unavailable { min-height: 28rem; }
   .scene-canvas-root { min-height: 28rem; }
