@@ -104,7 +104,9 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .site-header { display: flex; align-items: center; justify-content: space-between; min-height: 4.5rem; padding: 0 5vw; border-bottom: 1px solid var(--fs-border); background: var(--fs-bg-header); }
 .site-header nav { display: flex; gap: var(--fs-space-md); }
 .brand { color: var(--fs-text); font-size: var(--fs-type-lg); font-weight: 800; letter-spacing: 0.04em; text-decoration: none; }
-.app-shell { width: min(1280px, 100%); min-height: calc(100vh - 4.5rem); margin: 0 auto; padding: 2.25rem clamp(1rem, 4vw, 3rem) 4rem; }
+.app-shell { width: min(1280px, 100%); min-height: calc(100dvh - 4.5rem); margin: 0 auto; padding: var(--fs-space-xl) clamp(1rem, 4vw, 3rem) var(--fs-space-2xl); }
+/* The console sizes itself to the viewport, so the shell must not add trailing space. */
+.app-shell:has(.factory-console) { padding-bottom: var(--fs-space-md); }
 .dashboard-page { display: grid; gap: var(--fs-space-md); max-width: 920px; padding-top: 4vh; }
 .dashboard-page h1, .machine-header h1, .page-message h1, .factory-header h1 { margin: 0; color: var(--fs-accent); font-size: var(--fs-type-hero); line-height: 1.1; }
 .primary-link { display: inline-block; padding: var(--fs-space-sm) var(--fs-space-md); border: 1px solid var(--fs-border-strong); border-radius: var(--fs-radius-md); text-decoration: none; font-weight: 700; }
@@ -204,6 +206,56 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .page-message { max-width: 680px; padding-top: 12vh; }
 .page-message h1 { font-size: var(--fs-type-hero); }
 .factory-page { display: grid; gap: var(--fs-space-sm); }
+
+/*
+ * PRD 30: in the spatial views the page is an operations console, not a document. The scene band
+ * takes the height that is left after the header and the transport, so the machine and its values
+ * are readable together instead of a screen apart. Each column scrolls on its own.
+ */
+.factory-console {
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  /* A definite height, not a minimum: 1fr only holds the band back when the track has one. */
+  height: calc(100dvh - 4.5rem - var(--fs-space-xl) - var(--fs-space-md));
+  min-height: 34rem;
+}
+.factory-console .factory-layout { min-height: 0; align-items: stretch; }
+.factory-console .scene-panel,
+.factory-console .factory-detail-panel { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.factory-console .scene-panel { display: grid; grid-template-rows: auto auto minmax(0, 1fr); }
+.factory-console .scene-panel { overflow: hidden; }
+.factory-console .scene-viewport { min-height: 0; }
+/*
+ * Stacking the summary and the inspection strip under the canvas left the machine 224px in a
+ * 900px viewport. They read as instrument overlays, so the canvas takes the whole column and they
+ * float over its lower edge, the way a viewport HUD does.
+ */
+.factory-console .scene-canvas-root { position: relative; min-height: 0; height: 100%; grid-template-rows: minmax(0, 1fr); }
+.factory-console .scene-canvas-stage { height: auto; min-height: 14rem; }
+.factory-console .functional-twin-summary,
+.factory-console .machine-inspection-panel {
+  position: absolute;
+  right: 0;
+  left: 0;
+  border-top: 0;
+  background: rgb(11 20 25 / 88%);
+}
+.factory-console .functional-twin-summary { bottom: 3.5rem; }
+.factory-console .machine-inspection-panel { bottom: 0; }
+
+/* In the console the page title is a strip, not a hero, so the height goes to the machine. */
+.factory-console .factory-header { align-items: center; }
+.factory-console .factory-header > div:first-child {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--fs-space-xs) var(--fs-space-sm);
+}
+.factory-console .factory-header .eyebrow { display: none; }
+.factory-console .factory-header h1 { font-size: var(--fs-type-xl); }
+.factory-console .factory-header > div:first-child > p { margin: 0; font-size: var(--fs-type-xs); }
+.factory-console .scene-panel > h2 { font-size: var(--fs-type-md); margin-bottom: var(--fs-space-3xs); }
+.factory-console .scene-introduction { gap: var(--fs-space-3xs); padding: var(--fs-space-xs) var(--fs-space-sm); }
+.factory-console .scene-introduction span { font-size: var(--fs-type-2xs); }
 .factory-header { display: flex; align-items: end; justify-content: space-between; gap: var(--fs-space-xl); }
 .factory-header h1 { font-size: var(--fs-type-hero); }
 .factory-header p { color: var(--fs-text-muted); }
@@ -227,7 +279,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .scene-disclaimer > summary { width: fit-content; padding: var(--fs-space-3xs) var(--fs-space-xs); border: 1px solid var(--fs-border-strong); border-radius: var(--fs-radius-pill); color: var(--fs-accent-text); background: var(--fs-accent-surface); font-size: var(--fs-type-xs); letter-spacing: 0.04em; cursor: pointer; }
 .scene-disclaimer[open] > summary { margin-bottom: var(--fs-space-xs); }
 .scene-disclaimer p { margin: var(--fs-space-3xs) 0 0; }
-.factory-layout { display: grid; gap: var(--fs-space-md); align-items: start; }
+.factory-layout { display: grid; gap: var(--fs-space-md); align-items: start; min-width: 0; }
 .factory-layout-split { grid-template-columns: minmax(0, 1.55fr) minmax(22rem, 0.7fr); }
 .scene-panel, .factory-detail-panel { min-width: 0; }
 .scene-panel { padding: var(--fs-space-md); border: 1px solid var(--fs-border); border-radius: var(--fs-radius-lg); background: var(--fs-surface); }
@@ -286,10 +338,19 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 @media (max-width: 960px) {
+  /* Stacked columns cannot share one viewport, so the page becomes a document again. */
+  .factory-console { height: auto; min-height: 0; }
+  .factory-console .scene-panel,
+  .factory-console .factory-detail-panel { overflow-y: visible; }
   .factory-layout-split { grid-template-columns: 1fr; }
   .scene-viewport, .scene-loading, .scene-unavailable { min-height: 28rem; }
   .scene-canvas-root { min-height: 28rem; }
   .scene-canvas-stage { height: 23rem; }
+}
+
+@media (max-width: 860px) {
+  .replay-controls { grid-template-areas: "status" "transport" "timeline" "clocks"; grid-template-columns: minmax(0, 1fr); }
+  .replay-times { justify-content: flex-start; }
 }
 
 @media (max-width: 720px) {
@@ -306,15 +367,32 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
   .summary-state-grid, .summary-metric-grid { grid-template-columns: 1fr; }
   .provenance-list { grid-template-columns: 1fr; }
 }
+/*
+ * PRD 30 draws the transport as a bar under the scene, not a card above it. Stacking status,
+ * transport, timeline, and clocks in four rows cost 318px — 40% of the console — and pushed the
+ * machine off screen. Two rows carry the same content.
+ */
 .replay-controls {
+  align-items: center;
   border: 1px solid var(--fs-border);
   border-radius: var(--fs-radius-lg);
   display: grid;
-  gap: var(--fs-space-md);
-  margin-block: 1rem;
-  padding: var(--fs-space-md) var(--fs-space-md) var(--fs-space-md);
+  gap: var(--fs-space-xs) var(--fs-space-md);
+  grid-template-areas:
+    "status clocks"
+    "transport timeline";
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-block: 0;
+  padding: var(--fs-space-sm) var(--fs-space-md);
   background: linear-gradient(180deg, rgb(103 205 179 / 5%), transparent 6rem), var(--fs-bg);
 }
+
+.replay-heading { grid-area: status; }
+.replay-transport { grid-area: transport; }
+.replay-timeline { grid-area: timeline; }
+.replay-times { grid-area: clocks; }
+.replay-controls > button { grid-area: transport; justify-self: start; }
+.replay-controls > [role="alert"] { grid-column: 1 / -1; }
 
 .replay-heading {
   align-items: center;
@@ -556,16 +634,16 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 }
 
 .replay-times {
-  border-top: 1px solid var(--fs-border);
-  display: grid;
-  gap: var(--fs-space-xs);
-  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--fs-space-3xs) var(--fs-space-md);
+  justify-content: flex-end;
   margin: 0;
-  padding-top: var(--fs-space-xs);
 }
 
 .replay-times div {
-  display: grid;
+  align-items: baseline;
+  display: flex;
   gap: var(--fs-space-3xs);
 }
 

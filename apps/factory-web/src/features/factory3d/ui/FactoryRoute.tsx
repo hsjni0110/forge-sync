@@ -147,7 +147,7 @@ export function FactoryRoute({
   };
 
   return (
-    <section className="factory-page">
+    <section className={`factory-page${showsScene ? " factory-console" : ""}`}>
       <header className="factory-header">
         <div>
           <p className="eyebrow">공간 설비 보기</p>
@@ -194,16 +194,6 @@ export function FactoryRoute({
           RPM 기반 회전은 상태 변화를 보여주는 시각 효과이며 실제 물리 회전 속도가 아닙니다.
         </p>
       </details>
-      {replayControlClient && (
-        <ReplayControls
-          machineId={machineId}
-          client={replayControlClient}
-          snapshot={twinState.snapshot}
-          freshness={twinState.freshness}
-          controller={replay}
-          toolChangeClient={toolChangeClient}
-        />
-      )}
       {isAssetFallback && (
         <div className="notice notice-warning" role="status">
           3D 자산을 불러오지 못해 기본 CNC 도형을 표시합니다.
@@ -283,6 +273,18 @@ export function FactoryRoute({
           </section>
         )}
       </div>
+
+      {/* PRD 30 keeps the transport under the scene so the machine holds the top of the console. */}
+      {replayControlClient && (
+        <ReplayControls
+          machineId={machineId}
+          client={replayControlClient}
+          snapshot={twinState.snapshot}
+          freshness={twinState.freshness}
+          controller={replay}
+          toolChangeClient={toolChangeClient}
+        />
+      )}
     </section>
   );
 }

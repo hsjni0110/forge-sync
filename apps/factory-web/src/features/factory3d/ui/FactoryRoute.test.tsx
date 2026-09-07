@@ -89,6 +89,49 @@ describe("FactoryRoute", () => {
     expect(screen.getByRole("button", { name: "3D 다시 시도" })).toBeTruthy();
   });
 
+  it("gives the spatial views a viewport console and keeps 2D a scrolling document", async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <FactoryRoute sessionFactory={createSession} sceneLoader={async () => ({ default: HealthyScene })} />
+      </MemoryRouter>,
+    );
+    await screen.findByRole("button", { name: "SPLIT" });
+
+    const page = container.querySelector(".factory-page");
+    expect(page?.classList.contains("factory-console")).toBe(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "2D" }));
+    expect(container.querySelector(".factory-page")?.classList.contains("factory-console")).toBe(
+      false,
+    );
+  });
+
+  it("puts the replay transport below the scene so the machine keeps the top of the console", async () => {
+    const replayControlClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue({ schemaVersion: "1.0.0", machineId: "Mazak01",
+        replaySessionId: snapshot.replayCursor.replaySessionId, sourceSetId: "nist-mazak01-20161005",
+        status: "PAUSED", revision: 2, speedMultiplier: 10, publicationCursor: snapshot.replayCursor,
+        sourceRange: { startsAt: snapshot.replayCursor.sourceObservedAt, endsAt: "2016-10-05T19:15:07.025Z" } }),
+      start: vi.fn(), pause: vi.fn(), resume: vi.fn(), changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    const { container } = render(
+      <MemoryRouter>
+        <FactoryRoute sessionFactory={createSession} replayControlClient={replayControlClient}
+          sceneLoader={async () => ({ default: HealthyScene })} />
+      </MemoryRouter>,
+    );
+    await screen.findByRole("button", { name: "SPLIT" });
+
+    const layout = container.querySelector(".factory-layout");
+    const transport = container.querySelector(".replay-controls");
+    expect(transport).toBeTruthy();
+    expect(layout).toBeTruthy();
+    expect(
+      (layout as Element).compareDocumentPosition(transport as Node) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it("starts in SPLIT mode and switches between accessible 2D and 3D views", async () => {
     const sceneLoader = vi.fn(async () => ({ default: HealthyScene }));
     const sessionFactory = vi.fn(createSession);
