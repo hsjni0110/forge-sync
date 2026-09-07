@@ -306,3 +306,17 @@ def _write_run(root: Path, document: dict[str, object]) -> Path:
     }
     (root / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
     return root
+
+
+def test_reads_both_supported_observation_schema_versions(tmp_path: Path) -> None:
+    reader = FilesystemReplaySourceReader()
+    upgraded = _observation_document("upgraded-key", 0)
+    upgraded["schemaVersion"] = "2.1.0"
+    unsupported = _observation_document("unsupported-key", 0)
+    unsupported["schemaVersion"] = "3.0.0"
+
+    observations = reader.read(_write_run(tmp_path / "upgraded", upgraded))
+
+    assert observations[0].source_event_key == "upgraded-key"
+    with pytest.raises(ValueError, match="Unsupported Observation schema"):
+        reader.read(_write_run(tmp_path / "unsupported", unsupported))

@@ -1,10 +1,10 @@
 {
   "schemaVersion": "2.1.0",
-  "eventId": "5cb3568f-c5c7-4c34-a8b9-3ee18fcbc5c1",
-  "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=125",
+  "eventId": "6f0f1f0f-0a1b-4c2d-8e3f-4a5b6c7d8e9f",
+  "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=150",
   "machineId": "Mazak01",
   "subject": {
-    "componentId": "Mazak01-C"
+    "componentId": "Mazak01-path"
   },
   "observationKind": "SAMPLE",
   "source": {
@@ -18,15 +18,15 @@
       "artifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf"
     },
     "transformation": {
-      "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=125",
-      "mappingVersion": "2.0.0",
-      "sourceDataItemId": "Mazak01-C_5"
+      "rawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=150",
+      "mappingVersion": "2.2.0",
+      "sourceDataItemId": "Mazak01-path_18"
     }
   },
   "payload": {
-    "metric": "SPINDLE_SPEED",
+    "metric": "TOTAL_ACCUMULATED_TIME",
     "availability": "AVAILABLE",
-    "value": 0.0,
-    "unit": "REVOLUTION/MINUTE"
+    "value": 39932651.0,
+    "unit": "SECOND"
   }
 }

@@ -11,6 +11,7 @@ from uuid import UUID
 
 from .observation import (
     EXPECTED_UNITS,
+    NUMERIC_EVENT_TYPES,
     Availability,
     ConditionLevel,
     ConditionPayload,
@@ -69,6 +70,12 @@ class CatalogSnapshot:
 class MappingDefinition:
     data_item: CatalogDataItem
     target: str
+    derived_unit: str | None = None
+
+    @property
+    def resolved_unit(self) -> str | None:
+        """Unit of the canonical target: the catalog unit, or a reviewed derived unit."""
+        return self.data_item.unit if self.data_item.unit is not None else self.derived_unit
 
 
 @dataclass(frozen=True, slots=True)
@@ -226,13 +233,14 @@ def _map_sample(candidate: MappingCandidate, definition: MappingDefinition) -> S
     value = float(raw_value)
     if not math.isfinite(value):
         raise ValueError("Sample value must be finite")
-    if definition.data_item.unit is None:
-        raise ValueError("Available sample requires catalog unit")
+    resolved_unit = definition.resolved_unit
+    if resolved_unit is None:
+        raise ValueError("Available sample requires a resolved unit")
     return SamplePayload(
         metric=metric,
         availability=Availability.AVAILABLE,
         value=value,
-        unit=Unit(definition.data_item.unit),
+        unit=Unit(resolved_unit),
     )
 
 
@@ -242,7 +250,7 @@ def _map_event(candidate: MappingCandidate, definition: MappingDefinition) -> Ev
     if _is_unavailable(raw_value):
         return EventPayload(event_type=event_type, availability=Availability.UNAVAILABLE)
     value: str | int = raw_value
-    if event_type in {EventType.TOOL_NUMBER, EventType.PART_COUNT}:
+    if event_type in NUMERIC_EVENT_TYPES:
         value = int(raw_value)
     return EventPayload(
         event_type=event_type,
@@ -289,22 +297,43 @@ def _validate_target(definition: MappingDefinition) -> None:
     category = definition.data_item.category
     if category == "SAMPLE":
         metric = SampleMetric(definition.target)
-        unit = Unit(definition.data_item.unit or "")
-        if EXPECTED_UNITS[metric] is not unit:
-            raise ValueError(f"Mapping target unit differs: {definition.data_item.data_item_id}")
+        _validate_sample_unit(definition, metric)
         return
     if category == "EVENT":
         EventType(definition.target)
-        if definition.data_item.unit is not None:
-            raise ValueError(
-                f"Event mapping must not declare unit: {definition.data_item.data_item_id}"
-            )
+        _reject_derived_unit(definition, "Event")
         return
     if category == "CONDITION":
         if not CONDITION_TARGET.fullmatch(definition.target):
             raise ValueError(f"Invalid Condition target: {definition.data_item.data_item_id}")
+        _reject_derived_unit(definition, "Condition")
         return
     raise ValueError(f"Unsupported mapping category: {category}")
+
+
+def _validate_sample_unit(definition: MappingDefinition, metric: SampleMetric) -> None:
+    """A catalog that declares no unit needs an explicitly reviewed derived unit."""
+    if definition.data_item.unit is None:
+        if definition.derived_unit is None:
+            raise ValueError(
+                "Sample without catalog unit requires a reviewed derived unit: "
+                f"{definition.data_item.data_item_id}"
+            )
+    elif definition.derived_unit is not None:
+        raise ValueError(
+            "Sample with a catalog unit must not declare a derived unit: "
+            f"{definition.data_item.data_item_id}"
+        )
+    if EXPECTED_UNITS[metric] is not Unit(definition.resolved_unit or ""):
+        raise ValueError(f"Mapping target unit differs: {definition.data_item.data_item_id}")
+
+
+def _reject_derived_unit(definition: MappingDefinition, category_label: str) -> None:
+    if definition.derived_unit is not None:
+        raise ValueError(
+            f"{category_label} mapping must not declare a derived unit: "
+            f"{definition.data_item.data_item_id}"
+        )
 
 
 def _validate_unique_observation_channels(entries: tuple[MappingDefinition, ...]) -> None:

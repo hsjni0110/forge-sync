@@ -21,8 +21,10 @@ class ObservationContractValidatorTest {
   @ValueSource(
       strings = {
         "condition-warning.json",
+        "event-emergency-stop.json",
         "event-execution.json",
         "event-unavailable.json",
+        "sample-accumulated-time.json",
         "sample-spindle-speed.json",
         "sample-unavailable.json"
       })
@@ -35,7 +37,9 @@ class ObservationContractValidatorTest {
   @ParameterizedTest
   @ValueSource(
       strings = {
+        "accumulated-time-before-schema-upgrade.json",
         "condition-missing-provenance.json",
+        "event-line-value-type.json",
         "event-value-type.json",
         "missing-source-data-item.json",
         "missing-subject.json",

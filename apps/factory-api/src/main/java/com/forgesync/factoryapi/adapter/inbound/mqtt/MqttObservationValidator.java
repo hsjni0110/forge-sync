@@ -41,12 +41,15 @@ public final class MqttObservationValidator {
     String machineId = document.path("machineId").asText();
     String replaySessionId = replay.path("replaySessionId").asText();
     String sourceEventKey = document.path("sourceEventKey").asText();
-    validateRoutingMetadata(observationPacket, machineId, replaySessionId, sourceEventKey);
+    String schemaVersion = document.path("schemaVersion").asText();
+    validateRoutingMetadata(
+        observationPacket, schemaVersion, machineId, replaySessionId, sourceEventKey);
     JsonNode provenance = document.path("provenance");
     JsonNode sourceProvenance = provenance.path("source");
     JsonNode transformation = provenance.path("transformation");
     return new ValidatedObservationMessage(
         observationJson,
+        schemaVersion,
         UUID.fromString(document.path("eventId").asText()),
         machineId,
         document.path("subject").path("componentId").asText(),
@@ -127,13 +130,16 @@ public final class MqttObservationValidator {
 
   private static void validateRoutingMetadata(
       MqttObservationPacket observationPacket,
+      String schemaVersion,
       String machineId,
       String replaySessionId,
       String sourceEventKey) {
+    // The schema itself decides which versions exist; the delivery property only has to repeat
+    // the version of the payload it describes.
     Map<String, List<String>> properties = observationPacket.userProperties();
     boolean matches =
         observationPacket.topic().equals(TOPIC_PREFIX + machineId)
-            && properties.getOrDefault("schema-version", List.of()).equals(List.of("2.0.0"))
+            && properties.getOrDefault("schema-version", List.of()).equals(List.of(schemaVersion))
             && properties
                 .getOrDefault("message-key", List.of())
                 .equals(List.of(replaySessionId + ":" + sourceEventKey));

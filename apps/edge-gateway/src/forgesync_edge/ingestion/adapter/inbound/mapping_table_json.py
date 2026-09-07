@@ -26,6 +26,7 @@ ENTRY_FIELDS = {
     "type",
     "subType",
     "unit",
+    "derivedUnit",
     "target",
 }
 SEMANTIC_VERSION = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
@@ -80,6 +81,7 @@ def _entry(value: object, index: int) -> MappingDefinition:
             unit=unit,
         ),
         target=_string(entry["target"], f"{label}.target"),
+        derived_unit=_nullable_string(entry["derivedUnit"], f"{label}.derivedUnit"),
     )
 
 

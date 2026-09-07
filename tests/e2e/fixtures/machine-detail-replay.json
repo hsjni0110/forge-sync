@@ -1,19 +1,19 @@
 {
-  "canonicalRun": "datasets/canonical/nist-mazak01-20161005/b5709c2f64d2cd15a30b85bd2355bdc7e388ad058d883e7441536c2987c92cc7/observations.ndjson",
-  "canonicalSha256": "ff224865d1623f0a95b847f21537abdd1a89968b3369e716abb2ca1afdeefc8c",
+  "canonicalRun": "datasets/canonical/nist-mazak01-20161005/80ce6b099c6ee90c11dc04286030b7a2448108d7ef9f81152fb3f0e98a06b3ef/observations.ndjson",
+  "canonicalSha256": "fcbe745107fe709e1ddb428e40b6295ca85718e6b942bdbf71c1990de4332509",
   "replaySessionId": "9d4cba3e-9de7-43b7-b086-9c2de75e5120",
   "steps": {
     "initial": {
       "observations": [
         {
-          "line": 442,
+          "line": 1438,
           "replaySequence": 1,
           "replayPublishedAt": "2026-09-02T00:00:01Z",
           "sourceDataItemId": "Mazak01-path_13",
           "expectedValue": "ACTIVE"
         },
         {
-          "line": 444,
+          "line": 1442,
           "replaySequence": 2,
           "replayPublishedAt": "2026-09-02T00:00:02Z",
           "sourceDataItemId": "Mazak01-C_5",
@@ -24,7 +24,7 @@
     "live-update": {
       "observations": [
         {
-          "line": 445,
+          "line": 1445,
           "replaySequence": 3,
           "replayPublishedAt": "2026-09-02T00:00:03Z",
           "sourceDataItemId": "Mazak01-C_5",
@@ -35,7 +35,7 @@
     "stopped": {
       "observations": [
         {
-          "line": 465,
+          "line": 1482,
           "replaySequence": 4,
           "replayPublishedAt": "2026-09-02T00:00:04Z",
           "sourceDataItemId": "Mazak01-path_13",
@@ -46,7 +46,7 @@
     "reactivated": {
       "observations": [
         {
-          "line": 590,
+          "line": 1872,
           "replaySequence": 5,
           "replayPublishedAt": "2026-09-02T00:00:05Z",
           "sourceDataItemId": "Mazak01-path_13",
@@ -57,7 +57,7 @@
     "offline-update": {
       "observations": [
         {
-          "line": 1219,
+          "line": 3297,
           "replaySequence": 6,
           "replayPublishedAt": "2026-09-02T00:00:06Z",
           "sourceDataItemId": "Mazak01-C_5",

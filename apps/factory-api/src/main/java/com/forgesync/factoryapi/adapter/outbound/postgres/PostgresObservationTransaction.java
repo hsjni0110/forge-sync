@@ -278,7 +278,7 @@ public final class PostgresObservationTransaction implements ObservationTransact
               replay_published_at, ingested_at, artifact_id, raw_record_id, mapping_version,
               source_data_item_id, canonical_envelope
             ) VALUES (
-              :event_id, :replay_session_id, :source_event_key, '2.0.0', :machine_id,
+              :event_id, :replay_session_id, :source_event_key, :schema_version, :machine_id,
               :component_id, :observation_kind, :source_observed_at, :replay_sequence,
               :replay_published_at, :ingested_at, :artifact_id, :raw_record_id, :mapping_version,
               :source_data_item_id, CAST(:canonical_envelope AS jsonb)
@@ -287,6 +287,7 @@ public final class PostgresObservationTransaction implements ObservationTransact
         .param("event_id", observation.eventId())
         .param("replay_session_id", observation.replaySessionId())
         .param("source_event_key", observation.sourceEventKey())
+        .param("schema_version", observation.schemaVersion())
         .param("machine_id", observation.machineId())
         .param("component_id", observation.componentId())
         .param("observation_kind", observation.observationKind())

@@ -69,9 +69,9 @@ def test_maps_component_aware_samples_events_and_conditions() -> None:
     statuses = Counter(result.status for result in results)
     observations = [result.observation for result in results if result.observation is not None]
 
-    assert statuses == {MappingStatus.MAPPED: 32}
-    assert sum(isinstance(item.payload, SamplePayload) for item in observations) == 16
-    assert sum(isinstance(item.payload, EventPayload) for item in observations) == 12
+    assert statuses == {MappingStatus.MAPPED: 54}
+    assert sum(isinstance(item.payload, SamplePayload) for item in observations) == 23
+    assert sum(isinstance(item.payload, EventPayload) for item in observations) == 27
     assert sum(isinstance(item.payload, ConditionPayload) for item in observations) == 4
     assert (
         sum(
@@ -79,7 +79,7 @@ def test_maps_component_aware_samples_events_and_conditions() -> None:
             and item.payload.availability.value == "UNAVAILABLE"
             for item in observations
         )
-        == 13
+        == 22
     )
 
 
@@ -110,7 +110,7 @@ def test_golden_values_preserve_types_units_condition_and_provenance() -> None:
     assert spindle.source.agent_instance_id is None
     assert spindle.source.source_sequence is None
     assert spindle.provenance.transformation.raw_record_id == spindle.source_event_key
-    assert spindle.provenance.transformation.mapping_version == "2.1.0"
+    assert spindle.provenance.transformation.mapping_version == "2.2.0"
     assert spindle.subject.component_id == "Mazak01-C"
     assert spindle.provenance.transformation.source_data_item_id == "Mazak01-C_5"
     assert tool.payload.value == 13
@@ -143,7 +143,7 @@ def test_golden_values_preserve_types_units_condition_and_provenance() -> None:
     assert b_axis_angle.payload.unit.value == "DEGREE"
     assert b_axis_angle.subject.component_id == "Mazak01-B"
     assert b_axis_angle.provenance.transformation.source_data_item_id == "Mazak01-B_4"
-    assert b_axis_angle.provenance.transformation.mapping_version == "2.1.0"
+    assert b_axis_angle.provenance.transformation.mapping_version == "2.2.0"
 
 
 def test_generated_observations_satisfy_shared_contract() -> None:
@@ -220,9 +220,152 @@ def test_canonical_run_is_deterministic_and_reused(tmp_path: Path) -> None:
 
     assert first.status == "STORED"
     assert second.status == "REUSED_VERIFIED"
-    assert first.observation_count == 32
+    assert first.observation_count == 54
     assert first.report == second.report
     assert first.report["records"]["byStatus"] == {  # type: ignore[index]
-        "MAPPED": 32,
+        "MAPPED": 54,
     }
-    assert len((first.run_directory / "observations.ndjson").read_text().splitlines()) == 32
+    assert len((first.run_directory / "observations.ndjson").read_text().splitlines()) == 54
+
+
+def test_maps_accumulated_time_counters_to_subtype_specific_targets() -> None:
+    _, results = _mapping_results()
+    observations = [result.observation for result in results if result.observation is not None]
+    counters = [
+        item
+        for item in observations
+        if isinstance(item.payload, SamplePayload)
+        and item.payload.metric
+        in {
+            SampleMetric.TOTAL_ACCUMULATED_TIME,
+            SampleMetric.AUTO_ACCUMULATED_TIME,
+            SampleMetric.CUT_ACCUMULATED_TIME,
+        }
+        and item.payload.value is not None
+    ]
+    values_by_metric: dict[SampleMetric, list[float]] = {}
+    for item in counters:
+        values_by_metric.setdefault(item.payload.metric, []).append(item.payload.value)
+
+    assert values_by_metric[SampleMetric.TOTAL_ACCUMULATED_TIME] == [39932651, 39932652]
+    assert values_by_metric[SampleMetric.AUTO_ACCUMULATED_TIME] == [7717972]
+    assert values_by_metric[SampleMetric.CUT_ACCUMULATED_TIME] == [3819274]
+    assert {item.payload.unit.value for item in counters} == {"SECOND"}
+    assert {item.subject.component_id for item in counters} == {"Mazak01-path"}
+    assert {item.provenance.transformation.source_data_item_id for item in counters} == {
+        "Mazak01-path_17",
+        "Mazak01-path_18",
+        "Mazak01-path_19",
+    }
+
+
+def test_accumulated_time_unit_is_declared_as_derived_because_catalog_omits_it() -> None:
+    table, _ = _mapping_results()
+    definitions = table.by_data_item_id()
+
+    total = definitions["Mazak01-path_18"]
+    spindle = definitions["Mazak01-C_5"]
+
+    assert total.data_item.unit is None
+    assert total.derived_unit == "SECOND"
+    assert total.resolved_unit == "SECOND"
+    assert spindle.derived_unit is None
+    assert spindle.resolved_unit == "REVOLUTION/MINUTE"
+
+
+def test_maps_operating_signals_without_inventing_units() -> None:
+    _, results = _mapping_results()
+    observations = [result.observation for result in results if result.observation is not None]
+    events = {
+        (
+            item.provenance.transformation.source_data_item_id,
+            item.payload.value,
+        ): item
+        for item in observations
+        if isinstance(item.payload, EventPayload)
+    }
+
+    emergency_stop = events[("Mazak01-controller_4", "TRIGGERED")]
+    spindle_override = events[("Mazak01-C_6", 100)]
+    rapid_override = events[("Mazak01-path_8", 5)]
+    programmed_override = events[("Mazak01-path_9", 100)]
+    program_line = events[("Mazak01-path_3", 1)]
+    sequence_number = events[("Mazak01-path_5", 1)]
+
+    assert emergency_stop.payload.event_type is EventType.EMERGENCY_STOP
+    assert emergency_stop.subject.component_id == "Mazak01-controller"
+    assert spindle_override.payload.event_type is EventType.ROTARY_VELOCITY_OVERRIDE
+    assert rapid_override.payload.event_type is EventType.RAPID_PATH_FEEDRATE_OVERRIDE
+    assert programmed_override.payload.event_type is EventType.PROGRAMMED_PATH_FEEDRATE_OVERRIDE
+    assert program_line.payload.event_type is EventType.LINE
+    assert sequence_number.payload.event_type is EventType.SEQUENCE_NUMBER
+    assert not hasattr(spindle_override.payload, "unit")
+
+
+def test_preserves_counter_regression_instead_of_correcting_it() -> None:
+    table, results = _mapping_results()
+    counter = next(
+        result
+        for result in results
+        if result.candidate.data_item_name_raw == "total_time" and result.observation is not None
+    )
+    catalog = adapt_catalog(read_machine_catalog(FIXTURES / "Devices-mapping.xml", "Mazak01"))
+    use_case = MapCanonicalObservations(table, catalog, Uuid5ObservationIdGenerator())
+    regressed = replace(counter.candidate, value_fields_raw=("1",), source_event_key="regressed")
+
+    mapped = next(use_case.map([regressed]))
+
+    assert mapped.status is MappingStatus.MAPPED
+    assert mapped.observation is not None
+    assert mapped.observation.payload.value == 1
+
+
+def test_mapping_table_rejects_unitless_sample_without_declared_derived_unit() -> None:
+    table, _ = _mapping_results()
+    catalog = adapt_catalog(read_machine_catalog(FIXTURES / "Devices-mapping.xml", "Mazak01"))
+    definitions = table.by_data_item_id()
+    undeclared = replace(definitions["Mazak01-path_18"], derived_unit=None)
+    without_declared_unit = replace(
+        table,
+        entries=tuple(
+            undeclared if entry.data_item.data_item_id == "Mazak01-path_18" else entry
+            for entry in table.entries
+        ),
+    )
+
+    with pytest.raises(ValueError, match="derived unit"):
+        without_declared_unit.validate_catalog(catalog)
+
+
+def test_mapping_table_rejects_derived_unit_that_overrides_the_catalog() -> None:
+    table, _ = _mapping_results()
+    catalog = adapt_catalog(read_machine_catalog(FIXTURES / "Devices-mapping.xml", "Mazak01"))
+    definitions = table.by_data_item_id()
+    overridden = replace(definitions["Mazak01-C_5"], derived_unit="SECOND")
+    with_overridden_unit = replace(
+        table,
+        entries=tuple(
+            overridden if entry.data_item.data_item_id == "Mazak01-C_5" else entry
+            for entry in table.entries
+        ),
+    )
+
+    with pytest.raises(ValueError, match="derived unit"):
+        with_overridden_unit.validate_catalog(catalog)
+
+
+def test_report_discloses_which_units_are_derived_rather_than_source_declared(
+    tmp_path: Path,
+) -> None:
+    table, results = _mapping_results()
+    processing_run_id = canonical_processing_run_id(table, PARSER_VERSION)
+
+    output = write_canonical_run(results, table, processing_run_id, PARSER_VERSION, tmp_path)
+
+    mappings = {row["dataItemId"]: row for row in output.report["mappings"]}
+    assert mappings["Mazak01-path_18"]["unit"] is None
+    assert mappings["Mazak01-path_18"]["derivedUnit"] == "SECOND"
+    assert mappings["Mazak01-C_5"]["derivedUnit"] is None
+    markdown = (output.run_directory / "mapping-report.md").read_text(encoding="utf-8")
+    assert "`SECOND` (derived)" in markdown
+    assert any("derived unit" in limitation for limitation in output.report["limitations"])

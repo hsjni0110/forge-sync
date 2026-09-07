@@ -14,7 +14,7 @@ not wrap the Observation or claim exactly-once delivery.
 | Maximum payload | 65,536 bytes |
 | Content Type | `application/vnd.forgesync.observation+json` |
 | Payload Format Indicator | UTF-8 (`1`) |
-| User Property `schema-version` | exactly one `2.0.0`, equal to payload `schemaVersion` |
+| User Property `schema-version` | exactly one value, equal to payload `schemaVersion` |
 | User Property `message-key` | exactly one `{replaySessionId}:{sourceEventKey}` |
 
 MQTT-delivered Observations require the complete `replay` group. The base Observation contract

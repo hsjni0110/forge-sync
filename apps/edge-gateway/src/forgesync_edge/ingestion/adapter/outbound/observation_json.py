@@ -14,7 +14,7 @@ from ...domain.observation import (
     SamplePayload,
 )
 
-SCHEMA_VERSION = "2.0.0"
+SCHEMA_VERSION = "2.1.0"
 
 
 def serialize_observation(observation: ObservationEnvelope) -> bytes:

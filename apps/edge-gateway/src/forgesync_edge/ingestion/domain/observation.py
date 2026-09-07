@@ -26,6 +26,9 @@ class SampleMetric(StrEnum):
     TEMPERATURE = "TEMPERATURE"
     LOAD = "LOAD"
     POSITION = "POSITION"
+    TOTAL_ACCUMULATED_TIME = "TOTAL_ACCUMULATED_TIME"
+    AUTO_ACCUMULATED_TIME = "AUTO_ACCUMULATED_TIME"
+    CUT_ACCUMULATED_TIME = "CUT_ACCUMULATED_TIME"
 
 
 class Unit(StrEnum):
@@ -35,6 +38,7 @@ class Unit(StrEnum):
     CELSIUS = "CELSIUS"
     PERCENT = "PERCENT"
     MILLIMETER = "MILLIMETER"
+    SECOND = "SECOND"
 
 
 EXPECTED_UNITS = {
@@ -44,6 +48,9 @@ EXPECTED_UNITS = {
     SampleMetric.TEMPERATURE: Unit.CELSIUS,
     SampleMetric.LOAD: Unit.PERCENT,
     SampleMetric.POSITION: Unit.MILLIMETER,
+    SampleMetric.TOTAL_ACCUMULATED_TIME: Unit.SECOND,
+    SampleMetric.AUTO_ACCUMULATED_TIME: Unit.SECOND,
+    SampleMetric.CUT_ACCUMULATED_TIME: Unit.SECOND,
 }
 
 
@@ -55,6 +62,27 @@ class EventType(StrEnum):
     PART_COUNT = "PART_COUNT"
     AVAILABILITY = "AVAILABILITY"
     POWER_STATE = "POWER_STATE"
+    EMERGENCY_STOP = "EMERGENCY_STOP"
+    PROGRAMMED_PATH_FEEDRATE_OVERRIDE = "PROGRAMMED_PATH_FEEDRATE_OVERRIDE"
+    RAPID_PATH_FEEDRATE_OVERRIDE = "RAPID_PATH_FEEDRATE_OVERRIDE"
+    ROTARY_VELOCITY_OVERRIDE = "ROTARY_VELOCITY_OVERRIDE"
+    LINE = "LINE"
+    SEQUENCE_NUMBER = "SEQUENCE_NUMBER"
+
+
+# Observed values of these Events are whole counts in the pinned source; a fractional or
+# negative value stays an INVALID_VALUE record instead of being silently truncated.
+NUMERIC_EVENT_TYPES = frozenset(
+    {
+        EventType.TOOL_NUMBER,
+        EventType.PART_COUNT,
+        EventType.PROGRAMMED_PATH_FEEDRATE_OVERRIDE,
+        EventType.RAPID_PATH_FEEDRATE_OVERRIDE,
+        EventType.ROTARY_VELOCITY_OVERRIDE,
+        EventType.LINE,
+        EventType.SEQUENCE_NUMBER,
+    }
+)
 
 
 class ConditionLevel(StrEnum):
@@ -155,7 +183,7 @@ class EventPayload:
             return
         if self.value is None or isinstance(self.value, bool):
             raise ValueError("available event requires a string or integer value")
-        numeric_event = self.event_type in {EventType.TOOL_NUMBER, EventType.PART_COUNT}
+        numeric_event = self.event_type in NUMERIC_EVENT_TYPES
         if numeric_event and (not isinstance(self.value, int) or self.value < 0):
             raise ValueError(f"{self.event_type.value} requires a non-negative integer")
         if not numeric_event and (not isinstance(self.value, str) or not self.value):

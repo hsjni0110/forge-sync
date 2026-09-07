@@ -33,6 +33,7 @@
             <Rotary id="Mazak01-C" name="C">
               <DataItems>
                 <DataItem category="SAMPLE" id="Mazak01-C_5" name="Srpm" nativeUnits="REVOLUTION/MINUTE" subType="ACTUAL" type="ROTARY_VELOCITY" units="REVOLUTION/MINUTE"/>
+                <DataItem category="EVENT" id="Mazak01-C_6" name="Sovr" nativeUnits="PERCENT" type="ROTARY_VELOCITY_OVERRIDE" units="PERCENT"/>
               </DataItems>
             </Rotary>
             <Rotary id="Mazak01-C2" name="C">
@@ -46,6 +47,7 @@
         <Controller id="Mazak01-controller" name="controller">
           <DataItems>
             <DataItem category="CONDITION" id="Mazak01-controller_3" name="system_cond" type="SYSTEM"/>
+            <DataItem category="EVENT" id="Mazak01-controller_4" name="estop" type="EMERGENCY_STOP"/>
           </DataItems>
           <Components>
             <Path id="Mazak01-path" name="path">
@@ -56,6 +58,13 @@
                 <DataItem category="EVENT" id="Mazak01-path_10" name="Tool_number" type="TOOL_NUMBER"/>
                 <DataItem category="EVENT" id="Mazak01-path_13" name="execution" type="EXECUTION"/>
                 <DataItem category="EVENT" id="Mazak01-path_14" name="mode" type="CONTROLLER_MODE"/>
+                <DataItem category="EVENT" id="Mazak01-path_3" name="line" type="LINE"/>
+                <DataItem category="EVENT" id="Mazak01-path_5" name="sequenceNum" type="x:SEQUENCE_NUMBER"/>
+                <DataItem category="EVENT" id="Mazak01-path_8" name="Frapidovr" nativeUnits="PERCENT" subType="RAPID" type="PATH_FEEDRATE_OVERRIDE" units="PERCENT"/>
+                <DataItem category="EVENT" id="Mazak01-path_9" name="Fovr" nativeUnits="PERCENT" subType="PROGRAMMED" type="PATH_FEEDRATE_OVERRIDE" units="PERCENT"/>
+                <DataItem category="SAMPLE" id="Mazak01-path_17" name="auto_time" subType="x:AUTO" type="ACCUMULATED_TIME"/>
+                <DataItem category="SAMPLE" id="Mazak01-path_18" name="total_time" subType="x:TOTAL" type="ACCUMULATED_TIME"/>
+                <DataItem category="SAMPLE" id="Mazak01-path_19" name="cut_time" subType="x:CUT" type="ACCUMULATED_TIME"/>
               </DataItems>
             </Path>
           </Components>

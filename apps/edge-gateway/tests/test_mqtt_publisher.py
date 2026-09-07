@@ -261,3 +261,19 @@ def _publisher_request() -> MqttPublishRequest:
     transport = RecordingTransport()
     _publisher(transport).publish(VALID_REPLAY)
     return transport.requests[0]
+
+
+def test_publish_property_reports_the_schema_version_of_the_payload() -> None:
+    transport = RecordingTransport()
+    publisher = _publisher(transport)
+    upgraded = json.loads(VALID_REPLAY)
+    upgraded["schemaVersion"] = "2.1.0"
+    upgraded["payload"] = {
+        "eventType": "EMERGENCY_STOP",
+        "availability": "AVAILABLE",
+        "value": "TRIGGERED",
+    }
+
+    publisher.publish(json.dumps(upgraded).encode("utf-8"))
+
+    assert transport.requests[0].schema_version == "2.1.0"

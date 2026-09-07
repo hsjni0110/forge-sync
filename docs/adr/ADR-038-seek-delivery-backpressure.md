@@ -27,9 +27,14 @@ The user authorized resolving the E2E blocker. Stop a replaced Replay worker wit
 token before a new seek worker may publish. This prevents the old paused worker from waking and
 advancing the replacement session concurrently.
 
-Configure a finite broker queue of 60,000 messages and 128 MiB. The message bound exceeds the pinned
-MVP source's 52,996 observations, while the byte bound prevents unbounded memory growth. This is an
-MVP operational bound, not a general slow-consumer solution.
+Configure a finite broker queue whose message bound exceeds the pinned MVP source's observation
+count, together with a 128 MiB byte bound that prevents unbounded memory growth. This is an MVP
+operational bound, not a general slow-consumer solution.
+
+The bound follows the pinned source. It was 60,000 messages for the 52,996 observations of mapping
+`2.1.0`, and is 110,000 for the 101,644 observations of mapping `2.2.0`
+([ADR-049](./ADR-049-accumulated-time-and-operating-signal-mapping.md)). The raised bound has not
+been re-verified against a running broker; see Verification Ledger V-047.
 
 E2E must verify that the broker dropped-message counter does not increase and that every sequence
 from zero through the final active Twin cursor exists in Canonical Observation history. PUBACK is

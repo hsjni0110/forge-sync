@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record ValidatedObservationMessage(
     String observationJson,
+    String schemaVersion,
     UUID eventId,
     String machineId,
     String componentId,
@@ -22,6 +23,7 @@ public record ValidatedObservationMessage(
 
   public ValidatedObservationMessage {
     Objects.requireNonNull(observationJson, "observationJson");
+    Objects.requireNonNull(schemaVersion, "schemaVersion");
     Objects.requireNonNull(eventId, "eventId");
     Objects.requireNonNull(machineId, "machineId");
     Objects.requireNonNull(componentId, "componentId");

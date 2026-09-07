@@ -1,8 +1,8 @@
 {
   "schemaVersion": "1.0.0",
   "canonicalOutput": {
-    "path": "datasets/canonical/nist-mazak01-20161005/b5709c2f64d2cd15a30b85bd2355bdc7e388ad058d883e7441536c2987c92cc7/observations.ndjson",
-    "sha256": "ff224865d1623f0a95b847f21537abdd1a89968b3369e716abb2ca1afdeefc8c"
+    "path": "datasets/canonical/nist-mazak01-20161005/80ce6b099c6ee90c11dc04286030b7a2448108d7ef9f81152fb3f0e98a06b3ef/observations.ndjson",
+    "sha256": "fcbe745107fe709e1ddb428e40b6295ca85718e6b942bdbf71c1990de4332509"
   },
   "checkedInFiles": [
     {
@@ -15,7 +15,7 @@
     },
     {
       "path": "tests/e2e/fixtures/machine-detail-replay.json",
-      "sha256": "98355a948a875434ce14c00db9ce8fd36ce251acfa6eb25657ec371e064d136c"
+      "sha256": "535970516c63058b3a89cacb66d8cf25ee4c2c8c01b7ba39598b6c0026e3d130"
     }
   ],
   "expectedOperationalState": {

@@ -67,6 +67,7 @@ class IngestObservationTest {
   private static ValidatedObservationMessage observation() {
     return new ValidatedObservationMessage(
         "{}",
+        "2.1.0",
         UUID.fromString("f83a8401-5893-4a3d-a4b8-d71f772c84c3"),
         "Mazak01",
         "controller",

@@ -90,6 +90,29 @@ class MqttObservationConsumerTest {
   }
 
   @Test
+  void acceptsUpgradedSchemaVersionCarryingNewCanonicalVocabulary() {
+    MqttObservationPacket packet =
+        packet(upgradedPayload().getBytes(StandardCharsets.UTF_8), properties("2.1.0"));
+
+    consumer.consumeObservation(packet, acknowledgments::incrementAndGet);
+
+    assertThat(accepted).hasSize(1);
+    assertThat(accepted.getFirst().schemaVersion()).isEqualTo("2.1.0");
+    assertThat(acknowledgments).hasValue(1);
+  }
+
+  @Test
+  void rejectsDeliveryPropertyThatDisagreesWithThePayloadVersion() {
+    MqttObservationPacket packet =
+        packet(validPayload().getBytes(StandardCharsets.UTF_8), properties("2.1.0"));
+
+    consumer.consumeObservation(packet, acknowledgments::incrementAndGet);
+
+    assertThat(accepted).isEmpty();
+    assertThat(rejected("metadata_mismatch")).isEqualTo(1);
+  }
+
+  @Test
   void rejectsMetadataMismatchWithoutLoggingOrForwardingPayload() {
     MqttObservationPacket packet =
         packet(validPayload().getBytes(StandardCharsets.UTF_8), Map.of());
@@ -188,9 +211,20 @@ class MqttObservationConsumerTest {
   }
 
   private static Map<String, List<String>> validProperties() {
+    return properties("2.0.0");
+  }
+
+  private static Map<String, List<String>> properties(String schemaVersion) {
     return Map.of(
-        "schema-version", List.of("2.0.0"),
+        "schema-version", List.of(schemaVersion),
         "message-key", List.of(REPLAY_SESSION_ID + ":" + SOURCE_EVENT_KEY));
+  }
+
+  private static String upgradedPayload() {
+    return validPayload()
+        .replace("\"schemaVersion\": \"2.0.0\"", "\"schemaVersion\": \"2.1.0\"")
+        .replace("\"EXECUTION\"", "\"EMERGENCY_STOP\"")
+        .replace("\"ACTIVE\"", "\"TRIGGERED\"");
   }
 
   private static String validPayload() {

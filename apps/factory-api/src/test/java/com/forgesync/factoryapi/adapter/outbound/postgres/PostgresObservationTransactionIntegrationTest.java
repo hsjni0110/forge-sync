@@ -132,6 +132,20 @@ class PostgresObservationTransactionIntegrationTest {
   }
 
   @Test
+  void storesUpgradedAndBaselineSchemaVersionsSideBySide() {
+    ValidatedObservationMessage baseline = replayedObservation("event-execution.json", 42);
+    ValidatedObservationMessage upgraded = replayedObservation("sample-accumulated-time.json", 43);
+
+    assertThat(transaction.storeObservation(baseline, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(transaction.storeObservation(upgraded, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+
+    assertThat(storedSchemaVersion(baseline.sourceEventKey())).isEqualTo("2.0.0");
+    assertThat(storedSchemaVersion(upgraded.sourceEventKey())).isEqualTo("2.1.0");
+  }
+
+  @Test
   void rollsBackInboxWhenObservationInsertFails() {
     ValidatedObservationMessage accepted = replayedObservation("event-execution.json", 42);
     assertThat(transaction.storeObservation(accepted, INGESTED_AT, PROJECTED_AT))
@@ -523,6 +537,18 @@ class PostgresObservationTransactionIntegrationTest {
     assertThat(twinVersion("Mazak01")).isEqualTo(2);
   }
 
+  private static String storedSchemaVersion(String sourceEventKey) {
+    return jdbcClient
+        .sql(
+            """
+            SELECT schema_version FROM canonical_observation_history
+            WHERE source_event_key = :source_event_key
+            """)
+        .param("source_event_key", sourceEventKey)
+        .query(String.class)
+        .single();
+  }
+
   private static long rowCount(String tableName) {
     return jdbcClient.sql("SELECT COUNT(*) FROM " + tableName).query(Long.class).single();
   }
@@ -708,7 +734,7 @@ class PostgresObservationTransactionIntegrationTest {
             "application/vnd.forgesync.observation+json",
             1,
             Map.of(
-                "schema-version", List.of("2.0.0"),
+                "schema-version", List.of(document.path("schemaVersion").asText()),
                 "message-key", List.of(replaySessionId + ":" + sourceEventKey)));
     return new MqttObservationValidator(new ObservationContractValidator(), OBJECT_MAPPER)
         .validate(packet);
@@ -737,6 +763,7 @@ class PostgresObservationTransactionIntegrationTest {
       ValidatedObservationMessage observation, String sourceEventKey) {
     return new ValidatedObservationMessage(
         observation.observationJson(),
+        observation.schemaVersion(),
         observation.eventId(),
         observation.machineId(),
         observation.componentId(),

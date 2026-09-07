@@ -34,6 +34,8 @@ agent, replay 정보를 만들지 않는다. L2 output은 processing run별 새 
 - Canonical coverage는 catalog-match 비율이 아니라 실제 명시 mapping 비율로 보고된다.
 - 지원하지 않는 항목도 원본 byte locator와 함께 검토 가능하다.
 - 같은 component/category/target channel을 둘 이상 선언하면 mapping 시작 전에 실패한다.
+- subType만 다른 형제 DataItem, catalog가 단위를 선언하지 않는 SAMPLE, catalog 단위를 가진 EVENT의
+  처리는 [ADR-049](./ADR-049-accumulated-time-and-operating-signal-mapping.md)가 이 결정을 확장한다.
 
 ## Rejected alternatives
 

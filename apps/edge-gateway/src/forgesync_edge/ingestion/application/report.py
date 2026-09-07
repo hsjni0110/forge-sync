@@ -8,7 +8,7 @@ from typing import Any
 from ..domain.mapping import CatalogDataItem, MappingResult, MappingStatus, MappingTable
 from ..domain.observation import EventPayload, SamplePayload
 
-REPORT_SCHEMA_VERSION = "2.0.0"
+REPORT_SCHEMA_VERSION = "2.1.0"
 ISSUE_SAMPLE_LIMIT = 25
 
 
@@ -101,6 +101,10 @@ class MappingReportBuilder:
                 "Telemetry PART_COUNT is not a ProductionResult.",
                 "Cload is deferred because it collides with Sload on the same component "
                 "LOAD channel.",
+                "A derived unit is the reviewed unit of a canonical target whose catalog "
+                "declares none. It is evidence, not a source declaration.",
+                "Catalog units on Event DataItems stay in the Devices artifact; canonical Event "
+                "payloads carry no unit.",
             ],
         }
 
@@ -113,6 +117,7 @@ class MappingReportBuilder:
             rows.append(
                 {
                     **_catalog_metadata(definition.data_item),
+                    "derivedUnit": definition.derived_unit,
                     "target": definition.target,
                     "mappedRecords": counts[MappingStatus.MAPPED.value],
                     "unavailableRecords": self._item_unavailable_counts[data_item_id],
@@ -159,14 +164,14 @@ def render_mapping_report(report: dict[str, Any]) -> str:
         "",
         "## Explicit mappings",
         "",
-        "| DataItem | Component | Category | Source type | Target | Mapped | "
+        "| DataItem | Component | Category | Source type | Unit | Target | Mapped | "
         "Unavailable | Invalid |",
-        "|---|---|---|---|---|---:|---:|---:|",
+        "|---|---|---|---|---|---|---:|---:|---:|",
     ]
     for mapping in report["mappings"]:
         lines.append(
             f"| `{mapping['name']}` | `{mapping['componentId']}` | {mapping['category']} | "
-            f"`{mapping['type']}` | "
+            f"`{mapping['type']}` | {_format_unit(mapping)} | "
             f"`{mapping['target']}` | {mapping['mappedRecords']} | "
             f"{mapping['unavailableRecords']} | {mapping['invalidValueRecords']} |"
         )
@@ -215,6 +220,14 @@ def _unmapped_section(title: str, items: list[dict[str, object]]) -> list[str]:
     if not items:
         lines.append("| - | 0 | - |")
     return lines
+
+
+def _format_unit(mapping: dict[str, object]) -> str:
+    if mapping["unit"] is not None:
+        return f"`{mapping['unit']}`"
+    if mapping["derivedUnit"] is not None:
+        return f"`{mapping['derivedUnit']}` (derived)"
+    return "-"
 
 
 def _format_ratio(value: float | None) -> str:

@@ -10,6 +10,9 @@ from typing import Any
 
 from ...domain import ReplayObservation
 
+# 2.1.0 only adds canonical vocabulary, so runs recorded under 2.0.0 stay replayable.
+SUPPORTED_SCHEMA_VERSIONS = frozenset({"2.0.0", "2.1.0"})
+
 
 class FilesystemReplaySourceReader:
     def read(self, canonical_run: Path) -> tuple[ReplayObservation, ...]:
@@ -61,7 +64,7 @@ def _adapt_observation(
 ) -> ReplayObservation:
     if not isinstance(document, dict):
         raise ValueError(f"Canonical observations line {line_number} must be an object")
-    if document.get("schemaVersion") != "2.0.0":
+    if document.get("schemaVersion") not in SUPPORTED_SCHEMA_VERSIONS:
         raise ValueError(f"Unsupported Observation schema at line {line_number}")
     if "replay" in document:
         raise ValueError(

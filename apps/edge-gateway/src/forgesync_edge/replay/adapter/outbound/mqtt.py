@@ -19,7 +19,6 @@ from paho.mqtt.reasoncodes import ReasonCode
 
 MAX_OBSERVATION_BYTES = 65_536
 OBSERVATION_CONTENT_TYPE = "application/vnd.forgesync.observation+json"
-SCHEMA_VERSION = "2.0.0"
 MACHINE_TOPIC_SEGMENT = re.compile(r"^[A-Za-z0-9._-]{1,64}$")
 
 
@@ -97,13 +96,18 @@ class MqttObservationContract:
     def create_publish_request(self, envelope: bytes) -> MqttPublishRequest:
         document = self._decode_and_validate(envelope)
         routing = self._replay_routing(document)
+        # The delivery property must repeat the payload version instead of a build-time constant,
+        # so a consumer never sees a header that disagrees with the envelope it describes.
+        schema_version = document.get("schemaVersion")
+        if not isinstance(schema_version, str):
+            raise MqttObservationContractError("Observation requires a schemaVersion")
         return MqttPublishRequest(
             topic=f"forgesync/observations/{routing.machine_id}",
             payload=envelope,
             qos=1,
             is_retained=False,
             content_type=OBSERVATION_CONTENT_TYPE,
-            schema_version=SCHEMA_VERSION,
+            schema_version=schema_version,
             message_key=f"{routing.replay_session_id}:{routing.source_event_key}",
         )
 

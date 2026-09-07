@@ -85,9 +85,9 @@ Step 01~23에서 만든 ingestion, 권위 Twin, 2D, 격리된 3D scene, replay c
 
 | 신호 | 건수 | 현재 상태 | 사용처 |
 |---|---:|---|---|
-| `total_time` / `auto_time` / `cut_time` | 32,471 / 10,111 / 3,516 | 미매핑 | Step 32 → 34 가동률·절삭비 |
+| `total_time` / `auto_time` / `cut_time` | 32,471 / 10,111 / 3,516 | 매핑됨(Step 32), 미표출 | Step 34 가동률·절삭비 |
 | `execution` / `mode` / `power` | 329 / 79 / 49 | 매핑됨 | Step 33 상태 구간 |
-| `estop` | 51 | 미매핑 | Step 32 → 35 정지 사유 |
+| `estop` | 51 | 매핑됨(Step 32), 미표출 | Step 33 구간, Step 35 정지 사유 |
 | `Xabs` / `Yabs` / `Zabs` | 6,868 / 1,538 / 7,380 | 매핑됨, 미표출 | Step 29~30 축·툴패스 |
 | 축·주축 `LOAD` | 14,473 | 매핑됨, 미표출 | Step 37, 42 |
 | `Fact` PATH_FEEDRATE | 7,633 | 매핑됨, 미표출 | Step 37 |
@@ -95,10 +95,11 @@ Step 01~23에서 만든 ingestion, 권위 Twin, 2D, 격리된 3D scene, replay c
 | `PartCountAct` | 49 | 매핑됨, 미표출 | Step 36, 41 |
 | `Tool_number` | 593 | 매핑됨 | Step 28, 42 |
 | CONDITION 전체 | 1,052 | 매핑됨 | Step 35, 39 |
-| 오버라이드 `Sovr`/`Fovr`/`Frapidovr` | 184 | 미매핑 | Step 32 |
-| `line` / `sequenceNum` | 1,372 | 미매핑 | Step 32 |
+| 오버라이드 `Sovr`/`Fovr`/`Frapidovr` | 184 | 매핑됨(Step 32), 미표출 | 운전 문맥 |
+| `line` / `sequenceNum` | 1,372 | 매핑됨(Step 32), 미표출 | 생산 문맥 |
 
-Step 32 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이다.
+Step 32 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이었고 Step 32 이후는
+101,644 / 115,991 (87.63%)이다.
 
 #### Step 01~23 실측 점검 결과
 
@@ -1039,7 +1040,7 @@ C축, 실제 절삭 시뮬레이션, coolant/chip, OEM CAD fidelity는 완료 �
 
 ## Phase H — Observed Utilization and Operational KPI
 
-### Step 32 — Accumulated Time과 운전 신호 Canonical Mapping 확장
+### Step 32 — Accumulated Time과 운전 신호 Canonical Mapping 확장 ✅ DONE
 
 **목적**: 가동률 KPI의 원천인 누적 시간 카운터와 운전 신호를 canonical contract에 추가해 의미 커버리지를
 올린다.
@@ -1069,6 +1070,13 @@ C축, 실제 절삭 시뮬레이션, coolant/chip, OEM CAD fidelity는 완료 �
 Verification Ledger에 기록된다.
 
 **선행 조건**: Step 04, Step 16.
+
+**결과**: mapping `2.2.0` / mapper `2.1.0` / envelope `2.1.0`, 처리 run `sha256:80ce6b...b3ef`.
+Coverage 46.50% → 87.63%(101,644 / 115,991), invalid value 0. 누적 카운터는 catalog가 단위를 선언하지
+않으므로 mapping table의 `derivedUnit`으로 `SECOND`를 명시하고 근거는 Ledger V-044에 남겼다. subType만
+다른 형제 신호는 canonical target 이름으로 구분한다([ADR-049](../adr/ADR-049-accumulated-time-and-operating-signal-mapping.md)).
+남은 미매핑 14,325건은 이 Step의 범위 밖이다. PostgreSQL `V008` migration과 두 버전 병존 저장 test는
+Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.
 
 ### Step 33 — Equipment State Interval Projection
 

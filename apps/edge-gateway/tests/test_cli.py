@@ -79,6 +79,7 @@ def test_cli_acquire_verify_and_profile(
                         "type": "ROTARY_VELOCITY",
                         "subType": "ACTUAL",
                         "unit": "REVOLUTION/MINUTE",
+                        "derivedUnit": None,
                         "target": "SPINDLE_SPEED",
                     },
                     {
@@ -89,6 +90,7 @@ def test_cli_acquire_verify_and_profile(
                         "type": "EXECUTION",
                         "subType": None,
                         "unit": None,
+                        "derivedUnit": None,
                         "target": "EXECUTION",
                     },
                     {
@@ -99,6 +101,7 @@ def test_cli_acquire_verify_and_profile(
                         "type": "ACTUATOR",
                         "subType": None,
                         "unit": None,
+                        "derivedUnit": None,
                         "target": "SYSTEM",
                     },
                 ],

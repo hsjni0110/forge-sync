@@ -17,7 +17,10 @@
   "$defs": {
     "baseEnvelopeProperties": {
       "schemaVersion": {
-        "const": "2.0.0"
+        "enum": [
+          "2.0.0",
+          "2.1.0"
+        ]
       },
       "eventId": {
         "type": "string",
@@ -177,7 +180,10 @@
             "PATH_FEEDRATE",
             "TEMPERATURE",
             "LOAD",
-            "POSITION"
+            "POSITION",
+            "TOTAL_ACCUMULATED_TIME",
+            "AUTO_ACCUMULATED_TIME",
+            "CUT_ACCUMULATED_TIME"
           ]
         },
         "availability": {
@@ -196,7 +202,8 @@
             "MILLIMETER/SECOND",
             "CELSIUS",
             "PERCENT",
-            "MILLIMETER"
+            "MILLIMETER",
+            "SECOND"
           ]
         }
       },
@@ -327,6 +334,54 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "TOTAL_ACCUMULATED_TIME"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "SECOND"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "AUTO_ACCUMULATED_TIME"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "SECOND"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "metric": {
+                "const": "CUT_ACCUMULATED_TIME"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "unit": {
+                "const": "SECOND"
+              }
+            }
+          }
         }
       ]
     },
@@ -346,7 +401,13 @@
             "PROGRAM",
             "PART_COUNT",
             "AVAILABILITY",
-            "POWER_STATE"
+            "POWER_STATE",
+            "EMERGENCY_STOP",
+            "PROGRAMMED_PATH_FEEDRATE_OVERRIDE",
+            "RAPID_PATH_FEEDRATE_OVERRIDE",
+            "ROTARY_VELOCITY_OVERRIDE",
+            "LINE",
+            "SEQUENCE_NUMBER"
           ]
         },
         "availability": {
@@ -390,7 +451,12 @@
               "eventType": {
                 "enum": [
                   "TOOL_NUMBER",
-                  "PART_COUNT"
+                  "PART_COUNT",
+                  "PROGRAMMED_PATH_FEEDRATE_OVERRIDE",
+                  "RAPID_PATH_FEEDRATE_OVERRIDE",
+                  "ROTARY_VELOCITY_OVERRIDE",
+                  "LINE",
+                  "SEQUENCE_NUMBER"
                 ]
               }
             }
@@ -493,7 +559,32 @@
         "payload": {
           "$ref": "#/$defs/samplePayload"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "schemaVersion": {
+                "const": "2.0.0"
+              }
+            },
+            "required": [
+              "schemaVersion"
+            ]
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "metric": {
+                    "$ref": "#/$defs/baselineSampleMetric"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "eventEnvelope": {
       "type": "object",
@@ -540,7 +631,32 @@
         "payload": {
           "$ref": "#/$defs/eventPayload"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "schemaVersion": {
+                "const": "2.0.0"
+              }
+            },
+            "required": [
+              "schemaVersion"
+            ]
+          },
+          "then": {
+            "properties": {
+              "payload": {
+                "properties": {
+                  "eventType": {
+                    "$ref": "#/$defs/baselineEventType"
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "conditionEnvelope": {
       "type": "object",
@@ -588,6 +704,29 @@
           "$ref": "#/$defs/conditionPayload"
         }
       }
+    },
+    "baselineSampleMetric": {
+      "description": "Sample metrics available in schemaVersion 2.0.0.",
+      "enum": [
+        "ANGLE",
+        "SPINDLE_SPEED",
+        "PATH_FEEDRATE",
+        "TEMPERATURE",
+        "LOAD",
+        "POSITION"
+      ]
+    },
+    "baselineEventType": {
+      "description": "Event types available in schemaVersion 2.0.0.",
+      "enum": [
+        "EXECUTION",
+        "CONTROLLER_MODE",
+        "TOOL_NUMBER",
+        "PROGRAM",
+        "PART_COUNT",
+        "AVAILABILITY",
+        "POWER_STATE"
+      ]
     }
   }
 }
