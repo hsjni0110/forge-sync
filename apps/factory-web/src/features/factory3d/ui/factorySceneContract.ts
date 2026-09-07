@@ -8,7 +8,10 @@ import type { MachineVisualPresentation } from "../domain/machineVisualPresentat
 import type { SceneToolpath } from "../../toolpath/domain/observedToolpath";
 import type { FunctionalTwinPresentation } from "../domain/functionalTwinPresentation";
 
-export type SceneUnavailableReason = "BUNDLE_OR_SCENE" | "WEBGL";
+export type SceneUnavailableReason =
+  | "BUNDLE_OR_SCENE"
+  | "WEBGL"
+  | "WEBGL_CONTEXT_LOST";
 
 export interface FactorySceneProps {
   machineBinding: MachineSceneBinding;

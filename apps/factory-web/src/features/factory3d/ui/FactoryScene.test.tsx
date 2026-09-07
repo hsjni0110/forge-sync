@@ -104,6 +104,26 @@ describe("FactoryScene asset isolation", () => {
     expect(screen.queryByTestId("mock-canvas")).toBeNull();
   });
 
+  it("reports a lost graphics context so the scene stops showing a blank canvas", async () => {
+    const onUnavailable = vi.fn();
+
+    render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={onUnavailable}
+      />,
+    );
+    const canvas = (await screen.findByTestId("mock-canvas")).querySelector("canvas");
+
+    canvas?.dispatchEvent(new Event("webglcontextlost", { bubbles: false, cancelable: true }));
+
+    await waitFor(() => expect(onUnavailable).toHaveBeenCalledWith("WEBGL_CONTEXT_LOST"));
+  });
+
   it.each(["GLB request returned 404", "GLB payload is invalid"])(
     "uses the generic machine primitive when %s",
     async (message) => {

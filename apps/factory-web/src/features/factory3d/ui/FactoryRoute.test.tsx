@@ -80,6 +80,15 @@ describe("FactoryRoute", () => {
     fireEvent.click(screen.getByRole("button", { name: "2D" }));
     expect(await screen.findByRole("region", { name: "가공 목록과 상세" })).toBeTruthy();
   });
+  it("explains a lost graphics context differently from a browser that never had WebGL", async () => {
+    renderFactory(async () => ({ default: LostContextScene }), createSession);
+
+    expect(await screen.findByText("3D를 사용할 수 없습니다")).toBeTruthy();
+    expect(screen.getByText(/3D 그래픽 연결이 끊겼습니다/)).toBeTruthy();
+    expect(screen.queryByText(/브라우저가 WebGL 그래픽 환경을 만들지 못했습니다/)).toBeNull();
+    expect(screen.getByRole("button", { name: "3D 다시 시도" })).toBeTruthy();
+  });
+
   it("starts in SPLIT mode and switches between accessible 2D and 3D views", async () => {
     const sceneLoader = vi.fn(async () => ({ default: HealthyScene }));
     const sessionFactory = vi.fn(createSession);
@@ -292,4 +301,9 @@ function HealthyScene({
 function WebGlFailureScene({ onUnavailable }: FactorySceneProps) {
   useEffect(() => onUnavailable("WEBGL"), [onUnavailable]);
   return <div>WebGL unavailable</div>;
+}
+
+function LostContextScene({ onUnavailable }: FactorySceneProps) {
+  useEffect(() => onUnavailable("WEBGL_CONTEXT_LOST"), [onUnavailable]);
+  return <div>context lost</div>;
 }

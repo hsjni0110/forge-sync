@@ -32,6 +32,7 @@ export default function FactoryScene({
   const [isToolpathVisible, setIsToolpathVisible] = useState(true);
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>();
   const cameraSequence = useRef(0);
+  const stageRef = useRef<HTMLDivElement>(null);
   const handleModelReady = useCallback((readyModel?: MachineTwinModel) => {
     setModel(readyModel);
   }, []);
@@ -56,6 +57,23 @@ export default function FactoryScene({
     onUnavailable("WEBGL");
   }, [onUnavailable]);
 
+  // A context can also be lost after a healthy start. The canvas then keeps its box in the layout
+  // and paints nothing, so the reader is left with a blank rectangle unless the loss is reported.
+  // webglcontextlost does not bubble, so the stage listens during the capture phase.
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage) {
+      return;
+    }
+    const reportLostContext = () => {
+      setWebGlAvailability("UNAVAILABLE");
+      onUnavailable("WEBGL_CONTEXT_LOST");
+    };
+    stage.addEventListener("webglcontextlost", reportLostContext, true);
+    return () => stage.removeEventListener("webglcontextlost", reportLostContext, true);
+    // The stage only exists once WebGL is known to be available, so this must run again then.
+  }, [onUnavailable, webGlAvailability]);
+
   if (webGlAvailability !== "AVAILABLE") {
     return <div className="scene-loading" role="status">3D 그래픽 환경을 확인하는 중입니다.</div>;
   }
@@ -63,6 +81,7 @@ export default function FactoryScene({
   return (
     <div className="scene-canvas-root" aria-label="시뮬레이션 공장 3D 화면">
       <div
+        ref={stageRef}
         className="scene-canvas-stage"
         aria-label="3D 조작 영역"
         tabIndex={0}

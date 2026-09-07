@@ -295,6 +295,16 @@ function SceneLoading() {
   );
 }
 
+function sceneUnavailableExplanation(reason: SceneUnavailableReason): string {
+  if (reason === "WEBGL") {
+    return "브라우저가 WebGL 그래픽 환경을 만들지 못했습니다.";
+  }
+  if (reason === "WEBGL_CONTEXT_LOST") {
+    return "3D 그래픽 연결이 끊겼습니다. 그래픽 드라이버나 다른 프로그램이 자원을 회수했을 수 있습니다.";
+  }
+  return "3D 코드를 불러오거나 실행하지 못했습니다.";
+}
+
 function SceneUnavailableNotice({
   reason,
   retryScene,
@@ -305,11 +315,7 @@ function SceneUnavailableNotice({
   return (
     <div className="scene-unavailable" role="alert">
       <strong>3D를 사용할 수 없습니다</strong>
-      <span>
-        {reason === "WEBGL"
-          ? "브라우저가 WebGL 그래픽 환경을 만들지 못했습니다."
-          : "3D 코드를 불러오거나 실행하지 못했습니다."}
-      </span>
+      <span>{sceneUnavailableExplanation(reason)}</span>
       <span>설비 상태는 2D 화면에서 계속 확인할 수 있습니다.</span>
       <button type="button" className="button-quiet" onClick={retryScene}>3D 다시 시도</button>
     </div>
