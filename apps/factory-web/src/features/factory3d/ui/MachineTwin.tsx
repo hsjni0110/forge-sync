@@ -79,9 +79,11 @@ export function MachineTwin({
         />
       </AssetErrorBoundary>
       {visualState?.selected && (
+        // Selection is interface state, not machine state. An amber ring read as a warning and,
+        // being unlit, outshone the machine it was pointing at, so the cue is neutral and quiet.
         <mesh name="selected-machine-cue" rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.03, 0]}>
-          <ringGeometry args={[2.05, 2.25, 48]} />
-          <meshBasicMaterial color="#f7c948" transparent opacity={0.9} />
+          <ringGeometry args={[2.1, 2.2, 48]} />
+          <meshBasicMaterial color="#dbe8ed" transparent opacity={0.55} />
         </mesh>
       )}
     </group>

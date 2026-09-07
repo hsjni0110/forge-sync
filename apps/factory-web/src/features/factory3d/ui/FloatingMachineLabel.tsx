@@ -37,10 +37,12 @@ export function FloatingMachineLabel({
           ? "RPM 확인할 수 없음"
           : `${visualState.rpm} RPM`}
       </span>
-      <span>
+      {/* The scene already shows whether the spindle turns and which machine is ringed, so these
+          stay for readers who cannot see either. */}
+      <span className="visually-hidden">
         시각 회전 {visualPresentation.isSpindleAnimating ? "켜짐" : "꺼짐"}
       </span>
-      {isSelected && <span>선택됨</span>}
+      {isSelected && <span className="visually-hidden">선택됨</span>}
     </button>
   );
 }

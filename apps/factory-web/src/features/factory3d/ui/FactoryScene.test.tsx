@@ -302,6 +302,50 @@ describe("FactoryScene asset isolation", () => {
     expect(reducedMotionValues).toContain(true);
   });
 
+  it("keeps the selection cue out of the status colour vocabulary", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { container } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+    await screen.findByText("Twin v4");
+
+    const cue = container.querySelector('mesh[name="selected-machine-cue"] meshBasicMaterial');
+    const statusColours = ["#f7c948", "#ff5f5f", "#83e6cb", "#83b7e6", "#bda6e3"];
+
+    expect(cue).toBeTruthy();
+    expect(statusColours).not.toContain(cue?.getAttribute("color"));
+  });
+
+  it("shows only the machine, its state and speed on the label and leaves the rest to readers", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const { container } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+    const label = await screen.findByRole("button", { name: /Mazak01 Twin v4.*선택됨/ });
+
+    const hidden = [...label.querySelectorAll(".visually-hidden")].map((node) =>
+      node.textContent?.trim(),
+    );
+
+    expect(hidden.some((text) => text?.includes("시각 회전"))).toBe(true);
+    expect(hidden).toContain("선택됨");
+    expect(container.querySelector(".floating-machine-label")?.textContent).toContain("Twin v4");
+  });
+
   it("renders textual warning and stale cues without relying on color", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const warningState = { ...visualState, health: "WARNING" as const };
