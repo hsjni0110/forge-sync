@@ -156,10 +156,11 @@ export function FactoryRoute({
         </div>
         <div className="factory-controls">
           <div className="view-toggle" role="group" aria-label="공장 보기 방식">
-            {(["2D", "3D", "SPLIT"] as const).map((mode) => (
+            {VIEW_PROJECTIONS.map(({ mode, label, caption, glyph }) => (
               <button
                 type="button"
                 aria-pressed={viewMode === mode}
+                aria-label={label}
                 key={mode}
                 onClick={() => {
                   setViewMode(mode);
@@ -169,7 +170,8 @@ export function FactoryRoute({
                   }
                 }}
               >
-                {mode}
+                {glyph}
+                <span>{caption}</span>
               </button>
             ))}
           </div>
@@ -286,6 +288,56 @@ export function FactoryRoute({
     </section>
   );
 }
+
+/**
+ * Each view is named by the projection it puts on screen, drawn the way a drawing set labels its
+ * views. "2D / 3D / SPLIT" named the technology; these name what the reader will see.
+ */
+const VIEW_PROJECTIONS = [
+  {
+    mode: "2D" as const,
+    label: "평면 보기",
+    caption: "평면",
+    glyph: (
+      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
+        <rect x="6.5" y="2.5" width="13" height="11" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M2 8h3.5M20.5 8H24" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+  },
+  {
+    mode: "3D" as const,
+    label: "입체 보기",
+    caption: "입체",
+    glyph: (
+      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
+        <path
+          d="M13 1.6 21.5 6.4v5.2L13 16.4 4.5 11.6V6.4L13 1.6Z"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+        />
+        <path d="M13 1.6v5.2M13 6.8l8.5-.4M13 6.8 4.5 6.4" stroke="currentColor" strokeWidth="1.2" />
+      </svg>
+    ),
+  },
+  {
+    mode: "SPLIT" as const,
+    label: "평면과 입체 함께 보기",
+    caption: "함께",
+    glyph: (
+      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
+        <path
+          d="M8.6 2.4 14 5.4v4.4l-5.4 3-5.4-3V5.4l5.4-3Z"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+        />
+        <rect x="17" y="3.4" width="6.5" height="9.2" stroke="currentColor" strokeWidth="1.2" />
+      </svg>
+    ),
+  },
+];
 
 function SceneLoading() {
   return (

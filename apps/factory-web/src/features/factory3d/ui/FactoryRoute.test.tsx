@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { useEffect } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -77,7 +77,7 @@ describe("FactoryRoute", () => {
     expect(screen.queryByRole("link", { name: "공정 분석 상세 보기" })).toBeNull();
     expect(screen.getByText(/상단 2D 보기에서 가공 목록과 이상 근거/)).toBeTruthy();
     expect(screen.queryByRole("region", { name: "가공 목록과 상세" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "2D" }));
+    fireEvent.click(screen.getByRole("button", { name: "평면 보기" }));
     expect(await screen.findByRole("region", { name: "가공 목록과 상세" })).toBeTruthy();
   });
   it("explains a lost graphics context differently from a browser that never had WebGL", async () => {
@@ -95,12 +95,33 @@ describe("FactoryRoute", () => {
         <FactoryRoute sessionFactory={createSession} sceneLoader={async () => ({ default: HealthyScene })} />
       </MemoryRouter>,
     );
-    await screen.findByRole("button", { name: "SPLIT" });
+    await screen.findByRole("button", { name: "평면과 입체 함께 보기" });
 
     const disclosure = container.querySelector(".scene-disclaimer");
 
     expect(disclosure?.textContent).toContain("무엇을 보고 있나요?");
     expect(container.querySelector(".scene-panel .scene-introduction")).toBeNull();
+  });
+
+  it("names each view by the projection it shows and keeps the motion setting out of the group", async () => {
+    const { container } = render(
+      <MemoryRouter>
+        <FactoryRoute sessionFactory={createSession} sceneLoader={async () => ({ default: HealthyScene })} />
+      </MemoryRouter>,
+    );
+    await screen.findByRole("group", { name: "공장 보기 방식" });
+
+    const group = screen.getByRole("group", { name: "공장 보기 방식" });
+    const views = within(group).getAllByRole("button");
+
+    expect(views.map((button) => button.getAttribute("aria-label"))).toEqual([
+      "평면 보기",
+      "입체 보기",
+      "평면과 입체 함께 보기",
+    ]);
+    expect(views.every((button) => button.querySelector("svg"))).toBe(true);
+    expect(within(group).queryByRole("button", { name: /모션/ })).toBeNull();
+    expect(container.querySelector(".motion-toggle")).toBeTruthy();
   });
 
   it("gives the spatial views a viewport console and keeps 2D a scrolling document", async () => {
@@ -109,12 +130,12 @@ describe("FactoryRoute", () => {
         <FactoryRoute sessionFactory={createSession} sceneLoader={async () => ({ default: HealthyScene })} />
       </MemoryRouter>,
     );
-    await screen.findByRole("button", { name: "SPLIT" });
+    await screen.findByRole("button", { name: "평면과 입체 함께 보기" });
 
     const page = container.querySelector(".factory-page");
     expect(page?.classList.contains("factory-console")).toBe(true);
 
-    fireEvent.click(screen.getByRole("button", { name: "2D" }));
+    fireEvent.click(screen.getByRole("button", { name: "평면 보기" }));
     expect(container.querySelector(".factory-page")?.classList.contains("factory-console")).toBe(
       false,
     );
@@ -134,7 +155,7 @@ describe("FactoryRoute", () => {
           sceneLoader={async () => ({ default: HealthyScene })} />
       </MemoryRouter>,
     );
-    await screen.findByRole("button", { name: "SPLIT" });
+    await screen.findByRole("button", { name: "평면과 입체 함께 보기" });
 
     const layout = container.querySelector(".factory-layout");
     const transport = container.querySelector(".replay-controls");
@@ -151,7 +172,7 @@ describe("FactoryRoute", () => {
     const sessionFactory = vi.fn(createSession);
     renderFactory(sceneLoader, sessionFactory);
 
-    expect(screen.getByRole("button", { name: "SPLIT" }).getAttribute("aria-pressed")).toBe(
+    expect(screen.getByRole("button", { name: "평면과 입체 함께 보기" }).getAttribute("aria-pressed")).toBe(
       "true",
     );
     expect(await screen.findByTestId("healthy-scene")).toBeTruthy();
@@ -171,13 +192,13 @@ describe("FactoryRoute", () => {
     expect(reducedMotion.getAttribute("aria-pressed")).toBe("true");
     expect(screen.getByText("3D visual · ACTIVE · animation off")).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "2D" }));
+    fireEvent.click(screen.getByRole("button", { name: "평면 보기" }));
     expect(screen.queryByRole("heading", { name: "3D 공장" })).toBeNull();
     expect(screen.getByRole("heading", { name: "Mazak01" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "데이터 품질" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "데이터 출처" })).toBeTruthy();
 
-    fireEvent.click(screen.getByRole("button", { name: "3D" }));
+    fireEvent.click(screen.getByRole("button", { name: "입체 보기" }));
     expect(await screen.findByRole("heading", { name: "3D 공장" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Mazak01" })).toBeNull();
     expect(sessionFactory).toHaveBeenCalledTimes(1);

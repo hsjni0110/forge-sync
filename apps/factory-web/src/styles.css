@@ -78,10 +78,14 @@
   --fs-space-xl: 2rem;
   --fs-space-2xl: 3rem;
 
-  /* Radius */
-  --fs-radius-sm: 0.35rem;
-  --fs-radius-md: 0.6rem;
-  --fs-radius-lg: 0.75rem;
+  /*
+   * Radius. The console reads as drafting, not as cards: panel and control corners are square so
+   * the isometric scene and the interface around it share one geometry. The pill stays — a status
+   * chip is a tag, a different affordance from a panel, and rounding is what says so.
+   */
+  --fs-radius-sm: 0;
+  --fs-radius-md: 0;
+  --fs-radius-lg: 0;
   --fs-radius-pill: 999px;
 
   font-family: Pretendard, ui-sans-serif, system-ui, sans-serif;
@@ -263,10 +267,39 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .factory-header h1 { font-size: var(--fs-type-hero); }
 .factory-header p { color: var(--fs-text-muted); }
 .factory-controls { display: flex; align-items: center; gap: var(--fs-space-xs); flex-wrap: wrap; }
-.view-toggle { display: flex; gap: var(--fs-space-2xs); padding: var(--fs-space-2xs); border: 1px solid var(--fs-border); border-radius: var(--fs-radius-lg); background: var(--fs-surface-solid); }
-.view-toggle button, .motion-toggle { min-width: 4.4rem; border-color: transparent; color: var(--fs-text-muted); background: transparent; }
-.view-toggle button[aria-pressed="true"] { border-color: var(--fs-accent-strong); color: var(--fs-accent-ink); background: var(--fs-accent); }
-.motion-toggle[aria-pressed="true"] { border-color: var(--fs-accent); color: var(--fs-accent); background: var(--fs-accent-surface); }
+/*
+ * The three views are one exclusive choice, drawn as plates of the same deck: each carries the
+ * projection it shows, and the chosen one is pressed IN rather than filled with the accent — that
+ * fill belongs to primary actions, and using it here made picking a view the loudest thing on
+ * screen. Hairlines between plates instead of gaps, so the group reads as one instrument.
+ */
+.view-toggle { display: flex; border: 1px solid var(--fs-border-strong); background: var(--fs-surface-solid); }
+.view-toggle button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--fs-space-3xs);
+  min-width: 4.25rem;
+  padding: var(--fs-space-xs) var(--fs-space-sm) var(--fs-space-2xs);
+  border: 0;
+  border-left: 1px solid var(--fs-border);
+  color: var(--fs-text-muted);
+  background: transparent;
+  font-size: var(--fs-type-2xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.view-toggle button:first-child { border-left: 0; }
+.view-toggle button:hover:not([aria-pressed="true"]) { color: var(--fs-text); background: var(--fs-surface-sunken); }
+.view-toggle button[aria-pressed="true"] {
+  color: var(--fs-accent-text);
+  background: var(--fs-accent-surface);
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 45%);
+}
+
+/* A preference, not a view: an outline control, never a fourth plate in the group. */
+.motion-toggle { min-width: 0; padding: var(--fs-space-xs) var(--fs-space-sm); border: 1px solid var(--fs-border); color: var(--fs-text-muted); background: transparent; font-size: var(--fs-type-xs); }
+.motion-toggle[aria-pressed="true"] { border-color: var(--fs-accent-strong); color: var(--fs-accent); background: var(--fs-accent-surface); }
 
 /* Secondary / low-emphasis actions — the accent-filled default button is for primary actions only. */
 .button-quiet {
@@ -917,7 +950,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
   padding: 0 var(--fs-space-3xs);
   border: 1px solid var(--fs-accent-strong);
   border-bottom: none;
-  border-radius: 0.25rem 0.25rem 0 0;
+  border-radius: 0;
   background: linear-gradient(180deg, rgb(103 205 179 / 55%), rgb(103 205 179 / 25%));
   display: flex;
   align-items: flex-end;

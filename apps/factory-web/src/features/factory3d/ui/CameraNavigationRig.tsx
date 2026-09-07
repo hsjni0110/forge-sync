@@ -1,9 +1,9 @@
 import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
-import { Box3, PerspectiveCamera, Vector3 } from "three";
+import { Box3, OrthographicCamera, Vector3 } from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { calculateCameraFrame } from "./cameraFraming";
+import { calculateIsometricFrame } from "./cameraFraming";
 import type { MachineTwinModel, MachineInspectionPartId } from "./model/machineTwinModel";
 
 export type CameraCommandType =
@@ -14,6 +14,18 @@ export interface CameraCommand {
   sequence: number;
   type: CameraCommandType;
   partId?: MachineInspectionPartId;
+}
+
+/**
+ * A true isometric view: equal angles to all three axes, so no axis is foreshortened more than
+ * another and the floor grid reads as the machine's own axes.
+ */
+const ISOMETRIC_DIRECTION = new Vector3(1, 1, 1).normalize();
+
+/** The world direction that reads as "down the screen" for a camera placed on `direction`. */
+function screenDown(direction: Vector3): Vector3 {
+  const up = new Vector3(0, 1, 0);
+  return up.clone().addScaledVector(direction, -up.dot(direction)).normalize().negate();
 }
 
 export function CameraNavigationRig({
@@ -51,26 +63,30 @@ export function CameraNavigationRig({
   }, [camera, gl.domElement, isReducedMotion]);
 
   useEffect(() => {
-    if (!model || !(camera instanceof PerspectiveCamera)) return;
+    if (!model || !(camera instanceof OrthographicCamera)) return;
     const controls = controlsRef.current;
     if (!controls) return;
     const target = command?.type === "FOCUS_PART" && command.partId
       ? model.inspection.parts[command.partId].node
       : model.root;
-    const frame = calculateCameraFrame(
+    const frame = calculateIsometricFrame(
       new Box3().setFromObject(target),
-      camera.fov,
-      size.width / size.height,
+      size.width,
+      size.height,
       bottomObstructionFraction,
     );
-    controls.minDistance = frame.minDistance;
-    controls.maxDistance = frame.maxDistance;
+    controls.minZoom = frame.minZoom;
+    controls.maxZoom = frame.maxZoom;
     if (!command || command.type === "RESET" || command.type === "FOCUS_PART") {
-      const direction = new Vector3(1, 0.65, 1).normalize();
-      const toPosition = frame.target.clone().addScaledVector(direction, frame.distance);
+      const toTarget = frame.target
+        .clone()
+        .addScaledVector(screenDown(ISOMETRIC_DIRECTION), frame.screenLift);
+      const toPosition = toTarget.clone().addScaledVector(ISOMETRIC_DIRECTION, frame.distance);
+      camera.zoom = frame.zoom;
+      camera.updateProjectionMatrix();
       if (isReducedMotion) {
         camera.position.copy(toPosition);
-        controls.target.copy(frame.target);
+        controls.target.copy(toTarget);
         controls.update(0);
       } else {
         transitionRef.current = {
@@ -78,7 +94,7 @@ export function CameraNavigationRig({
           fromPosition: camera.position.clone(),
           toPosition,
           fromTarget: controls.target.clone(),
-          toTarget: frame.target.clone(),
+          toTarget,
         };
       }
       return;

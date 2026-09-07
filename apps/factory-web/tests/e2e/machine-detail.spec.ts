@@ -86,7 +86,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   ).toBeVisible();
   await expect(page.getByLabel("트윈 연결 상태").getByText("실시간 연결됨")).toBeVisible();
 
-  await page.getByRole("button", { name: "2D", exact: true }).click();
+  await page.getByRole("button", { name: "평면 보기", exact: true }).click();
   await expect(page.getByText("데이터 버전 6")).toBeVisible();
   await expect(page.getByText("1,873 rpm", { exact: true }).first()).toBeVisible();
   await page.getByText(/원본 추적 정보 .*건 · .*개 출처/).click();
@@ -98,7 +98,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
 
   await page.goto("/factory");
   await expect(page.getByRole("heading", { name: "Factory Scene" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "SPLIT" })).toHaveAttribute(
+  await expect(page.getByRole("button", { name: "평면과 입체 함께 보기" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );

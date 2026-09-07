@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 test("available WebGL keeps the 3D factory scene visible", async ({ page }) => {
   await page.goto("/factory");
 
-  await expect(page.getByRole("button", { name: "SPLIT" })).toHaveAttribute(
+  await expect(page.getByRole("button", { name: "평면과 입체 함께 보기" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -50,7 +50,7 @@ test("available WebGL keeps the 3D factory scene visible", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByLabel("시뮬레이션 공장 3D 화면").locator("canvas")).toBeVisible();
 
-  await page.getByRole("button", { name: "2D" }).click();
+  await page.getByRole("button", { name: "평면 보기" }).click();
   await expect(
     page.locator(".metric-card").filter({ hasText: "X축 위치" }).getByText("80.08 mm"),
   ).toBeVisible();
@@ -79,7 +79,7 @@ test("WebGL failure keeps the 2D factory detail usable", async ({ page }) => {
   });
   await page.goto("/factory");
 
-  await expect(page.getByRole("button", { name: "SPLIT" })).toHaveAttribute(
+  await expect(page.getByRole("button", { name: "평면과 입체 함께 보기" })).toHaveAttribute(
     "aria-pressed",
     "true",
   );

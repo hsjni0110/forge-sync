@@ -85,15 +85,19 @@ export default function FactoryScene({
       setBottomObstructionFraction(0);
       return;
     }
+    // Reframing the camera resizes the canvas, which the observer sees again. Sub-pixel drift in
+    // the measurement would make that loop forever, so only a step that actually matters counts.
     const measure = () => {
       const stageBox = stage.getBoundingClientRect();
       const overlayBox = overlay.getBoundingClientRect();
-      if (stageBox.height <= 0 || overlayBox.height <= 0) {
-        setBottomObstructionFraction(0);
-        return;
-      }
-      const covered = stageBox.bottom - overlayBox.top;
-      setBottomObstructionFraction(Math.min(Math.max(covered / stageBox.height, 0), 0.8));
+      const covered =
+        stageBox.height <= 0 || overlayBox.height <= 0
+          ? 0
+          : (stageBox.bottom - overlayBox.top) / stageBox.height;
+      const quantized = Math.round(Math.min(Math.max(covered, 0), 0.8) * 50) / 50;
+      setBottomObstructionFraction((current) =>
+        current === quantized ? current : quantized,
+      );
     };
     measure();
     const observer = new ResizeObserver(measure);
@@ -130,7 +134,8 @@ export default function FactoryScene({
         }}
       >
         <Canvas
-        camera={{ position: [6, 4.5, 7], fov: 42 }}
+        orthographic
+        camera={{ position: [9, 9, 9], zoom: 48, near: -200, far: 400 }}
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "default" }}
         shadows

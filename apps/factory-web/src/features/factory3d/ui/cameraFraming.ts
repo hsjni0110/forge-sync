@@ -1,46 +1,62 @@
 import { Box3, Vector3 } from "three";
 
-const VISIBLE_FRACTION = 0.7;
+/**
+ * Share of the limiting viewport axis the machine fills. Orthographic framing has no perspective
+ * falloff to imply space, so the margin can be tighter than a perspective camera wants before the
+ * machine starts to feel cramped.
+ */
+const VISIBLE_FRACTION = 0.82;
 
-export interface CameraFrame {
+export interface IsometricFrame {
   target: Vector3;
   radius: number;
   distance: number;
-  minDistance: number;
-  maxDistance: number;
+  zoom: number;
+  minZoom: number;
+  maxZoom: number;
+  screenLift: number;
   visibleFraction: number;
 }
 
 /**
- * `obstructedBottomFraction` is the share of the viewport height hidden behind overlays along the
- * bottom edge. The machine has to read inside what is left, so it must fit a shorter band and sit
- * above the overlays rather than behind them.
+ * The scene uses an orthographic isometric camera, so framing sets a zoom rather than a distance:
+ * equal travel measures equal on screen wherever the tool is, which is what makes an observed
+ * toolpath comparable. `zoom` is world units per pixel inverted — the frustum is the canvas in
+ * pixels at zoom 1, the convention react-three-fiber sets up for an orthographic canvas.
+ *
+ * `obstructedBottomFraction` is the share of viewport height hidden behind overlays along the
+ * bottom edge. The machine has to read inside what is left, so it fits a shorter band and
+ * `screenLift` says how far the aim point moves down-screen to raise it clear. The caller applies
+ * that along the camera's own up vector, which world Y only approximates at an isometric angle.
  */
-export function calculateCameraFrame(
+export function calculateIsometricFrame(
   bounds: Box3,
-  verticalFovDegrees: number,
-  aspect: number,
+  viewportWidth: number,
+  viewportHeight: number,
   obstructedBottomFraction = 0,
-): CameraFrame {
+): IsometricFrame {
   const obstructed = Math.min(Math.max(obstructedBottomFraction, 0), 0.8);
   const clearFraction = 1 - obstructed;
   const target = bounds.getCenter(new Vector3());
   const size = bounds.getSize(new Vector3());
   const radius = Math.max(size.length() / 2, 0.1);
-  const verticalFovRadians = (verticalFovDegrees * Math.PI) / 180;
-  const limitingHalfSize = Math.max(size.y / (2 * clearFraction), size.x / (2 * aspect));
-  const distance =
-    limitingHalfSize / Math.tan(verticalFovRadians / 2) / VISIBLE_FRACTION +
-    size.z / 2;
-  // Aiming below the model centre by half the hidden band raises the machine into the clear part.
-  target.y -= distance * Math.tan(verticalFovRadians / 2) * obstructed;
+  // An isometric camera turns depth into screen width and height, so the diagonal is what has to
+  // fit, not the axis-aligned width.
+  const projectedWidth = Math.max(size.x + size.z, 0.1);
+  const projectedHeight = Math.max(size.y + (size.x + size.z) / 2, 0.1);
+  const clearHeight = Math.max(viewportHeight * clearFraction, 1);
+  const zoom =
+    Math.min(viewportWidth / projectedWidth, clearHeight / projectedHeight) * VISIBLE_FRACTION;
 
   return {
     target,
     radius,
-    distance,
-    minDistance: radius * 0.45,
-    maxDistance: radius * 4,
+    // Orthographic scale is set by zoom, so distance only has to keep the model off the near plane.
+    distance: radius * 4,
+    zoom,
+    minZoom: zoom * 0.35,
+    maxZoom: zoom * 4,
+    screenLift: (viewportHeight * obstructed) / 2 / zoom,
     visibleFraction: VISIBLE_FRACTION,
   };
 }

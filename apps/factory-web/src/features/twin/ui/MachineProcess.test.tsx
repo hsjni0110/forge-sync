@@ -70,7 +70,7 @@ function showProcess(document: typeof runFixture, mismatch: boolean | "recover" 
   });
   render(<MemoryRouter><FactoryRoute sessionFactory={sessionFactory} replayControlClient={replayControlClient}
     sceneLoader={async () => ({ default: () => null })} /></MemoryRouter>);
-  fireEvent.click(screen.getByRole("button", { name: "2D" }));
+  fireEvent.click(screen.getByRole("button", { name: "평면 보기" }));
   return Object.assign(fetch, { retryTwin, replayControlClient });
 }
 
