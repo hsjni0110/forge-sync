@@ -91,7 +91,9 @@ mappingVersion
 
 원천에 없는 `agentInstanceId`, `sourceSequence`, 단위, 시간은 만들어 내지 않는다. 파생하거나 보정한 값은 방식과 버전을 provenance에 기록한다.
 
-catalog가 단위를 선언하지 않는 SAMPLE의 단위는 mapping table의 `derivedUnit`으로만 정할 수 있다. `mappingVersion`과 `sourceDataItemId`로 그 entry를 되짚을 수 있고, mapping report의 단위 열이 `(derived)`로 원천 선언과 구분한다. 근거 없이 `derivedUnit`을 채우거나, catalog 단위를 `derivedUnit`으로 덮어쓰는 것은 매핑 시작 전에 실패한다([ADR-049](../adr/ADR-049-accumulated-time-and-operating-signal-mapping.md)).
+catalog가 단위를 선언하지 않는 SAMPLE의 단위는 mapping table의 `derivedUnit`으로만 정할 수 있다. 근거 없이 `derivedUnit`을 채우거나 catalog 단위를 `derivedUnit`으로 덮어쓰는 것은 매핑 시작 전에 실패하고, mapping report의 단위 열이 `(derived)`로 원천 선언과 구분한다.
+
+mapping table은 Ingestion 경계를 넘지 않으므로 파생 여부를 소비자가 되짚을 수 없다. 그래서 Canonical Observation의 available SAMPLE은 `unitProvenance`로 `SOURCE_DECLARED`와 `DERIVED`를 직접 구분한다([ADR-049](../adr/ADR-049-accumulated-time-and-operating-signal-mapping.md)).
 
 ### L3. Operational Projection
 

@@ -298,7 +298,7 @@ def test_maps_operating_signals_without_inventing_units() -> None:
     assert rapid_override.payload.event_type is EventType.RAPID_PATH_FEEDRATE_OVERRIDE
     assert programmed_override.payload.event_type is EventType.PROGRAMMED_PATH_FEEDRATE_OVERRIDE
     assert program_line.payload.event_type is EventType.LINE
-    assert sequence_number.payload.event_type is EventType.SEQUENCE_NUMBER
+    assert sequence_number.payload.event_type.value == "PROGRAM_SEQUENCE_NUMBER"
     assert not hasattr(spindle_override.payload, "unit")
 
 
@@ -369,3 +369,30 @@ def test_report_discloses_which_units_are_derived_rather_than_source_declared(
     markdown = (output.run_directory / "mapping-report.md").read_text(encoding="utf-8")
     assert "`SECOND` (derived)" in markdown
     assert any("derived unit" in limitation for limitation in output.report["limitations"])
+
+
+def test_contract_separates_a_derived_unit_from_a_source_declared_one() -> None:
+    _, results = _mapping_results()
+    documents = [
+        observation_to_dict(result.observation)
+        for result in results
+        if result.observation is not None
+    ]
+    available_samples = {
+        document["provenance"]["transformation"]["sourceDataItemId"]: document["payload"]
+        for document in documents
+        if document["observationKind"] == "SAMPLE"
+        and document["payload"]["availability"] == "AVAILABLE"
+    }
+    unavailable_counter = next(
+        document["payload"]
+        for document in documents
+        if document["provenance"]["transformation"]["sourceDataItemId"] == "Mazak01-path_18"
+        and document["payload"]["availability"] == "UNAVAILABLE"
+    )
+
+    assert available_samples["Mazak01-path_18"]["unit"] == "SECOND"
+    assert available_samples["Mazak01-path_18"]["unitProvenance"] == "DERIVED"
+    assert available_samples["Mazak01-X_1"]["unit"] == "MILLIMETER"
+    assert available_samples["Mazak01-X_1"]["unitProvenance"] == "SOURCE_DECLARED"
+    assert "unitProvenance" not in unavailable_counter

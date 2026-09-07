@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "2.1.0",
+  "schemaVersion": "2.0.0",
   "eventId": "6f0f1f0f-0a1b-4c2d-8e3f-4a5b6c7d8e9f",
   "sourceEventKey": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#line=150",
   "machineId": "Mazak01",
@@ -24,10 +24,10 @@
     }
   },
   "payload": {
-    "metric": "TOTAL_ACCUMULATED_TIME",
+    "metric": "POSITION",
     "availability": "AVAILABLE",
-    "value": 39932651.0,
-    "unit": "SECOND",
+    "value": 9.635617,
+    "unit": "MILLIMETER",
     "unitProvenance": "DERIVED"
   }
 }

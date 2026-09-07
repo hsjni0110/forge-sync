@@ -80,6 +80,8 @@ def _payload_to_dict(payload: SamplePayload | EventPayload | ConditionPayload) -
         if payload.value is not None and payload.unit is not None:
             sample["value"] = payload.value
             sample["unit"] = payload.unit.value
+        if payload.unit_provenance is not None:
+            sample["unitProvenance"] = payload.unit_provenance.value
         return sample
     if isinstance(payload, EventPayload):
         event: dict[str, Any] = {

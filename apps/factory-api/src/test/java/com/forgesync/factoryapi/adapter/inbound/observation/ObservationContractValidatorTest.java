@@ -45,9 +45,11 @@ class ObservationContractValidatorTest {
         "missing-subject.json",
         "replay-partial.json",
         "sample-unit-mismatch.json",
+        "sample-without-unit-provenance.json",
         "schema-version-mismatch.json",
         "source-timezone-missing.json",
         "unavailable-sample-with-value.json",
+        "unit-provenance-before-schema-upgrade.json",
         "unknown-field.json"
       })
   void rejectsSharedInvalidFixtureBeforeApplicationUseCase(String fixtureName) {

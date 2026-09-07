@@ -9,13 +9,17 @@ Canonical Observations. It uses JSON Schema Draft 2020-12 constructs supported b
 - Every object is closed. Unknown fields are rejected instead of being silently ignored.
 - Adding, removing, or changing a field requires a new schema version and an explicit producer and
   consumer upgrade. A new schema never changes an existing versioned file in place.
-- `2.1.0` adds canonical vocabulary only: the `TOTAL_ACCUMULATED_TIME`, `AUTO_ACCUMULATED_TIME`,
-  and `CUT_ACCUMULATED_TIME` metrics with the `SECOND` unit, and the `EMERGENCY_STOP`,
+- `2.1.0` adds canonical vocabulary: the `TOTAL_ACCUMULATED_TIME`, `AUTO_ACCUMULATED_TIME`, and
+  `CUT_ACCUMULATED_TIME` metrics with the `SECOND` unit, and the `EMERGENCY_STOP`,
   `PROGRAMMED_PATH_FEEDRATE_OVERRIDE`, `RAPID_PATH_FEEDRATE_OVERRIDE`,
-  `ROTARY_VELOCITY_OVERRIDE`, `LINE`, and `SEQUENCE_NUMBER` Event types. No field was added,
-  removed, or changed, so documents already stored under `2.0.0` stay valid and replayable.
-- The added vocabulary belongs to `2.1.0` alone. A document that declares `2.0.0` and carries a
-  `2.1.0` metric or Event type is rejected, so the declared version always describes the payload.
+  `ROTARY_VELOCITY_OVERRIDE`, `LINE`, and `PROGRAM_SEQUENCE_NUMBER` Event types.
+- `2.1.0` also adds one field: an available SAMPLE payload carries `unitProvenance`, either
+  `SOURCE_DECLARED` or `DERIVED`. A unit the source catalog never declared must not look like one
+  it did, and the mapping table that records the derivation never crosses the ingestion boundary,
+  so the envelope states it. An unavailable SAMPLE has no value, unit, or unit provenance.
+- Both additions belong to `2.1.0` alone. A document that declares `2.0.0` and carries a `2.1.0`
+  metric, Event type, or `unitProvenance` is rejected, so the declared version always describes
+  the payload, and documents already stored under `2.0.0` stay valid and replayable.
 - Producers emit the highest version they can populate. The MQTT `schema-version` delivery
   property repeats the payload `schemaVersion` instead of a build-time constant.
 - SAMPLE, EVENT, and CONDITION are separate payload shapes selected by `observationKind`.

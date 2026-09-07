@@ -105,6 +105,10 @@ class MappingReportBuilder:
                 "declares none. It is evidence, not a source declaration.",
                 "Catalog units on Event DataItems stay in the Devices artifact; canonical Event "
                 "payloads carry no unit.",
+                "Per-axis feedrate DataItems are deferred: no roadmap consumer reads them yet, "
+                "and the project maps a signal when a consumer exists rather than earlier.",
+                "C-axis DataItems stay deferred because the roadmap excludes that axis until its "
+                "coordinate evidence is confirmed.",
             ],
         }
 

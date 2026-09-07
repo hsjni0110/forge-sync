@@ -37,6 +37,14 @@ Mapping entry에 `derivedUnit`을 추가한다. catalog가 단위를 선언하�
 증가 간격의 중앙값은 1.052초다. 이는 관측에서 파생한 근거이지 원천의 선언이 아니며, mapping report의
 단위 열에 `(derived)`로, Verification Ledger V-044에 재현 절차와 함께 남긴다.
 
+### 파생 여부는 envelope 자체가 말한다
+
+`unit: SECOND`와 `unit: MILLIMETER`는 모양이 같아서, 어느 쪽이 원천 선언인지 payload만 보고는 알 수
+없다. mapping table은 Ingestion 경계를 넘지 않으므로 소비자가 되짚을 수도 없다. 그래서 available
+Sample payload는 `unitProvenance`로 `SOURCE_DECLARED`와 `DERIVED`를 직접 구분한다. PRD 75와 120이
+요구하는 값 단위의 provenance 구분을, Twin과 화면이 별도 조회 없이 표시할 수 있게 하기 위해서다.
+unavailable Sample은 값도 단위도 없으므로 이 표시도 갖지 않는다.
+
 ### subType이 의미를 가르면 canonical target 이름이 그 의미를 담는다
 
 MTConnect type만으로 채널이 겹치고 subType이 실제로 다른 지표를 가리키면, canonical target 이름에
@@ -45,8 +53,10 @@ MTConnect type만으로 채널이 겹치고 subType이 실제로 다른 지표�
 그대로 유지되고, 소비자는 `(type, subType)` 쌍이 아니라 하나의 target enum으로 지표를 고른다.
 원천의 `type`과 `subType`은 mapping table과 report에 그대로 보존된다.
 
-`x:SEQUENCE_NUMBER`처럼 벤더 확장 접두사가 붙은 type의 target은 접두사를 뺀 `SEQUENCE_NUMBER`다.
-canonical target은 ForgeSync의 어휘이고 원천 type은 mapping table과 Devices artifact에 남는다.
+`x:SEQUENCE_NUMBER`의 target은 `PROGRAM_SEQUENCE_NUMBER`다. 값의 의미는 NC 블록 번호이며 Replay
+Sequence나 `source.sourceSequence` 같은 순서 identity와 무관하다. 도메인 용어집이 "sequence"를 순서
+identity 용어로 지키고 있으므로 target 이름이 프로그램 위치임을 드러낸다. canonical target은
+ForgeSync의 어휘이고 원천 type은 mapping table과 Devices artifact에 남는다.
 
 ### EVENT의 catalog 단위는 허용하되 canonical payload에 싣지 않는다
 
@@ -56,8 +66,8 @@ canonical target은 ForgeSync의 어휘이고 원천 type은 mapping table과 De
 
 ### 정수 Event
 
-`TOOL_NUMBER`, `PART_COUNT`에 더해 오버라이드 3종과 `LINE`, `SEQUENCE_NUMBER`를 비음수 정수 Event로
-둔다. 고정 artifact의 관측값이 모두 정수이기 때문이다. 소수나 음수가 나타나면 잘라내지 않고
+`TOOL_NUMBER`, `PART_COUNT`에 더해 오버라이드 3종과 `LINE`, `PROGRAM_SEQUENCE_NUMBER`를 비음수 정수
+Event로 둔다. 고정 artifact의 관측값이 모두 정수이기 때문이다. 소수나 음수가 나타나면 잘라내지 않고
 `INVALID_VALUE` record로 남겨 원본 locator와 함께 검토한다.
 
 ### 누적 카운터의 값은 보정하지 않는다
@@ -67,21 +77,23 @@ projection의 책임이다.
 
 ### Observation envelope 2.1.0
 
-새 어휘만 추가하는 minor 증가다. 필드는 추가·삭제·변경되지 않으므로 `2.0.0`으로 저장된 기존 history와
-canonical run은 그대로 유효하고 replay 가능하다. 새 어휘는 `2.1.0`에만 속하며, `2.0.0`을 선언한
-문서가 새 metric이나 Event type을 담으면 거부된다. MQTT `schema-version` property는 build-time 상수가
-아니라 payload의 `schemaVersion`을 반복한다.
+어휘를 더하고 available Sample에 `unitProvenance` 하나를 더하는 minor 증가다. 두 추가는 모두
+`2.1.0`에만 속한다. `2.0.0`을 선언한 문서는 새 metric이나 Event type을 담을 수 없고 `unitProvenance`도
+가질 수 없으므로, 이미 `2.0.0`으로 저장된 history와 canonical run은 그대로 유효하고 replay 가능하다.
+MQTT `schema-version` property는 build-time 상수가 아니라 payload의 `schemaVersion`을 반복한다.
 
 ## Consequences
 
 - Semantic coverage가 53,939 / 115,991 (46.50%)에서 101,644 / 115,991 (87.63%)로 올라간다.
   invalid value는 0건이다.
-- Mapping version은 `2.2.0`, mapper version은 `2.1.0`, report schema version은 `2.1.0`이 되고
-  새 processing run `sha256:80ce6b...b3ef`가 만들어진다. 기존 run은 덮어쓰지 않는다.
+- Mapping version은 `2.2.0`, mapper version은 `2.2.0`, report schema version은 `2.1.0`이 되고
+  새 processing run `sha256:0f1a8d...15bc4`가 만들어진다. 기존 run은 덮어쓰지 않는다.
 - Replay 대상이 53,939건에서 101,644건으로 늘어난다. sequence hash와 replay plan이 새로 만들어진다.
 - Step 33의 상태 구간, Step 34의 가동률·절삭 비율, Step 35의 정지 사유가 원천 근거를 갖는다.
-- 남은 미매핑 14,325건(`Bfrt`, `Cfrt`, `Xfrt`/`Yfrt`/`Zfrt`, `Cload`, `Cdeg`, `Tool_group`,
-  `Tool_suffix`, 주석·프로그램 보조 항목)은 이 결정의 범위 밖이며 계속 원본과 함께 보존·계수된다.
+- 남은 미매핑 14,325건은 계속 원본과 함께 보존·계수되며 보류 근거를 mapping report에 남긴다. 축별
+  이송속도 12,390건(`Xfrt`/`Yfrt`/`Zfrt`/`Bfrt`/`Cfrt`)은 현재 로드맵에 소비자가 없어 미룬다. 근거가
+  없어서가 아니라 쓰는 곳이 없기 때문이며, 소비자가 생기는 Step에서 매핑한다. C축 항목은 좌표 근거
+  확인 전까지 로드맵이 제외한 범위다.
 
 ## Rejected alternatives
 
@@ -91,5 +103,7 @@ canonical run은 그대로 유효하고 replay 가능하다. 새 어휘는 `2.1.
   구분할 수 없게 된다.
 - payload에 subType 필드를 추가: 원천에 더 충실하지만 모든 소비자가 `(target, subType)` 쌍으로 지표를
   골라야 하고, 하나의 지표를 가리키는 데 두 값이 필요해진다.
+- 파생 여부를 mapping table에만 두고 envelope에는 싣지 않기: mapping table은 Ingestion 경계를 넘지
+  않으므로 Twin과 화면이 원천 선언과 파생을 구분할 수 없다.
 - 오버라이드를 SAMPLE로 매핑: category를 바꾸는 것은 데이터 불변식 위반이다.
 - 누적 카운터를 단조 증가로 보정: 관측하지 않은 값을 만든다.

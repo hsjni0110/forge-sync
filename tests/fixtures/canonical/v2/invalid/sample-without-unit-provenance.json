@@ -27,7 +27,6 @@
     "metric": "TOTAL_ACCUMULATED_TIME",
     "availability": "AVAILABLE",
     "value": 39932651.0,
-    "unit": "SECOND",
-    "unitProvenance": "DERIVED"
+    "unit": "SECOND"
   }
 }

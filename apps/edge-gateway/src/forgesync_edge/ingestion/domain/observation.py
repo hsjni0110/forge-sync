@@ -31,6 +31,13 @@ class SampleMetric(StrEnum):
     CUT_ACCUMULATED_TIME = "CUT_ACCUMULATED_TIME"
 
 
+class UnitProvenance(StrEnum):
+    """Whether the source catalog declared the unit or ForgeSync derived it from evidence."""
+
+    SOURCE_DECLARED = "SOURCE_DECLARED"
+    DERIVED = "DERIVED"
+
+
 class Unit(StrEnum):
     DEGREE = "DEGREE"
     REVOLUTION_PER_MINUTE = "REVOLUTION/MINUTE"
@@ -67,7 +74,7 @@ class EventType(StrEnum):
     RAPID_PATH_FEEDRATE_OVERRIDE = "RAPID_PATH_FEEDRATE_OVERRIDE"
     ROTARY_VELOCITY_OVERRIDE = "ROTARY_VELOCITY_OVERRIDE"
     LINE = "LINE"
-    SEQUENCE_NUMBER = "SEQUENCE_NUMBER"
+    PROGRAM_SEQUENCE_NUMBER = "PROGRAM_SEQUENCE_NUMBER"
 
 
 # Observed values of these Events are whole counts in the pinned source; a fractional or
@@ -80,7 +87,7 @@ NUMERIC_EVENT_TYPES = frozenset(
         EventType.RAPID_PATH_FEEDRATE_OVERRIDE,
         EventType.ROTARY_VELOCITY_OVERRIDE,
         EventType.LINE,
-        EventType.SEQUENCE_NUMBER,
+        EventType.PROGRAM_SEQUENCE_NUMBER,
     }
 )
 
@@ -158,14 +165,21 @@ class SamplePayload:
     availability: Availability
     value: float | None = None
     unit: Unit | None = None
+    unit_provenance: UnitProvenance | None = None
 
     def __post_init__(self) -> None:
         if self.availability is Availability.UNAVAILABLE:
             if self.value is not None or self.unit is not None:
                 raise ValueError("unavailable sample must not invent a value or unit")
+            if self.unit_provenance is not None:
+                raise ValueError("unavailable sample must not claim unit provenance")
             return
         if self.value is None or self.unit is None:
             raise ValueError("available sample requires value and unit")
+        # A reader cannot tell a source-declared unit from a derived one by its shape alone,
+        # so every available sample states which one it is.
+        if self.unit_provenance is None:
+            raise ValueError("available sample requires unit provenance")
         if self.unit is not EXPECTED_UNITS[self.metric]:
             raise ValueError(f"{self.metric.value} requires {EXPECTED_UNITS[self.metric].value}")
 

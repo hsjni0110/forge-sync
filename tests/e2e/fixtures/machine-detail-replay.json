@@ -1,6 +1,6 @@
 {
-  "canonicalRun": "datasets/canonical/nist-mazak01-20161005/80ce6b099c6ee90c11dc04286030b7a2448108d7ef9f81152fb3f0e98a06b3ef/observations.ndjson",
-  "canonicalSha256": "fcbe745107fe709e1ddb428e40b6295ca85718e6b942bdbf71c1990de4332509",
+  "canonicalRun": "datasets/canonical/nist-mazak01-20161005/0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4/observations.ndjson",
+  "canonicalSha256": "2fc48ab581fb133ac9d9340e2f2c23058d7ea3b5002fedcf8900cb8c6e7aa340",
   "replaySessionId": "9d4cba3e-9de7-43b7-b086-9c2de75e5120",
   "steps": {
     "initial": {

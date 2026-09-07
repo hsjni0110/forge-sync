@@ -31,7 +31,7 @@
     {"dataItemId":"Mazak01-path_14","componentId":"Mazak01-path","name":"mode","category":"EVENT","type":"CONTROLLER_MODE","subType":null,"unit":null,"derivedUnit":null,"target":"CONTROLLER_MODE"},
     {"dataItemId":"Mazak01-path_6","componentId":"Mazak01-path","name":"PartCountAct","category":"EVENT","type":"PART_COUNT","subType":null,"unit":null,"derivedUnit":null,"target":"PART_COUNT"},
     {"dataItemId":"Mazak01-path_3","componentId":"Mazak01-path","name":"line","category":"EVENT","type":"LINE","subType":null,"unit":null,"derivedUnit":null,"target":"LINE"},
-    {"dataItemId":"Mazak01-path_5","componentId":"Mazak01-path","name":"sequenceNum","category":"EVENT","type":"x:SEQUENCE_NUMBER","subType":null,"unit":null,"derivedUnit":null,"target":"SEQUENCE_NUMBER"},
+    {"dataItemId":"Mazak01-path_5","componentId":"Mazak01-path","name":"sequenceNum","category":"EVENT","type":"x:SEQUENCE_NUMBER","subType":null,"unit":null,"derivedUnit":null,"target":"PROGRAM_SEQUENCE_NUMBER"},
     {"dataItemId":"Mazak01-path_8","componentId":"Mazak01-path","name":"Frapidovr","category":"EVENT","type":"PATH_FEEDRATE_OVERRIDE","subType":"RAPID","unit":"PERCENT","derivedUnit":null,"target":"RAPID_PATH_FEEDRATE_OVERRIDE"},
     {"dataItemId":"Mazak01-path_9","componentId":"Mazak01-path","name":"Fovr","category":"EVENT","type":"PATH_FEEDRATE_OVERRIDE","subType":"PROGRAMMED","unit":"PERCENT","derivedUnit":null,"target":"PROGRAMMED_PATH_FEEDRATE_OVERRIDE"},
     {"dataItemId":"Mazak01-controller_4","componentId":"Mazak01-controller","name":"estop","category":"EVENT","type":"EMERGENCY_STOP","subType":null,"unit":null,"derivedUnit":null,"target":"EMERGENCY_STOP"},

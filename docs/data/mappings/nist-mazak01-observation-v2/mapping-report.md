@@ -2,10 +2,10 @@
 
 ## Reproducibility
 
-- Processing run: `sha256:80ce6b099c6ee90c11dc04286030b7a2448108d7ef9f81152fb3f0e98a06b3ef`
-- Mapping / Mapper / Parser: `2.2.0` / `2.1.0` / `1.0.0`
+- Processing run: `sha256:0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4`
+- Mapping / Mapper / Parser: `2.2.0` / `2.2.0` / `1.0.0`
 - Raw artifact: `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf`
-- Mapping table SHA-256: `65530790c24dd504b5531bac3ab26bab44a3e426b4cad697d573297dc351cfe5`
+- Mapping table SHA-256: `1e6d2d2381218303230bbecc404430e59acf271e4621bd2e65adc20309cc109c`
 
 ## Semantic coverage
 
@@ -61,7 +61,7 @@
 | `motion_cond` | `Mazak01-path` | CONDITION | `MOTION_PROGRAM` | - | `MOTION_PROGRAM` | 49 | 0 | 0 |
 | `path_system` | `Mazak01-path` | CONDITION | `SYSTEM` | - | `SYSTEM` | 49 | 0 | 0 |
 | `line` | `Mazak01-path` | EVENT | `LINE` | - | `LINE` | 686 | 25 | 0 |
-| `sequenceNum` | `Mazak01-path` | EVENT | `x:SEQUENCE_NUMBER` | - | `SEQUENCE_NUMBER` | 686 | 25 | 0 |
+| `sequenceNum` | `Mazak01-path` | EVENT | `x:SEQUENCE_NUMBER` | - | `PROGRAM_SEQUENCE_NUMBER` | 686 | 25 | 0 |
 | `PartCountAct` | `Mazak01-path` | EVENT | `PART_COUNT` | - | `PART_COUNT` | 49 | 25 | 0 |
 | `Fact` | `Mazak01-path` | SAMPLE | `PATH_FEEDRATE` | `MILLIMETER/SECOND` | `PATH_FEEDRATE` | 7633 | 25 | 0 |
 | `Frapidovr` | `Mazak01-path` | EVENT | `PATH_FEEDRATE_OVERRIDE` | `PERCENT` | `RAPID_PATH_FEEDRATE_OVERRIDE` | 86 | 25 | 0 |
@@ -120,3 +120,5 @@
 - Cload is deferred because it collides with Sload on the same component LOAD channel.
 - A derived unit is the reviewed unit of a canonical target whose catalog declares none. It is evidence, not a source declaration.
 - Catalog units on Event DataItems stay in the Devices artifact; canonical Event payloads carry no unit.
+- Per-axis feedrate DataItems are deferred: no roadmap consumer reads them yet, and the project maps a signal when a consumer exists rather than earlier.
+- C-axis DataItems stay deferred because the roadmap excludes that axis until its coordinate evidence is confirmed.

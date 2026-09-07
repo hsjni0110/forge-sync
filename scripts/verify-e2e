@@ -58,7 +58,7 @@ wait_for_url() {
 run_database_compose up --detach --wait
 run_mqtt_compose up --detach --wait
 
-canonical_run="$repository_root/datasets/canonical/nist-mazak01-20161005/80ce6b099c6ee90c11dc04286030b7a2448108d7ef9f81152fb3f0e98a06b3ef"
+canonical_run="$repository_root/datasets/canonical/nist-mazak01-20161005/0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4"
 FORGESYNC_REPOSITORY_ROOT="$repository_root" \
 FORGESYNC_REPLAY_SOURCE_PATH="$canonical_run" \
 FORGESYNC_REPLAY_SOURCE_SET_ID="nist-mazak01-20161005" \

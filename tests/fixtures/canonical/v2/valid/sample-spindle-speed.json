@@ -27,6 +27,7 @@
     "metric": "SPINDLE_SPEED",
     "availability": "AVAILABLE",
     "value": 0.0,
-    "unit": "REVOLUTION/MINUTE"
+    "unit": "REVOLUTION/MINUTE",
+    "unitProvenance": "SOURCE_DECLARED"
   }
 }

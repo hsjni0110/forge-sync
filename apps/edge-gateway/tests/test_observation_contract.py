@@ -18,6 +18,7 @@ from forgesync_edge.ingestion.domain import (
     SourceIdentity,
     TransformationProvenance,
     Unit,
+    UnitProvenance,
 )
 from jsonschema import Draft202012Validator, FormatChecker
 
@@ -78,6 +79,7 @@ def test_edge_mapping_produces_shared_sample_fixture() -> None:
             availability=Availability.AVAILABLE,
             value=0.0,
             unit=Unit.REVOLUTION_PER_MINUTE,
+            unit_provenance=UnitProvenance.SOURCE_DECLARED,
         ),
     )
     expected = json.loads(

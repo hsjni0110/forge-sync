@@ -1071,9 +1071,10 @@ Verification Ledger에 기록된다.
 
 **선행 조건**: Step 04, Step 16.
 
-**결과**: mapping `2.2.0` / mapper `2.1.0` / envelope `2.1.0`, 처리 run `sha256:80ce6b...b3ef`.
+**결과**: mapping `2.2.0` / mapper `2.2.0` / envelope `2.1.0`, 처리 run `sha256:0f1a8d...15bc4`.
 Coverage 46.50% → 87.63%(101,644 / 115,991), invalid value 0. 누적 카운터는 catalog가 단위를 선언하지
-않으므로 mapping table의 `derivedUnit`으로 `SECOND`를 명시하고 근거는 Ledger V-044에 남겼다. subType만
+않으므로 mapping table의 `derivedUnit`으로 `SECOND`를 명시하고 근거는 Ledger V-044에 남겼다. 소비자가
+원천 선언 단위와 구별할 수 있도록 available SAMPLE은 `unitProvenance`를 함께 싣는다(V-048). subType만
 다른 형제 신호는 canonical target 이름으로 구분한다([ADR-049](../adr/ADR-049-accumulated-time-and-operating-signal-mapping.md)).
 남은 미매핑 14,325건은 이 Step의 범위 밖이다. PostgreSQL `V008` migration과 두 버전 병존 저장 test는
 Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.

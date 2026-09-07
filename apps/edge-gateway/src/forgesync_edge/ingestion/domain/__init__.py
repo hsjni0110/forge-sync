@@ -28,6 +28,7 @@ from .observation import (
     SourceIdentity,
     TransformationProvenance,
     Unit,
+    UnitProvenance,
 )
 
 __all__ = [
@@ -56,4 +57,5 @@ __all__ = [
     "SourceIdentity",
     "TransformationProvenance",
     "Unit",
+    "UnitProvenance",
 ]

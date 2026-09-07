@@ -26,6 +26,7 @@ from .observation import (
     SourceIdentity,
     TransformationProvenance,
     Unit,
+    UnitProvenance,
 )
 
 CONDITION_TARGET = re.compile(r"^[A-Z][A-Z0-9_]*$")
@@ -76,6 +77,12 @@ class MappingDefinition:
     def resolved_unit(self) -> str | None:
         """Unit of the canonical target: the catalog unit, or a reviewed derived unit."""
         return self.data_item.unit if self.data_item.unit is not None else self.derived_unit
+
+    @property
+    def unit_provenance(self) -> UnitProvenance:
+        if self.data_item.unit is not None:
+            return UnitProvenance.SOURCE_DECLARED
+        return UnitProvenance.DERIVED
 
 
 @dataclass(frozen=True, slots=True)
@@ -241,6 +248,7 @@ def _map_sample(candidate: MappingCandidate, definition: MappingDefinition) -> S
         availability=Availability.AVAILABLE,
         value=value,
         unit=Unit(resolved_unit),
+        unit_provenance=definition.unit_provenance,
     )
 
 

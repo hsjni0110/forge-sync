@@ -205,6 +205,13 @@
             "MILLIMETER",
             "SECOND"
           ]
+        },
+        "unitProvenance": {
+          "description": "Whether the source catalog declared the unit or ForgeSync derived it from evidence. Required with an available value from schemaVersion 2.1.0.",
+          "enum": [
+            "SOURCE_DECLARED",
+            "DERIVED"
+          ]
         }
       },
       "allOf": [
@@ -235,7 +242,8 @@
           "then": {
             "required": [
               "value",
-              "unit"
+              "unit",
+              "unitProvenance"
             ]
           },
           "else": {
@@ -249,6 +257,11 @@
                 {
                   "required": [
                     "unit"
+                  ]
+                },
+                {
+                  "required": [
+                    "unitProvenance"
                   ]
                 }
               ]
@@ -407,7 +420,7 @@
             "RAPID_PATH_FEEDRATE_OVERRIDE",
             "ROTARY_VELOCITY_OVERRIDE",
             "LINE",
-            "SEQUENCE_NUMBER"
+            "PROGRAM_SEQUENCE_NUMBER"
           ]
         },
         "availability": {
@@ -456,7 +469,7 @@
                   "RAPID_PATH_FEEDRATE_OVERRIDE",
                   "ROTARY_VELOCITY_OVERRIDE",
                   "LINE",
-                  "SEQUENCE_NUMBER"
+                  "PROGRAM_SEQUENCE_NUMBER"
                 ]
               }
             }
@@ -579,6 +592,11 @@
                   "metric": {
                     "$ref": "#/$defs/baselineSampleMetric"
                   }
+                },
+                "not": {
+                  "required": [
+                    "unitProvenance"
+                  ]
                 }
               }
             }

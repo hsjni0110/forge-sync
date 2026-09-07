@@ -4,8 +4,8 @@ This report verifies a deterministic schedule. It does not claim that messages w
 
 | Field | Value |
 |---|---|
-| Canonical Processing Run | `sha256:80ce6b099c6ee90c11dc04286030b7a2448108d7ef9f81152fb3f0e98a06b3ef` |
-| Canonical Observations SHA-256 | `fcbe745107fe709e1ddb428e40b6295ca85718e6b942bdbf71c1990de4332509` |
+| Canonical Processing Run | `sha256:0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4` |
+| Canonical Observations SHA-256 | `2fc48ab581fb133ac9d9340e2f2c23058d7ea3b5002fedcf8900cb8c6e7aa340` |
 | Replay Session | `61c7fe98-d1cd-4a2c-9ea8-24f72cc714db` |
 | Speed | `10x` |
 | Observation Count | 101644 |
