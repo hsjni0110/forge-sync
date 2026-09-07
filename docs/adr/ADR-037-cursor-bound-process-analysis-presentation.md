@@ -60,6 +60,14 @@ Equipment State atomically as in ADR-026; its field provenance retains its own o
 A newly activated session may move source time backwards as specified by ADR-033. This is a repair
 of the existing cursor-order invariant, not a history deletion, migration or new delivery guarantee.
 
+## Scope
+
+This decision governs analysis of the run AT a cursor. Range-scoped aggregation over everything a
+Replay Session has observed — equipment state dwell time and the utilization figures built on it —
+answers a different question and is governed by
+[ADR-050](./ADR-050-range-scoped-equipment-state-intervals.md). The invalidation rules here do not
+hide those results, and they do not depend on a confirmed cursor.
+
 ## Consequences and limits
 
 - Each processing stage retains its own transaction. The browser publishes a coherent bundle, not

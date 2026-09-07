@@ -122,10 +122,10 @@ Step 32 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이었고 St
 | D-12 | 짧은 run과 종료 근거 미확정 구간 | 30초 미만 13건, 종료 근거 미확정 20건(16%) | Step 24의 등급 분리와 Step 25의 필터로 완화한다. segmentation rule 자체의 변경은 근거 확인 후 별도로 판단한다 |
 | D-13 | 분류가 30개 동시 비교의 최댓값이었다 | 최상위 사유가 metric 채널인 run 92/94, run당 임계 초과 feature 중앙 5.5개, duration은 정상인데 채널 때문에 이상으로 분류된 run 73/94 | **완료** — Step 24. `durationSeconds`가 등급을 정하고 채널은 `supportingOutlierCount`로 분리 |
 
-**결정이 필요한 항목**: [ADR-037](../adr/ADR-037-cursor-bound-process-analysis-presentation.md)은 공정
-분석을 정지된 replay cursor 시점으로 한정한다. Step 33~38의 구간 집계 KPI는 cursor 시점이 아니라 관측
-구간 전체를 대상으로 하므로 이 결정의 확장 또는 별도 집계 경로가 필요하다. Step 33 착수 전에 ADR을
-갱신한다.
+**해결된 항목**: [ADR-037](../adr/ADR-037-cursor-bound-process-analysis-presentation.md)이 공정 분석을
+정지된 replay cursor 시점으로 한정하는 것과 Step 33~38의 구간 집계가 충돌하던 문제는
+[ADR-050](../adr/ADR-050-range-scoped-equipment-state-intervals.md)으로 두 경로를 분리해 해결했다.
+ADR-037은 그대로 두고 범위만 명시했으며, 구간 집계는 cursor와 무관하게 세션이 관측한 전체를 대상으로 한다.
 
 ---
 
@@ -1079,7 +1079,7 @@ Coverage 46.50% → 87.63%(101,644 / 115,991), invalid value 0. 누적 카운터
 남은 미매핑 14,325건은 이 Step의 범위 밖이다. PostgreSQL `V008` migration과 두 버전 병존 저장 test는
 Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.
 
-### Step 33 — Equipment State Interval Projection
+### Step 33 — Equipment State Interval Projection ✅ DONE
 
 **목적**: 시점별 상태 관측을 시간 구간으로 재구성해 체류시간을 계산할 수 있게 한다.
 
@@ -1102,6 +1102,13 @@ Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.
 설명할 수 있다.
 
 **선행 조건**: Step 08, Step 32.
+
+**결과**: interval rule `1.0.0`, contract `equipment-state-intervals` `1.0.0`, migration `V009`.
+`execution`/`mode`/`power`/`estop`를 신호별 독립 구간 시리즈로 만들고 Equipment Twin Context가 소유한다
+([ADR-050](../adr/ADR-050-range-scoped-equipment-state-intervals.md)). 공백은 임계값 없이 근거로만
+처리한다 — 실측상 60초 초과 공백 3개 중 최대인 11,621초가 이미 `UNAVAILABLE`로 표시돼 있어 임의 임계값이
+필요 없다. 열린 구간은 종료 시각을 만들지 않으므로 구간 합 < 원천 범위이며, 그 차이를 signal별
+`leadingUnobserved`와 `openSince`로 분해해 함께 낸다. 실제 PostgreSQL에서 재처리 불변성을 검증했다(V-054).
 
 ### Step 34 — Utilization KPI Projection
 

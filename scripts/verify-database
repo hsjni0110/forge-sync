@@ -29,4 +29,5 @@ FORGESYNC_DATABASE_PASSWORD=forgesync-test \
   -p "$repository_root/apps/factory-api" \
   test \
   --tests '*PostgresObservationTransactionIntegrationTest' \
-  --tests '*PostgresMachiningRunRepositoryIntegrationTest'
+  --tests '*PostgresMachiningRunRepositoryIntegrationTest' \
+  --tests '*PostgresEquipmentStateIntervalIntegrationTest'

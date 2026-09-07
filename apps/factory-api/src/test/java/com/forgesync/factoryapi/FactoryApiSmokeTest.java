@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
       "forgesync.twin.query.enabled=false",
       "forgesync.replay.enabled=false",
       "forgesync.process-analytics.enabled=false",
+      "forgesync.equipment-state-intervals.enabled=false",
       "spring.autoconfigure.exclude="
           + "org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,"
           + "org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration"

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/twin/v1/equipment-state-intervals.schema.json",
+  "title": "ForgeSync Equipment State Intervals v1",
+  "description": "Dwell intervals reconstructed from state observations over everything one Replay Session has observed. Interval totals are smaller than the observed range by design; coverage names the difference.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "processingRunId",
+    "machineId",
+    "replaySessionId",
+    "throughReplaySequence",
+    "intervalRuleVersion",
+    "observedFrom",
+    "observedTo",
+    "inputHash",
+    "inputObservationCount",
+    "resultHash",
+    "createdAt",
+    "coverage",
+    "intervals"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "processingRunId": { "$ref": "#/$defs/sha256" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "intervalRuleVersion": { "const": "1.0.0" },
+    "observedFrom": { "$ref": "#/$defs/instant" },
+    "observedTo": { "$ref": "#/$defs/instant" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "inputObservationCount": { "type": "integer", "minimum": 1 },
+    "resultHash": { "$ref": "#/$defs/sha256" },
+    "createdAt": { "$ref": "#/$defs/instant" },
+    "coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["signal", "closedDuration", "leadingUnobserved", "intervalCount"],
+        "properties": {
+          "signal": { "$ref": "#/$defs/signal" },
+          "closedDuration": { "$ref": "#/$defs/duration" },
+          "leadingUnobserved": { "$ref": "#/$defs/duration" },
+          "openSince": { "$ref": "#/$defs/instant" },
+          "intervalCount": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "intervals": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["signal", "startedAt", "startEvidence"],
+        "properties": {
+          "signal": { "$ref": "#/$defs/signal" },
+          "value": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Absent when the source reported the signal as unavailable. Never a value the policy inferred."
+          },
+          "startedAt": { "$ref": "#/$defs/instant" },
+          "endedAt": { "$ref": "#/$defs/instant" },
+          "durationSeconds": { "type": "number", "minimum": 0 },
+          "startEvidence": { "$ref": "#/$defs/evidence" },
+          "endEvidence": { "$ref": "#/$defs/evidence" }
+        },
+        "allOf": [
+          {
+            "if": { "required": ["endedAt"] },
+            "then": { "required": ["endEvidence", "durationSeconds"] },
+            "else": {
+              "not": {
+                "anyOf": [
+                  { "required": ["endEvidence"] },
+                  { "required": ["durationSeconds"] }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "instant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "duration": { "type": "string", "pattern": "^PT" },
+    "signal": {
+      "enum": ["EXECUTION", "CONTROLLER_MODE", "POWER_STATE", "EMERGENCY_STOP"]
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["replaySequence", "sourceObservedAt", "sourceEventKey"],
+      "properties": {
+        "replaySequence": { "type": "integer", "minimum": 0 },
+        "sourceObservedAt": { "$ref": "#/$defs/instant" },
+        "sourceEventKey": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}
