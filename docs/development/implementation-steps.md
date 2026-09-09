@@ -1110,7 +1110,7 @@ Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.
 필요 없다. 열린 구간은 종료 시각을 만들지 않으므로 구간 합 < 원천 범위이며, 그 차이를 signal별
 `leadingUnobserved`와 `openSince`로 분해해 함께 낸다. 실제 PostgreSQL에서 재처리 불변성을 검증했다(V-054).
 
-### Step 34 — Utilization KPI Projection
+### Step 34 — Utilization KPI Projection ✅ DONE
 
 **목적**: 상태 구간과 기계 자체 누적 카운터로 가동률 계열 지표를 두 경로로 산출하고 근거를 구분한다.
 
@@ -1134,7 +1134,15 @@ Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.
 
 **선행 조건**: Step 33.
 
-### Step 35 — Downtime과 정지 사유 Pareto
+**결과**: calculation/contract `1.0.0`, migration `V010`. 상태 비율은 Step 33의 전체 관측 범위를
+분모로 사용하며 닫힌 `EXECUTION` 구간만 상태에 배정한다. `FEED_HOLD`/`INTERRUPTED`는 계산상
+`INTERRUPTED`로 묶되 원래 구간값은 보존하고, 명시적 `UNAVAILABLE`은 `UNKNOWN`, 첫 관찰 전과 열린
+꼬리는 `uncoveredDuration`으로 분리한다. 카운터는 단조 증가 구간의 증가량만 합산하고 리셋·unavailable을
+coverage에 계수한다. 분모 0, 표본 부족, 분자 > 분모는 숫자를 만들거나 clamp하지 않는다. 상태 ACTIVE와
+카운터 자동운전 비율은 서로 다른 관측 경로임을 명시한 채 signed percentage-point 차이를 함께 제공한다
+([ADR-051](../adr/ADR-051-observed-utilization-kpi-projection.md), V-056).
+
+### Step 35 — Downtime과 정지 사유 Pareto ✅ DONE
 
 **목적**: 비가동 구간을 길이순으로 정렬하고 동시 관측된 근거를 인과 주장 없이 함께 제시한다.
 
@@ -1156,6 +1164,15 @@ Docker 부재로 미실행이며 Ledger V-046에 `TO_VERIFY`로 남아 있다.
 **완료 조건**: 상위 정지 구간마다 시작/종료 근거와 동시 관측 근거를 확인할 수 있고 인과를 주장하지 않는다.
 
 **선행 조건**: Step 21, Step 34.
+
+**결과**: rule/contract `1.0.0`, migration `V011`. Step 34와 같은 상태 묶음으로 닫힌
+`STOPPED`/`INTERRUPTED`/`UNKNOWN` 구간을 지속시간순으로 정렬하고 전체 비가동 시간 대비 비율과 누적
+비율을 계산한다. `estop=TRIGGERED`는 구간 겹침, mode는 최초 관찰 이후의 변경 시점, CONDITION
+WARNING/FAULT는 반열린 구간 `[start, end)` 안의 점시점 관찰만 연결한다. 겹치는 근거는 모두
+`CONCURRENT_EVIDENCE`로 보존하되 인과로 표현하지 않고, 없으면 `UNCONFIRMED_REASON`으로 남긴다.
+불변 Utilization/interval 참조와 CONDITION watermark로 PostgreSQL에 보존하며, Dashboard의 최소 Pareto
+목록을 선택하면 기존 Replay seek 수렴 경로로 구간 시작 시각을 연다
+([ADR-052](../adr/ADR-052-downtime-pareto-concurrent-evidence.md), V-057).
 
 ### Step 36 — Cycle 기준 Performance와 OEE 공개 정책
 

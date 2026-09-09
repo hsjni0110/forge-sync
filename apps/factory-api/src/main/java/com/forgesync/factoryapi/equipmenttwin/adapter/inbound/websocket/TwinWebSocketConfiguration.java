@@ -81,7 +81,14 @@ public class TwinWebSocketConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
-    for (String resource : List.of("machining-runs", "cycle-features", "anomaly-assessments")) {
+    for (String resource :
+        List.of(
+            "machining-runs",
+            "cycle-features",
+            "anomaly-assessments",
+            "equipment-state-intervals",
+            "utilization-kpis",
+            "downtime-pareto")) {
       registry
           .addMapping("/api/v1/machines/*/" + resource + "/processing-runs")
           .allowedOrigins(allowedOrigins)

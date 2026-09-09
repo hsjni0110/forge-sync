@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0.0",
+  "processingRunId": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "machineId": "Mazak01",
+  "replaySessionId": "00d64db8-967e-41ba-9d09-fdd087710aac",
+  "throughReplaySequence": 42,
+  "calculationVersion": "1.0.0",
+  "intervalProcessingRunId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "observedFrom": "2016-10-05T09:00:00Z",
+  "observedTo": "2016-10-05T09:10:00Z",
+  "inputHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "resultHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "createdAt": "2026-09-08T00:00:00Z",
+  "state": {
+    "status": "PARTIAL",
+    "source": "OBSERVED_EXECUTION_INTERVALS",
+    "valueProvenance": "DERIVED",
+    "denominatorDuration": "PT10M",
+    "uncoveredDuration": "PT2M",
+    "formula": "STATE_DURATION / OBSERVED_RANGE",
+    "states": [
+      { "state": "ACTIVE", "duration": "PT3M", "ratioPercent": 30.000000 },
+      { "state": "READY", "duration": "PT1M", "ratioPercent": 10.000000 },
+      { "state": "STOPPED", "duration": "PT1M", "ratioPercent": 10.000000 },
+      { "state": "INTERRUPTED", "duration": "PT1M", "ratioPercent": 10.000000 },
+      { "state": "UNKNOWN", "duration": "PT2M", "ratioPercent": 20.000000 }
+    ]
+  },
+  "counters": {
+    "source": "OBSERVED_ACCUMULATED_TIME",
+    "valueProvenance": "DERIVED",
+    "deltas": [
+      { "metric": "TOTAL", "valueSeconds": 200, "unit": "SECOND", "unitProvenance": "DERIVED", "usedTransitionCount": 1, "resetCount": 0, "unavailableObservationCount": 0 },
+      { "metric": "AUTO", "valueSeconds": 100, "unit": "SECOND", "unitProvenance": "DERIVED", "usedTransitionCount": 1, "resetCount": 0, "unavailableObservationCount": 0 },
+      { "metric": "CUT", "valueSeconds": 40, "unit": "SECOND", "unitProvenance": "DERIVED", "usedTransitionCount": 1, "resetCount": 0, "unavailableObservationCount": 0 }
+    ],
+    "automaticRatio": { "status": "AVAILABLE", "ratioPercent": 50.000000, "formula": "AUTO_DELTA / TOTAL_DELTA" },
+    "cuttingRatio": { "status": "AVAILABLE", "ratioPercent": 40.000000, "formula": "CUT_DELTA / AUTO_DELTA" }
+  },
+  "comparison": {
+    "status": "AVAILABLE",
+    "intervalActivePercent": 30.000000,
+    "counterAutomaticPercent": 50.000000,
+    "counterAutomaticMinusIntervalActivePercentagePoints": 20.000000,
+    "interpretation": "DIFFERENT_EVIDENCE_PATHS_NOT_EQUIVALENT"
+  }
+}

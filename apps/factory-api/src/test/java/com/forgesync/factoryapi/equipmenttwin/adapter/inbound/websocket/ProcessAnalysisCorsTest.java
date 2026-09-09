@@ -14,7 +14,14 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 class ProcessAnalysisCorsTest {
   @Test
   void allowsAnalysisPreflightOnlyFromConfiguredOrigin() throws Exception {
-    for (String resource : List.of("machining-runs", "cycle-features", "anomaly-assessments")) {
+    for (String resource :
+        List.of(
+            "machining-runs",
+            "cycle-features",
+            "anomaly-assessments",
+            "equipment-state-intervals",
+            "utilization-kpis",
+            "downtime-pareto")) {
       String path = "/api/v1/machines/Mazak01/" + resource + "/processing-runs";
       var allowed = preflight(path, "http://localhost:5173");
       assertThat(allowed.getStatus()).isEqualTo(200);

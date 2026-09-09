@@ -1,4 +1,4 @@
-import { useCallback, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import type { ReplayControlClient } from "../../replay/application/ports";
@@ -11,6 +11,9 @@ import { TwinConnectionStatus } from "../../twin/ui/TwinConnectionStatus";
 import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
 import { deriveTwinPresentation } from "../../twin/application/twinPresentationPolicy";
 import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
+import type { DowntimeParetoClient } from "../../downtime/application/ports";
+import type { DowntimeParetoReport } from "../../downtime/domain/downtimePareto";
+import { DowntimeParetoPanel } from "../../downtime/ui/DowntimeParetoPanel";
 
 const MACHINE_ID = "Mazak01";
 
@@ -26,16 +29,63 @@ const REPLAY_STATUS_LABELS: Record<ReplayStatus, string> = {
 export function DashboardRoute({
   twinSessionFactory,
   replayControlClient,
+  downtimeParetoClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
+  downtimeParetoClient?: DowntimeParetoClient;
 }) {
+  void downtimeParetoClient;
   const createSession = useCallback(
     () => twinSessionFactory(MACHINE_ID),
     [twinSessionFactory],
   );
   const { state, retryNow } = useTwinLiveSession(createSession);
   const replay = useReplayController(MACHINE_ID, replayControlClient);
+  const [downtimeReport, setDowntimeReport] = useState<DowntimeParetoReport>();
+  const [downtimeFailure, setDowntimeFailure] = useState(false);
+  const replaySession = replay.authoritativeSession;
+
+  useEffect(() => {
+    const snapshot = state.snapshot;
+    if (
+      !downtimeParetoClient ||
+      !snapshot ||
+      !replaySession ||
+      !["PAUSED", "COMPLETED"].includes(replaySession.status) ||
+      replaySession.replaySessionId !== snapshot.replayCursor.replaySessionId
+    ) {
+      return;
+    }
+    const abort = new AbortController();
+    setDowntimeFailure(false);
+    void downtimeParetoClient
+      .analyze(
+        MACHINE_ID,
+        snapshot.replayCursor.replaySessionId,
+        snapshot.replayCursor.replaySequence,
+        abort.signal,
+      )
+      .then((report) => {
+        if (!abort.signal.aborted) setDowntimeReport(report);
+      })
+      .catch(() => {
+        if (!abort.signal.aborted) setDowntimeFailure(true);
+      });
+    return () => abort.abort();
+  }, [downtimeParetoClient, replaySession, state.snapshot]);
+
+  const seekToDowntime = (startedAt: string) => {
+    if (!replayControlClient) return;
+    void replay.run("SEEKING", (current) =>
+      replayControlClient.seek(
+        current.replaySessionId,
+        current.revision,
+        startedAt,
+        current.speedMultiplier,
+      ),
+    );
+  };
 
   return (
     <section className="dashboard-page">
@@ -55,6 +105,14 @@ export function DashboardRoute({
       ) : (
         <DashboardPlaceholder state={state} retryNow={retryNow} />
       )}
+
+      {downtimeReport ? (
+        <DowntimeParetoPanel report={downtimeReport} onSelect={seekToDowntime} />
+      ) : downtimeFailure ? (
+        <p className="downtime-unavailable" role="status">
+          정지 시간 분석을 불러오지 못했습니다.
+        </p>
+      ) : null}
 
       <div className="dashboard-actions">
         <Link className="primary-link" to="/factory">

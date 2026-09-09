@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/twin/v1/utilization-kpis.schema.json",
+  "title": "ForgeSync Utilization KPI Projection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion", "processingRunId", "machineId", "replaySessionId",
+    "throughReplaySequence", "calculationVersion", "intervalProcessingRunId",
+    "observedFrom", "observedTo", "inputHash", "resultHash", "createdAt",
+    "state", "counters", "comparison"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "processingRunId": { "$ref": "#/$defs/sha256" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "calculationVersion": { "const": "1.0.0" },
+    "intervalProcessingRunId": { "$ref": "#/$defs/sha256" },
+    "observedFrom": { "$ref": "#/$defs/instant" },
+    "observedTo": { "$ref": "#/$defs/instant" },
+    "inputHash": { "$ref": "#/$defs/sha256" },
+    "resultHash": { "$ref": "#/$defs/sha256" },
+    "createdAt": { "$ref": "#/$defs/instant" },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "source", "valueProvenance", "denominatorDuration", "uncoveredDuration", "formula", "states"],
+      "properties": {
+        "status": { "$ref": "#/$defs/status" },
+        "reason": { "$ref": "#/$defs/reason" },
+        "source": { "const": "OBSERVED_EXECUTION_INTERVALS" },
+        "valueProvenance": { "const": "DERIVED" },
+        "denominatorDuration": { "$ref": "#/$defs/duration" },
+        "uncoveredDuration": { "$ref": "#/$defs/duration" },
+        "formula": { "const": "STATE_DURATION / OBSERVED_RANGE" },
+        "states": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+              "required": ["state", "duration"],
+            "properties": {
+              "state": { "enum": ["ACTIVE", "READY", "STOPPED", "INTERRUPTED", "UNKNOWN"] },
+              "duration": { "$ref": "#/$defs/duration" },
+              "ratioPercent": { "$ref": "#/$defs/percent" }
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "UNAVAILABLE" } }, "required": ["status"] },
+          "then": { "required": ["reason"] },
+          "else": { "not": { "required": ["reason"] } }
+        }
+      ]
+    },
+    "counters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "valueProvenance", "deltas", "automaticRatio", "cuttingRatio"],
+      "properties": {
+        "source": { "const": "OBSERVED_ACCUMULATED_TIME" },
+        "valueProvenance": { "const": "DERIVED" },
+        "deltas": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/counterDelta" }
+        },
+        "automaticRatio": { "$ref": "#/$defs/ratio" },
+        "cuttingRatio": { "$ref": "#/$defs/ratio" }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "interpretation"],
+      "properties": {
+        "status": { "$ref": "#/$defs/status" },
+        "intervalActivePercent": { "$ref": "#/$defs/percent" },
+        "counterAutomaticPercent": { "$ref": "#/$defs/percent" },
+        "counterAutomaticMinusIntervalActivePercentagePoints": { "type": "number", "minimum": -100, "maximum": 100 },
+        "reason": { "$ref": "#/$defs/reason" },
+        "interpretation": { "const": "DIFFERENT_EVIDENCE_PATHS_NOT_EQUIVALENT" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "instant": { "type": "string", "format": "date-time", "pattern": "(?:Z|[+-][0-9]{2}:[0-9]{2})$" },
+    "duration": { "type": "string", "pattern": "^PT" },
+    "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+    "status": { "enum": ["AVAILABLE", "PARTIAL", "UNAVAILABLE"] },
+    "reason": { "enum": ["INSUFFICIENT_DATA", "ZERO_DENOMINATOR", "COUNTER_RELATION_VIOLATION"] },
+    "counterDelta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["metric", "valueSeconds", "unit", "unitProvenance", "usedTransitionCount", "resetCount", "unavailableObservationCount"],
+      "properties": {
+        "metric": { "enum": ["TOTAL", "AUTO", "CUT"] },
+        "valueSeconds": { "type": "number", "minimum": 0 },
+        "unit": { "const": "SECOND" },
+        "unitProvenance": { "const": "DERIVED" },
+        "usedTransitionCount": { "type": "integer", "minimum": 0 },
+        "resetCount": { "type": "integer", "minimum": 0 },
+        "unavailableObservationCount": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "ratio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "formula"],
+      "properties": {
+        "status": { "$ref": "#/$defs/status" },
+        "ratioPercent": { "$ref": "#/$defs/percent" },
+        "reason": { "$ref": "#/$defs/reason" },
+        "formula": { "enum": ["AUTO_DELTA / TOTAL_DELTA", "CUT_DELTA / AUTO_DELTA"] }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "UNAVAILABLE" } }, "required": ["status"] },
+          "then": { "required": ["reason"], "not": { "required": ["ratioPercent"] } },
+          "else": { "required": ["ratioPercent"], "not": { "required": ["reason"] } }
+        }
+      ]
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -8,6 +8,9 @@ import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { TwinSnapshot } from "../../twin/domain/twin";
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { ReplaySessionState } from "../../replay/domain/replay";
+import type { DowntimeParetoClient } from "../../downtime/application/ports";
+import paretoFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-downtime-pareto.json";
+import type { DowntimeParetoReport } from "../../downtime/domain/downtimePareto";
 import { DashboardRoute } from "./DashboardRoute";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
@@ -27,12 +30,17 @@ function sessionFactoryFor(state: TwinLiveState): TwinSessionFactory {
   });
 }
 
-function renderDashboard(state: TwinLiveState, replayControlClient?: ReplayControlClient) {
+function renderDashboard(
+  state: TwinLiveState,
+  replayControlClient?: ReplayControlClient,
+  downtimeParetoClient?: DowntimeParetoClient,
+) {
   render(
     <MemoryRouter>
       <DashboardRoute
         twinSessionFactory={sessionFactoryFor(state)}
         replayControlClient={replayControlClient}
+        downtimeParetoClient={downtimeParetoClient}
       />
     </MemoryRouter>,
   );
@@ -91,5 +99,52 @@ describe("DashboardRoute", () => {
     await waitFor(() => expect(screen.getByRole("status").textContent).toMatch(/재생이 완료/));
     expect(screen.queryByRole("alert")).toBeNull();
     expect(screen.getAllByText("마지막 재생 데이터").length).toBeGreaterThan(0);
+  });
+
+  it("seeks the replay to the selected downtime interval", async () => {
+    const paused: ReplaySessionState = {
+      schemaVersion: "1.0.0",
+      replaySessionId: snapshot.replayCursor.replaySessionId,
+      machineId: "Mazak01",
+      sourceSetId: "nist-mazak01-20161005",
+      status: "PAUSED",
+      speedMultiplier: 10,
+      revision: 7,
+      sourceRange: {
+        startsAt: "2016-10-05T05:27:55.740Z",
+        endsAt: "2016-10-05T19:15:07.025Z",
+      },
+    };
+    const replayClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(paused),
+      start: vi.fn(),
+      pause: vi.fn(),
+      resume: vi.fn(),
+      changeSpeed: vi.fn(),
+      seek: vi.fn().mockResolvedValue(paused),
+    };
+    const paretoClient: DowntimeParetoClient = {
+      analyze: vi.fn().mockResolvedValue({
+        ...paretoFixture,
+        replaySessionId: snapshot.replayCursor.replaySessionId,
+        throughReplaySequence: snapshot.replayCursor.replaySequence,
+      } as DowntimeParetoReport),
+    };
+    renderDashboard(
+      { connectionStatus: "LIVE", snapshot, freshness: "FRESH" },
+      replayClient,
+      paretoClient,
+    );
+
+    fireEvent.click(await screen.findByRole("button", { name: /1위.*정지/ }));
+
+    await waitFor(() =>
+      expect(replayClient.seek).toHaveBeenCalledWith(
+        paused.replaySessionId,
+        7,
+        "2016-10-05T09:00:00Z",
+        10,
+      ),
+    );
   });
 });

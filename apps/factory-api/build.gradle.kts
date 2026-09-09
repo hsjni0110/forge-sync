@@ -51,6 +51,12 @@ tasks.processResources {
     from("../../contracts/twin/v1/equipment-state-intervals.schema.json") {
         into("contracts/twin/v1")
     }
+    from("../../contracts/twin/v1/utilization-kpis.schema.json") {
+        into("contracts/twin/v1")
+    }
+    from("../../contracts/twin/v1/downtime-pareto.schema.json") {
+        into("contracts/twin/v1")
+    }
     from("../../contracts/websocket/v1/twin-patch.schema.json") {
         into("contracts/websocket/v1")
     }

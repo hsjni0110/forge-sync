@@ -7,6 +7,7 @@ import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { ToolChangeClient } from "../../tool-change/application/ports";
 import type { ObservedToolpathClient } from "../../toolpath/application/ports";
+import type { DowntimeParetoClient } from "../../downtime/application/ports";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -17,12 +18,14 @@ export function App({
   factorySceneLoader = loadFactoryScene,
   toolChangeClient,
   observedToolpathClient,
+  downtimeParetoClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   factorySceneLoader?: FactorySceneLoader;
   toolChangeClient?: ToolChangeClient;
   observedToolpathClient?: ObservedToolpathClient;
+  downtimeParetoClient?: DowntimeParetoClient;
 }) {
   return (
     <div className="site-shell">
@@ -46,6 +49,7 @@ export function App({
               <DashboardRoute
                 twinSessionFactory={twinSessionFactory}
                 replayControlClient={replayControlClient}
+                downtimeParetoClient={downtimeParetoClient}
               />
             }
           />

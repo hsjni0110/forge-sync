@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 const apiBaseUrl = process.env.FORGESYNC_API_BASE_URL ?? "http://127.0.0.1:18080";
 
 test("browser Replay start creates an authoritative session and Twin", async ({ page, request }) => {
-  test.setTimeout(180_000);
+  test.setTimeout(300_000);
   await page.goto("/factory");
 
   await page.getByRole("button", { name: "Replay 시작" }).click();
@@ -97,4 +97,42 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   // changes and exercises marker resynchronization against the new seek session.
   await page.getByRole("button", { name: "끝으로 이동", exact: true }).click();
   await expect(page.locator(".tool-change-marker").first()).toBeVisible({ timeout: 60_000 });
+
+  // The Dashboard Pareto reuses the authoritative seek path whose current-run convergence was
+  // verified above. Its first-ranked interval must move the cursor and shared 2D/3D Twin version.
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "정지 사유 Pareto" })).toBeVisible({
+    timeout: 60_000,
+  });
+  const firstDowntime = page.locator(".downtime-list button").first();
+  const downtimeStartedAt = await firstDowntime.getAttribute("data-started-at");
+  expect(downtimeStartedAt).toBeTruthy();
+  await firstDowntime.click();
+  await expect
+    .poll(async () => {
+      const response = await request.get(`${apiBaseUrl}/api/v1/machines/Mazak01/twin`, {
+        headers: { Accept: "application/vnd.forgesync.twin.v1+json" },
+      });
+      return response.ok() ? (await response.json()).replayCursor.sourceObservedAt : undefined;
+    }, { timeout: 60_000 })
+    .toBe(downtimeStartedAt);
+  await expect
+    .poll(async () => {
+      const response = await request.get(
+        `${apiBaseUrl}/api/v1/machines/Mazak01/replay-session`,
+        { headers: { Accept: "application/vnd.forgesync.replay-session.v1+json" } },
+      );
+      return response.ok() ? (await response.json()).status : undefined;
+    }, { timeout: 120_000 })
+    .toBe("PAUSED");
+  await page.goto("/factory");
+  await expect
+    .poll(async () => {
+      const visual = await page.locator(".floating-machine-label").textContent();
+      const summary = await page.locator(".machine-summary .machine-version").textContent();
+      const visualVersion = visual?.match(/Twin v(\d+)/)?.[1];
+      const summaryVersion = summary?.match(/v(\d+)/)?.[1];
+      return visualVersion !== undefined && visualVersion === summaryVersion;
+    })
+    .toBe(true);
 });

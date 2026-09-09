@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.0",
+  "processingRunId": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "machineId": "Mazak01",
+  "replaySessionId": "00d64db8-967e-41ba-9d09-fdd087710aac",
+  "throughReplaySequence": 100,
+  "ruleVersion": "1.0.0",
+  "utilizationProcessingRunId": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "intervalProcessingRunId": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "observedFrom": "2016-10-05T09:00:00Z",
+  "observedTo": "2016-10-05T09:10:00Z",
+  "totalDowntimeSeconds": 160.000000,
+  "inputHash": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "resultHash": "sha256:dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "createdAt": "2026-09-10T00:00:00Z",
+  "entries": [
+    {
+      "rank": 1,
+      "state": "STOPPED",
+      "startedAt": "2016-10-05T09:00:00Z",
+      "endedAt": "2016-10-05T09:01:40Z",
+      "durationSeconds": 100.000000,
+      "ratioPercent": 62.500000,
+      "cumulativeRatioPercent": 62.500000,
+      "startEvidence": { "replaySequence": 1, "sourceObservedAt": "2016-10-05T09:00:00Z", "sourceEventKey": "execution-1" },
+      "endEvidence": { "replaySequence": 9, "sourceObservedAt": "2016-10-05T09:01:40Z", "sourceEventKey": "execution-9" },
+      "reasonClassification": "CONCURRENT_EVIDENCE",
+      "evidence": [
+        { "kind": "ESTOP_OVERLAP", "signal": "EMERGENCY_STOP", "value": "TRIGGERED", "sourceObservedAt": "2016-10-05T09:00:20Z", "replaySequence": 2, "sourceEventKey": "estop-2" },
+        { "kind": "MODE_CHANGE", "signal": "CONTROLLER_MODE", "value": "MANUAL", "sourceObservedAt": "2016-10-05T09:00:30Z", "replaySequence": 3, "sourceEventKey": "mode-3" },
+        { "kind": "CONDITION_OBSERVATION", "signal": "CONDITION", "value": "WARNING", "sourceObservedAt": "2016-10-05T09:00:40Z", "replaySequence": 4, "sourceEventKey": "condition-4", "componentId": "Mazak01-controller", "conditionType": "SYSTEM", "level": "WARNING", "nativeCode": "406", "message": "DOOR OPEN" }
+      ]
+    },
+    {
+      "rank": 2,
+      "state": "UNKNOWN",
+      "startedAt": "2016-10-05T09:02:00Z",
+      "endedAt": "2016-10-05T09:03:00Z",
+      "durationSeconds": 60.000000,
+      "ratioPercent": 37.500000,
+      "cumulativeRatioPercent": 100.000000,
+      "startEvidence": { "replaySequence": 10, "sourceObservedAt": "2016-10-05T09:02:00Z", "sourceEventKey": "execution-10" },
+      "endEvidence": { "replaySequence": 11, "sourceObservedAt": "2016-10-05T09:03:00Z", "sourceEventKey": "execution-11" },
+      "reasonClassification": "UNCONFIRMED_REASON",
+      "evidence": []
+    }
+  ]
+}
