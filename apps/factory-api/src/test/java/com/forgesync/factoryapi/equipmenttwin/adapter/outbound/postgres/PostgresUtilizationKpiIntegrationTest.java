@@ -51,7 +51,8 @@ class PostgresUtilizationKpiIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE utilization_kpi_processing, equipment_state_interval,
+            TRUNCATE operational_effectiveness_processing,
+              utilization_kpi_processing, equipment_state_interval,
               equipment_state_interval_processing, canonical_observation_history,
               ingestion_inbox RESTART IDENTITY CASCADE
             """)

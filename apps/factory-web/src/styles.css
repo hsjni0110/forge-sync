@@ -1120,3 +1120,24 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 @media (prefers-reduced-motion: reduce) {
   .help-popover { transition: none; }
 }
+
+.effectiveness-panel {
+  display: grid;
+  gap: var(--fs-space-md);
+  padding: var(--fs-space-lg);
+  border: 1px solid var(--fs-border);
+  border-radius: var(--fs-radius-lg);
+  background: var(--fs-surface);
+}
+.effectiveness-heading { display: flex; justify-content: space-between; gap: var(--fs-space-md); align-items: end; }
+.effectiveness-heading h2, .effectiveness-heading p { margin: 0; }
+.effectiveness-heading > p { color: var(--fs-text-muted); font-weight: 700; }
+.effectiveness-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--fs-space-sm); }
+.effectiveness-card { padding: var(--fs-space-md); border: 1px solid var(--fs-border); border-radius: var(--fs-radius-md); background: var(--fs-surface-sunken); }
+.effectiveness-card > div { display: flex; justify-content: space-between; gap: var(--fs-space-xs); align-items: center; }
+.effectiveness-card h3, .effectiveness-card p { margin: 0; }
+.effectiveness-card span { color: var(--fs-accent-text); font-size: var(--fs-type-2xs); font-weight: 800; }
+.effectiveness-card strong { display: block; margin: var(--fs-space-sm) 0 var(--fs-space-2xs); font-size: var(--fs-type-xl); }
+.effectiveness-card p, .effectiveness-policy { color: var(--fs-text-muted); font-size: var(--fs-type-sm); }
+.effectiveness-policy { margin: 0; }
+@media (max-width: 760px) { .effectiveness-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

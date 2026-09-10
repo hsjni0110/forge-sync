@@ -1199,6 +1199,14 @@ WARNING/FAULT는 반열린 구간 `[start, end)` 안의 점시점 관찰만 연�
 
 **선행 조건**: Step 20, Step 34.
 
+**결과**: policy/contract `1.0.0`, migration `V012`. 가장 최근 완료 Cycle Feature의 duration을 같은
+설비·프로그램·feature version의 엄격히 이전 5~30개 중앙값과 비교해 Performance를 계산한다. 외부
+프로그램별 이상 사이클 시간은 `ASSUMED`, 자체 baseline은 `DERIVED`로 구분한다. `PartCountAct`는
+연속 available 관측의 비음수 증가만 합하고 unavailable에서 연결을 끊으며 역행을 reset으로 보존한다.
+사용 가능한 전이가 없으면 숫자 0을 만들지 않는다. Availability는 관측 상태구간에서 파생했음을 함께
+표시하고 Quality와 종합 OEE numeric value는 원천 부재 사유와 함께 생략한다
+([ADR-053](../adr/ADR-053-cycle-performance-and-oee-disclosure.md), V-058).
+
 ### Step 37 — Twin Snapshot 관측 지표 확장
 
 **목적**: 이미 canonical로 적재되지만 Twin snapshot에 노출되지 않는 지표를 권위 계약에 추가한다.

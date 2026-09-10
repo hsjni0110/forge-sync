@@ -11,6 +11,8 @@ import type { ReplaySessionState } from "../../replay/domain/replay";
 import type { DowntimeParetoClient } from "../../downtime/application/ports";
 import paretoFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-downtime-pareto.json";
 import type { DowntimeParetoReport } from "../../downtime/domain/downtimePareto";
+import type { OperationalEffectivenessClient } from "../../effectiveness/application/ports";
+import type { OperationalEffectivenessReport } from "../../effectiveness/domain/operationalEffectiveness";
 import { DashboardRoute } from "./DashboardRoute";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
@@ -34,6 +36,7 @@ function renderDashboard(
   state: TwinLiveState,
   replayControlClient?: ReplayControlClient,
   downtimeParetoClient?: DowntimeParetoClient,
+  operationalEffectivenessClient?: OperationalEffectivenessClient,
 ) {
   render(
     <MemoryRouter>
@@ -41,6 +44,7 @@ function renderDashboard(
         twinSessionFactory={sessionFactoryFor(state)}
         replayControlClient={replayControlClient}
         downtimeParetoClient={downtimeParetoClient}
+        operationalEffectivenessClient={operationalEffectivenessClient}
       />
     </MemoryRouter>,
   );
@@ -146,5 +150,40 @@ describe("DashboardRoute", () => {
         10,
       ),
     );
+  });
+
+  it("shows evidence states at a stable replay cursor without inventing composite OEE", async () => {
+    const paused: ReplaySessionState = {
+      schemaVersion: "1.0.0", replaySessionId: snapshot.replayCursor.replaySessionId,
+      machineId: "Mazak01", sourceSetId: "nist-mazak01-20161005", status: "PAUSED",
+      speedMultiplier: 10, revision: 7,
+      sourceRange: { startsAt: "2016-10-05T05:27:55.740Z", endsAt: "2016-10-05T19:15:07.025Z" },
+    };
+    const replayClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(paused), start: vi.fn(), pause: vi.fn(), resume: vi.fn(),
+      changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    const effectivenessClient: OperationalEffectivenessClient = {
+      analyze: vi.fn().mockResolvedValue({
+        availability: { status: "AVAILABLE", percent: 70, sourceProvenance: "OBSERVED",
+          valueProvenance: "DERIVED", formula: "ACTIVE_DURATION / OBSERVED_RANGE" },
+        performance: { status: "UNAVAILABLE", provenance: "UNAVAILABLE", sampleCount: 2,
+          contributingFeatureSetIds: [], reason: "MINIMUM_SAMPLE_COUNT_NOT_MET" },
+        throughput: { status: "UNAVAILABLE", usedTransitionCount: 0, resetCount: 0,
+          unavailableObservationCount: 8, reason: "NO_USABLE_TRANSITIONS" },
+        quality: { status: "UNAVAILABLE", provenance: "UNAVAILABLE",
+          reason: "QUALITY_SOURCE_NOT_AVAILABLE" },
+        compositeOee: { status: "UNAVAILABLE", provenance: "UNAVAILABLE",
+          reason: "QUALITY_COMPONENT_UNAVAILABLE" },
+      } as unknown as OperationalEffectivenessReport),
+    };
+
+    renderDashboard({ connectionStatus: "LIVE", snapshot, freshness: "FRESH" },
+      replayClient, undefined, effectivenessClient);
+
+    expect(await screen.findByText("종합 OEE 제공 불가")).toBeTruthy();
+    expect(screen.getByText("표본 부족 (2/5)")).toBeTruthy();
+    expect(effectivenessClient.analyze).toHaveBeenCalledWith("Mazak01",
+      snapshot.replayCursor.replaySessionId, snapshot.replayCursor.replaySequence, expect.anything());
   });
 });

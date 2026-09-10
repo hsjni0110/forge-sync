@@ -8,6 +8,7 @@ import type { ReplayControlClient } from "../../replay/application/ports";
 import type { ToolChangeClient } from "../../tool-change/application/ports";
 import type { ObservedToolpathClient } from "../../toolpath/application/ports";
 import type { DowntimeParetoClient } from "../../downtime/application/ports";
+import type { OperationalEffectivenessClient } from "../../effectiveness/application/ports";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -19,6 +20,7 @@ export function App({
   toolChangeClient,
   observedToolpathClient,
   downtimeParetoClient,
+  operationalEffectivenessClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
@@ -26,6 +28,7 @@ export function App({
   toolChangeClient?: ToolChangeClient;
   observedToolpathClient?: ObservedToolpathClient;
   downtimeParetoClient?: DowntimeParetoClient;
+  operationalEffectivenessClient?: OperationalEffectivenessClient;
 }) {
   return (
     <div className="site-shell">
@@ -50,6 +53,7 @@ export function App({
                 twinSessionFactory={twinSessionFactory}
                 replayControlClient={replayControlClient}
                 downtimeParetoClient={downtimeParetoClient}
+                operationalEffectivenessClient={operationalEffectivenessClient}
               />
             }
           />

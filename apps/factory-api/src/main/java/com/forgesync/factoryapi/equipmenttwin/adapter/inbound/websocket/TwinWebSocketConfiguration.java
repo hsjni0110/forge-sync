@@ -88,7 +88,8 @@ public class TwinWebSocketConfiguration implements WebMvcConfigurer {
             "anomaly-assessments",
             "equipment-state-intervals",
             "utilization-kpis",
-            "downtime-pareto")) {
+            "downtime-pareto",
+            "operational-effectiveness")) {
       registry
           .addMapping("/api/v1/machines/*/" + resource + "/processing-runs")
           .allowedOrigins(allowedOrigins)

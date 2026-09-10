@@ -62,7 +62,8 @@ class PostgresEquipmentStateIntervalIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE equipment_state_interval, equipment_state_interval_processing,
+            TRUNCATE operational_effectiveness_processing,
+              equipment_state_interval, equipment_state_interval_processing,
               canonical_observation_history, ingestion_inbox RESTART IDENTITY CASCADE
             """)
         .update();

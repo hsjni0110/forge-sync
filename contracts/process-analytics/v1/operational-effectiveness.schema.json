@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/process-analytics/v1/operational-effectiveness.schema.json",
+  "title": "ForgeSync Operational Effectiveness v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "processingRunId", "createdAt", "policyVersion", "machineId",
+    "replaySessionId", "throughReplaySequence", "observedFrom", "observedTo",
+    "utilizationProcessingRunId", "cycleFeatureProcessingRunId", "machiningRunProcessingRunId",
+    "inputHash", "resultHash", "availability", "performance", "throughput", "quality", "compositeOee"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "processingRunId": { "$ref": "#/$defs/hash" },
+    "createdAt": { "$ref": "#/$defs/instant" },
+    "policyVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "observedFrom": { "$ref": "#/$defs/instant" },
+    "observedTo": { "$ref": "#/$defs/instant" },
+    "utilizationProcessingRunId": { "$ref": "#/$defs/hash" },
+    "cycleFeatureProcessingRunId": { "$ref": "#/$defs/hash" },
+    "machiningRunProcessingRunId": { "$ref": "#/$defs/hash" },
+    "targetFeatureSetId": { "$ref": "#/$defs/hash" },
+    "programName": { "type": "string", "minLength": 1 },
+    "inputHash": { "$ref": "#/$defs/hash" },
+    "resultHash": { "$ref": "#/$defs/hash" },
+    "availability": { "$ref": "#/$defs/availability" },
+    "performance": { "$ref": "#/$defs/performance" },
+    "throughput": { "$ref": "#/$defs/throughput" },
+    "quality": { "$ref": "#/$defs/unavailableQuality" },
+    "compositeOee": { "$ref": "#/$defs/unavailableComposite" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "instant": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["AVAILABLE", "UNAVAILABLE"] },
+    "provenance": { "enum": ["OBSERVED", "DERIVED", "ASSUMED", "UNAVAILABLE"] },
+    "availability": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "sourceProvenance", "valueProvenance", "formula"],
+      "properties": {
+        "status": { "$ref": "#/$defs/status" }, "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+        "sourceProvenance": { "const": "OBSERVED" }, "valueProvenance": { "$ref": "#/$defs/provenance" },
+        "formula": { "const": "ACTIVE_DURATION / OBSERVED_RANGE" }, "reason": { "type": "string" }
+      }
+    },
+    "performance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "provenance", "sampleCount", "contributingFeatureSetIds"],
+      "properties": {
+        "status": { "$ref": "#/$defs/status" }, "percent": { "type": "number", "exclusiveMinimum": 0 },
+        "actualCycleSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "referenceSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "referenceKind": { "enum": ["HISTORICAL_MEDIAN", "ASSUMED_IDEAL_CYCLE"] },
+        "provenance": { "$ref": "#/$defs/provenance" }, "sampleCount": { "type": "integer", "minimum": 0 },
+        "contributingFeatureSetIds": { "type": "array", "items": { "$ref": "#/$defs/hash" } },
+        "reason": { "type": "string" }
+      }
+    },
+    "throughput": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "usedTransitionCount", "resetCount", "unavailableObservationCount"],
+      "properties": {
+        "status": { "$ref": "#/$defs/status" }, "partCount": { "type": "number", "minimum": 0 },
+        "usedTransitionCount": { "type": "integer", "minimum": 0 }, "resetCount": { "type": "integer", "minimum": 0 },
+        "unavailableObservationCount": { "type": "integer", "minimum": 0 }, "reason": { "type": "string" }
+      }
+    },
+    "unavailableQuality": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "provenance", "reason"],
+      "properties": { "status": { "const": "UNAVAILABLE" }, "provenance": { "const": "UNAVAILABLE" },
+        "reason": { "const": "QUALITY_SOURCE_NOT_AVAILABLE" } }
+    },
+    "unavailableComposite": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "provenance", "reason"],
+      "properties": { "status": { "const": "UNAVAILABLE" }, "provenance": { "const": "UNAVAILABLE" },
+        "reason": { "const": "QUALITY_COMPONENT_UNAVAILABLE" } }
+    }
+  }
+}

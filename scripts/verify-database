@@ -32,4 +32,5 @@ FORGESYNC_DATABASE_PASSWORD=forgesync-test \
   --tests '*PostgresMachiningRunRepositoryIntegrationTest' \
   --tests '*PostgresEquipmentStateIntervalIntegrationTest' \
   --tests '*PostgresUtilizationKpiIntegrationTest' \
-  --tests '*PostgresDowntimeParetoIntegrationTest'
+  --tests '*PostgresDowntimeParetoIntegrationTest' \
+  --tests '*PostgresOperationalEffectivenessIntegrationTest'

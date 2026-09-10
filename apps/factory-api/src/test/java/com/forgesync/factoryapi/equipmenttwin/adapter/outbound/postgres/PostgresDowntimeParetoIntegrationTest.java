@@ -44,7 +44,8 @@ class PostgresDowntimeParetoIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE downtime_pareto_processing, utilization_kpi_processing,
+            TRUNCATE operational_effectiveness_processing,
+              downtime_pareto_processing, utilization_kpi_processing,
               equipment_state_interval, equipment_state_interval_processing,
               canonical_observation_history, ingestion_inbox RESTART IDENTITY CASCADE
             """)

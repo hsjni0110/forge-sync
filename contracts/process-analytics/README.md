@@ -137,3 +137,15 @@ Observation evidence carries a display-only `OBSERVED · REAL:NIST` label; wire 
 to use its existing values. Processing versions, source locators, feature coverage and baseline
 contributors remain accessible in evidence disclosures. See
 [ADR-037](../../docs/adr/ADR-037-cursor-bound-process-analysis-presentation.md).
+
+## Operational Effectiveness without composite OEE
+
+`v1/operational-effectiveness.schema.json`은 같은 Replay cursor의 immutable Utilization과 Cycle
+Feature 결과를 묶어 Availability, Performance, PartCount throughput의 근거 상태를 공개한다.
+Performance는 동일 프로그램의 이전 5~30개 duration 중앙값 또는 프로그램별 외부 가정 시간을
+기준으로 하며 각각 `DERIVED`, `ASSUMED`로 구분한다. available PartCount 사이의 비음수 증가만
+합산하고 reset/unavailable을 계수한다. 품질 원천이 없으므로 `quality`와 `compositeOee`는 항상
+`UNAVAILABLE`이며 종합 OEE numeric field는 존재하지 않는다. 생성은
+`POST /api/v1/machines/{machineId}/operational-effectiveness/processing-runs`, 조회는 processing run
+경로를 사용하고 응답 media type은
+`application/vnd.forgesync.operational-effectiveness.v1+json`이다.

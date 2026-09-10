@@ -14,6 +14,9 @@ import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
 import type { DowntimeParetoClient } from "../../downtime/application/ports";
 import type { DowntimeParetoReport } from "../../downtime/domain/downtimePareto";
 import { DowntimeParetoPanel } from "../../downtime/ui/DowntimeParetoPanel";
+import type { OperationalEffectivenessClient } from "../../effectiveness/application/ports";
+import type { OperationalEffectivenessReport } from "../../effectiveness/domain/operationalEffectiveness";
+import { OperationalEffectivenessPanel } from "../../effectiveness/ui/OperationalEffectivenessPanel";
 
 const MACHINE_ID = "Mazak01";
 
@@ -30,12 +33,13 @@ export function DashboardRoute({
   twinSessionFactory,
   replayControlClient,
   downtimeParetoClient,
+  operationalEffectivenessClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   downtimeParetoClient?: DowntimeParetoClient;
+  operationalEffectivenessClient?: OperationalEffectivenessClient;
 }) {
-  void downtimeParetoClient;
   const createSession = useCallback(
     () => twinSessionFactory(MACHINE_ID),
     [twinSessionFactory],
@@ -44,6 +48,8 @@ export function DashboardRoute({
   const replay = useReplayController(MACHINE_ID, replayControlClient);
   const [downtimeReport, setDowntimeReport] = useState<DowntimeParetoReport>();
   const [downtimeFailure, setDowntimeFailure] = useState(false);
+  const [effectivenessReport, setEffectivenessReport] = useState<OperationalEffectivenessReport>();
+  const [effectivenessFailure, setEffectivenessFailure] = useState(false);
   const replaySession = replay.authoritativeSession;
 
   useEffect(() => {
@@ -74,6 +80,20 @@ export function DashboardRoute({
       });
     return () => abort.abort();
   }, [downtimeParetoClient, replaySession, state.snapshot]);
+
+  useEffect(() => {
+    const snapshot = state.snapshot;
+    if (!operationalEffectivenessClient || !snapshot || !replaySession
+      || !["PAUSED", "COMPLETED"].includes(replaySession.status)
+      || replaySession.replaySessionId !== snapshot.replayCursor.replaySessionId) return;
+    const abort = new AbortController();
+    setEffectivenessFailure(false);
+    void operationalEffectivenessClient.analyze(MACHINE_ID,
+      snapshot.replayCursor.replaySessionId, snapshot.replayCursor.replaySequence, abort.signal)
+      .then((report) => { if (!abort.signal.aborted) setEffectivenessReport(report); })
+      .catch(() => { if (!abort.signal.aborted) setEffectivenessFailure(true); });
+    return () => abort.abort();
+  }, [operationalEffectivenessClient, replaySession, state.snapshot]);
 
   const seekToDowntime = (startedAt: string) => {
     if (!replayControlClient) return;
@@ -112,6 +132,12 @@ export function DashboardRoute({
         <p className="downtime-unavailable" role="status">
           정지 시간 분석을 불러오지 못했습니다.
         </p>
+      ) : null}
+
+      {effectivenessReport ? (
+        <OperationalEffectivenessPanel report={effectivenessReport} />
+      ) : effectivenessFailure ? (
+        <p className="effectiveness-unavailable" role="status">운영 효과 분석을 불러오지 못했습니다.</p>
       ) : null}
 
       <div className="dashboard-actions">

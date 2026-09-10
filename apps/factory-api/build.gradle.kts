@@ -75,6 +75,9 @@ tasks.processResources {
     from("../../contracts/process-analytics/v1/anomaly-assessments.schema.json") {
         into("contracts/process-analytics/v1")
     }
+    from("../../contracts/process-analytics/v1/operational-effectiveness.schema.json") {
+        into("contracts/process-analytics/v1")
+    }
     from("../../contracts/tool-changes/v1/tool-change-timeline.schema.json") {
         into("contracts/tool-changes/v1")
     }
