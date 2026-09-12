@@ -37,7 +37,7 @@ class TwinPatchBroadcasterTest {
 
     broadcaster.broadcast(
         new TwinPatchMessage(
-            "1.5.0",
+            "1.6.0",
             "TWIN_PATCH",
             "Mazak01",
             3,
@@ -69,7 +69,7 @@ class TwinPatchBroadcasterTest {
     }
     TwinPatchMessage patch =
         new TwinPatchMessage(
-            "1.5.0",
+            "1.6.0",
             "TWIN_PATCH",
             "Mazak01",
             3,

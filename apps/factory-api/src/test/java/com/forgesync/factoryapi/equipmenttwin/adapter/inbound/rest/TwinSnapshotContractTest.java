@@ -1,11 +1,14 @@
 package com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.TwinMetrics;
+import com.forgesync.factoryapi.equipmenttwin.application.ReplayCursor;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinConsistencyState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ExecutionState;
@@ -28,6 +31,12 @@ import org.junit.jupiter.api.Test;
 
 class TwinSnapshotContractTest {
 
+  /**
+   * One WebSocket patch carries a whole snapshot, so the snapshot size is the patch budget. The
+   * ceiling is deliberately loose here; Step 47 measures the achieved publish rate and narrows it.
+   */
+  private static final int MAX_SNAPSHOT_BYTES = 64 * 1024;
+
   private final Schema schema = loadSchema();
 
   @Test
@@ -45,6 +54,8 @@ class TwinSnapshotContractTest {
             "Mazak01",
             new TwinVersion(1),
             projectedAt,
+            new ReplayCursor(
+                new java.util.UUID(0, 0), 0, projectedAt, projectedAt, new TwinVersion(1)),
             TwinConsistencyState.PARTIAL,
             List.of(
                 "metrics.spindleSpeeds",
@@ -64,11 +75,9 @@ class TwinSnapshotContractTest {
             List.of(),
             List.of(),
             List.of(),
+            TwinMetrics.none(),
             List.of(),
-            Optional.empty(),
-            Optional.empty(),
-            Optional.empty(),
-            List.of());
+            Optional.empty());
     String document =
         new ObjectMapper()
             .findAndRegisterModules()
@@ -76,17 +85,89 @@ class TwinSnapshotContractTest {
             .writeValueAsString(new TwinSnapshotResponseMapper().map(snapshot));
 
     assertThat(violations(document)).isEmpty();
-    assertThat(document).contains("\"schemaVersion\":\"1.5.0\"").contains("\"axisPositions\"");
+    assertThat(document).contains("\"schemaVersion\":\"1.6.0\"").contains("\"axisPositions\"");
+  }
+
+  @Test
+  void goldenTwinKeepsEveryObservedChannelSeparateAndNeverZeroFills() throws IOException {
+    com.fasterxml.jackson.databind.JsonNode metrics =
+        new ObjectMapper()
+            .readTree(readResource("fixtures/twin/v1/mazak01-operational-twin.json"))
+            .path("metrics");
+
+    assertThat(metrics.path("loads"))
+        .extracting(
+            load -> load.path("observation").path("componentId").asText(),
+            load ->
+                load.path("provenance").path("transformation").path("sourceDataItemId").asText())
+        .containsExactly(
+            tuple("Mazak01-B", "Mazak01-B_1"),
+            tuple("Mazak01-C", "Mazak01-C_2"),
+            tuple("Mazak01-C2", "Mazak01-C2_1"),
+            tuple("Mazak01-X", "Mazak01-X_3"),
+            tuple("Mazak01-Y", "Mazak01-Y_3"),
+            tuple("Mazak01-Z", "Mazak01-Z_3"));
+    assertThat(metrics.path("loads").path(4).has("value")).isFalse();
+    assertThat(metrics.path("temperatures"))
+        .extracting(
+            item ->
+                item.path("provenance").path("transformation").path("sourceDataItemId").asText())
+        .containsExactly("Mazak01-C_7", "Mazak01-C2_3");
+    assertThat(metrics.path("pathFeedrate").path("unit").asText()).isEqualTo("MILLIMETER/SECOND");
+    assertThat(metrics.path("partCount").path("value").asInt()).isEqualTo(17);
+    assertThat(metrics.path("controllerMode").path("value").asText()).isEqualTo("AUTOMATIC");
+    assertThat(metrics.path("powerState").path("value").asText()).isEqualTo("ON");
+  }
+
+  @Test
+  void earlierSnapshotWithoutTheNewOptionalChannelsStaysValid() {
+    String withoutNewChannels = readResource("fixtures/twin/v1/mazak01-twin-patch.json");
+
+    assertThat(violations(snapshotOf(withoutNewChannels))).isEmpty();
+  }
+
+  @Test
+  void rejectsAChannelUnitThatTheSourceNeverDeclared() {
+    String valid = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
+
+    assertThat(violations(valid.replace("\"unit\": \"PERCENT\"", "\"unit\": \"NEWTON\"")))
+        .isNotEmpty();
+    assertThat(violations(valid.replace("\"unit\": \"CELSIUS\"", "\"unit\": \"FAHRENHEIT\"")))
+        .isNotEmpty();
+  }
+
+  @Test
+  void oneFullyPopulatedSnapshotStaysInsideThePublishedPayloadBudget() {
+    String golden = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
+
+    assertThat(compact(golden).getBytes(StandardCharsets.UTF_8).length)
+        .isLessThanOrEqualTo(MAX_SNAPSHOT_BYTES);
   }
 
   @Test
   void rejectsWrongVersionMissingProvenanceAndUnavailableValue() {
     String valid = readResource("fixtures/twin/v1/mazak01-operational-twin.json");
 
-    assertThat(violations(valid.replace("\"1.5.0\"", "\"2.0.0\""))).isNotEmpty();
+    assertThat(violations(valid.replace("\"1.6.0\"", "\"2.0.0\""))).isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"provenance\": \\{", "\"lineage\": {")))
         .isNotEmpty();
     assertThat(violations(valid.replaceFirst("\"AVAILABLE\"", "\"UNAVAILABLE\""))).isNotEmpty();
+  }
+
+  private static String snapshotOf(String patch) {
+    try {
+      return new ObjectMapper().readTree(patch).path("snapshot").toString();
+    } catch (IOException exception) {
+      throw new UncheckedIOException("Cannot read the patch fixture", exception);
+    }
+  }
+
+  private static String compact(String document) {
+    try {
+      return new ObjectMapper().readTree(document).toString();
+    } catch (IOException exception) {
+      throw new UncheckedIOException("Cannot read the snapshot fixture", exception);
+    }
   }
 
   private java.util.List<com.networknt.schema.Error> violations(String document) {

@@ -149,10 +149,13 @@ export function FactoryRoute({
   return (
     <section className={`factory-page${showsScene ? " factory-console" : ""}`}>
       <header className="factory-header">
-        <div>
-          <p className="eyebrow">공간 설비 보기</p>
-          <h1>Factory Scene</h1>
-          <p>공장 배치는 실제 NIST 위치가 아닌 시뮬레이션입니다.</p>
+        <div className="factory-identity">
+          <p className="factory-kicker">OPERATIONAL DIGITAL TWIN</p>
+          <h1>
+            <span>{machineId}</span>
+            <span>운영 트윈</span>
+          </h1>
+          <p>같은 Twin State를 2D와 공간 3D에 동기화합니다.</p>
         </div>
         <div className="factory-controls">
           <div className="view-toggle" role="group" aria-label="공장 보기 방식">
@@ -214,7 +217,7 @@ export function FactoryRoute({
       <div className={`factory-layout factory-layout-${viewMode.toLowerCase()}`}>
         {showsScene && (
           <section className="scene-panel" aria-labelledby="factory-scene-title">
-            <h2 id="factory-scene-title">3D 공장</h2>
+            <h2 id="factory-scene-title">공간 투영</h2>
             <div className="scene-viewport">
               {unavailableReason === undefined ? (
                 <SceneErrorBoundary

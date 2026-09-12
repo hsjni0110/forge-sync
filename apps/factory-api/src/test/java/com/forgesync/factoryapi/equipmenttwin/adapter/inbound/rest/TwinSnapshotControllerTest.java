@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.forgesync.factoryapi.equipmenttwin.application.GetOperationalTwinSnapshot;
 import com.forgesync.factoryapi.equipmenttwin.application.MachineTwinNotFoundException;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.TwinMetrics;
+import com.forgesync.factoryapi.equipmenttwin.application.ReplayCursor;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinConsistencyState;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinSnapshotUnavailableException;
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
@@ -49,7 +51,7 @@ class TwinSnapshotControllerTest {
         .perform(get("/api/v1/machines/Mazak01/twin"))
         .andExpect(status().isOk())
         .andExpect(content().contentType(TwinSnapshotController.TWIN_MEDIA_TYPE))
-        .andExpect(jsonPath("$.schemaVersion").value("1.5.0"))
+        .andExpect(jsonPath("$.schemaVersion").value("1.6.0"))
         .andExpect(jsonPath("$.replayCursor.twinVersion").value(4))
         .andExpect(jsonPath("$.machine.machineId").value("Mazak01"))
         .andExpect(jsonPath("$.consistency.twinVersion").value(4))
@@ -94,6 +96,7 @@ class TwinSnapshotControllerTest {
         "Mazak01",
         new TwinVersion(4),
         projectedAt,
+        new ReplayCursor(new java.util.UUID(0, 0), 0, projectedAt, projectedAt, new TwinVersion(4)),
         TwinConsistencyState.PARTIAL,
         List.of(
             "metrics.spindleSpeeds",
@@ -112,10 +115,8 @@ class TwinSnapshotControllerTest {
         List.of(),
         List.of(),
         List.of(),
+        TwinMetrics.none(),
         List.of(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        List.of());
+        Optional.empty());
   }
 }

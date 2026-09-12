@@ -39,6 +39,9 @@ describe("App", () => {
     expect(screen.getByRole("link", { name: "공장 보기" }).getAttribute("href")).toBe(
       "/factory",
     );
+    expect(screen.getByRole("link", { name: "대시보드" }).getAttribute("aria-current")).toBe(
+      "page",
+    );
   });
 
   it("links from the dashboard to the operational factory view", () => {

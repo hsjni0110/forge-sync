@@ -11,6 +11,7 @@ import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotR
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservationMetadataDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedAngleDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedIntegerDto;
+import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedSampleDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.ObservedTextDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.SourceProvenanceDto;
 import com.forgesync.factoryapi.equipmenttwin.adapter.inbound.rest.TwinSnapshotResponse.SpatialDto;
@@ -21,6 +22,8 @@ import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapsho
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservationMetadata;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedAngle;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedEvent;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedSample;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.TwinMetrics;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +31,7 @@ public final class TwinSnapshotResponseMapper {
 
   public TwinSnapshotResponse map(OperationalTwinSnapshot snapshot) {
     return new TwinSnapshotResponse(
-        "1.5.0",
+        "1.6.0",
         new MachineDto(snapshot.machineId()),
         new ConsistencyDto(
             snapshot.consistencyState().name(),
@@ -55,31 +58,7 @@ public final class TwinSnapshotResponseMapper {
                 snapshot.freshMaxAgeMillis(),
                 snapshot.laggingMaxAgeMillis(),
                 "PROJECTED_AT")),
-        new MetricsDto(
-            snapshot.spindleSpeeds().stream()
-                .map(
-                    speed ->
-                        new SpindleSpeedDto(
-                            speed.availability().name(),
-                            speed.value(),
-                            speed.unit(),
-                            metadata(speed.metadata()),
-                            provenance(speed.metadata().provenance())))
-                .toList(),
-            snapshot.axisPositions().stream()
-                .map(
-                    position ->
-                        new AxisPositionDto(
-                            position.axis(),
-                            position.availability().name(),
-                            position.value(),
-                            position.unit(),
-                            metadata(position.metadata()),
-                            provenance(position.metadata().provenance())))
-                .toList(),
-            snapshot.bAxisAngle().map(TwinSnapshotResponseMapper::bAxisAngle).orElse(null),
-            snapshot.toolNumber().map(TwinSnapshotResponseMapper::toolNumber).orElse(null),
-            snapshot.program().map(TwinSnapshotResponseMapper::program).orElse(null)),
+        metrics(snapshot.metrics()),
         snapshot.conditions().stream()
             .map(
                 condition ->
@@ -115,7 +94,50 @@ public final class TwinSnapshotResponseMapper {
             .orElse(null));
   }
 
-  private static ObservedIntegerDto toolNumber(ObservedEvent event) {
+  private static MetricsDto metrics(TwinMetrics metrics) {
+    return new MetricsDto(
+        metrics.spindleSpeeds().stream()
+            .map(
+                speed ->
+                    new SpindleSpeedDto(
+                        speed.availability().name(),
+                        speed.value(),
+                        speed.unit(),
+                        metadata(speed.metadata()),
+                        provenance(speed.metadata().provenance())))
+            .toList(),
+        metrics.axisPositions().stream()
+            .map(
+                position ->
+                    new AxisPositionDto(
+                        position.axis(),
+                        position.availability().name(),
+                        position.value(),
+                        position.unit(),
+                        metadata(position.metadata()),
+                        provenance(position.metadata().provenance())))
+            .toList(),
+        metrics.loads().stream().map(TwinSnapshotResponseMapper::observedSample).toList(),
+        metrics.temperatures().stream().map(TwinSnapshotResponseMapper::observedSample).toList(),
+        metrics.pathFeedrate().map(TwinSnapshotResponseMapper::observedSample).orElse(null),
+        metrics.bAxisAngle().map(TwinSnapshotResponseMapper::bAxisAngle).orElse(null),
+        metrics.toolNumber().map(TwinSnapshotResponseMapper::observedInteger).orElse(null),
+        metrics.partCount().map(TwinSnapshotResponseMapper::observedInteger).orElse(null),
+        metrics.program().map(TwinSnapshotResponseMapper::observedText).orElse(null),
+        metrics.controllerMode().map(TwinSnapshotResponseMapper::observedText).orElse(null),
+        metrics.powerState().map(TwinSnapshotResponseMapper::observedText).orElse(null));
+  }
+
+  private static ObservedSampleDto observedSample(ObservedSample sample) {
+    return new ObservedSampleDto(
+        sample.availability().name(),
+        sample.value(),
+        sample.unit(),
+        metadata(sample.metadata()),
+        provenance(sample.metadata().provenance()));
+  }
+
+  private static ObservedIntegerDto observedInteger(ObservedEvent event) {
     return new ObservedIntegerDto(
         event.availability().name(),
         event.value() == null ? null : Long.valueOf(event.value()),
@@ -132,7 +154,7 @@ public final class TwinSnapshotResponseMapper {
         provenance(angle.metadata().provenance()));
   }
 
-  private static ObservedTextDto program(ObservedEvent event) {
+  private static ObservedTextDto observedText(ObservedEvent event) {
     return new ObservedTextDto(
         event.availability().name(),
         event.value(),

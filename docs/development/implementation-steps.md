@@ -1235,6 +1235,16 @@ WARNING/FAULT는 반열린 구간 `[start, end)` 안의 점시점 관찰만 연�
 
 **선행 조건**: Step 10, Step 32.
 
+**결과**: snapshot/patch contract `1.6.0`. 축 위치는 Step 29에서 이미 노출되어 범위에서 제외했고
+`LOAD`/`TEMPERATURE`/`PATH_FEEDRATE`/`PART_COUNT`/`CONTROLLER_MODE`/`POWER_STATE`를 추가했다. 원천이
+주 컴포넌트를 지정하지 않으므로 부하·온도는 `componentId` 순서의 목록으로 두고 축/주축으로 분류하지
+않는다. 각 채널은 카탈로그가 선언한 단위(`PERCENT`, `CELSIUS`, `MILLIMETER/SECOND`)에 고정되며 다른
+단위는 변환하지 않고 거부한다. 신규 필드는 optional이고 `consistency.missingFields`에 넣지 않아
+`CONSISTENT`의 의미가 유지된다. `PART_COUNT`는 telemetry로 남고 `productionResult`는 계속 빈 컨테이너다.
+patch 1건이 snapshot 전체를 담으므로 snapshot 크기를 64 KiB 상한 회귀 테스트로 고정했고 실측 publish
+rate는 Step 47에서 기록한다
+([ADR-054](../adr/ADR-054-observed-metric-channel-disclosure.md), V-059, V-060).
+
 ### Step 38 — Shift Overview 화면
 
 **목적**: cursor 시점 상태에 더해 관측 구간 전체에서 무슨 일이 있었는지 한 화면에서 보여준다.

@@ -38,7 +38,34 @@ describe("MachineDetailView", () => {
     expect(screen.getByText("114")).toBeTruthy();
     expect(screen.getAllByText(/실제 데이터 · NIST/).length).toBeGreaterThan(0);
     expect(screen.getByText(/상세 품질 정보는 아직 제공하지 않습니다/)).toBeTruthy();
-    expect(screen.getByText(/원본 추적 정보 8건 · 1개 출처/)).toBeTruthy();
+    expect(screen.getByText(/원본 추적 정보 20건 · 1개 출처/)).toBeTruthy();
+  });
+
+  it("shows the newly exposed channels in the section that matches how they are read", () => {
+    render(
+      <MachineDetailView
+        machineId="Mazak01"
+        state={{ connectionStatus: "LIVE", snapshot, freshness: "FRESH" }}
+        retryNow={vi.fn()}
+      />,
+    );
+
+    const currentWork = screen.getByRole("region", { name: "지금 작업" });
+    expect(within(currentWork).getByText("자동")).toBeTruthy();
+    expect(within(currentWork).getByText("켜짐")).toBeTruthy();
+    expect(within(currentWork).getByText("17")).toBeTruthy();
+
+    const readings = screen.getByRole("region", { name: "측정값" });
+    expect(within(readings).getByText("부하 · Mazak01-X")).toBeTruthy();
+    expect(within(readings).getByText("4 %")).toBeTruthy();
+    expect(within(readings).getByText("온도 · Mazak01-C2")).toBeTruthy();
+    expect(within(readings).getByText("29.8 °C")).toBeTruthy();
+    expect(within(readings).getByText("5.4 mm/s")).toBeTruthy();
+    const unavailableLoad = within(readings)
+      .getByText("부하 · Mazak01-Y")
+      .closest<HTMLElement>(".metric-card");
+    expect(within(unavailableLoad!).getByText("확인할 수 없음")).toBeTruthy();
+    expect(within(readings).getByText("0 %")).toBeTruthy();
   });
 
   it("renders a compact operational summary without the full provenance list", () => {
@@ -99,9 +126,9 @@ describe("MachineDetailView", () => {
       />,
     );
 
-    const disclosure = screen.getByText(/원본 추적 정보 8건 · 1개 출처/).closest("details");
+    const disclosure = screen.getByText(/원본 추적 정보 20건 · 1개 출처/).closest("details");
     expect(disclosure?.hasAttribute("open")).toBe(false);
-    expect(within(disclosure!).getByRole("heading", { name: /NIST.*8건/ })).toBeTruthy();
+    expect(within(disclosure!).getByRole("heading", { name: /NIST.*20건/ })).toBeTruthy();
   });
 
   it("summarizes many condition signals instead of listing every normal one", () => {
@@ -147,7 +174,7 @@ describe("MachineDetailView", () => {
       />,
     );
 
-    expect(screen.getAllByText("확인할 수 없음")).toHaveLength(2);
+    expect(screen.getAllByText("확인할 수 없음")).toHaveLength(3);
     expect(screen.queryByText("0")).toBeNull();
   });
 

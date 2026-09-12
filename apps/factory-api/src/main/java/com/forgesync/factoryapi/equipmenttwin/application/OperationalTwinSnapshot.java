@@ -31,112 +31,9 @@ public record OperationalTwinSnapshot(
     List<FieldProvenance> connectivityProvenance,
     List<FieldProvenance> executionProvenance,
     List<FieldProvenance> healthProvenance,
-    List<SpindleSpeed> spindleSpeeds,
-    List<AxisPosition> axisPositions,
-    Optional<ObservedAngle> bAxisAngle,
-    Optional<ObservedEvent> toolNumber,
-    Optional<ObservedEvent> program,
+    TwinMetrics metrics,
     List<CurrentCondition> conditions,
     Optional<SpatialLayout> spatial) {
-
-  public OperationalTwinSnapshot(
-      String machineId,
-      TwinVersion twinVersion,
-      Instant projectedAt,
-      ReplayCursor replayCursor,
-      TwinConsistencyState consistencyState,
-      List<String> missingFields,
-      ConnectivityState connectivity,
-      ExecutionState execution,
-      HealthState health,
-      FreshnessState freshness,
-      Instant evaluatedAt,
-      Duration age,
-      long freshMaxAgeMillis,
-      long laggingMaxAgeMillis,
-      List<FieldProvenance> connectivityProvenance,
-      List<FieldProvenance> executionProvenance,
-      List<FieldProvenance> healthProvenance,
-      List<SpindleSpeed> spindleSpeeds,
-      Optional<ObservedAngle> bAxisAngle,
-      Optional<ObservedEvent> toolNumber,
-      Optional<ObservedEvent> program,
-      List<CurrentCondition> conditions) {
-    this(
-        machineId,
-        twinVersion,
-        projectedAt,
-        replayCursor,
-        consistencyState,
-        missingFields,
-        connectivity,
-        execution,
-        health,
-        freshness,
-        evaluatedAt,
-        age,
-        freshMaxAgeMillis,
-        laggingMaxAgeMillis,
-        connectivityProvenance,
-        executionProvenance,
-        healthProvenance,
-        spindleSpeeds,
-        List.of(),
-        bAxisAngle,
-        toolNumber,
-        program,
-        conditions,
-        Optional.empty());
-  }
-
-  public OperationalTwinSnapshot(
-      String machineId,
-      TwinVersion twinVersion,
-      Instant projectedAt,
-      TwinConsistencyState consistencyState,
-      List<String> missingFields,
-      ConnectivityState connectivity,
-      ExecutionState execution,
-      HealthState health,
-      FreshnessState freshness,
-      Instant evaluatedAt,
-      Duration age,
-      long freshMaxAgeMillis,
-      long laggingMaxAgeMillis,
-      List<FieldProvenance> connectivityProvenance,
-      List<FieldProvenance> executionProvenance,
-      List<FieldProvenance> healthProvenance,
-      List<SpindleSpeed> spindleSpeeds,
-      Optional<ObservedAngle> bAxisAngle,
-      Optional<ObservedEvent> toolNumber,
-      Optional<ObservedEvent> program,
-      List<CurrentCondition> conditions) {
-    this(
-        machineId,
-        twinVersion,
-        projectedAt,
-        new ReplayCursor(new java.util.UUID(0, 0), 0, projectedAt, projectedAt, twinVersion),
-        consistencyState,
-        missingFields,
-        connectivity,
-        execution,
-        health,
-        freshness,
-        evaluatedAt,
-        age,
-        freshMaxAgeMillis,
-        laggingMaxAgeMillis,
-        connectivityProvenance,
-        executionProvenance,
-        healthProvenance,
-        spindleSpeeds,
-        List.of(),
-        bAxisAngle,
-        toolNumber,
-        program,
-        conditions,
-        Optional.empty());
-  }
 
   public OperationalTwinSnapshot {
     Objects.requireNonNull(machineId, "machineId");
@@ -157,13 +54,56 @@ public record OperationalTwinSnapshot(
     connectivityProvenance = List.copyOf(connectivityProvenance);
     executionProvenance = List.copyOf(executionProvenance);
     healthProvenance = List.copyOf(healthProvenance);
-    spindleSpeeds = List.copyOf(spindleSpeeds);
-    axisPositions = List.copyOf(axisPositions);
-    Objects.requireNonNull(bAxisAngle, "bAxisAngle");
-    Objects.requireNonNull(toolNumber, "toolNumber");
-    Objects.requireNonNull(program, "program");
+    Objects.requireNonNull(metrics, "metrics");
     conditions = List.copyOf(conditions);
     Objects.requireNonNull(spatial, "spatial");
+  }
+
+  /**
+   * Observed metric channels of one snapshot. Channels that expose more than one source DataItem
+   * stay collections so the contract never elects a primary component on the source's behalf.
+   */
+  public record TwinMetrics(
+      List<SpindleSpeed> spindleSpeeds,
+      List<AxisPosition> axisPositions,
+      List<ObservedSample> loads,
+      List<ObservedSample> temperatures,
+      Optional<ObservedSample> pathFeedrate,
+      Optional<ObservedAngle> bAxisAngle,
+      Optional<ObservedEvent> toolNumber,
+      Optional<ObservedEvent> partCount,
+      Optional<ObservedEvent> program,
+      Optional<ObservedEvent> controllerMode,
+      Optional<ObservedEvent> powerState) {
+
+    public TwinMetrics {
+      spindleSpeeds = List.copyOf(spindleSpeeds);
+      axisPositions = List.copyOf(axisPositions);
+      loads = List.copyOf(loads);
+      temperatures = List.copyOf(temperatures);
+      Objects.requireNonNull(pathFeedrate, "pathFeedrate");
+      Objects.requireNonNull(bAxisAngle, "bAxisAngle");
+      Objects.requireNonNull(toolNumber, "toolNumber");
+      Objects.requireNonNull(partCount, "partCount");
+      Objects.requireNonNull(program, "program");
+      Objects.requireNonNull(controllerMode, "controllerMode");
+      Objects.requireNonNull(powerState, "powerState");
+    }
+
+    public static TwinMetrics none() {
+      return new TwinMetrics(
+          List.of(),
+          List.of(),
+          List.of(),
+          List.of(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty());
+    }
   }
 
   public record ObservationMetadata(
@@ -183,6 +123,13 @@ public record OperationalTwinSnapshot(
   }
 
   public record SpindleSpeed(
+      ObservationAvailability availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadata metadata) {}
+
+  /** A numeric Sample channel whose component identity lives in its own observation metadata. */
+  public record ObservedSample(
       ObservationAvailability availability,
       BigDecimal value,
       String unit,

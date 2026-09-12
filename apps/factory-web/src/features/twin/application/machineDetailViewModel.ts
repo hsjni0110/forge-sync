@@ -10,6 +10,23 @@ import type {
 import { effectiveConnectivity, effectiveConsistency } from "../domain/freshness";
 import { formatDecimal } from "../../../shared/presentation/valueFormatters";
 
+interface ChannelPresentation {
+  keyPrefix: string;
+  labelPrefix: string;
+  unitSuffix: string;
+}
+
+const LOAD_CHANNEL: ChannelPresentation = {
+  keyPrefix: "load",
+  labelPrefix: "부하",
+  unitSuffix: "%",
+};
+const TEMPERATURE_CHANNEL: ChannelPresentation = {
+  keyPrefix: "temp",
+  labelPrefix: "온도",
+  unitSuffix: "°C",
+};
+
 export interface MachineDetailMetric {
   key: string;
   label: string;
@@ -101,6 +118,31 @@ export function mapTwinToMachineDetail(
     } satisfies MachineDetailMetric;
   });
 
+  const loads = (snapshot.metrics.loads ?? []).map((load) =>
+    componentChannelMetric(load, LOAD_CHANNEL),
+  );
+  const temperatures = (snapshot.metrics.temperatures ?? []).map((temperature) =>
+    componentChannelMetric(temperature, TEMPERATURE_CHANNEL),
+  );
+
+  const pathFeedrate = optionalMetric(
+    "feedrate",
+    "경로 이송속도",
+    snapshot.metrics.pathFeedrate,
+    "mm/s",
+  );
+  const partCount = optionalMetric("part-count", "부품 수 카운터", snapshot.metrics.partCount);
+  const controllerMode = translatedMetric(
+    "controller-mode",
+    "제어 모드",
+    snapshot.metrics.controllerMode,
+  );
+  const powerState = translatedMetric("power-state", "전원 상태", snapshot.metrics.powerState);
+  appendObservedProvenance("경로 이송속도", snapshot.metrics.pathFeedrate);
+  appendObservedProvenance("부품 수 카운터", snapshot.metrics.partCount);
+  appendObservedProvenance("제어 모드", snapshot.metrics.controllerMode);
+  appendObservedProvenance("전원 상태", snapshot.metrics.powerState);
+
   const toolNumber = observedMetric("tool", "공구 번호", snapshot.metrics.toolNumber);
   const program = observedMetric("program", "실행 프로그램", snapshot.metrics.program);
   const bAxisAngle = observedMetric("b-axis", "B축 각도", snapshot.metrics.bAxisAngle);
@@ -143,11 +185,49 @@ export function mapTwinToMachineDetail(
     healthState: translateCode(snapshot.state.health.value),
     primaryCondition,
     spindleSummary: summarizeSpindles(snapshot.metrics.spindleSpeeds),
-    metrics: [...spindleSpeeds, ...axisPositions, bAxisAngle, toolNumber, program],
+    metrics: [
+      ...spindleSpeeds,
+      ...axisPositions,
+      ...loads,
+      ...temperatures,
+      pathFeedrate,
+      bAxisAngle,
+      toolNumber,
+      partCount,
+      program,
+      controllerMode,
+      powerState,
+    ].filter((metric) => metric !== undefined),
     conditions,
     provenance,
     provenanceGroups: groupProvenance(provenance),
   };
+
+  function componentChannelMetric(
+    observed: ObservedValue<number>,
+    channel: ChannelPresentation,
+  ): MachineDetailMetric {
+    const label = `${channel.labelPrefix} · ${observed.observation.componentId}`;
+    appendProvenance(provenance, label, [observed.provenance]);
+    return {
+      key: `${channel.keyPrefix}-${observed.provenance.transformation.sourceDataItemId}`,
+      label,
+      value:
+        observed.availability === "AVAILABLE" && observed.value !== undefined
+          ? `${formatDecimal(observed.value)} ${channel.unitSuffix}`
+          : "확인할 수 없음",
+      detail: observed.provenance.transformation.sourceDataItemId,
+      availability: observed.availability,
+    };
+  }
+
+  function appendObservedProvenance(
+    field: string,
+    observed: ObservedValue<number | string> | undefined,
+  ): void {
+    if (!observed) return;
+    appendProvenance(provenance, field, [observed.provenance]);
+  }
 
   function mapCondition(condition: CurrentCondition, index: number): MachineDetailCondition {
     appendProvenance(provenance, `상태 신호 · ${condition.conditionType}`, [condition.provenance]);
@@ -230,19 +310,53 @@ function observedMetric(
   key: string,
   label: string,
   observed: ObservedValue<number | string> | undefined,
+  unitSuffix?: string,
 ): MachineDetailMetric {
   if (!observed) {
     return { key, label, value: "확인할 수 없음", availability: "MISSING" };
   }
+  const reading =
+    typeof observed.value === "number" ? formatDecimal(observed.value) : observed.value;
   return {
     key,
     label,
     value:
       observed.availability === "AVAILABLE" && observed.value !== undefined
-        ? typeof observed.value === "number" ? formatDecimal(observed.value) : observed.value
+        ? unitSuffix
+          ? `${reading} ${unitSuffix}`
+          : String(reading)
         : "확인할 수 없음",
     detail: observed.provenance.transformation.sourceDataItemId,
     availability: observed.availability,
+  };
+}
+
+/**
+ * Channels added after the first 2D slice stay absent instead of claiming a missing P0 value: the
+ * snapshot contract leaves them optional rather than listing them in `consistency.missingFields`.
+ */
+function optionalMetric(
+  key: string,
+  label: string,
+  observed: ObservedValue<number | string> | undefined,
+  unitSuffix?: string,
+): MachineDetailMetric | undefined {
+  return observed ? observedMetric(key, label, observed, unitSuffix) : undefined;
+}
+
+function translatedMetric(
+  key: string,
+  label: string,
+  observed: ObservedValue<string> | undefined,
+): MachineDetailMetric | undefined {
+  const metric = optionalMetric(key, label, observed);
+  if (!metric || metric.availability !== "AVAILABLE" || observed?.value === undefined) {
+    return metric;
+  }
+  return {
+    ...metric,
+    value: translateCode(observed.value),
+    detail: `${observed.provenance.transformation.sourceDataItemId} · 원본 값 ${observed.value}`,
   };
 }
 
@@ -279,6 +393,13 @@ const CODE_LABELS: Record<string, string> = {
   WARNING: "주의",
   FAULT: "고장",
   UNAVAILABLE: "확인할 수 없음",
+  AUTOMATIC: "자동",
+  MANUAL: "수동",
+  MANUAL_DATA_INPUT: "수동 입력(MDI)",
+  SEMI_AUTOMATIC: "반자동",
+  EDIT: "편집",
+  ON: "켜짐",
+  OFF: "꺼짐",
 };
 
 function translateCode(value: string): string {

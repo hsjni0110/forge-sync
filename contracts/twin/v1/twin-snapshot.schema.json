@@ -9,7 +9,7 @@
     "production", "productionResult", "alarms", "maintenance", "intelligence", "quality"
   ],
   "properties": {
-    "schemaVersion": { "const": "1.5.0" },
+    "schemaVersion": { "const": "1.6.0" },
     "machine": {
       "type": "object",
       "additionalProperties": false,
@@ -83,9 +83,21 @@
           "maxItems": 3,
           "items": { "$ref": "#/$defs/axisPosition" }
         },
+        "loads": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/observedLoad" }
+        },
+        "temperatures": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/observedTemperature" }
+        },
+        "pathFeedrate": { "$ref": "#/$defs/observedPathFeedrate" },
         "bAxisAngle": { "$ref": "#/$defs/observedAngle" },
         "toolNumber": { "$ref": "#/$defs/observedInteger" },
-        "program": { "$ref": "#/$defs/observedText" }
+        "partCount": { "$ref": "#/$defs/observedInteger" },
+        "program": { "$ref": "#/$defs/observedText" },
+        "controllerMode": { "$ref": "#/$defs/observedText" },
+        "powerState": { "$ref": "#/$defs/observedText" }
       }
     },
     "conditions": { "type": "array", "items": { "$ref": "#/$defs/condition" } },
@@ -211,6 +223,60 @@
           "properties": {
             "value": { "type": "number" },
             "unit": { "const": "REVOLUTION/MINUTE" }
+          }
+        },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value", "unit"] },
+          "else": { "not": { "anyOf": [{ "required": ["value"] }, { "required": ["unit"] }] } }
+        }
+      ]
+    },
+    "observedLoad": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        {
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "const": "PERCENT" }
+          }
+        },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value", "unit"] },
+          "else": { "not": { "anyOf": [{ "required": ["value"] }, { "required": ["unit"] }] } }
+        }
+      ]
+    },
+    "observedTemperature": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        {
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "const": "CELSIUS" }
+          }
+        },
+        {
+          "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+          "then": { "required": ["value", "unit"] },
+          "else": { "not": { "anyOf": [{ "required": ["value"] }, { "required": ["unit"] }] } }
+        }
+      ]
+    },
+    "observedPathFeedrate": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "allOf": [
+        { "$ref": "#/$defs/observedBase" },
+        {
+          "properties": {
+            "value": { "type": "number" },
+            "unit": { "const": "MILLIMETER/SECOND" }
           }
         },
         {

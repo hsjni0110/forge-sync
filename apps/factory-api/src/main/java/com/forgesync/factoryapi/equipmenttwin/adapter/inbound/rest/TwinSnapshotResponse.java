@@ -66,9 +66,23 @@ public record TwinSnapshotResponse(
   public record MetricsDto(
       List<SpindleSpeedDto> spindleSpeeds,
       List<AxisPositionDto> axisPositions,
+      List<ObservedSampleDto> loads,
+      List<ObservedSampleDto> temperatures,
+      ObservedSampleDto pathFeedrate,
       ObservedAngleDto bAxisAngle,
       ObservedIntegerDto toolNumber,
-      ObservedTextDto program) {}
+      ObservedIntegerDto partCount,
+      ObservedTextDto program,
+      ObservedTextDto controllerMode,
+      ObservedTextDto powerState) {}
+
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  public record ObservedSampleDto(
+      String availability,
+      BigDecimal value,
+      String unit,
+      ObservationMetadataDto observation,
+      FieldProvenanceDto provenance) {}
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   public record SpindleSpeedDto(

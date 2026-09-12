@@ -1,4 +1,4 @@
-import { Link, Route, Routes } from "react-router-dom";
+import { Link, NavLink, Route, Routes } from "react-router-dom";
 
 import { DashboardRoute } from "../../dashboard/ui/DashboardRoute";
 import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
@@ -37,11 +37,15 @@ export function App({
       </a>
       <header className="site-header">
         <Link className="brand" to="/">
-          ForgeSync
+          <span className="brand-mark" aria-hidden="true">FS</span>
+          <span className="brand-lockup">
+            <strong>ForgeSync</strong>
+            <small>Operational Twin</small>
+          </span>
         </Link>
         <nav aria-label="주요 메뉴">
-          <Link to="/">대시보드</Link>
-          <Link to="/factory">공장 보기</Link>
+          <NavLink to="/" end>대시보드</NavLink>
+          <NavLink to="/factory">공장 보기</NavLink>
         </nav>
       </header>
       <main id="main-content" className="app-shell">

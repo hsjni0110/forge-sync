@@ -2,6 +2,7 @@ package com.forgesync.factoryapi.equipmenttwin.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentState;
@@ -45,19 +46,19 @@ class OperationalTwinSnapshotServiceTest {
         service(projection, PROJECTED_AT.plusSeconds(1)).getSnapshot("Mazak01");
 
     assertThat(snapshot.consistencyState()).isEqualTo(TwinConsistencyState.CONSISTENT);
-    assertThat(snapshot.spindleSpeeds())
+    assertThat(snapshot.metrics().spindleSpeeds())
         .extracting(item -> item.metadata().provenance().sourceDataItemId())
         .containsExactly("Mazak01-C_5", "Mazak01-C2_2");
-    assertThat(snapshot.spindleSpeeds())
+    assertThat(snapshot.metrics().spindleSpeeds())
         .extracting(item -> item.value().intValue())
         .containsExactly(6842, 2000);
     assertThat(snapshot.freshMaxAgeMillis()).isEqualTo(2_000);
     assertThat(snapshot.laggingMaxAgeMillis()).isEqualTo(10_000);
-    assertThat(snapshot.bAxisAngle())
+    assertThat(snapshot.metrics().bAxisAngle())
         .get()
         .extracting(item -> item.value().intValue())
         .isEqualTo(45);
-    assertThat(snapshot.axisPositions())
+    assertThat(snapshot.metrics().axisPositions())
         .extracting(
             OperationalTwinSnapshot.AxisPosition::axis,
             item -> item.value().toPlainString(),
@@ -66,6 +67,132 @@ class OperationalTwinSnapshotServiceTest {
             org.assertj.core.groups.Tuple.tuple("X", "80.078834", "Mazak01-X_1"),
             org.assertj.core.groups.Tuple.tuple("Y", "-68.786629", "Mazak01-Y_1"),
             org.assertj.core.groups.Tuple.tuple("Z", "9.635998", "Mazak01-Z_1"));
+  }
+
+  @Test
+  void keepsEveryLoadAndTemperatureChannelSeparatedByItsOwnComponent() {
+    LoadedTwinProjection projection =
+        projection(
+            List.of(
+                numeric("LOAD", "Mazak01-X", "Mazak01-X_2", "12.5", "PERCENT"),
+                numeric("LOAD", "Mazak01-C", "Mazak01-C_3", "40", "PERCENT"),
+                numeric("LOAD", "Mazak01-B", "Mazak01-B_2", "3", "PERCENT"),
+                angle("Mazak01-B_4", "45", "DEGREE"),
+                numeric("TEMPERATURE", "Mazak01-C2", "Mazak01-C2_4", "29.8", "CELSIUS"),
+                numeric("TEMPERATURE", "Mazak01-C", "Mazak01-C_6", "31.2", "CELSIUS")));
+
+    OperationalTwinSnapshot snapshot = service(projection, PROJECTED_AT).getSnapshot("Mazak01");
+
+    assertThat(snapshot.metrics().loads())
+        .extracting(
+            item -> item.metadata().componentId(),
+            item -> item.metadata().provenance().sourceDataItemId(),
+            item -> item.value().toPlainString(),
+            OperationalTwinSnapshot.ObservedSample::unit)
+        .containsExactly(
+            tuple("Mazak01-B", "Mazak01-B_2", "3", "PERCENT"),
+            tuple("Mazak01-C", "Mazak01-C_3", "40", "PERCENT"),
+            tuple("Mazak01-X", "Mazak01-X_2", "12.5", "PERCENT"));
+    assertThat(snapshot.metrics().temperatures())
+        .extracting(item -> item.metadata().provenance().sourceDataItemId())
+        .containsExactly("Mazak01-C_6", "Mazak01-C2_4");
+    assertThat(snapshot.metrics().bAxisAngle())
+        .get()
+        .extracting(item -> item.value().intValue())
+        .isEqualTo(45);
+  }
+
+  @Test
+  void exposesPathFeedratePartCountControllerModeAndPowerState() {
+    LoadedTwinProjection projection =
+        projection(
+            List.of(
+                numeric(
+                    "PATH_FEEDRATE", "Mazak01-path", "Mazak01-path_6", "5.4", "MILLIMETER/SECOND"),
+                event("PART_COUNT", "17", "Mazak01-path_11"),
+                event("CONTROLLER_MODE", "AUTOMATIC", "Mazak01-path_12"),
+                event("POWER_STATE", "ON", "Mazak01-electric_1")));
+
+    OperationalTwinSnapshot snapshot = service(projection, PROJECTED_AT).getSnapshot("Mazak01");
+
+    assertThat(snapshot.metrics().pathFeedrate())
+        .get()
+        .extracting(
+            item -> item.value().toPlainString(), OperationalTwinSnapshot.ObservedSample::unit)
+        .isEqualTo(List.of("5.4", "MILLIMETER/SECOND"));
+    assertThat(snapshot.metrics().partCount())
+        .get()
+        .extracting(OperationalTwinSnapshot.ObservedEvent::value)
+        .isEqualTo("17");
+    assertThat(snapshot.metrics().controllerMode())
+        .get()
+        .extracting(OperationalTwinSnapshot.ObservedEvent::value)
+        .isEqualTo("AUTOMATIC");
+    assertThat(snapshot.metrics().powerState())
+        .get()
+        .extracting(OperationalTwinSnapshot.ObservedEvent::value)
+        .isEqualTo("ON");
+  }
+
+  @Test
+  void leavesNewChannelsAbsentInsteadOfReportingZeroOrMissingP0() {
+    LoadedTwinProjection projection =
+        projection(
+            List.of(
+                numeric(
+                    "LOAD",
+                    "Mazak01-X",
+                    "Mazak01-X_2",
+                    null,
+                    null,
+                    ObservationAvailability.UNAVAILABLE)));
+
+    OperationalTwinSnapshot snapshot = service(projection, PROJECTED_AT).getSnapshot("Mazak01");
+
+    assertThat(snapshot.metrics().loads())
+        .singleElement()
+        .extracting(
+            OperationalTwinSnapshot.ObservedSample::availability,
+            OperationalTwinSnapshot.ObservedSample::value,
+            OperationalTwinSnapshot.ObservedSample::unit)
+        .containsExactly(ObservationAvailability.UNAVAILABLE, null, null);
+    assertThat(snapshot.metrics().temperatures()).isEmpty();
+    assertThat(snapshot.metrics().pathFeedrate()).isEmpty();
+    assertThat(snapshot.metrics().partCount()).isEmpty();
+    assertThat(snapshot.metrics().controllerMode()).isEmpty();
+    assertThat(snapshot.metrics().powerState()).isEmpty();
+    assertThat(snapshot.missingFields())
+        .doesNotContain(
+            "metrics.loads",
+            "metrics.temperatures",
+            "metrics.pathFeedrate",
+            "metrics.partCount",
+            "metrics.controllerMode",
+            "metrics.powerState");
+  }
+
+  @Test
+  void refusesToChooseAnAmbiguousPathFeedrateChannel() {
+    OperationalTwinSnapshot snapshot =
+        service(
+                projection(
+                    List.of(
+                        numeric(
+                            "PATH_FEEDRATE",
+                            "Mazak01-path",
+                            "Mazak01-path_6",
+                            "5.4",
+                            "MILLIMETER/SECOND"),
+                        numeric(
+                            "PATH_FEEDRATE",
+                            "Mazak01-path",
+                            "Mazak01-path_7",
+                            "9.1",
+                            "MILLIMETER/SECOND"))),
+                PROJECTED_AT)
+            .getSnapshot("Mazak01");
+
+    assertThat(snapshot.metrics().pathFeedrate()).isEmpty();
   }
 
   @Test
@@ -98,7 +225,7 @@ class OperationalTwinSnapshotServiceTest {
             "metrics.bAxisAngle",
             "metrics.toolNumber",
             "metrics.program");
-    assertThat(snapshot.toolNumber())
+    assertThat(snapshot.metrics().toolNumber())
         .get()
         .extracting(OperationalTwinSnapshot.ObservedEvent::value)
         .isNull();
@@ -137,8 +264,8 @@ class OperationalTwinSnapshotServiceTest {
         service(projection(List.of(angle("Mazak01-B_4", "45", "RADIAN"))), PROJECTED_AT)
             .getSnapshot("Mazak01");
 
-    assertThat(duplicate.bAxisAngle()).isEmpty();
-    assertThat(unknownUnit.bAxisAngle()).isEmpty();
+    assertThat(duplicate.metrics().bAxisAngle()).isEmpty();
+    assertThat(unknownUnit.metrics().bAxisAngle()).isEmpty();
     assertThat(duplicate.missingFields()).contains("metrics.bAxisAngle");
     assertThat(unknownUnit.missingFields()).contains("metrics.bAxisAngle");
   }
@@ -156,7 +283,7 @@ class OperationalTwinSnapshotServiceTest {
                 PROJECTED_AT)
             .getSnapshot("Mazak01");
 
-    assertThat(snapshot.axisPositions())
+    assertThat(snapshot.metrics().axisPositions())
         .extracting(OperationalTwinSnapshot.AxisPosition::axis)
         .containsExactly("Z");
     assertThat(snapshot.missingFields())
@@ -232,6 +359,31 @@ class OperationalTwinSnapshotServiceTest {
         sourceDataItemId);
   }
 
+  private static ProjectedTwinObservation numeric(
+      String metric, String componentId, String sourceDataItemId, String value, String unit) {
+    return numeric(
+        metric, componentId, sourceDataItemId, value, unit, ObservationAvailability.AVAILABLE);
+  }
+
+  private static ProjectedTwinObservation numeric(
+      String metric,
+      String componentId,
+      String sourceDataItemId,
+      String value,
+      String unit,
+      ObservationAvailability availability) {
+    return observation(
+        StateObservationKind.SAMPLE,
+        metric,
+        availability,
+        value == null ? null : new BigDecimal(value),
+        null,
+        null,
+        unit,
+        componentId,
+        sourceDataItemId);
+  }
+
   private static ProjectedTwinObservation event(
       String eventType, String value, String sourceDataItemId) {
     return event(eventType, value, sourceDataItemId, ObservationAvailability.AVAILABLE);
@@ -270,7 +422,10 @@ class OperationalTwinSnapshotServiceTest {
       String value,
       String sourceDataItemId,
       ObservationAvailability availability) {
-    Long integer = eventType.equals("TOOL_NUMBER") && value != null ? Long.valueOf(value) : null;
+    Long integer =
+        List.of("TOOL_NUMBER", "PART_COUNT").contains(eventType) && value != null
+            ? Long.valueOf(value)
+            : null;
     String text = integer == null ? value : null;
     return observation(
         StateObservationKind.EVENT,

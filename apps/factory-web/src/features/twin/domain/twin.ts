@@ -51,6 +51,18 @@ export interface AxisPosition extends ObservedValue<number> {
   unit?: "MILLIMETER";
 }
 
+export interface ComponentLoad extends ObservedValue<number> {
+  unit?: "PERCENT";
+}
+
+export interface ComponentTemperature extends ObservedValue<number> {
+  unit?: "CELSIUS";
+}
+
+export interface PathFeedrate extends ObservedValue<number> {
+  unit?: "MILLIMETER/SECOND";
+}
+
 export interface CurrentCondition {
   conditionType: string;
   level: "NORMAL" | "WARNING" | "FAULT" | "UNAVAILABLE";
@@ -63,7 +75,7 @@ export interface CurrentCondition {
 }
 
 export interface TwinSnapshot {
-  schemaVersion: "1.5.0";
+  schemaVersion: "1.6.0";
   machine: { machineId: string };
   consistency: {
     status: "CONSISTENT" | "PARTIAL" | "STALE" | "DEGRADED";
@@ -97,9 +109,15 @@ export interface TwinSnapshot {
   metrics: {
     spindleSpeeds: SpindleSpeed[];
     axisPositions: AxisPosition[];
+    loads?: ComponentLoad[];
+    temperatures?: ComponentTemperature[];
+    pathFeedrate?: PathFeedrate;
     bAxisAngle?: BAxisAngle;
     toolNumber?: ObservedValue<number>;
+    partCount?: ObservedValue<number>;
     program?: ObservedValue<string>;
+    controllerMode?: ObservedValue<string>;
+    powerState?: ObservedValue<string>;
   };
   conditions: CurrentCondition[];
   production: Record<string, never>;
@@ -123,7 +141,7 @@ export interface SpatialLayout {
 }
 
 export interface TwinPatch {
-  schemaVersion: "1.5.0";
+  schemaVersion: "1.6.0";
   type: "TWIN_PATCH";
   machineId: string;
   baseVersion: number;

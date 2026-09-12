@@ -10,6 +10,8 @@ import static org.mockito.Mockito.when;
 
 import com.forgesync.factoryapi.equipmenttwin.application.GetOperationalTwinSnapshot;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.TwinMetrics;
+import com.forgesync.factoryapi.equipmenttwin.application.ReplayCursor;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinConsistencyState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ExecutionState;
@@ -84,6 +86,7 @@ class WebSocketTwinProjectionNotifierTest {
         "Mazak01",
         new TwinVersion(4),
         projectedAt,
+        new ReplayCursor(new java.util.UUID(0, 0), 0, projectedAt, projectedAt, new TwinVersion(4)),
         TwinConsistencyState.PARTIAL,
         List.of(
             "metrics.spindleSpeeds",
@@ -102,10 +105,8 @@ class WebSocketTwinProjectionNotifierTest {
         List.of(),
         List.of(),
         List.of(),
+        TwinMetrics.none(),
         List.of(),
-        Optional.empty(),
-        Optional.empty(),
-        Optional.empty(),
-        List.of());
+        Optional.empty());
   }
 }

@@ -18,6 +18,15 @@ const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
 afterEach(cleanup);
 
 describe("FactoryRoute", () => {
+  it("identifies the workspace as one operational Twin projected into 2D and spatial 3D", async () => {
+    renderFactory(async () => ({ default: HealthyScene }), createSession);
+
+    expect(screen.getByText("OPERATIONAL DIGITAL TWIN")).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Mazak01 운영 트윈" })).toBeTruthy();
+    expect(screen.getByText("같은 Twin State를 2D와 공간 3D에 동기화합니다.")).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "공간 투영" })).toBeTruthy();
+  });
+
   it("loads only the selected machining run path at the authoritative cursor", async () => {
     const processAnalysisClient: ProcessAnalysisClient = { analyze: vi.fn().mockResolvedValue({
       processingId: "runs", featureProcessingId: "features", assessmentProcessingId: "assessments",
@@ -193,13 +202,13 @@ describe("FactoryRoute", () => {
     expect(screen.getByText("3D visual · ACTIVE · animation off")).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "평면 보기" }));
-    expect(screen.queryByRole("heading", { name: "3D 공장" })).toBeNull();
+    expect(screen.queryByRole("heading", { name: "공간 투영" })).toBeNull();
     expect(screen.getByRole("heading", { name: "Mazak01" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "데이터 품질" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "데이터 출처" })).toBeTruthy();
 
     fireEvent.click(screen.getByRole("button", { name: "입체 보기" }));
-    expect(await screen.findByRole("heading", { name: "3D 공장" })).toBeTruthy();
+    expect(await screen.findByRole("heading", { name: "공간 투영" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Mazak01" })).toBeNull();
     expect(sessionFactory).toHaveBeenCalledTimes(1);
   });

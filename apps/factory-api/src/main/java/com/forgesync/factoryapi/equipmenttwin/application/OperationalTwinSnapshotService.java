@@ -5,7 +5,9 @@ import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapsho
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservationMetadata;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedAngle;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedEvent;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.ObservedSample;
 import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.SpindleSpeed;
+import com.forgesync.factoryapi.equipmenttwin.application.OperationalTwinSnapshot.TwinMetrics;
 import com.forgesync.factoryapi.equipmenttwin.domain.ConnectivityState;
 import com.forgesync.factoryapi.equipmenttwin.domain.ExecutionState;
 import com.forgesync.factoryapi.equipmenttwin.domain.FreshnessPolicy;
@@ -31,9 +33,16 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
   private static final String MILLIMETER = "MILLIMETER";
   private static final java.util.Map<String, String> AXIS_DATA_ITEMS =
       java.util.Map.of("X", "Mazak01-X_1", "Y", "Mazak01-Y_1", "Z", "Mazak01-Z_1");
+  private static final String LOAD = "LOAD";
+  private static final String TEMPERATURE = "TEMPERATURE";
+  private static final String PATH_FEEDRATE = "PATH_FEEDRATE";
+  private static final String MILLIMETER_PER_SECOND = "MILLIMETER/SECOND";
   private static final String EXECUTION = "EXECUTION";
   private static final String TOOL_NUMBER = "TOOL_NUMBER";
+  private static final String PART_COUNT = "PART_COUNT";
   private static final String PROGRAM = "PROGRAM";
+  private static final String CONTROLLER_MODE = "CONTROLLER_MODE";
+  private static final String POWER_STATE = "POWER_STATE";
 
   private final TwinProjectionReader projectionReader;
   private final FreshnessPolicy freshnessPolicy;
@@ -94,11 +103,18 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
         provenanceOfAvailable(observations),
         provenanceOf(observations, StateObservationKind.EVENT, EXECUTION),
         provenanceOfKind(observations, StateObservationKind.CONDITION),
-        spindleSpeeds,
-        axisPositions,
-        bAxisAngle,
-        toolNumber,
-        program,
+        new TwinMetrics(
+            spindleSpeeds,
+            axisPositions,
+            samples(observations, LOAD),
+            samples(observations, TEMPERATURE),
+            uniqueSample(observations, PATH_FEEDRATE, MILLIMETER_PER_SECOND),
+            bAxisAngle,
+            toolNumber,
+            uniqueEvent(observations, PART_COUNT),
+            program,
+            uniqueEvent(observations, CONTROLLER_MODE),
+            uniqueEvent(observations, POWER_STATE)),
         conditions(observations),
         spatialLayoutProvider.findByMachineId(projection.machineId()));
   }
@@ -130,6 +146,38 @@ public final class OperationalTwinSnapshotService implements GetOperationalTwinS
                 new SpindleSpeed(
                     item.availability(), item.numericValue(), item.unit(), metadata(item)))
         .toList();
+  }
+
+  private static List<ObservedSample> samples(
+      List<ProjectedTwinObservation> observations, String metric) {
+    return observations.stream()
+        .filter(item -> item.kind() == StateObservationKind.SAMPLE)
+        .filter(item -> item.semanticType().equals(metric))
+        .sorted(observationOrder())
+        .map(OperationalTwinSnapshotService::observedSample)
+        .toList();
+  }
+
+  private static Optional<ObservedSample> uniqueSample(
+      List<ProjectedTwinObservation> observations, String metric, String expectedUnit) {
+    List<ProjectedTwinObservation> matching =
+        observations.stream()
+            .filter(item -> item.kind() == StateObservationKind.SAMPLE)
+            .filter(item -> item.semanticType().equals(metric))
+            .sorted(observationOrder())
+            .toList();
+    if (matching.size() != 1 || !expectedUnit.equals(matching.getFirst().unit())) {
+      return Optional.empty();
+    }
+    return Optional.of(observedSample(matching.getFirst()));
+  }
+
+  private static ObservedSample observedSample(ProjectedTwinObservation observation) {
+    return new ObservedSample(
+        observation.availability(),
+        observation.numericValue(),
+        observation.unit(),
+        metadata(observation));
   }
 
   private static Optional<ObservedEvent> uniqueEvent(

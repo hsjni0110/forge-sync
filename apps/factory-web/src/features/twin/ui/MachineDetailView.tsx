@@ -1,7 +1,11 @@
-import type { ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 
 import type { TwinLiveState } from "../application/TwinLiveSession";
-import type { MachineDetailCondition, MachineDetailViewModel } from "../application/machineDetailViewModel";
+import type {
+  MachineDetailCondition,
+  MachineDetailMetric,
+  MachineDetailViewModel,
+} from "../application/machineDetailViewModel";
 import { mapTwinToMachineDetail } from "../application/machineDetailViewModel";
 import {
   deriveTwinPresentation,
@@ -11,6 +15,10 @@ import { TwinConnectionStatus } from "./TwinConnectionStatus";
 import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
 
 const NORMAL_LEVEL = "정상";
+/** Values an operator reads as "what is the machine doing right now", not as a raw channel. */
+const CURRENT_WORK_KEYS = ["program", "tool", "controller-mode", "power-state", "part-count"];
+const CHANNEL_READING_PREFIXES = ["spindle-", "axis-", "load-", "temp-"];
+const CHANNEL_READING_KEYS = ["b-axis", "feedrate"];
 const CONDITION_SEVERITY_ORDER = ["고장", "확인할 수 없음", "주의", NORMAL_LEVEL];
 
 interface MachineDetailViewProps {
@@ -105,7 +113,7 @@ export function MachineDetailView({
         <DetailSection title="지금 작업" wide>
           <div className="metric-grid">
             {detail.metrics
-              .filter((metric) => metric.key === "program" || metric.key === "tool")
+              .filter((metric) => CURRENT_WORK_KEYS.includes(metric.key))
               .map((metric) => (
                 <div className="metric-card" key={metric.key}>
                   <span>{metric.label}</span>
@@ -133,10 +141,7 @@ export function MachineDetailView({
           <p className="empty-state">채널별 원본 측정값입니다. 요약은 위 "지금 작업"을 참고하세요.</p>
           <div className="metric-grid">
             {detail.metrics
-              .filter((metric) =>
-                metric.key.startsWith("spindle-") ||
-                metric.key.startsWith("axis-") ||
-                metric.key === "b-axis")
+              .filter(isChannelReading)
               .map((metric) => (
               <div className="metric-card" key={metric.key}>
                 <span>{metric.label}</span>
@@ -352,6 +357,13 @@ function MachineDetailMessage({
   );
 }
 
+function isChannelReading(metric: MachineDetailMetric): boolean {
+  return (
+    CHANNEL_READING_PREFIXES.some((prefix) => metric.key.startsWith(prefix)) ||
+    CHANNEL_READING_KEYS.includes(metric.key)
+  );
+}
+
 function DetailSection({
   title,
   wide = false,
@@ -361,9 +373,13 @@ function DetailSection({
   wide?: boolean;
   children: ReactNode;
 }) {
+  const headingId = useId();
   return (
-    <section className={`detail-section${wide ? " detail-section-wide" : ""}`}>
-      <h2>{title}</h2>
+    <section
+      className={`detail-section${wide ? " detail-section-wide" : ""}`}
+      aria-labelledby={headingId}
+    >
+      <h2 id={headingId}>{title}</h2>
       {children}
     </section>
   );

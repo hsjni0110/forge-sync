@@ -7,10 +7,11 @@ GET /api/v1/machines/{machineId}/twin
 Accept: application/vnd.forgesync.twin.v1+json
 ```
 
-Version `1.5.0` is defined by
+Version `1.6.0` is defined by
 [`v1/twin-snapshot.schema.json`](./v1/twin-snapshot.schema.json). The schema keeps the PRD 27
 sections stable while the MVP populates machine identity, consistency, Replay Cursor, Equipment State, freshness,
-spindle speeds, X/Y/Z axis positions, tool, program, current Conditions, and field-level provenance. Unsupported business
+spindle speeds, X/Y/Z axis positions, component loads and temperatures, path feedrate, tool, part count, program,
+controller mode, power state, current Conditions, and field-level provenance. Unsupported business
 sections remain typed empty containers; they do not imply simulated or inferred facts.
 
 ## RPM and unavailable values
@@ -25,6 +26,22 @@ become zero or an empty string.
 and Z DataItems in `MILLIMETER`. Each axis retains its own observation time and provenance. These
 numbers are observed machine-coordinate values; the contract does not define physical travel limits,
 an absolute 3D pose, or a scene scale.
+
+## Observed channels beyond the P0 set
+
+`metrics.loads` and `metrics.temperatures` return every mapped `LOAD` and `TEMPERATURE` Sample
+ordered by `componentId` then `sourceDataItemId`. The source does not say which component is the
+primary one, nor which load belongs to an axis rather than a spindle, so the contract keeps the
+channels separate instead of classifying them. `metrics.pathFeedrate`, `metrics.partCount`,
+`metrics.controllerMode`, and `metrics.powerState` are single-component channels and stay absent
+when the current observations are ambiguous.
+
+Each channel is bound to the unit its catalog declares — `PERCENT`, `CELSIUS`, and
+`MILLIMETER/SECOND` — and a document carrying another unit on those channels is invalid rather than
+converted. These fields are optional and are not listed in `consistency.missingFields`: their
+absence is not a missing P0 value, so `CONSISTENT` keeps the meaning it had in `1.5.0`.
+`metrics.partCount` is telemetry, not a ProductionResult; `productionResult` stays an empty
+container. See [ADR-054](../../docs/adr/ADR-054-observed-metric-channel-disclosure.md).
 
 The required `replayCursor` is committed with the projection and its `twinVersion` must equal the
 snapshot consistency version. It keeps `sourceObservedAt` separate from `replayPublishedAt`.
