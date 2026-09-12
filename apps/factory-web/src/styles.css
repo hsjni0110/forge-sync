@@ -367,10 +367,27 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--fs-focus); outl
 .camera-button-grid button:hover { border-color: #77838a; background: #242e33; color: #eef1f2; }
 .inspection-part-select { display: grid; min-width: 12rem; gap: var(--fs-space-3xs); color: #8f9a9f; font-size: var(--fs-type-2xs); }
 .inspection-part-select select { min-height: 2.15rem; border: 1px solid #3a4449; border-radius: var(--fs-radius-sm); background: #1b2429; color: #d5dade; }
-.machine-inspection-panel details { color: #aab2b6; font-size: var(--fs-type-xs); }
+.machine-inspection-panel details { position: relative; color: #aab2b6; font-size: var(--fs-type-xs); }
 .machine-inspection-panel summary { min-height: 2.15rem; padding: var(--fs-space-xs) var(--fs-space-sm); border: 1px solid #3a4449; border-radius: var(--fs-radius-sm); background: #1b2429; cursor: pointer; list-style-position: inside; }
-.machine-inspection-panel details[open] { position: relative; }
-.machine-inspection-panel details[open] > :not(summary) { display: block; margin: var(--fs-space-xs) var(--fs-space-2xs) 0; }
+.machine-inspection-panel details[open] > summary { border-color: var(--fs-accent-strong); color: var(--fs-accent-text); background: var(--fs-accent-surface); }
+.inspection-popover {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + var(--fs-space-xs));
+  z-index: 4;
+  display: grid;
+  width: min(23rem, calc(100vw - var(--fs-space-xl)));
+  max-height: 13.5rem;
+  gap: var(--fs-space-xs);
+  padding: var(--fs-space-sm);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--fs-border-strong);
+  background: #0c1a21;
+  box-shadow: 0 0.75rem 2rem rgb(1 8 11 / 55%);
+}
+.inspection-popover label { display: flex; align-items: center; gap: var(--fs-space-xs); min-height: 1.75rem; }
+.inspection-options .inspection-popover { width: min(18rem, calc(100vw - var(--fs-space-xl))); }
 .inspection-capability-note { color: #929ca1; font-size: var(--fs-type-2xs); line-height: 1.35; }
 .floating-machine-label { position: absolute; top: var(--fs-space-md); left: var(--fs-space-md); z-index: 2; display: grid; min-width: 10rem; gap: var(--fs-space-3xs); padding: var(--fs-space-sm) var(--fs-space-sm); border: 1px solid #53717e; border-top: 2px solid var(--fs-accent-strong); border-radius: var(--fs-radius-md); background: rgb(7 18 23 / 94%); color: #dbe8ed; text-align: left; }
 .floating-machine-label span { color: var(--fs-text-muted); font-size: var(--fs-type-xs); }

@@ -309,6 +309,29 @@ describe("FactoryScene asset isolation", () => {
     expect(reducedMotionValues).toContain(true);
   });
 
+  it("opens inspection guidance in overlay panels without growing the camera control strip", async () => {
+    const { container } = render(
+      <FactoryScene
+        machineBinding={binding(proceduralAsset)}
+        visualState={visualState}
+        visualPresentation={visualPresentation}
+        isReducedMotion
+        onSelectMachine={vi.fn()}
+        onAssetFallback={vi.fn()}
+        onUnavailable={vi.fn()}
+      />,
+    );
+
+    await screen.findByLabelText("3D 조작 영역");
+
+    expect(
+      container.querySelector('.inspection-options > [role="group"][aria-label="보기 옵션 내용"]'),
+    ).toBeTruthy();
+    expect(
+      container.querySelector('.inspection-help > [role="group"][aria-label="조작법 내용"]'),
+    ).toBeTruthy();
+  });
+
   it("keeps the selection cue out of the status colour vocabulary", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
     const { container } = render(

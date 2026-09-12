@@ -252,6 +252,13 @@ function MachineInspectionControls({
     ["확대", "+", "ZOOM_IN"],
     ["전체 보기", "⌂", "RESET"],
   ];
+  const [openPanel, setOpenPanel] = useState<"OPTIONS" | "MODEL" | "HELP">();
+  const togglePanel = (
+    panel: "OPTIONS" | "MODEL" | "HELP",
+    isOpen: boolean,
+  ) => {
+    setOpenPanel((current) => isOpen ? panel : current === panel ? undefined : current);
+  };
   return (
     <aside className="machine-inspection-panel" aria-label="3D 카메라와 부품 검사">
       <div className="camera-button-grid" role="group" aria-label="3D 카메라 조작">
@@ -287,55 +294,73 @@ function MachineInspectionControls({
           ))}
         </select>
       </label>
-      <details className="inspection-options">
+      <details
+        className="inspection-options"
+        open={openPanel === "OPTIONS"}
+        onToggle={(event) => togglePanel("OPTIONS", event.currentTarget.open)}
+      >
         <summary>보기 옵션</summary>
-        <label>
-          <input
-            type="checkbox"
-            checked={isEnclosureTransparent}
-            disabled={!model?.inspection.enclosure}
-            onChange={toggleEnclosure}
-          />
-          외함 반투명
-        </label>
-        <label>
-          <input
-            type="checkbox"
-            checked={isToolpathVisible}
-            disabled={!observedToolpath}
-            onChange={toggleToolpath}
-          />
-          관측 경로
-        </label>
-        {!model?.inspection.enclosure && model && (
-          <span className="inspection-capability-note">이 모델은 외함 투명화를 지원하지 않습니다.</span>
-        )}
+        <div className="inspection-popover" role="group" aria-label="보기 옵션 내용">
+          <label>
+            <input
+              type="checkbox"
+              checked={isEnclosureTransparent}
+              disabled={!model?.inspection.enclosure}
+              onChange={toggleEnclosure}
+            />
+            외함 반투명
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              checked={isToolpathVisible}
+              disabled={!observedToolpath}
+              onChange={toggleToolpath}
+            />
+            관측 경로
+          </label>
+          {!model?.inspection.enclosure && model && (
+            <span className="inspection-capability-note">이 모델은 외함 투명화를 지원하지 않습니다.</span>
+          )}
+        </div>
       </details>
-      <details className="scene-model-info">
+      <details
+        className="scene-model-info"
+        open={openPanel === "MODEL"}
+        onToggle={(event) => togglePanel("MODEL", event.currentTarget.open)}
+      >
         <summary>모델 정보</summary>
-        <span>범용 수직형 CNC 표현</span>
-        <span>밝은 원판: RPM에 반응하는 스핀들 표시</span>
-        <span>위쪽 표시등: 현재 상태</span>
-        <span>바닥의 노란 원: 선택된 설비</span>
-        <span>대표 공작물: SIMULATED</span>
-        <span>공장 배치: SIMULATED_LAYOUT</span>
-        <span>{bAxisStatus}</span>
-        <span>C축 위치 · unavailable</span>
-        <span>{linearAxisStatus}</span>
-        <span>관측 변화 OBSERVED · 기준 자세·축척 SIMULATED</span>
-        <span>{toolStatus}</span>
-        {observedToolpath && <>
-          <span>{selectedRunLabel ?? "선택한 가공"}의 관측 위치 {observedToolpath.points.length}점을 연결한 경로</span>
-          <span>관측 범위 상자는 실제 절삭 흔적이나 기계 이동 한계가 아닙니다.</span>
-        </>}
-        {!observedToolpath && toolpathStatus && <span>{toolpathStatus}</span>}
+        <div className="inspection-popover" role="group" aria-label="모델 정보 내용">
+          <span>범용 수직형 CNC 표현</span>
+          <span>밝은 원판: RPM에 반응하는 스핀들 표시</span>
+          <span>위쪽 표시등: 현재 상태</span>
+          <span>바닥의 노란 원: 선택된 설비</span>
+          <span>대표 공작물: SIMULATED</span>
+          <span>공장 배치: SIMULATED_LAYOUT</span>
+          <span>{bAxisStatus}</span>
+          <span>C축 위치 · unavailable</span>
+          <span>{linearAxisStatus}</span>
+          <span>관측 변화 OBSERVED · 기준 자세·축척 SIMULATED</span>
+          <span>{toolStatus}</span>
+          {observedToolpath && <>
+            <span>{selectedRunLabel ?? "선택한 가공"}의 관측 위치 {observedToolpath.points.length}점을 연결한 경로</span>
+            <span>관측 범위 상자는 실제 절삭 흔적이나 기계 이동 한계가 아닙니다.</span>
+          </>}
+          {!observedToolpath && toolpathStatus && <span>{toolpathStatus}</span>}
+        </div>
       </details>
       <span className="visually-hidden" role="status">
         {selectedPartId && model ? `${model.inspection.parts[selectedPartId].label} 선택됨` : "선택한 부품 없음"}
       </span>
-      <details className="inspection-help">
+      <details
+        className="inspection-help"
+        open={openPanel === "HELP"}
+        onToggle={(event) => togglePanel("HELP", event.currentTarget.open)}
+      >
         <summary>조작법</summary>
-        <span>드래그 회전 · 휠 확대 · 방향키 회전 · +/- 확대 · Home 전체 보기 · Esc 선택 해제</span>
+        <div className="inspection-popover" role="group" aria-label="조작법 내용">
+          <span>드래그 회전 · 휠 확대 · 방향키 회전 · +/- 확대 · Home 전체 보기 · Esc 선택 해제</span>
+        </div>
       </details>
     </aside>
   );
