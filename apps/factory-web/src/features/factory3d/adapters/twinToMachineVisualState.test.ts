@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import twinFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-operational-twin.json";
 import type { TwinSnapshot } from "../../twin/domain/twin";
+import type { Alarm } from "../../alarm/domain/alarm";
+import alarmFixture from "../../../../../../tests/fixtures/alarm/v1/mazak01-alarm-timeline.json";
 import { mapTwinToMachineVisualState } from "./twinToMachineVisualState";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
@@ -107,5 +109,22 @@ describe("mapTwinToMachineVisualState", () => {
 
     expect(visualState.rpm).toBeUndefined();
     expect(visualState.rpmSourceDataItemId).toBe("Mazak01-C_5");
+  });
+
+  it("projects the highest active business Alarm severity and ignores resolved alarms", () => {
+    const warning = alarmFixture.alarms[0] as Alarm;
+    const critical = { ...warning, alarmId: "30000000-0000-4000-8000-000000000001",
+      severity: "CRITICAL" as const };
+    const resolved = { ...critical, severity: "CRITICAL" as const, status: "RESOLVED" as const };
+
+    const criticalState = mapTwinToMachineVisualState({ snapshot, freshness: "FRESH",
+      selectedMachineId: "Mazak01", visualSpindleSourceDataItemId: "Mazak01-C_5",
+      alarms: [warning, critical] });
+    const warningState = mapTwinToMachineVisualState({ snapshot, freshness: "FRESH",
+      selectedMachineId: "Mazak01", visualSpindleSourceDataItemId: "Mazak01-C_5",
+      alarms: [warning, resolved] });
+
+    expect(criticalState.alarmSeverity).toBe("CRITICAL");
+    expect(warningState.alarmSeverity).toBe("WARNING");
   });
 });

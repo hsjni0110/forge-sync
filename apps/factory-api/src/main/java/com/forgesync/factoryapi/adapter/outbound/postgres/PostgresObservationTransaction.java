@@ -1,8 +1,12 @@
 package com.forgesync.factoryapi.adapter.outbound.postgres;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.forgesync.factoryapi.alarm.application.AlarmObservationParticipant;
 import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ObservationTransaction;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
+import com.forgesync.factoryapi.dataquality.application.DataQualityObservationParticipant;
+import com.forgesync.factoryapi.dataquality.application.RuntimeObservationOutcome;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinProjectionNotifier;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrder;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
@@ -25,6 +29,9 @@ public final class PostgresObservationTransaction implements ObservationTransact
   private final ObservationOrderingPolicy observationOrderingPolicy;
   private final PostgresEquipmentStateProjection equipmentStateProjection;
   private final TwinProjectionNotifier twinProjectionNotifier;
+  private final AlarmObservationParticipant alarmObservationParticipant;
+  private final CanonicalConditionObservationMapper conditionObservationMapper;
+  private final DataQualityObservationParticipant dataQualityObservationParticipant;
 
   public PostgresObservationTransaction(
       JdbcClient jdbcClient,
@@ -36,7 +43,10 @@ public final class PostgresObservationTransaction implements ObservationTransact
         transactionManager,
         observationOrderingPolicy,
         equipmentStateProjection,
-        TwinProjectionNotifier.noOp());
+        TwinProjectionNotifier.noOp(),
+        AlarmObservationParticipant.noOp(),
+        DataQualityObservationParticipant.noOp(),
+        new ObjectMapper());
   }
 
   public PostgresObservationTransaction(
@@ -45,11 +55,35 @@ public final class PostgresObservationTransaction implements ObservationTransact
       ObservationOrderingPolicy observationOrderingPolicy,
       PostgresEquipmentStateProjection equipmentStateProjection,
       TwinProjectionNotifier twinProjectionNotifier) {
+    this(
+        jdbcClient,
+        transactionManager,
+        observationOrderingPolicy,
+        equipmentStateProjection,
+        twinProjectionNotifier,
+        AlarmObservationParticipant.noOp(),
+        DataQualityObservationParticipant.noOp(),
+        new ObjectMapper());
+  }
+
+  public PostgresObservationTransaction(
+      JdbcClient jdbcClient,
+      PlatformTransactionManager transactionManager,
+      ObservationOrderingPolicy observationOrderingPolicy,
+      PostgresEquipmentStateProjection equipmentStateProjection,
+      TwinProjectionNotifier twinProjectionNotifier,
+      AlarmObservationParticipant alarmObservationParticipant,
+      DataQualityObservationParticipant dataQualityObservationParticipant,
+      ObjectMapper objectMapper) {
     this.jdbcClient = Objects.requireNonNull(jdbcClient);
     this.transactionTemplate = new TransactionTemplate(Objects.requireNonNull(transactionManager));
     this.observationOrderingPolicy = Objects.requireNonNull(observationOrderingPolicy);
     this.equipmentStateProjection = Objects.requireNonNull(equipmentStateProjection);
     this.twinProjectionNotifier = Objects.requireNonNull(twinProjectionNotifier);
+    this.alarmObservationParticipant = Objects.requireNonNull(alarmObservationParticipant);
+    this.dataQualityObservationParticipant =
+        Objects.requireNonNull(dataQualityObservationParticipant);
+    this.conditionObservationMapper = new CanonicalConditionObservationMapper(objectMapper);
   }
 
   @Override
@@ -69,9 +103,13 @@ public final class PostgresObservationTransaction implements ObservationTransact
       ValidatedObservationMessage observation, Instant ingestedAt, Instant projectedAt) {
     int claimed = insertInbox(observation, ingestedAt);
     if (claimed == 0) {
+      dataQualityObservationParticipant.record(
+          observation, ingestedAt, RuntimeObservationOutcome.DUPLICATE);
       return IngestionResult.SKIPPED_DUPLICATE;
     }
     insertObservation(observation, ingestedAt);
+    dataQualityObservationParticipant.record(
+        observation, ingestedAt, RuntimeObservationOutcome.ACCEPTED);
     if (!isActiveReplaySession(observation)) {
       return IngestionResult.ACCEPTED_LATE;
     }
@@ -109,6 +147,9 @@ public final class PostgresObservationTransaction implements ObservationTransact
     updateMachineVersion(observation, nextVersion, projectedAt);
     upsertLatestObservation(observation, nextVersion, projectedAt);
     equipmentStateProjection.project(observation.machineId(), nextVersion, projectedAt);
+    conditionObservationMapper
+        .map(observation)
+        .ifPresent(condition -> alarmObservationParticipant.project(condition, projectedAt));
     return IngestionResult.ACCEPTED;
   }
 

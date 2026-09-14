@@ -12,12 +12,27 @@ import { FactoryRoute } from "./FactoryRoute";
 import type { FactorySceneProps } from "./factorySceneContract";
 import type { ProcessAnalysisClient } from "../../process-analytics/application/ports";
 import type { ObservedToolpathClient } from "../../toolpath/application/ports";
+import type { AlarmClient } from "../../alarm/application/ports";
+import type { AlarmTimeline } from "../../alarm/domain/alarm";
+import alarmFixture from "../../../../../../tests/fixtures/alarm/v1/mazak01-alarm-timeline.json";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
 
 afterEach(cleanup);
 
 describe("FactoryRoute", () => {
+  it("shows the same Condition-derived Alarm identity in 2D and the 3D projection", async () => {
+    const alarmClient: AlarmClient = {
+      find: vi.fn().mockResolvedValue(alarmFixture as AlarmTimeline),
+      acknowledge: vi.fn(),
+    };
+    render(<MemoryRouter><FactoryRoute sessionFactory={createSession} alarmClient={alarmClient}
+      sceneLoader={async () => ({ default: HealthyScene })} /></MemoryRouter>);
+
+    expect(await screen.findByText(alarmFixture.alarms[0].alarmId)).toBeTruthy();
+    expect(screen.getByText(`3D alarm · ${alarmFixture.alarms[0].alarmId} · WARNING`)).toBeTruthy();
+  });
+
   it("identifies the workspace as one operational Twin projected into 2D and spatial 3D", async () => {
     renderFactory(async () => ({ default: HealthyScene }), createSession);
 
@@ -211,6 +226,8 @@ describe("FactoryRoute", () => {
     expect(await screen.findByRole("heading", { name: "공간 투영" })).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "Mazak01" })).toBeNull();
     expect(sessionFactory).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("healthy-scene"));
+    expect(screen.getByRole("heading", { name: "Mazak01" })).toBeTruthy();
   });
 
   it("moves the 2D panel and 3D visual state to the same patched Twin version", async () => {
@@ -376,6 +393,7 @@ function HealthyScene({
         3D visual · {visualPresentation.status} · animation{" "}
         {visualPresentation.isSpindleAnimating ? "on" : "off"}
       </span>
+      {visualState?.activeAlarmId && <span>3D alarm · {visualState.activeAlarmId} · {visualState.alarmSeverity}</span>}
       {observedToolpath && <span>3D observed path · {observedToolpath.points.length} points · {selectedRunLabel}</span>}
       {functionalPresentation && <>
         <span>{functionalPresentation.currentRun}</span>

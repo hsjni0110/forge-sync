@@ -1,44 +1,62 @@
-# ForgeSync 개발 문서
+# ForgeSync 문서
 
-이 디렉터리는 [ForgeSync PRD v1.4](./ForgeSync_PRD_v1.4_Spatial_Digital_Twin.md)를 실제 구현과 검증으로 전환하기 위한 실행 문서 모음이다. PRD가 제품의 **무엇과 왜**를 정의한다면, 아래 문서는 **어떤 경계로, 어떤 순서로, 무엇을 테스트하며 만들 것인지**를 정의한다.
+ForgeSync는 제조 설비의 기록을 믿을 수 있는 운영 정보로 바꾸고, 같은 상태를 2D와 3D에서 함께 보여 주는
+디지털 트윈이다. 과거 상황을 다시 재생해 살펴볼 수 있으며, 모든 값이 어느 원본에서 왔는지 추적할 수
+있도록 만든다.
 
-## 문서 지도
+이 문서 모음에는 제품이 해결하려는 문제, 데이터가 화면에 도착하는 과정, 중요한 설계 판단과 실제 검증
+결과가 담겨 있다. 처음 읽는 사람이라면 아래 세 문서부터 보는 것을 권한다.
 
-| 문서 | 목적 |
+1. [구현 성과와 의미](./ForgeSync_구현_성과와_의미.md) — 현재 무엇을 할 수 있고 왜 의미가 있는지 쉽게 설명한다.
+2. [제품 요구사항](./ForgeSync_PRD_v1.4_Spatial_Digital_Twin.md) — 제품 범위와 주요 사용자 행동을 설명한다.
+3. [도메인 용어](./%EB%8F%84%EB%A9%94%EC%9D%B8%20%EC%9A%A9%EC%96%B4.md) — 문서와 코드에서 함께 쓰는 제조 용어를 정리한다.
+
+## ForgeSync가 중요하게 보는 것
+
+- 원본은 고치거나 덮어쓰지 않고 그대로 보존한다.
+- 실제 관찰, 계산한 값, 화면을 위한 모형을 분명히 구분한다.
+- 늦거나 중복된 데이터가 현재 설비 상태를 잘못 바꾸지 않게 한다.
+- 3D가 실패해도 2D 핵심 정보는 계속 사용할 수 있게 한다.
+- 생산 실적, OEE, 고장과 공구 마모처럼 근거가 없는 결과는 만들어 내지 않는다.
+- 제품에서 말하는 모든 주요 결과는 코드와 검증 근거로 다시 확인할 수 있게 한다.
+
+## 주제별 문서 안내
+
+### 제품과 데이터 이해
+
+| 문서 | 내용 |
 |---|---|
-| [도메인 용어](./%EB%8F%84%EB%A9%94%EC%9D%B8%20%EC%9A%A9%EC%96%B4.md) | 코드·API·문서·UI에서 함께 사용할 Ubiquitous Language와 금지된 혼용 |
-| [개발 Step](./development/implementation-steps.md) | 테스트 가능한 최소 작업 단위와 순서, 완료 조건 |
-| [엔지니어링 원칙](./architecture/engineering-principles.md) | Clean Architecture, DDD, 객체지향, 모듈 경계와 의존성 규칙 |
-| [Raw 데이터 파이프라인](./data/raw-to-canonical-pipeline.md) | 원본 보존부터 Canonical Observation, Twin Projection까지의 데이터 계약 |
-| [NIST Source Notice](./data/nist-source-notice.md) | 선택 원천, checksum, attribution과 사용 조건 |
-| [Mazak01 Source Profile](./data/profiles/nist-mazak01-20161005/profile.md) | 실제 일별 raw와 Devices.xml에서 생성한 human-readable profile |
-| [테스트 전략](./testing/test-strategy.md) | 계층별 테스트 범위, 품질 게이트, 실패 시나리오 |
-| [코딩 및 리뷰 가이드](./development/coding-and-review-guide.md) | 메서드 분리, 네이밍, 복잡도 관리, 에이전트 리뷰/수정 절차 |
-| [ADR-020 Raw Source Preservation](./adr/ADR-020-raw-source-preservation.md) | 원천 데이터를 변환 전에 불변 보존하기로 한 결정 |
-| [Verification Ledger](./verification-ledger.md) | 주장, 근거, 검증 상태 추적 |
+| [구현 성과와 의미](./ForgeSync_구현_성과와_의미.md) | 사업·기술·데이터 분석 관점에서 현재 결과와 시행착오를 설명한다. |
+| [제품 요구사항](./ForgeSync_PRD_v1.4_Spatial_Digital_Twin.md) | 제품 목표, 사용자 행동과 MVP 범위를 정의한다. |
+| [도메인 용어](./%EB%8F%84%EB%A9%94%EC%9D%B8%20%EC%9A%A9%EC%96%B4.md) | 같은 개념을 같은 말로 사용하기 위한 기준이다. |
+| [원본에서 공통 관찰까지](./data/raw-to-canonical-pipeline.md) | 원본 보존, 문법 해석과 의미 변환 과정을 설명한다. |
+| [Mazak01 원천 설명](./data/profiles/nist-mazak01-20161005/profile.md) | 사용한 설비 기록의 범위와 데이터 항목을 보여 준다. |
+| [NIST 데이터 출처](./data/nist-source-notice.md) | 원본 위치, 체크섬, 출처와 사용 조건을 기록한다. |
 
-## 우선순위와 충돌 해결
+### 설계와 구현
 
-1. 안전, 데이터 진실성, 출처 보존 규칙을 최우선으로 한다.
-2. 제품 범위와 사용자 행동은 PRD를 따른다.
-3. 구현 구조는 아키텍처 문서와 ADR을 따른다.
-4. 작업 순서와 완료 기준은 개발 Step 문서를 따른다.
-5. 충돌이나 새로운 중대한 결정은 임의로 숨기지 않고 ADR과 Verification Ledger에 남긴다.
+| 문서 | 내용 |
+|---|---|
+| [엔지니어링 원칙](./architecture/engineering-principles.md) | 기능 경계, 의존 방향과 데이터 진실성 원칙을 설명한다. |
+| [설계 결정 기록](./adr/) | 데이터 의미나 구조에 영향을 준 중요한 결정과 이유를 보관한다. |
+| [코딩과 리뷰 안내](./development/coding-and-review-guide.md) | 이름, 책임 분리와 리뷰 기준을 정리한다. |
 
-`Step 01` 같은 Step 번호는 roadmap 문서에서 진행 순서를 표현하는 관리용 표기다. 코드, 설정, 데이터 계약, CLI, 파일 경로, runtime identity에는 사용하지 않는다. 구현 이름은 도메인 의미, 원천 identity, 관찰 기간과 version을 기준으로 한다.
+### 검증과 신뢰
 
-## 모든 Step에 적용되는 공통 완료 조건
+| 문서 | 내용 |
+|---|---|
+| [검증 장부](./verification-ledger.md) | 제품과 데이터에 관한 주장, 근거와 현재 확인 상태를 추적한다. |
+| [테스트 전략](./testing/test-strategy.md) | 단위, 계약, 데이터베이스와 브라우저 검증 범위를 설명한다. |
+| [의미 변환 보고서](./data/mappings/nist-mazak01-observation-v2/mapping-report.md) | 실제 원본 중 무엇을 변환했고 무엇이 남았는지 보여 준다. |
+| [재생 계획 보고서](./data/replay/nist-mazak01-20161005-observation-v2/replay-plan.md) | 같은 과거를 같은 순서로 재현하는 근거를 기록한다. |
 
-- 먼저 실패하는 테스트 또는 명시적인 검증 시나리오로 기대 동작을 고정한다.
-- 정상 경로뿐 아니라 최소 1개의 경계값 또는 실패 경로를 테스트한다.
-- 도메인 규칙은 UI, Controller, Framework Callback이 아니라 도메인 계층에 존재한다.
-- 외부 시스템과 프레임워크는 Port/Adapter 뒤에 둔다.
-- provenance, source time, ordering 정보를 변환 과정에서 유실하지 않는다.
-- 관련 단위 테스트와 통합/계약 테스트가 통과한다.
-- 사용자에게 보이는 동작은 인수 조건 또는 E2E 테스트로 연결한다.
-- 새로 확인한 외부 사실이나 성능 수치는 Verification Ledger에 근거와 함께 반영한다.
-- 문서와 코드가 다르면 Step 완료로 보지 않는다.
+## 코드에서 살펴볼 곳
 
-## 구현 시작점
+- [원천 수집·변환·재생](../apps/edge-gateway/src/forgesync_edge/)
+- [설비 상태·분석·알람 API](../apps/factory-api/src/main/java/com/forgesync/factoryapi/)
+- [2D·3D 운영 화면](../apps/factory-web/src/features/)
+- [서비스 사이의 공통 데이터 계약](../contracts/)
+- [브라우저 전체 흐름 검증](../apps/factory-web/tests/e2e/)
 
-첫 구현은 저장소 골격만 만드는 작업이 아니다. [Step 01](./development/implementation-steps.md#step-01--원천-데이터-불변-보존과-human-readable-profile)은 선택한 NIST 원천 데이터를 가져와 원본 그대로 보존하고, 해시와 출처를 기록한 뒤, 별도 파생물로 사람이 읽을 수 있는 프로파일을 생성하는 작은 end-to-end data discovery slice다.
+문서와 코드가 다르면 어느 한쪽을 추측으로 맞추지 않는다. 데이터 뜻, 출처, 공개 계약이나 신뢰성에 관한
+차이는 새로운 설계 판단으로 기록하고 검증한 뒤 반영한다.

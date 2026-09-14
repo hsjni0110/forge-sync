@@ -97,7 +97,7 @@ test("replay, REST resync, and 3D failure keep the accessible detail authoritati
   }
 
   await page.goto("/factory");
-  await expect(page.getByRole("heading", { name: "Factory Scene" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "공간 투영" })).toBeVisible();
   await expect(page.getByRole("button", { name: "평면과 입체 함께 보기" })).toHaveAttribute(
     "aria-pressed",
     "true",

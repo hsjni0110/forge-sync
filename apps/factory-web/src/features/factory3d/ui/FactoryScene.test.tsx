@@ -399,7 +399,10 @@ describe("FactoryScene asset isolation", () => {
 
   it("renders textual warning and stale cues without relying on color", async () => {
     vi.spyOn(console, "error").mockImplementation(() => undefined);
-    const warningState = { ...visualState, health: "WARNING" as const };
+    const warningState = { ...visualState, health: "WARNING" as const,
+      alarmSeverity: "WARNING" as const,
+      activeAlarmId: "20000000-0000-4000-8000-000000000001",
+      activeAlarmMessage: "ERROR(DOOR OPEN)" };
     const { container, rerender } = render(
       <FactoryScene
         machineBinding={binding(proceduralAsset)}
@@ -412,8 +415,10 @@ describe("FactoryScene asset isolation", () => {
     );
 
     expect(
-      await screen.findByRole("button", { name: /Mazak01 Twin v4 주의 49 RPM/ }),
+      await screen.findByRole("button", { name: /Mazak01 Twin v4 주의 알람.*DOOR OPEN.*49 RPM/ }),
     ).toBeTruthy();
+    expect(container.querySelector("[data-alarm-id='20000000-0000-4000-8000-000000000001']"))
+      .toBeTruthy();
 
     const staleState = {
       ...warningState,

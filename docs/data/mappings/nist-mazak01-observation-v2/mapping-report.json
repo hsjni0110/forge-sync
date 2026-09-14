@@ -10,8 +10,8 @@
     "Per-axis feedrate DataItems are deferred: no roadmap consumer reads them yet, and the project maps a signal when a consumer exists rather than earlier.",
     "C-axis DataItems stay deferred because the roadmap excludes that axis until its coordinate evidence is confirmed."
   ],
-  "mapperVersion": "2.2.0",
-  "mappingVersion": "2.2.0",
+  "mapperVersion": "2.3.1",
+  "mappingVersion": "2.3.0",
   "mappings": [
     {
       "category": "SAMPLE",
@@ -602,6 +602,20 @@
       "unit": null
     },
     {
+      "category": "EVENT",
+      "componentId": "Mazak01-path",
+      "dataItemId": "Mazak01-path_2",
+      "derivedUnit": null,
+      "invalidValueRecords": 0,
+      "mappedRecords": 49,
+      "name": "subprogram",
+      "subType": "x:SUB",
+      "target": "SUBPROGRAM",
+      "type": "PROGRAM",
+      "unavailableRecords": 49,
+      "unit": null
+    },
+    {
       "category": "CONDITION",
       "componentId": "Mazak01-path",
       "dataItemId": "Mazak01-path_20",
@@ -729,28 +743,28 @@
     }
   ],
   "parserVersion": "1.0.0",
-  "processingRunId": "sha256:0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4",
+  "processingRunId": "sha256:839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c",
   "records": {
     "byStatus": {
-      "MAPPED": 101644,
+      "MAPPED": 101693,
       "UNKNOWN_DATA_ITEM": 22,
-      "UNSUPPORTED_DATA_ITEM": 14325
+      "UNSUPPORTED_DATA_ITEM": 14276
     },
-    "mapped": 101644,
+    "mapped": 101693,
     "syntacticallyParsed": 115991,
     "total": 115991
   },
   "reportSchemaVersion": "2.1.0",
   "semanticCoverage": {
     "definition": "mapped records / syntactically parsed records",
-    "mappedRecords": 101644,
+    "mappedRecords": 101693,
     "parsedRecords": 115991,
-    "ratio": 0.8763093688303403
+    "ratio": 0.8767318153994706
   },
   "source": {
     "devicesArtifactId": "sha256:bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
     "machineId": "Mazak01",
-    "mappingTableSha256": "1e6d2d2381218303230bbecc404430e59acf271e4621bd2e65adc20309cc109c",
+    "mappingTableSha256": "70d61111887fa84021375d4a80bf3924548aecb192f0d31f719e90efac8966b7",
     "rawArtifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
     "sourceSetId": "nist-mazak01-20161005"
   },
@@ -986,17 +1000,6 @@
       "recordCount": 49,
       "subType": "x:SUB",
       "type": "x:PROGRAM_COMMENT",
-      "unit": null
-    },
-    {
-      "category": "EVENT",
-      "componentId": "Mazak01-path",
-      "dataItemId": "Mazak01-path_2",
-      "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3610-3660",
-      "name": "subprogram",
-      "recordCount": 49,
-      "subType": "x:SUB",
-      "type": "PROGRAM",
       "unit": null
     },
     {

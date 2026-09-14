@@ -90,6 +90,12 @@ function classifyVisualStatus(
   if (visualState.connectivity === "OFFLINE") {
     return "OFFLINE";
   }
+  if (visualState.alarmSeverity === "CRITICAL") {
+    return "FAULT";
+  }
+  if (visualState.alarmSeverity === "WARNING") {
+    return "WARNING";
+  }
   if (visualState.health === "FAULT") {
     return "FAULT";
   }

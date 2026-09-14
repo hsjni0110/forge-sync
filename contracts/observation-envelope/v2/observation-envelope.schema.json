@@ -412,6 +412,7 @@
             "CONTROLLER_MODE",
             "TOOL_NUMBER",
             "PROGRAM",
+            "SUBPROGRAM",
             "PART_COUNT",
             "AVAILABILITY",
             "POWER_STATE",

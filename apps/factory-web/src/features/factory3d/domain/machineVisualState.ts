@@ -23,7 +23,9 @@ export interface MachineVisualState {
   toolSourceDataItemId?: string;
   toolSourceObservedAt?: string;
   operationProgress?: number;
-  alarmSeverity?: "WARNING" | "FAULT";
+  alarmSeverity?: "WARNING" | "CRITICAL";
+  activeAlarmId?: string;
+  activeAlarmMessage?: string;
   stale: boolean;
   selected: boolean;
   isReplayAdvancing?: boolean;

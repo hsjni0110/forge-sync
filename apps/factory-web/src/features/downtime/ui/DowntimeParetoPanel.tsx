@@ -69,7 +69,9 @@ export function DowntimeParetoPanel({
 
 function evidenceLabel(evidence: DowntimeEvidence): string {
   if (evidence.kind === "ESTOP_OVERLAP") return "비상정지 관측";
-  if (evidence.kind === "MODE_CHANGE") return `운전 모드 변경 · ${evidence.value}`;
+  if (evidence.kind === "MODE_CHANGE") {
+    return `운전 모드 변경 · ${evidence.value === "UNKNOWN" ? "값 확인 불가" : evidence.value}`;
+  }
   const detail = evidence.message ?? evidence.nativeCode ?? evidence.conditionType;
   return `상태 경고${detail ? ` · ${detail}` : ""}`;
 }

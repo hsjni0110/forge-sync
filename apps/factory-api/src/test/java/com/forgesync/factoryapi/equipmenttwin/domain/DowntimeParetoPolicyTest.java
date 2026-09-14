@@ -75,6 +75,31 @@ class DowntimeParetoPolicyTest {
     assertThat(entry.evidence()).extracting(DowntimeEvidence::message).containsExactly("AT_START");
   }
 
+  @Test
+  void preservesAModeChangeWithoutAValueAsExplicitUnknownEvidence() {
+    EquipmentStateInterval stopped = interval(StateSignal.EXECUTION, "STOPPED", 0, 100, 10);
+    EquipmentStateInterval knownMode =
+        interval(StateSignal.CONTROLLER_MODE, "AUTOMATIC", -10, 30, 20);
+    EquipmentStateInterval unknownMode = interval(StateSignal.CONTROLLER_MODE, null, 30, 90, 21);
+
+    DowntimeParetoReport report =
+        new DowntimeParetoPolicy()
+            .rank(
+                "sha256:" + "b".repeat(64),
+                "sha256:" + "d".repeat(64),
+                report(List.of(stopped, knownMode, unknownMode)),
+                List.of());
+
+    assertThat(report.ruleVersion()).isEqualTo("1.1.0");
+    assertThat(report.entries().getFirst().evidence())
+        .singleElement()
+        .satisfies(
+            evidence -> {
+              assertThat(evidence.kind()).isEqualTo(DowntimeEvidenceKind.MODE_CHANGE);
+              assertThat(evidence.value()).isEqualTo("UNKNOWN");
+            });
+  }
+
   private static EquipmentStateIntervalReport report(List<EquipmentStateInterval> intervals) {
     return new EquipmentStateIntervalReport(
         "1.0.0",

@@ -1,5 +1,6 @@
 import { effectiveConnectivity } from "../../twin/domain/freshness";
 import type { Freshness, TwinSnapshot } from "../../twin/domain/twin";
+import type { Alarm } from "../../alarm/domain/alarm";
 import type { MachineVisualState } from "../domain/machineVisualState";
 
 export function mapTwinToMachineVisualState({
@@ -7,11 +8,13 @@ export function mapTwinToMachineVisualState({
   freshness,
   selectedMachineId,
   visualSpindleSourceDataItemId,
+  alarms,
 }: {
   snapshot: TwinSnapshot;
   freshness: Freshness;
   selectedMachineId: string | undefined;
   visualSpindleSourceDataItemId: string;
+  alarms?: Alarm[];
 }): MachineVisualState {
   const spindle = snapshot.metrics.spindleSpeeds.find(
     ({ provenance }) =>
@@ -45,6 +48,16 @@ export function mapTwinToMachineVisualState({
     toolNumber?.availability === "AVAILABLE" && toolNumber.value !== undefined
       ? String(toolNumber.value)
       : undefined;
+  const activeAlarmSeverities = (alarms ?? [])
+    .filter((alarm) => alarm.machineId === snapshot.machine.machineId && alarm.status !== "RESOLVED")
+    .map(({ severity }) => severity);
+  const alarmSeverity = activeAlarmSeverities.includes("CRITICAL")
+    ? "CRITICAL" as const
+    : activeAlarmSeverities.includes("WARNING") ? "WARNING" as const : undefined;
+  const activeAlarm = (alarms ?? []).find((alarm) =>
+    alarm.machineId === snapshot.machine.machineId
+    && alarm.status !== "RESOLVED"
+    && alarm.severity === alarmSeverity);
 
   return {
     machineId: snapshot.machine.machineId,
@@ -74,7 +87,9 @@ export function mapTwinToMachineVisualState({
     toolSourceObservedAt: tool === undefined
       ? undefined : toolNumber?.observation.sourceObservedAt,
     operationProgress: undefined,
-    alarmSeverity: undefined,
+    alarmSeverity,
+    activeAlarmId: activeAlarm?.alarmId,
+    activeAlarmMessage: activeAlarm?.message ?? undefined,
     stale: freshness === "STALE",
     selected: selectedMachineId === snapshot.machine.machineId,
     spatial: snapshot.spatial ? {

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "machineId": "Mazak01",
+  "replaySessionId": "10000000-0000-4000-8000-000000000001",
+  "throughReplaySequence": 42,
+  "alarms": [
+    {
+      "alarmId": "20000000-0000-4000-8000-000000000001",
+      "machineId": "Mazak01",
+      "replaySessionId": "10000000-0000-4000-8000-000000000001",
+      "openedReplaySequence": 42,
+      "openedAt": "2016-10-05T09:01:00Z",
+      "sourceDataItemId": "Mazak01-controller_2",
+      "componentId": "Mazak01-controller",
+      "conditionType": "LOGIC_PROGRAM",
+      "nativeCode": "345",
+      "message": "ERROR(DOOR OPEN)",
+      "severity": "WARNING",
+      "status": "OPEN",
+      "ruleVersion": "1.0.0",
+      "revision": 0,
+      "acknowledgedBy": null,
+      "acknowledgedAt": null,
+      "resolvedReplaySequence": null,
+      "resolvedAt": null,
+      "source": "EQUIPMENT_CONDITION"
+    }
+  ]
+}

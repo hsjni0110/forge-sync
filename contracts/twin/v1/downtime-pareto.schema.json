@@ -17,7 +17,7 @@
     "machineId": { "type": "string", "minLength": 1 },
     "replaySessionId": { "type": "string", "format": "uuid" },
     "throughReplaySequence": { "type": "integer", "minimum": 0 },
-    "ruleVersion": { "const": "1.0.0" },
+    "ruleVersion": { "enum": ["1.0.0", "1.1.0"] },
     "utilizationProcessingRunId": { "$ref": "#/$defs/sha256" },
     "intervalProcessingRunId": { "$ref": "#/$defs/sha256" },
     "observedFrom": { "$ref": "#/$defs/instant" },

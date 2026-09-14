@@ -33,6 +33,17 @@ class ProcessAnalysisCorsTest {
         .isEqualTo(403);
   }
 
+  @Test
+  void allowsAlarmAcknowledgementPreflightOnlyFromConfiguredOrigin() throws Exception {
+    String path = "/api/v1/alarms/042f81cb-b48d-3a10-b44d-e5c1836c1758/acknowledge";
+
+    var allowed = preflight(path, "http://localhost:5173");
+
+    assertThat(allowed.getStatus()).isEqualTo(200);
+    assertThat(allowed.getHeader("Access-Control-Allow-Origin")).isEqualTo("http://localhost:5173");
+    assertThat(preflight(path, "https://untrusted.example").getStatus()).isEqualTo(403);
+  }
+
   private MockHttpServletResponse preflight(String path, String origin) throws Exception {
     var registry = new TestCorsRegistry();
     new TwinWebSocketConfiguration(List.of("http://localhost:5173")).addCorsMappings(registry);

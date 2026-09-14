@@ -11,6 +11,8 @@ import type { TwinSessionFactory } from "../application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { AssessmentDocument } from "../../process-analytics/adapters/processDocuments";
 import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
+import type { ObservedProductionContext } from "../../production/domain/observedProductionContext";
+import type { ToolLoadTrendReport } from "../../tool-load-trend/domain/toolLoadTrend";
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 
@@ -50,7 +52,9 @@ function showProcess(document: typeof runFixture, mismatch: boolean | "recover" 
       features.machiningRunProcessingRunId = document.processingRunId;
     }
     return new Response(JSON.stringify(url.includes("cycle-features") ? features :
-      url.includes("anomaly-assessments") ? assessments : document));
+      url.includes("anomaly-assessments") ? assessments :
+      url.includes("tool-load-trends") ? toolLoadTrend(document) :
+      url.includes("production-context") ? productionContext(document) : document));
   });
   vi.stubGlobal("fetch", fetch);
   const replayControlClient: ReplayControlClient = {
@@ -138,6 +142,8 @@ describe("Machine Detail process analysis", () => {
       "/api/v1/machines/Mazak01/machining-runs/processing-runs",
       "/api/v1/machines/Mazak01/cycle-features/processing-runs",
       "/api/v1/machines/Mazak01/anomaly-assessments/processing-runs",
+      expect.stringContaining("/api/v1/machines/Mazak01/production-context?"),
+      expect.stringContaining("/api/v1/machines/Mazak01/tool-load-trends?"),
     ]);
   });
 
@@ -159,7 +165,7 @@ describe("Machine Detail process analysis", () => {
     fireEvent.click(await screen.findByRole("button", { name: /가공 선택 · 155/ }));
     fireEvent.click(screen.getByRole("button", { name: "분석 다시 계산" }));
     expect(screen.queryByRole("region", { name: "PROCESS · 공정 특징" })).toBeNull();
-    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(6));
+    await waitFor(() => expect(fetch).toHaveBeenCalledTimes(10));
     expect(await screen.findByText(/목록에서 가공을 선택/)).toBeTruthy();
   });
 
@@ -232,3 +238,34 @@ describe("Machine Detail process analysis", () => {
     expect(screen.getByText(/지금 \d{2}:\d{2}/)).toBeTruthy();
   });
 });
+
+function productionContext(document: typeof runFixture): ObservedProductionContext {
+  return {
+    schemaVersion: "1.0.0", ruleVersion: "1.0.0", machineId: "Mazak01",
+    replaySessionId: document.replaySessionId,
+    throughReplaySequence: document.throughReplaySequence,
+    machiningRunProcessingRunId: document.processingRunId,
+    programIntervals: [],
+    programSummaries: [],
+    unassignedRunCount: 0,
+    partCount: { status: "UNAVAILABLE", usedTransitionCount: 0, resetCount: 0,
+      unavailableObservationCount: 0, reason: "NO_USABLE_TRANSITIONS", associations: [] },
+    productionResultStatus: "NOT_OBSERVED",
+  };
+}
+
+function toolLoadTrend(document: typeof runFixture): ToolLoadTrendReport {
+  return {
+    schemaVersion: "1.0.0", policyVersion: "1.0.0", machineId: "Mazak01",
+    replaySessionId: document.replaySessionId,
+    throughReplaySequence: document.throughReplaySequence,
+    machiningRunProcessingRunId: document.processingRunId,
+    policy: { minimumRawSamplesPerPoint: 3, minimumTrendPoints: 5,
+      baselinePointCount: 3, minimumCoverageRatio: 0.8,
+      pointFormula: "median", coverageFormula: "eligible observed points / observed candidate points",
+      deviationFormula: "relative difference", slopeFormula: "OLS" },
+    provenance: { origin: "DERIVED", sourceKind: "REAL", provider: "NIST",
+      sourceSetId: "nist-mazak01-20161005" },
+    groups: [],
+  };
+}

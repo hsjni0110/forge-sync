@@ -1,0 +1,168 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.dev/contracts/data-quality/v1/data-quality-report.schema.json",
+  "title": "ForgeSync Data Quality Report v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "machineId", "sourceSetId", "replaySessionId", "throughReplaySequence", "evaluatedAt", "overallGrade", "dimensions", "runtime", "derivedProcess", "unmappedDataItems", "evidence"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "sourceSetId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": ["string", "null"], "format": "uuid" },
+    "throughReplaySequence": { "type": ["integer", "null"], "minimum": 0 },
+    "evaluatedAt": { "type": "string", "format": "date-time" },
+    "overallGrade": { "type": "null" },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["validity", "completeness", "ordering", "duplication", "freshness", "semanticCoverage"],
+      "properties": {
+        "validity": { "$ref": "#/$defs/layeredDimension" },
+        "completeness": { "$ref": "#/$defs/measurement" },
+        "ordering": { "$ref": "#/$defs/layeredDimension" },
+        "duplication": { "$ref": "#/$defs/layeredDimension" },
+        "freshness": { "$ref": "#/$defs/freshness" },
+        "semanticCoverage": { "$ref": "#/$defs/semanticCoverage" }
+      }
+    },
+    "runtime": { "$ref": "#/$defs/runtime" },
+    "derivedProcess": { "$ref": "#/$defs/derivedProcess" },
+    "unmappedDataItems": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/unmappedItem" }
+    },
+    "evidence": { "$ref": "#/$defs/evidence" }
+  },
+  "$defs": {
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "numerator", "denominator", "ratio", "grade", "basis", "reason"],
+      "properties": {
+        "status": { "enum": ["MEASURED", "NOT_EVALUATED"] },
+        "numerator": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 0 },
+        "ratio": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+        "grade": { "type": "null" },
+        "basis": { "type": "string", "minLength": 1 },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "layeredDimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceProfile", "runtime"],
+      "properties": {
+        "sourceProfile": { "$ref": "#/$defs/measurement" },
+        "runtime": { "$ref": "#/$defs/measurement" }
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "value", "ageMillis", "freshMaxAgeMillis", "laggingMaxAgeMillis", "basis", "reason"],
+      "properties": {
+        "status": { "enum": ["MEASURED", "NOT_EVALUATED"] },
+        "value": { "type": ["string", "null"], "enum": ["FRESH", "LAGGING", "STALE", null] },
+        "ageMillis": { "type": ["integer", "null"], "minimum": 0 },
+        "freshMaxAgeMillis": { "type": ["integer", "null"], "minimum": 0 },
+        "laggingMaxAgeMillis": { "type": ["integer", "null"], "minimum": 0 },
+        "basis": { "const": "PROJECTED_AT_WALL_CLOCK" },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "semanticCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "numerator", "denominator", "ratio", "grade", "basis", "reason", "mappingVersion", "processingRunId"],
+      "properties": {
+        "status": { "const": "MEASURED" },
+        "numerator": { "type": "integer", "minimum": 0 },
+        "denominator": { "type": "integer", "minimum": 0 },
+        "ratio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "grade": { "type": "null" },
+        "basis": { "type": "string", "minLength": 1 },
+        "reason": { "type": "null" },
+        "mappingVersion": { "type": "string", "minLength": 1 },
+        "processingRunId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "receivedCount", "acceptedCount", "duplicateCount", "outOfOrderCount", "firstIngestedAt", "lastIngestedAt", "scope"],
+      "properties": {
+        "status": { "enum": ["MEASURED", "NOT_EVALUATED"] },
+        "receivedCount": { "type": "integer", "minimum": 0 },
+        "acceptedCount": { "type": "integer", "minimum": 0 },
+        "duplicateCount": { "type": "integer", "minimum": 0 },
+        "outOfOrderCount": { "type": "integer", "minimum": 0 },
+        "firstIngestedAt": { "type": ["string", "null"], "format": "date-time" },
+        "lastIngestedAt": { "type": ["string", "null"], "format": "date-time" },
+        "scope": { "const": "REPLAY_SESSION_THROUGH_SEQUENCE" }
+      }
+    },
+    "derivedProcess": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["segmentation", "featureCoverage"],
+      "properties": {
+        "segmentation": { "$ref": "#/$defs/derivedMeasurement" },
+        "featureCoverage": { "$ref": "#/$defs/featureCoverage" }
+      }
+    },
+    "derivedMeasurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "processingRunId", "inputObservationCount", "resultCount", "reason"],
+      "properties": {
+        "status": { "enum": ["MEASURED", "NOT_EVALUATED"] },
+        "processingRunId": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+        "inputObservationCount": { "type": "integer", "minimum": 0 },
+        "resultCount": { "type": "integer", "minimum": 0 },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "featureCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "processingRunId", "eligibleRunCount", "availableCount", "partialCount", "missingCount", "emptyWindowCount", "reason"],
+      "properties": {
+        "status": { "enum": ["MEASURED", "NOT_EVALUATED"] },
+        "processingRunId": { "type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$" },
+        "eligibleRunCount": { "type": "integer", "minimum": 0 },
+        "availableCount": { "type": "integer", "minimum": 0 },
+        "partialCount": { "type": "integer", "minimum": 0 },
+        "missingCount": { "type": "integer", "minimum": 0 },
+        "emptyWindowCount": { "type": "integer", "minimum": 0 },
+        "reason": { "type": ["string", "null"] }
+      }
+    },
+    "unmappedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "dataItemId", "name", "recordCount", "firstRawRecordId", "evidenceHref"],
+      "properties": {
+        "classification": { "enum": ["UNKNOWN", "AMBIGUOUS", "UNSUPPORTED"] },
+        "dataItemId": { "type": ["string", "null"] },
+        "name": { "type": "string", "minLength": 1 },
+        "recordCount": { "type": "integer", "minimum": 1 },
+        "firstRawRecordId": { "type": "string", "minLength": 1 },
+        "evidenceHref": { "type": "string", "pattern": "^https://" }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sourceProfileProcessingRunId", "semanticMappingProcessingRunId", "rawArtifactId", "mappingVersion", "sourceHref"],
+      "properties": {
+        "sourceProfileProcessingRunId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "semanticMappingProcessingRunId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "rawArtifactId": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "mappingVersion": { "type": "string", "minLength": 1 },
+        "sourceHref": { "type": "string", "pattern": "^https://" }
+      }
+    }
+  }
+}

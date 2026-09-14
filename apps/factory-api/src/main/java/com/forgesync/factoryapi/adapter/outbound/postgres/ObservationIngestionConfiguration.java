@@ -1,9 +1,12 @@
 package com.forgesync.factoryapi.adapter.outbound.postgres;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.forgesync.factoryapi.alarm.adapter.outbound.postgres.PostgresAlarmProjection;
+import com.forgesync.factoryapi.alarm.domain.ConditionToAlarmPolicy;
 import com.forgesync.factoryapi.application.IngestObservation;
 import com.forgesync.factoryapi.application.ObservationIngress;
 import com.forgesync.factoryapi.application.ObservationTransaction;
+import com.forgesync.factoryapi.dataquality.adapter.outbound.postgres.PostgresRuntimeDataQualityProjection;
 import com.forgesync.factoryapi.equipmenttwin.application.TwinProjectionNotifier;
 import com.forgesync.factoryapi.equipmenttwin.domain.EquipmentStateProjectionPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.ObservationOrderingPolicy;
@@ -37,7 +40,10 @@ public class ObservationIngestionConfiguration {
         transactionManager,
         observationOrderingPolicy,
         equipmentStateProjection,
-        twinProjectionNotifier.getIfAvailable(TwinProjectionNotifier::noOp));
+        twinProjectionNotifier.getIfAvailable(TwinProjectionNotifier::noOp),
+        new PostgresAlarmProjection(jdbcClient, ConditionToAlarmPolicy.nistMazak01V1()),
+        new PostgresRuntimeDataQualityProjection(jdbcClient),
+        objectMapper);
   }
 
   @Bean

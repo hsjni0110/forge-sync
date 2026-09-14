@@ -78,11 +78,29 @@ tasks.processResources {
     from("../../contracts/process-analytics/v1/operational-effectiveness.schema.json") {
         into("contracts/process-analytics/v1")
     }
+    from("../../contracts/process-analytics/v1/tool-load-trends.schema.json") {
+        into("contracts/process-analytics/v1")
+    }
     from("../../contracts/tool-changes/v1/tool-change-timeline.schema.json") {
         into("contracts/tool-changes/v1")
     }
     from("../../contracts/toolpath/v1/observed-toolpath.schema.json") {
         into("contracts/toolpath/v1")
+    }
+    from("../../contracts/alarm/v1/alarm-timeline.schema.json") {
+        into("contracts/alarm/v1")
+    }
+    from("../../contracts/data-quality/v1/data-quality-report.schema.json") {
+        into("contracts/data-quality/v1")
+    }
+    from("../../contracts/production/v1/observed-production-context.schema.json") {
+        into("contracts/production/v1")
+    }
+    from("../../docs/data/profiles/nist-mazak01-20161005/profile.json") {
+        into("data-quality/nist-mazak01-20161005")
+    }
+    from("../../docs/data/mappings/nist-mazak01-observation-v2/mapping-report.json") {
+        into("data-quality/nist-mazak01-20161005")
     }
 }
 
@@ -104,6 +122,12 @@ tasks.processTestResources {
     }
     from("../../tests/fixtures/toolpath/v1") {
         into("fixtures/toolpath/v1")
+    }
+    from("../../tests/fixtures/alarm/v1") {
+        into("fixtures/alarm/v1")
+    }
+    from("../../tests/fixtures/data-quality/v1") {
+        into("fixtures/data-quality/v1")
     }
 }
 

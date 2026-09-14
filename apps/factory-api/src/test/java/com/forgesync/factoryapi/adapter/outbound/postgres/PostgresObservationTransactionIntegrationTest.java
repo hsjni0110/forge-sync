@@ -9,8 +9,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.forgesync.factoryapi.adapter.inbound.mqtt.MqttObservationPacket;
 import com.forgesync.factoryapi.adapter.inbound.mqtt.MqttObservationValidator;
 import com.forgesync.factoryapi.adapter.inbound.observation.ObservationContractValidator;
+import com.forgesync.factoryapi.alarm.adapter.outbound.postgres.PostgresAlarmProjection;
+import com.forgesync.factoryapi.alarm.domain.ConditionToAlarmPolicy;
 import com.forgesync.factoryapi.application.IngestionResult;
 import com.forgesync.factoryapi.application.ValidatedObservationMessage;
+import com.forgesync.factoryapi.dataquality.adapter.outbound.postgres.PostgresDataQualityQuery;
+import com.forgesync.factoryapi.dataquality.adapter.outbound.postgres.PostgresRuntimeDataQualityProjection;
 import com.forgesync.factoryapi.equipmenttwin.adapter.outbound.postgres.PostgresReplayProjectionActivator;
 import com.forgesync.factoryapi.equipmenttwin.adapter.outbound.postgres.PostgresTwinProjectionReader;
 import com.forgesync.factoryapi.equipmenttwin.application.LoadedTwinProjection;
@@ -71,7 +75,10 @@ class PostgresObservationTransactionIntegrationTest {
             new ObservationOrderingPolicy(),
             new PostgresEquipmentStateProjection(
                 jdbcClient, new EquipmentStateProjectionPolicy(), OBJECT_MAPPER),
-            committedProjectionNotifications::add);
+            committedProjectionNotifications::add,
+            new PostgresAlarmProjection(jdbcClient, ConditionToAlarmPolicy.nistMazak01V1()),
+            new PostgresRuntimeDataQualityProjection(jdbcClient),
+            OBJECT_MAPPER);
     twinProjectionReader =
         new PostgresTwinProjectionReader(
             jdbcClient, OBJECT_MAPPER, new DataSourceTransactionManager(dataSource));
@@ -86,7 +93,9 @@ class PostgresObservationTransactionIntegrationTest {
     jdbcClient
         .sql(
             """
-            TRUNCATE operational_effectiveness_processing,
+            TRUNCATE business_outbox, alarm, condition_projection,
+              runtime_data_quality_observation, runtime_data_quality_projection,
+              operational_effectiveness_processing,
               anomaly_assessment_projection, anomaly_assessment_processing_run,
               cycle_feature_projection, cycle_feature_processing_run,
               machining_run_projection, process_analytics_processing_run,
@@ -96,6 +105,148 @@ class PostgresObservationTransactionIntegrationTest {
               canonical_observation_history, ingestion_inbox
             """)
         .update();
+  }
+
+  @Test
+  void preservesConditionAndAlarmOutboxInTheSameIdempotentIngestionTransaction() {
+    ValidatedObservationMessage warning = replayedObservation("condition-warning.json", 42);
+
+    assertThat(transaction.storeObservation(warning, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(transaction.storeObservation(warning, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.SKIPPED_DUPLICATE);
+
+    assertThat(rowCount("canonical_observation_history")).isEqualTo(1);
+    assertThat(rowCount("condition_projection")).isEqualTo(1);
+    assertThat(rowCount("alarm")).isEqualTo(1);
+    assertThat(rowCount("business_outbox")).isEqualTo(1);
+  }
+
+  @Test
+  void keepsRuntimeQualityCountsInsideOneReplaySession() {
+    ValidatedObservationMessage current = replayedObservation("event-execution.json", 42);
+    ValidatedObservationMessage late = replayedObservation("sample-spindle-speed.json", 41);
+
+    assertThat(transaction.storeObservation(current, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.ACCEPTED);
+    assertThat(transaction.storeObservation(current, INGESTED_AT, PROJECTED_AT))
+        .isEqualTo(IngestionResult.SKIPPED_DUPLICATE);
+    assertThat(transaction.storeObservation(late, INGESTED_AT, PROJECTED_AT.plusSeconds(1)))
+        .isEqualTo(IngestionResult.ACCEPTED);
+
+    Map<String, Object> quality =
+        jdbcClient
+            .sql(
+                """
+                SELECT received_count, accepted_count, duplicate_count, out_of_order_count
+                FROM runtime_data_quality_projection
+                WHERE machine_id = 'Mazak01' AND replay_session_id = :replay_session_id
+                """)
+            .param("replay_session_id", REPLAY_SESSION_ID)
+            .query()
+            .singleRow();
+    assertThat(quality)
+        .containsEntry("received_count", 3L)
+        .containsEntry("accepted_count", 2L)
+        .containsEntry("duplicate_count", 1L)
+        .containsEntry("out_of_order_count", 1L);
+    var throughLateObservation =
+        new PostgresDataQualityQuery(jdbcClient)
+            .findRuntime("Mazak01", REPLAY_SESSION_ID, 41)
+            .orElseThrow();
+    assertThat(throughLateObservation.receivedCount()).isEqualTo(1);
+    assertThat(throughLateObservation.acceptedCount()).isEqualTo(1);
+    assertThat(throughLateObservation.duplicateCount()).isZero();
+    assertThat(throughLateObservation.outOfOrderCount()).isEqualTo(1);
+  }
+
+  @Test
+  void readsDerivedProcessCoverageWithoutTreatingItAsSourceQuality() {
+    String segmentationId = "sha256:" + "a".repeat(64);
+    String featureId = "sha256:" + "d".repeat(64);
+    jdbcClient
+        .sql(
+            """
+            INSERT INTO process_analytics_processing_run (
+              processing_run_id, machine_id, replay_session_id, through_replay_sequence,
+              segmentation_rule_version, input_hash, input_observation_count, result_hash,
+              created_at
+            ) VALUES (
+              :id, 'Mazak01', :session, 42, '1.0.0', :input_hash, 10, :result_hash,
+              :created_at
+            )
+            """)
+        .param("id", segmentationId)
+        .param("session", REPLAY_SESSION_ID)
+        .param("input_hash", "sha256:" + "b".repeat(64))
+        .param("result_hash", "sha256:" + "c".repeat(64))
+        .param("created_at", OffsetDateTime.ofInstant(INGESTED_AT, ZoneOffset.UTC))
+        .update();
+    jdbcClient
+        .sql(
+            """
+            INSERT INTO machining_run_projection (
+              processing_run_id, machining_run_id, machine_id, started_at, ended_at,
+              run_status, program_name, confidence, result_hash, run_projection
+            ) VALUES (
+              :processing_id, :run_id, 'Mazak01', :started_at, :ended_at,
+              'COMPLETED', '1001', 'HIGH', :result_hash, '{}'::jsonb
+            )
+            """)
+        .param("processing_id", segmentationId)
+        .param("run_id", "sha256:" + "1".repeat(64))
+        .param("started_at", OffsetDateTime.ofInstant(INGESTED_AT, ZoneOffset.UTC))
+        .param("ended_at", OffsetDateTime.ofInstant(INGESTED_AT.plusSeconds(10), ZoneOffset.UTC))
+        .param("result_hash", "sha256:" + "2".repeat(64))
+        .update();
+    jdbcClient
+        .sql(
+            """
+            INSERT INTO cycle_feature_processing_run (
+              feature_processing_run_id, machining_run_processing_run_id, machine_id,
+              cycle_feature_version, input_hash, input_observation_count, eligible_run_count,
+              result_hash, created_at
+            ) VALUES (
+              :feature_id, :processing_id, 'Mazak01', '1.0.0', :input_hash, 10, 1,
+              :result_hash, :created_at
+            )
+            """)
+        .param("feature_id", featureId)
+        .param("processing_id", segmentationId)
+        .param("input_hash", "sha256:" + "e".repeat(64))
+        .param("result_hash", "sha256:" + "f".repeat(64))
+        .param("created_at", OffsetDateTime.ofInstant(INGESTED_AT, ZoneOffset.UTC))
+        .update();
+    jdbcClient
+        .sql(
+            """
+            INSERT INTO cycle_feature_projection (
+              feature_processing_run_id, cycle_feature_set_id, machining_run_id, machine_id,
+              started_at, ended_at, feature_status, result_hash, feature_projection
+            ) VALUES (
+              :feature_id, :set_id, :run_id, 'Mazak01', :started_at, :ended_at,
+              'AVAILABLE', :result_hash, '{}'::jsonb
+            )
+            """)
+        .param("feature_id", featureId)
+        .param("set_id", "sha256:" + "3".repeat(64))
+        .param("run_id", "sha256:" + "1".repeat(64))
+        .param("started_at", OffsetDateTime.ofInstant(INGESTED_AT, ZoneOffset.UTC))
+        .param("ended_at", OffsetDateTime.ofInstant(INGESTED_AT.plusSeconds(10), ZoneOffset.UTC))
+        .param("result_hash", "sha256:" + "4".repeat(64))
+        .update();
+
+    var derived =
+        new PostgresDataQualityQuery(jdbcClient)
+            .findDerivedProcess("Mazak01", REPLAY_SESSION_ID, 42)
+            .orElseThrow();
+
+    assertThat(derived.segmentation().processingRunId()).isEqualTo(segmentationId);
+    assertThat(derived.segmentation().inputObservationCount()).isEqualTo(10);
+    assertThat(derived.segmentation().resultCount()).isEqualTo(1);
+    assertThat(derived.featureCoverage().processingRunId()).isEqualTo(featureId);
+    assertThat(derived.featureCoverage().availableCount()).isEqualTo(1);
+    assertThat(derived.featureCoverage().partialCount()).isZero();
   }
 
   @Test

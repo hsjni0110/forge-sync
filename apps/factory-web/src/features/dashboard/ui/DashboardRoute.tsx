@@ -17,6 +17,12 @@ import { DowntimeParetoPanel } from "../../downtime/ui/DowntimeParetoPanel";
 import type { OperationalEffectivenessClient } from "../../effectiveness/application/ports";
 import type { OperationalEffectivenessReport } from "../../effectiveness/domain/operationalEffectiveness";
 import { OperationalEffectivenessPanel } from "../../effectiveness/ui/OperationalEffectivenessPanel";
+import type { ShiftOverviewClient } from "../../shift-overview/application/ports";
+import { ShiftOverviewError } from "../../shift-overview/application/ports";
+import type { ShiftOverview } from "../../shift-overview/domain/shiftOverview";
+import { ShiftOverviewPanel } from "../../shift-overview/ui/ShiftOverviewPanel";
+import type { AlarmClient } from "../../alarm/application/ports";
+import type { Alarm } from "../../alarm/domain/alarm";
 
 const MACHINE_ID = "Mazak01";
 
@@ -34,11 +40,15 @@ export function DashboardRoute({
   replayControlClient,
   downtimeParetoClient,
   operationalEffectivenessClient,
+  shiftOverviewClient,
+  alarmClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
   downtimeParetoClient?: DowntimeParetoClient;
   operationalEffectivenessClient?: OperationalEffectivenessClient;
+  shiftOverviewClient?: ShiftOverviewClient;
+  alarmClient?: AlarmClient;
 }) {
   const createSession = useCallback(
     () => twinSessionFactory(MACHINE_ID),
@@ -50,7 +60,60 @@ export function DashboardRoute({
   const [downtimeFailure, setDowntimeFailure] = useState(false);
   const [effectivenessReport, setEffectivenessReport] = useState<OperationalEffectivenessReport>();
   const [effectivenessFailure, setEffectivenessFailure] = useState(false);
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
+  const [shiftLoad, setShiftLoad] = useState<{
+    status: "IDLE" | "LOADING" | "READY" | "FAILED";
+    report?: ShiftOverview;
+    failure?: "NETWORK" | "INSUFFICIENT_DATA" | "VERSION_MISMATCH";
+    diagnostic?: string;
+  }>({ status: "IDLE" });
   const replaySession = replay.authoritativeSession;
+  const snapshot = state.snapshot;
+  const isShiftCursorPending = Boolean(
+    shiftOverviewClient
+      && snapshot
+      && replaySession
+      && ["PAUSED", "COMPLETED"].includes(replaySession.status)
+      && replaySession.replaySessionId === snapshot.replayCursor.replaySessionId
+      && replaySession.publicationCursor
+      && snapshot.replayCursor.replaySequence < replaySession.publicationCursor.replaySequence,
+  );
+
+  useEffect(() => {
+    const snapshot = state.snapshot;
+    if (!shiftOverviewClient || !snapshot || !replaySession
+      || !["PAUSED", "COMPLETED"].includes(replaySession.status)
+      || replaySession.replaySessionId !== snapshot.replayCursor.replaySessionId
+      || (replaySession.publicationCursor
+        && snapshot.replayCursor.replaySequence < replaySession.publicationCursor.replaySequence)) return;
+    const throughReplaySequence = replaySession.publicationCursor?.replaySequence
+      ?? snapshot.replayCursor.replaySequence;
+    const abort = new AbortController();
+    setShiftLoad({ status: "LOADING" });
+    void shiftOverviewClient.load(MACHINE_ID, snapshot.replayCursor.replaySessionId,
+      throughReplaySequence, abort.signal)
+      .then((report) => { if (!abort.signal.aborted) setShiftLoad({ status: "READY", report }); })
+      .catch((failure: unknown) => {
+        if (abort.signal.aborted) return;
+        setShiftLoad({ status: "FAILED", failure: failure instanceof ShiftOverviewError
+          ? failure.code : "NETWORK", diagnostic: failure instanceof Error ? failure.message : undefined });
+      });
+    return () => abort.abort();
+  }, [replaySession, shiftOverviewClient, state.snapshot]);
+
+  useEffect(() => {
+    if (!alarmClient || !snapshot || !replaySession
+      || !["PAUSED", "COMPLETED"].includes(replaySession.status)
+      || replaySession.replaySessionId !== snapshot.replayCursor.replaySessionId) return;
+    const abort = new AbortController();
+    const throughReplaySequence = replaySession.publicationCursor?.replaySequence
+      ?? snapshot.replayCursor.replaySequence;
+    void alarmClient.find(MACHINE_ID, snapshot.replayCursor.replaySessionId,
+      throughReplaySequence, abort.signal)
+      .then((timeline) => { if (!abort.signal.aborted) setAlarms(timeline.alarms); })
+      .catch(() => undefined);
+    return () => abort.abort();
+  }, [alarmClient, replaySession, snapshot]);
 
   useEffect(() => {
     const snapshot = state.snapshot;
@@ -111,22 +174,51 @@ export function DashboardRoute({
     <section className="dashboard-page">
       <header className="dashboard-header">
         <p className="eyebrow">제조 운영 디지털 트윈</p>
-        <h1>ForgeSync</h1>
-        <p>{MACHINE_ID} 설비의 현재 상태와 데이터 최신성을 한눈에 확인하세요.</p>
+        <h1>교대조 개요</h1>
+        <p>{MACHINE_ID} 전체 관측 구간의 가동 상태와 주요 손실을 확인하세요.</p>
       </header>
 
       {state.snapshot ? (
-        <DashboardSummary
-          state={state}
-          snapshot={state.snapshot}
-          replayStatus={replay.session?.status}
-          replaySpeed={replay.session?.speedMultiplier}
-        />
+        shiftOverviewClient ? (
+          <TwinConnectionStatus state={state} replayStatus={replay.session?.status} />
+        ) : (
+          <DashboardSummary
+            state={state}
+            snapshot={state.snapshot}
+            replayStatus={replay.session?.status}
+            replaySpeed={replay.session?.speedMultiplier}
+          />
+        )
       ) : (
         <DashboardPlaceholder state={state} retryNow={retryNow} />
       )}
 
-      {downtimeReport ? (
+      {isShiftCursorPending ? (
+        <section className="shift-placeholder" aria-live="polite">
+          <p>Replay 데이터가 화면에 반영되기를 기다리는 중입니다.</p>
+        </section>
+      ) : shiftOverviewClient && shiftLoad.status === "LOADING" ? (
+        <section className="shift-placeholder" aria-busy="true" aria-live="polite">
+          <p>교대조 분석을 불러오는 중입니다.</p>
+        </section>
+      ) : shiftOverviewClient && shiftLoad.status === "FAILED" ? (
+        <section className="shift-placeholder" role="alert"
+          data-shift-diagnostic={shiftLoad.diagnostic}>
+          <p>{shiftFailureMessage(shiftLoad.failure)}</p>
+        </section>
+      ) : shiftLoad.report ? (
+        <>
+          <ShiftOverviewPanel report={shiftLoad.report} freshness={state.freshness}
+            replayStatus={replaySession?.status} onSeek={seekToDowntime} alarms={alarms} />
+          <DowntimeParetoPanel report={shiftLoad.report.pareto} onSelect={seekToDowntime} />
+        </>
+      ) : shiftOverviewClient && replaySession && !["PAUSED", "COMPLETED"].includes(replaySession.status) ? (
+        <section className="shift-placeholder" aria-live="polite">
+          <p>Replay를 일시정지하거나 완료하면 같은 버전의 교대조 분석을 표시합니다.</p>
+        </section>
+      ) : null}
+
+      {!shiftOverviewClient && downtimeReport ? (
         <DowntimeParetoPanel report={downtimeReport} onSelect={seekToDowntime} />
       ) : downtimeFailure ? (
         <p className="downtime-unavailable" role="status">
@@ -134,7 +226,7 @@ export function DashboardRoute({
         </p>
       ) : null}
 
-      {effectivenessReport ? (
+      {!shiftOverviewClient && effectivenessReport ? (
         <OperationalEffectivenessPanel report={effectivenessReport} />
       ) : effectivenessFailure ? (
         <p className="effectiveness-unavailable" role="status">운영 효과 분석을 불러오지 못했습니다.</p>
@@ -142,7 +234,7 @@ export function DashboardRoute({
 
       <div className="dashboard-actions">
         <Link className="primary-link" to="/factory">
-          운영 뷰 열기
+          시점 상세 보기
         </Link>
         <p className="dashboard-provenance">
           공장 배치는 SIMULATED, 설비 측정값은 REAL&nbsp;·&nbsp;NIST Mazak01 replay 입니다.
@@ -150,6 +242,14 @@ export function DashboardRoute({
       </div>
     </section>
   );
+}
+
+function shiftFailureMessage(failure?: "NETWORK" | "INSUFFICIENT_DATA" | "VERSION_MISMATCH"): string {
+  if (failure === "VERSION_MISMATCH") {
+    return "분석 버전이 일치하지 않습니다. Replay 시점을 다시 맞춘 뒤 확인해 주세요.";
+  }
+  if (failure === "INSUFFICIENT_DATA") return "교대조를 분석할 관측 데이터가 아직 충분하지 않습니다.";
+  return "교대조 분석을 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.";
 }
 
 function DashboardSummary({

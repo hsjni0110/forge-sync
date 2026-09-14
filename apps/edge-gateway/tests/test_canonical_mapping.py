@@ -5,6 +5,7 @@ import json
 from collections import Counter
 from dataclasses import replace
 from pathlib import Path
+from uuid import UUID
 
 import pytest
 from conftest import FIXTURES
@@ -21,6 +22,13 @@ from forgesync_edge.ingestion.adapter.outbound.observation_json import observati
 from forgesync_edge.ingestion.application import MapCanonicalObservations
 from forgesync_edge.ingestion.application.run_identity import canonical_processing_run_id
 from forgesync_edge.ingestion.domain import MappingResult, MappingStatus, MappingTable
+from forgesync_edge.ingestion.domain.mapping import (
+    CatalogDataItem,
+    MappingCandidate,
+    MappingContext,
+    MappingDefinition,
+    ObservationMapper,
+)
 from forgesync_edge.ingestion.domain.observation import (
     ConditionPayload,
     EventPayload,
@@ -110,7 +118,7 @@ def test_golden_values_preserve_types_units_condition_and_provenance() -> None:
     assert spindle.source.agent_instance_id is None
     assert spindle.source.source_sequence is None
     assert spindle.provenance.transformation.raw_record_id == spindle.source_event_key
-    assert spindle.provenance.transformation.mapping_version == "2.2.0"
+    assert spindle.provenance.transformation.mapping_version == "2.3.0"
     assert spindle.subject.component_id == "Mazak01-C"
     assert spindle.provenance.transformation.source_data_item_id == "Mazak01-C_5"
     assert tool.payload.value == 13
@@ -143,7 +151,7 @@ def test_golden_values_preserve_types_units_condition_and_provenance() -> None:
     assert b_axis_angle.payload.unit.value == "DEGREE"
     assert b_axis_angle.subject.component_id == "Mazak01-B"
     assert b_axis_angle.provenance.transformation.source_data_item_id == "Mazak01-B_4"
-    assert b_axis_angle.provenance.transformation.mapping_version == "2.2.0"
+    assert b_axis_angle.provenance.transformation.mapping_version == "2.3.0"
 
 
 def test_generated_observations_satisfy_shared_contract() -> None:
@@ -300,6 +308,64 @@ def test_maps_operating_signals_without_inventing_units() -> None:
     assert program_line.payload.event_type is EventType.LINE
     assert sequence_number.payload.event_type.value == "PROGRAM_SEQUENCE_NUMBER"
     assert not hasattr(spindle_override.payload, "unit")
+
+
+def test_maps_subprogram_as_a_distinct_canonical_event() -> None:
+    data_item = CatalogDataItem(
+        "Mazak01-path_2", "Mazak01-path", "subprogram", "EVENT", "PROGRAM", "x:SUB", None
+    )
+    candidate = MappingCandidate(
+        artifact_id="sha256:" + "a" * 64,
+        raw_record_id="raw:1",
+        source_event_key="event:1",
+        line_number=1,
+        timestamp_raw="2016-10-05T09:18:30.447Z",
+        value_fields_raw=("1001",),
+        parse_status="PARSED",
+        parse_error=None,
+        data_item=data_item,
+        data_item_name_raw="subprogram",
+    )
+
+    result = ObservationMapper().map(
+        candidate,
+        MappingDefinition(data_item, "SUBPROGRAM"),
+        UUID("00000000-0000-0000-0000-000000000001"),
+        MappingContext("nist-mazak01-20161005", "Mazak01", "2.3.0"),
+    )
+
+    assert result.status is MappingStatus.MAPPED
+    assert isinstance(result.observation.payload, EventPayload)
+    assert result.observation.payload.event_type is EventType.SUBPROGRAM
+
+
+def test_preserves_blank_subprogram_as_unavailable_instead_of_inventing_a_name() -> None:
+    data_item = CatalogDataItem(
+        "Mazak01-path_2", "Mazak01-path", "subprogram", "EVENT", "PROGRAM", "x:SUB", None
+    )
+    candidate = MappingCandidate(
+        artifact_id="sha256:" + "a" * 64,
+        raw_record_id="raw:blank",
+        source_event_key="event:blank",
+        line_number=1,
+        timestamp_raw="2016-10-05T09:18:30.447Z",
+        value_fields_raw=("",),
+        parse_status="PARSED",
+        parse_error=None,
+        data_item=data_item,
+        data_item_name_raw="subprogram",
+    )
+
+    result = ObservationMapper().map(
+        candidate,
+        MappingDefinition(data_item, "SUBPROGRAM"),
+        UUID("00000000-0000-0000-0000-000000000001"),
+        MappingContext("nist-mazak01-20161005", "Mazak01", "2.3.0"),
+    )
+
+    assert result.status is MappingStatus.MAPPED
+    assert result.observation.payload.availability.value == "UNAVAILABLE"
+    assert result.observation.payload.value is None
 
 
 def test_preserves_counter_regression_instead_of_correcting_it() -> None:

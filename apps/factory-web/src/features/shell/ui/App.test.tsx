@@ -16,15 +16,15 @@ const idleSessionFactory: TwinSessionFactory = () => ({
 });
 
 describe("App", () => {
-  it("renders the ForgeSync dashboard at the root route", () => {
+  it("renders the shift overview dashboard at the root route", () => {
     render(
       <MemoryRouter>
         <App twinSessionFactory={idleSessionFactory} />
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("heading", { name: "ForgeSync" })).toBeTruthy();
-    expect(screen.getByText(/현재 상태와 데이터 최신성/)).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "교대조 개요" })).toBeTruthy();
+    expect(screen.getByText(/전체 관측 구간의 가동 상태와 주요 손실/)).toBeTruthy();
     expect(screen.getByText(/설비 상태를 불러오는 중입니다/)).toBeTruthy();
   });
 
@@ -39,6 +39,9 @@ describe("App", () => {
     expect(screen.getByRole("link", { name: "공장 보기" }).getAttribute("href")).toBe(
       "/factory",
     );
+    expect(screen.getByRole("link", { name: "데이터 품질" }).getAttribute("href")).toBe(
+      "/data-quality",
+    );
     expect(screen.getByRole("link", { name: "대시보드" }).getAttribute("aria-current")).toBe(
       "page",
     );
@@ -51,7 +54,7 @@ describe("App", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole("link", { name: "운영 뷰 열기" }).getAttribute("href")).toBe(
+    expect(screen.getByRole("link", { name: "시점 상세 보기" }).getAttribute("href")).toBe(
       "/factory",
     );
   });

@@ -20,12 +20,17 @@ import org.springframework.web.client.RestClient;
     havingValue = "true",
     matchIfMissing = true)
 public class ReplayConfiguration {
+  private static final Duration EDGE_CONNECT_TIMEOUT = Duration.ofSeconds(2);
+  private static final Duration EDGE_READ_TIMEOUT = Duration.ofSeconds(30);
+
   @Bean
   ReplayControlGateway replayControlGateway(
       @Value("${forgesync.replay.edge-base-url:http://127.0.0.1:8002}") String edgeBaseUrl) {
-    HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(2)).build();
+    HttpClient httpClient = HttpClient.newBuilder().connectTimeout(EDGE_CONNECT_TIMEOUT).build();
     JdkClientHttpRequestFactory requestFactory = new JdkClientHttpRequestFactory(httpClient);
-    requestFactory.setReadTimeout(Duration.ofSeconds(10));
+    // Preparing a replacement session indexes the pinned canonical run before replying. The
+    // reviewed 85 MB NIST run can exceed ten seconds on a cold local filesystem.
+    requestFactory.setReadTimeout(EDGE_READ_TIMEOUT);
     RestClient client =
         RestClient.builder().baseUrl(edgeBaseUrl).requestFactory(requestFactory).build();
     return new HttpReplayControlGateway(client);

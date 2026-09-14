@@ -31,13 +31,16 @@ describe("MachineDetailView", () => {
     ]) {
       expect(screen.getByRole("heading", { name: section })).toBeTruthy();
     }
+    expect(screen.getByText("종합 점수는 계산하지 않음")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "상세 데이터 품질 보기" }).getAttribute("href"))
+      .toBe("/data-quality");
     const hero = screen.getByRole("region", { name: "설비 가동 상태" });
     expect(within(hero).getByText("가동 중")).toBeTruthy();
     expect(screen.getAllByText("49 rpm")).toHaveLength(2);
     expect(screen.getByText("13")).toBeTruthy();
     expect(screen.getByText("114")).toBeTruthy();
     expect(screen.getAllByText(/실제 데이터 · NIST/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/상세 품질 정보는 아직 제공하지 않습니다/)).toBeTruthy();
+    expect(screen.getByText(/유효성·완전성·순서·중복·최신성·의미 변환률/)).toBeTruthy();
     expect(screen.getByText(/원본 추적 정보 20건 · 1개 출처/)).toBeTruthy();
   });
 

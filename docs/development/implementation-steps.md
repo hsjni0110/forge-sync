@@ -99,7 +99,8 @@ Step 01~23에서 만든 ingestion, 권위 Twin, 2D, 격리된 3D scene, replay c
 | `line` / `sequenceNum` | 1,372 | 매핑됨(Step 32), 미표출 | 생산 문맥 |
 
 Step 32 이전 기준 semantic coverage는 53,939 / 115,991 (46.50%)이었고 Step 32 이후는
-101,644 / 115,991 (87.63%)이다.
+101,644 / 115,991 (87.63%)였다. Step 41에서 `SUBPROGRAM`을 별도 보존한 뒤에는
+101,693 / 115,991 (87.67%)다.
 
 #### Step 01~23 실측 점검 결과
 
@@ -1165,11 +1166,13 @@ coverage에 계수한다. 분모 0, 표본 부족, 분자 > 분모는 숫자를 
 
 **선행 조건**: Step 21, Step 34.
 
-**결과**: rule/contract `1.0.0`, migration `V011`. Step 34와 같은 상태 묶음으로 닫힌
+**결과**: rule `1.1.0`/contract `1.0.0`, migration `V011`. Step 34와 같은 상태 묶음으로 닫힌
 `STOPPED`/`INTERRUPTED`/`UNKNOWN` 구간을 지속시간순으로 정렬하고 전체 비가동 시간 대비 비율과 누적
 비율을 계산한다. `estop=TRIGGERED`는 구간 겹침, mode는 최초 관찰 이후의 변경 시점, CONDITION
 WARNING/FAULT는 반열린 구간 `[start, end)` 안의 점시점 관찰만 연결한다. 겹치는 근거는 모두
 `CONCURRENT_EVIDENCE`로 보존하되 인과로 표현하지 않고, 없으면 `UNCONFIRMED_REASON`으로 남긴다.
+rule `1.1.0`은 값이 빠진 mode 변화도 삭제하지 않고 `UNKNOWN` 근거로 보존하며 화면에는 `값 확인 불가`로
+표시한다. 기존 rule `1.0.0` 결과와 계약 호환성은 유지한다.
 불변 Utilization/interval 참조와 CONDITION watermark로 PostgreSQL에 보존하며, Dashboard의 최소 Pareto
 목록을 선택하면 기존 Replay seek 수렴 경로로 구간 시작 시각을 연다
 ([ADR-052](../adr/ADR-052-downtime-pareto-concurrent-evidence.md), V-057).
@@ -1245,14 +1248,15 @@ patch 1건이 snapshot 전체를 담으므로 snapshot 크기를 64 KiB 상한 �
 rate는 Step 47에서 기록한다
 ([ADR-054](../adr/ADR-054-observed-metric-channel-disclosure.md), V-059, V-060).
 
-### Step 38 — Shift Overview 화면
+### Step 38 — Shift Overview 화면 ✅ DONE
 
 **목적**: cursor 시점 상태에 더해 관측 구간 전체에서 무슨 일이 있었는지 한 화면에서 보여준다.
 
 **구현 범위**
 
 - 상단 KPI 밴드: 가동률, 절삭 비율, 정지 시간, 가공 건수, 데이터 최신성. 각 값에 provenance chip
-- replay 타임라인 위 상태 띠(ACTIVE/READY/STOPPED/UNKNOWN)와 정지·알람·공구 교체 marker
+- replay 타임라인 위 상태 띠(ACTIVE/READY/STOPPED/INTERRUPTED/UNKNOWN)와 정지·공구 교체 marker.
+  Alarm marker는 Alarm identity가 생기는 Step 39에서 연결
 - 정지 사유 Pareto와 항목 선택 시 cursor 이동
 - 대시보드(`/`)는 구간 요약, 운영 뷰(`/factory`)는 시점 상세로 역할 분리
 - loading, insufficient-data, version mismatch 상태
@@ -1270,6 +1274,16 @@ rate는 Step 47에서 기록한다
 출처를 확인할 수 있다.
 
 **선행 조건**: Step 35, Step 36, Step 37.
+
+**결과**: Dashboard `/`를 전체 관측 구간 요약, `/factory`를 선택 시점 상세로 분리했다. 같은
+`replaySessionId`와 `throughReplaySequence`의 composite projection 한 건으로 가동률, 절삭 비율, 정지
+시간, 전체/완료 가공 건수, 데이터 최신성, 상태 구간과 Pareto를 표시한다. `INTERRUPTED`는
+`STOPPED`와 합치지 않고 색·패턴·텍스트를 함께 사용하며, 원천에 없는 Quality와 아직 identity가 없는
+Alarm은 만들지 않는다. Replay 발행 cursor를 Twin이 따라잡기 전에는 분석을 반복 요청하지 않고 반영
+대기 상태를 표시하며, 일치한 뒤에만 분석한다. loading, insufficient-data, version mismatch를 서로
+다르게 안내하고 marker/Pareto 선택은 기존 Replay seek 경로를 사용한다. 실제 Chromium E2E에서 KPI,
+타임라인, Pareto 선택 후 2D/3D cursor 수렴을 확인했고, 3D grid의 최소 높이 제약 때문에 canvas가
+문서 높이를 계속 늘리던 회귀도 고정 크기 테스트와 실제 브라우저 측정으로 차단했다 (V-061).
 
 ---
 
@@ -1298,7 +1312,15 @@ rate는 Step 47에서 기록한다
 
 **선행 조건**: Step 31, Step 38.
 
-### Step 40 — Data Quality Projection과 UI
+구현 완료: 고정 NIST Condition을 먼저 보존한 뒤 rule `1.0.0`의 DataItem/native code allowlist만
+Business Alarm으로 승격한다. OPEN/ACKNOWLEDGED/RESOLVED와 해제 Replay 순번을 보존하고, 생성·확인·
+해제 Outbox를 같은 DB transaction에 기록한다. 전용 Alarm `1.0.0` 계약을 통해 2D 목록, 3D 상태 표식,
+Step 38 타임라인이 같은 Alarm ID를 사용하며 색 외에 아이콘·텍스트 cue를 함께 제공한다. Anomaly와
+비대상 Condition은 Alarm을 만들지 않는다. 결정과 검증 범위는 ADR-055 및 V-062에 기록한다.
+
+### Step 40 — Data Quality Projection과 UI ✅ DONE
+
+**상태**: `DONE` (2026-09-14)
 
 **목적**: Validity, Completeness, Ordering, Duplication, Freshness, Semantic Coverage를 숨기지 않고
 운영자에게 노출한다.
@@ -1324,7 +1346,20 @@ rate는 Step 47에서 기록한다
 
 **선행 조건**: Step 07~09, Step 19, Step 32.
 
-### Step 41 — 관측 기반 Production Context
+**구현 기록**: 종합 점수나 근거 없는 정상/주의/위험 임계값을 만들지 않는다. 원천 profile, 의미
+매핑, Replay 수신, Twin 최신성, 가공 구간 분리, feature coverage를 서로 다른 근거 계층으로 유지하고
+각 항목을 `MEASURED` 또는 이유가 있는 `NOT_EVALUATED`로 공개한다. 고정 Mazak01의 실제 의미
+변환률 101,693 / 115,991(87.67318153994706%)와 unknown 22종, unsupported 12종을 원본 locator와
+함께 제공한다. Completeness는 기대 cadence/record count가 없어 측정 불가이고, contract 거절 payload의
+identity는 신뢰할 수 없어 세션별 Runtime Validity에 재할당하지 않는다. 결정은 ADR-056, 검증 상태는
+V-063에 기록한다. 전용 `/data-quality` 화면은 원천 근거를 먼저 표시하고, Replay cursor가 안정되면
+같은 session/cursor 범위의 Runtime·Freshness·파생 품질로 교체한다. Twin 상세에도 같은 보고서의
+요약과 전용 화면 링크를 제공한다. 브라우저 기본 `fetch`는 호출 객체가 바뀌지 않도록 래핑해 네이티브
+호출 오류를 막았고, 실제 PostgreSQL/MQTT/API/Web/Chromium E2E 4개로 전체 흐름을 확인했다.
+
+### Step 41 — 관측 기반 Production Context ✅ DONE
+
+**상태**: `DONE` (2026-09-14)
 
 **목적**: 프로그램, 부품 수, 가공 run을 연결해 관측만으로 설명 가능한 생산 문맥을 제공한다.
 
@@ -1350,7 +1385,17 @@ aggregate, 작업 할당 CRUD, `SIMULATED` 생산 흐름. PRD 8의 Non-Goal과 �
 
 **선행 조건**: Step 21, Step 36.
 
-### Step 42 — Tool별 Load Trend와 마모 대리지표
+**구현 기록**: Canonical `SUBPROGRAM`을 main `PROGRAM`과 구분해 mapping `2.3.0` / mapper
+`2.3.1`로 추가했다. 고정 원천 49건은 이름이 없는 빈 값 또는 `UNAVAILABLE`이므로 임의 이름 없이 모두
+unavailable로 보존한다. 관측 생산 문맥 `1.0.0`은 같은 Machining Run processing cursor의 프로그램
+구간, 프로그램별 run 수와 완료 경계가 있는 run의 총·평균·중앙 시간, Part Count 인접 증가를 제공한다.
+Part Count와 run은 `TEMPORAL_OVERLAP_ONLY`로만 연결하며 계약에 `productionResultStatus:
+NOT_OBSERVED`를 고정한다. 결정은 ADR-057에 기록한다. Python mapping, domain/contract/frontend,
+실제 PostgreSQL integration과 PostgreSQL/MQTT/API/Web/Chromium E2E 4개가 통과했다.
+
+### Step 42 — Tool별 Load Trend와 마모 대리지표 ✅ DONE
+
+**상태**: `DONE` (2026-09-14)
 
 **목적**: 같은 프로그램과 공구 조합의 부하 추세를 비교해 이 기계의 관측값에 근거한 마모 대리지표를 만든다.
 
@@ -1371,6 +1416,17 @@ aggregate, 작업 할당 CRUD, `SIMULATED` 생산 흐름. PRD 8의 Non-Goal과 �
 **완료 조건**: 실제 Mazak01 관측값으로 계산되며 마모 물리량이 아니라 부하 추세 지표임을 화면에서 명시한다.
 
 **선행 조건**: Step 28, Step 37.
+
+**구현 기록**: Tool Load Trend policy/contract `1.0.0`을 추가했다. 계산 단위는 `(machine,
+program, tool number, component, source DataItem)`이며 B/C/C2/X/Y/Z 부하 채널을 합치지 않는다.
+완료 run의 한 공구·채널에서 available 원본 3개 이상인 중앙값만 유효 점으로 쓰고, 유효 점 5개,
+관측 후보 coverage 0.8, 첫 3점 기준선을 모두 만족할 때만 최근 편차와 OLS 기울기를 표시한다.
+coverage는 원천 전체 시간이나 기대 sampling 비율이 아니라 실제 관측된 run-tool-channel 후보 중
+유효 점 비율이다. `DERIVED · REAL:NIST`와 계산식, raw evidence를 보존하고 wear/RUL/FAULT/Alarm
+필드는 계약에서 허용하지 않는다. 실제 브라우저의 2016-10-05 09:21 cursor에서 40개 채널 분리
+그룹을 확인했으며, 모두 유효 점 5개 미만이라 숫자 추세 대신 “근거 부족”을 표시했다. Domain/contract/
+frontend, 실제 PostgreSQL integration, 전체 품질 게이트와 PostgreSQL/MQTT/API/Web/Chromium E2E
+4개가 통과했다. 결정은 ADR-058, 검증 상태는 V-065에 기록한다.
 
 ---
 

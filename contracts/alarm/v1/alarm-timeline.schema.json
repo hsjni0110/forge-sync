@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/alarm/v1/alarm-timeline.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "machineId", "replaySessionId", "throughReplaySequence", "alarms"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "minLength": 1 },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "alarms": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/alarm" }
+    }
+  },
+  "$defs": {
+    "alarm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "alarmId", "machineId", "replaySessionId", "openedReplaySequence", "openedAt",
+        "sourceDataItemId", "componentId", "conditionType", "nativeCode", "message",
+        "severity", "status", "ruleVersion", "revision", "acknowledgedBy",
+        "acknowledgedAt", "resolvedReplaySequence", "resolvedAt", "source"
+      ],
+      "properties": {
+        "alarmId": { "type": "string", "format": "uuid" },
+        "machineId": { "type": "string", "minLength": 1 },
+        "replaySessionId": { "type": "string", "format": "uuid" },
+        "openedReplaySequence": { "type": "integer", "minimum": 0 },
+        "openedAt": { "type": "string", "format": "date-time" },
+        "sourceDataItemId": { "type": "string", "minLength": 1 },
+        "componentId": { "type": "string", "minLength": 1 },
+        "conditionType": { "type": "string", "minLength": 1 },
+        "nativeCode": { "type": "string", "minLength": 1 },
+        "message": { "type": ["string", "null"] },
+        "severity": { "enum": ["WARNING", "CRITICAL"] },
+        "status": { "enum": ["OPEN", "ACKNOWLEDGED", "RESOLVED"] },
+        "ruleVersion": { "type": "string", "minLength": 1 },
+        "revision": { "type": "integer", "minimum": 0 },
+        "acknowledgedBy": { "type": ["string", "null"] },
+        "acknowledgedAt": { "type": ["string", "null"], "format": "date-time" },
+        "resolvedReplaySequence": { "type": ["integer", "null"], "minimum": 0 },
+        "resolvedAt": { "type": ["string", "null"], "format": "date-time" },
+        "source": { "const": "EQUIPMENT_CONDITION" }
+      }
+    }
+  }
+}

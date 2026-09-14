@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/process-analytics/v1/tool-load-trends.schema.json",
+  "title": "ForgeSync Tool Load Trends v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "policyVersion", "machineId", "replaySessionId", "throughReplaySequence", "machiningRunProcessingRunId", "policy", "provenance", "groups"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "policyVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "machiningRunProcessingRunId": { "$ref": "#/$defs/hash" },
+    "policy": { "$ref": "#/$defs/policy" },
+    "provenance": { "$ref": "#/$defs/provenance" },
+    "groups": { "type": "array", "items": { "$ref": "#/$defs/group" } }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["minimumRawSamplesPerPoint", "minimumTrendPoints", "baselinePointCount", "minimumCoverageRatio", "pointFormula", "coverageFormula", "deviationFormula", "slopeFormula"],
+      "properties": {
+        "minimumRawSamplesPerPoint": { "const": 3 },
+        "minimumTrendPoints": { "const": 5 },
+        "baselinePointCount": { "const": 3 },
+        "minimumCoverageRatio": { "const": 0.8 },
+        "pointFormula": { "type": "string", "minLength": 1 },
+        "coverageFormula": { "type": "string", "minLength": 1 },
+        "deviationFormula": { "type": "string", "minLength": 1 },
+        "slopeFormula": { "type": "string", "minLength": 1 }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin", "sourceKind", "provider", "sourceSetId"],
+      "properties": {
+        "origin": { "const": "DERIVED" },
+        "sourceKind": { "enum": ["REAL", "UNKNOWN"] },
+        "provider": { "type": "string", "minLength": 1 },
+        "sourceSetId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["replaySequence", "sourceObservedAt", "sourceEventKey", "rawRecordId", "sourceDataItemId", "mappingVersion"],
+      "properties": {
+        "replaySequence": { "type": "integer", "minimum": 0 },
+        "sourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "sourceEventKey": { "type": "string", "minLength": 1 },
+        "rawRecordId": { "type": "string", "minLength": 1 },
+        "sourceDataItemId": { "type": "string", "minLength": 1 },
+        "mappingVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" }
+      }
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["machiningRunId", "status", "availableSampleCount", "totalObservationCount", "firstEvidence", "lastEvidence"],
+      "properties": {
+        "machiningRunId": { "$ref": "#/$defs/hash" },
+        "status": { "enum": ["AVAILABLE", "INSUFFICIENT_SAMPLES"] },
+        "availableSampleCount": { "type": "integer", "minimum": 0 },
+        "totalObservationCount": { "type": "integer", "minimum": 1 },
+        "medianLoad": { "type": "number", "minimum": 0 },
+        "deviationPercent": { "type": "number" },
+        "firstEvidence": { "$ref": "#/$defs/evidence" },
+        "lastEvidence": { "$ref": "#/$defs/evidence" }
+      },
+      "allOf": [{
+        "if": { "properties": { "status": { "const": "AVAILABLE" } } },
+        "then": { "required": ["medianLoad"] },
+        "else": { "not": { "anyOf": [{ "required": ["medianLoad"] }, { "required": ["deviationPercent"] }] } }
+      }]
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["programName", "toolNumber", "componentId", "sourceDataItemId", "unit", "status", "reasons", "candidatePointCount", "eligiblePointCount", "coverageRatio", "points"],
+      "properties": {
+        "programName": { "type": "string", "minLength": 1 },
+        "toolNumber": { "type": "integer", "minimum": 0 },
+        "componentId": { "type": "string", "minLength": 1 },
+        "sourceDataItemId": { "type": "string", "minLength": 1 },
+        "unit": { "const": "PERCENT" },
+        "status": { "enum": ["AVAILABLE", "INSUFFICIENT_SAMPLES", "INSUFFICIENT_COVERAGE", "BASELINE_UNAVAILABLE"] },
+        "reasons": { "type": "array", "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }, "uniqueItems": true },
+        "candidatePointCount": { "type": "integer", "minimum": 1 },
+        "eligiblePointCount": { "type": "integer", "minimum": 0 },
+        "coverageRatio": { "type": "number", "minimum": 0, "maximum": 1 },
+        "baselineMedianLoad": { "type": "number", "minimum": 0 },
+        "latestDeviationPercent": { "type": "number" },
+        "slopePercentPerPoint": { "type": "number" },
+        "points": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/point" } }
+      },
+      "allOf": [{
+        "if": { "properties": { "status": { "const": "AVAILABLE" } } },
+        "then": { "required": ["baselineMedianLoad", "latestDeviationPercent", "slopePercentPerPoint"] }
+      }]
+    }
+  }
+}

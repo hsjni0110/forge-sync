@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://forgesync.local/contracts/production/v1/observed-production-context.schema.json",
+  "title": "ForgeSync Observed Production Context v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "ruleVersion", "machineId", "replaySessionId", "throughReplaySequence", "machiningRunProcessingRunId", "programIntervals", "programSummaries", "unassignedRunCount", "partCount", "productionResultStatus"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "ruleVersion": { "const": "1.0.0" },
+    "machineId": { "type": "string", "pattern": "^[A-Za-z0-9._-]{1,64}$" },
+    "replaySessionId": { "type": "string", "format": "uuid" },
+    "throughReplaySequence": { "type": "integer", "minimum": 0 },
+    "machiningRunProcessingRunId": { "$ref": "#/$defs/hash" },
+    "programIntervals": { "type": "array", "items": { "$ref": "#/$defs/programInterval" } },
+    "programSummaries": { "type": "array", "items": { "$ref": "#/$defs/programSummary" } },
+    "unassignedRunCount": { "type": "integer", "minimum": 0 },
+    "partCount": { "$ref": "#/$defs/partCount" },
+    "productionResultStatus": { "const": "NOT_OBSERVED" }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+    "timestamp": { "type": "string", "format": "date-time" },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["replaySequence", "sourceObservedAt", "sourceEventKey", "rawRecordId", "sourceDataItemId"],
+      "properties": {
+        "replaySequence": { "type": "integer", "minimum": 0 },
+        "sourceObservedAt": { "$ref": "#/$defs/timestamp" },
+        "sourceEventKey": { "type": "string", "minLength": 1 },
+        "rawRecordId": { "type": "string", "minLength": 1 },
+        "sourceDataItemId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "programInterval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "availability", "startedAt", "startEvidence"],
+      "properties": {
+        "kind": { "enum": ["MAIN", "SUBPROGRAM"] },
+        "availability": { "enum": ["AVAILABLE", "UNAVAILABLE"] },
+        "programName": { "type": "string", "minLength": 1 },
+        "startedAt": { "$ref": "#/$defs/timestamp" },
+        "endedAt": { "$ref": "#/$defs/timestamp" },
+        "startEvidence": { "$ref": "#/$defs/evidence" },
+        "endEvidence": { "$ref": "#/$defs/evidence" }
+      },
+      "allOf": [{
+        "if": { "properties": { "availability": { "const": "AVAILABLE" } } },
+        "then": { "required": ["programName"] },
+        "else": { "not": { "required": ["programName"] } }
+      }]
+    },
+    "programSummary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["programName", "runCount", "completedRunCount", "totalDurationSeconds", "machiningRunIds"],
+      "properties": {
+        "programName": { "type": "string", "minLength": 1 },
+        "runCount": { "type": "integer", "minimum": 0 },
+        "completedRunCount": { "type": "integer", "minimum": 0 },
+        "totalDurationSeconds": { "type": "number", "minimum": 0 },
+        "meanDurationSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "medianDurationSeconds": { "type": "number", "exclusiveMinimum": 0 },
+        "machiningRunIds": { "type": "array", "items": { "$ref": "#/$defs/hash" }, "uniqueItems": true }
+      }
+    },
+    "association": {
+      "type": "object", "additionalProperties": false,
+      "required": ["observedIncrease", "fromEvidence", "toEvidence", "relationship", "overlappingMachiningRunIds"],
+      "properties": {
+        "observedIncrease": { "type": "number", "minimum": 0 },
+        "fromEvidence": { "$ref": "#/$defs/evidence" },
+        "toEvidence": { "$ref": "#/$defs/evidence" },
+        "relationship": { "const": "TEMPORAL_OVERLAP_ONLY" },
+        "overlappingMachiningRunIds": { "type": "array", "items": { "$ref": "#/$defs/hash" }, "uniqueItems": true }
+      }
+    },
+    "partCount": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "usedTransitionCount", "resetCount", "unavailableObservationCount", "associations"],
+      "properties": {
+        "status": { "enum": ["AVAILABLE", "UNAVAILABLE"] },
+        "netIncrease": { "type": "number", "minimum": 0 },
+        "usedTransitionCount": { "type": "integer", "minimum": 0 },
+        "resetCount": { "type": "integer", "minimum": 0 },
+        "unavailableObservationCount": { "type": "integer", "minimum": 0 },
+        "reason": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" },
+        "associations": { "type": "array", "items": { "$ref": "#/$defs/association" } }
+      },
+      "allOf": [{
+        "if": { "properties": { "status": { "const": "AVAILABLE" } } },
+        "then": { "required": ["netIncrease"] },
+        "else": { "required": ["reason"], "not": { "required": ["netIncrease"] } }
+      }]
+    }
+  }
+}

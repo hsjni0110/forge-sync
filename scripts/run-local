@@ -84,7 +84,7 @@ run_database_compose up --detach --wait
 run_mqtt_compose up --detach --wait
 
 printf 'Factory API와 Factory Web을 시작합니다...\n'
-canonical_run="$repository_root/datasets/canonical/nist-mazak01-20161005/0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4"
+canonical_run="$repository_root/datasets/canonical/nist-mazak01-20161005/839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c"
 FORGESYNC_REPOSITORY_ROOT="$repository_root" \
 FORGESYNC_REPLAY_SOURCE_PATH="$canonical_run" \
 FORGESYNC_REPLAY_SOURCE_SET_ID="nist-mazak01-20161005" \

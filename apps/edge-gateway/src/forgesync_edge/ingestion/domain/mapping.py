@@ -255,7 +255,7 @@ def _map_sample(candidate: MappingCandidate, definition: MappingDefinition) -> S
 def _map_event(candidate: MappingCandidate, definition: MappingDefinition) -> EventPayload:
     raw_value = _single_value(candidate)
     event_type = EventType(definition.target)
-    if _is_unavailable(raw_value):
+    if _is_unavailable(raw_value) or (event_type is EventType.SUBPROGRAM and raw_value == ""):
         return EventPayload(event_type=event_type, availability=Availability.UNAVAILABLE)
     value: str | int = raw_value
     if event_type in NUMERIC_EVENT_TYPES:

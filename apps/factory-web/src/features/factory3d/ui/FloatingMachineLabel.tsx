@@ -22,6 +22,7 @@ export function FloatingMachineLabel({
       className={`floating-machine-label${isSelected ? " is-selected" : ""}`}
       aria-pressed={isSelected}
       data-status={visualPresentation.status.toLowerCase()}
+      data-alarm-id={visualState?.activeAlarmId}
       onClick={() => onSelectMachine(binding.machineId)}
     >
       <strong>{binding.machineId}</strong>
@@ -30,8 +31,13 @@ export function FloatingMachineLabel({
       </span>
       <span className="machine-visual-status">
         <span aria-hidden="true">{visualPresentation.statusSymbol}</span>{" "}
-        {visualPresentation.statusLabel}
+        {visualPresentation.status === "FAULT" && visualState?.alarmSeverity === "CRITICAL"
+          ? "긴급 알람"
+          : visualPresentation.status === "WARNING" && visualState?.alarmSeverity === "WARNING"
+            ? "주의 알람" : visualPresentation.statusLabel}
       </span>
+      {(visualPresentation.status === "WARNING" || visualPresentation.status === "FAULT")
+        && visualState?.activeAlarmMessage && <span>{visualState.activeAlarmMessage}</span>}
       <span>
         {visualState?.rpm === undefined
           ? "RPM 확인할 수 없음"

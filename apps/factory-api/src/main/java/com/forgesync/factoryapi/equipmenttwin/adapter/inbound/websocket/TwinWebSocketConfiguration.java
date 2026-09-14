@@ -106,5 +106,10 @@ public class TwinWebSocketConfiguration implements WebMvcConfigurer {
         .allowedOrigins(allowedOrigins)
         .allowedMethods("POST", "PUT")
         .allowedHeaders("Accept", "Content-Type");
+    registry
+        .addMapping("/api/v1/alarms/*/acknowledge")
+        .allowedOrigins(allowedOrigins)
+        .allowedMethods("POST")
+        .allowedHeaders("Accept", "Content-Type");
   }
 }

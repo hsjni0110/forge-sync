@@ -7,6 +7,7 @@ import com.forgesync.factoryapi.equipmenttwin.application.DowntimeParetoProcessi
 import com.forgesync.factoryapi.equipmenttwin.domain.DowntimeEvidence;
 import com.forgesync.factoryapi.equipmenttwin.domain.DowntimeEvidenceKind;
 import com.forgesync.factoryapi.equipmenttwin.domain.DowntimeParetoEntry;
+import com.forgesync.factoryapi.equipmenttwin.domain.DowntimeParetoPolicy;
 import com.forgesync.factoryapi.equipmenttwin.domain.DowntimeParetoReport;
 import com.forgesync.factoryapi.equipmenttwin.domain.DowntimeReasonClassification;
 import com.forgesync.factoryapi.equipmenttwin.domain.IntervalBoundaryEvidence;
@@ -88,7 +89,7 @@ class DowntimeParetoContractTest {
             DowntimeReasonClassification.CONCURRENT_EVIDENCE,
             List.of(evidence));
     return new DowntimeParetoReport(
-        "1.0.0",
+        DowntimeParetoPolicy.RULE_VERSION,
         "sha256:" + "b".repeat(64),
         "sha256:" + "a".repeat(64),
         "Mazak01",

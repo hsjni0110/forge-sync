@@ -37,4 +37,15 @@ describe("DowntimeParetoPanel", () => {
 
     expect(onSelect).toHaveBeenCalledWith("2016-10-05T09:00:00Z");
   });
+
+  it("labels an observed mode change with no source value as unknown", () => {
+    const report = structuredClone(paretoFixture) as DowntimeParetoReport;
+    const modeChange = report.entries[0]?.evidence.find((evidence) =>
+      evidence.kind === "MODE_CHANGE");
+    if (modeChange) modeChange.value = "UNKNOWN";
+
+    render(<DowntimeParetoPanel report={report} onSelect={() => undefined} />);
+
+    expect(screen.getByText("운전 모드 변경 · 값 확인 불가")).toBeTruthy();
+  });
 });

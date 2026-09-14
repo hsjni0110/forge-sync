@@ -26,7 +26,8 @@ Step 34와 같은 상태 묶음을 재사용해 닫힌 `EXECUTION` 구간 중 `S
 
 - `EMERGENCY_STOP=TRIGGERED` 구간은 비가동 구간과 실제 시간 범위가 겹칠 때 연결한다.
 - 운전 모드 근거는 최초 모드 관찰을 제외한 뒤, 새 모드 구간의 시작 관찰 시점이 비가동 구간 안에
-  있을 때 연결한다.
+  있을 때 연결한다. 관찰에 모드 값이 없더라도 근거를 버리거나 값을 추측하지 않는다. Pareto rule
+  `1.1.0`은 이 경우 `UNKNOWN`을 명시적으로 보존하고 UI는 `값 확인 불가`로 설명한다.
 - CONDITION WARNING/FAULT는 점시점 관찰이다. 관찰 시각이 반열린 범위
   `[downtime.startedAt, downtime.endedAt)` 안에 있을 때만 연결하며 지속을 추론하지 않는다.
 
@@ -35,11 +36,12 @@ Step 34와 같은 상태 묶음을 재사용해 닫힌 `EXECUTION` 구간 중 `S
 
 ### 결과와 탐색은 같은 불변 입력을 가리킨다
 
-Pareto `1.0.0`은 명시적인 Utilization processing run, 그 결과가 가리키는 interval processing run,
-같은 Replay watermark까지의 CONDITION 관찰을 입력으로 한다. V011에 새 processing result를 보존하며
-기존 결과를 수정하지 않는다. Dashboard는 Replay가 일시정지 또는 완료된 안정된 cursor에서만 이
-연쇄 projection을 요청한다. 항목을 선택하면 해당 구간의 `startedAt`으로 기존 Replay seek를 보내며,
-이후 2D, 3D, current run은 기존 권위 cursor 수렴 경로를 그대로 사용한다.
+Pareto `1.0.0`과 `1.1.0`은 명시적인 Utilization processing run, 그 결과가 가리키는 interval
+processing run, 같은 Replay watermark까지의 CONDITION 관찰을 입력으로 한다. `1.1.0`은 값 없는 운전
+모드 변화도 `UNKNOWN` 근거로 보존하는 규칙 보강이다. V011에 규칙 버전별 새 processing result를
+보존하며 기존 `1.0.0` 결과를 수정하지 않는다. Dashboard는 Replay가 일시정지 또는 완료된 안정된
+cursor에서만 이 연쇄 projection을 요청한다. 항목을 선택하면 해당 구간의 `startedAt`으로 기존 Replay
+seek를 보내며, 이후 2D, 3D, current run은 기존 권위 cursor 수렴 경로를 그대로 사용한다.
 
 ## Consequences
 

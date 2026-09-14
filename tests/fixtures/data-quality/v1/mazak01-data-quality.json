@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "machineId": "Mazak01",
+  "sourceSetId": "nist-mazak01-20161005",
+  "replaySessionId": "00d64db8-967e-41ba-9d09-fdd087710aac",
+  "throughReplaySequence": 42,
+  "evaluatedAt": "2026-09-13T09:00:00Z",
+  "overallGrade": null,
+  "dimensions": {
+    "validity": {
+      "sourceProfile": { "status": "MEASURED", "numerator": 115991, "denominator": 115991, "ratio": 1.0, "grade": null, "basis": "schema-and-mapping-valid records / source records", "reason": null },
+      "runtime": { "status": "NOT_EVALUATED", "numerator": 0, "denominator": 0, "ratio": null, "grade": null, "basis": "contract rejections attributable to a trusted replay identity", "reason": "Rejected payload identity is not trusted for per-session aggregation." }
+    },
+    "completeness": { "status": "NOT_EVALUATED", "numerator": 0, "denominator": 0, "ratio": null, "grade": null, "basis": "received records / expected records", "reason": "The source declares no expected delivery cadence or record count." },
+    "ordering": {
+      "sourceProfile": { "status": "MEASURED", "numerator": 115991, "denominator": 115991, "ratio": 1.0, "grade": null, "basis": "source records preserving declared timestamp order / source records", "reason": null },
+      "runtime": { "status": "MEASURED", "numerator": 40, "denominator": 41, "ratio": 0.975609756097561, "grade": null, "basis": "accepted observations not arriving behind the session watermark / accepted observations", "reason": null }
+    },
+    "duplication": {
+      "sourceProfile": { "status": "NOT_EVALUATED", "numerator": 0, "denominator": 0, "ratio": null, "grade": null, "basis": "unique source identities / source records", "reason": "Raw records do not declare replay delivery identity." },
+      "runtime": { "status": "MEASURED", "numerator": 41, "denominator": 42, "ratio": 0.9761904761904762, "grade": null, "basis": "non-duplicate deliveries / received deliveries", "reason": null }
+    },
+    "freshness": { "status": "MEASURED", "value": "FRESH", "ageMillis": 120, "freshMaxAgeMillis": 2000, "laggingMaxAgeMillis": 10000, "basis": "PROJECTED_AT_WALL_CLOCK", "reason": null },
+    "semanticCoverage": { "status": "MEASURED", "numerator": 101693, "denominator": 115991, "ratio": 0.8767318153994706, "grade": null, "basis": "mapped records / syntactically parsed records", "reason": null, "mappingVersion": "2.3.0", "processingRunId": "sha256:839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c" }
+  },
+  "runtime": { "status": "MEASURED", "receivedCount": 42, "acceptedCount": 41, "duplicateCount": 1, "outOfOrderCount": 1, "firstIngestedAt": "2026-09-13T08:59:00Z", "lastIngestedAt": "2026-09-13T09:00:00Z", "scope": "REPLAY_SESSION_THROUGH_SEQUENCE" },
+  "derivedProcess": {
+    "segmentation": { "status": "NOT_EVALUATED", "processingRunId": null, "inputObservationCount": 0, "resultCount": 0, "reason": "No processing run exists for this replay scope." },
+    "featureCoverage": { "status": "NOT_EVALUATED", "processingRunId": null, "eligibleRunCount": 0, "availableCount": 0, "partialCount": 0, "missingCount": 0, "emptyWindowCount": 0, "reason": "No feature processing run exists for this replay scope." }
+  },
+  "unmappedDataItems": [
+    { "classification": "UNKNOWN", "dataItemId": null, "name": "Brfunc", "recordCount": 1, "firstRawRecordId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=188-234", "evidenceHref": "https://github.com/usnistgov/smstestbed/blob/968279f14ebe96c03c8877eeb1901cf6b4c8fbab/raw/Mazak01/Mazak01-20161005-20161006.txt#L5" }
+  ],
+  "evidence": { "sourceProfileProcessingRunId": "sha256:b0f6d75c12eac620b2b1a278a12fa3b5b31ef57c54290ef4afa55cc1a4179a91", "semanticMappingProcessingRunId": "sha256:839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c", "rawArtifactId": "sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf", "mappingVersion": "2.3.0", "sourceHref": "https://github.com/usnistgov/smstestbed/blob/968279f14ebe96c03c8877eeb1901cf6b4c8fbab/raw/Mazak01/Mazak01-20161005-20161006.txt" }
+}

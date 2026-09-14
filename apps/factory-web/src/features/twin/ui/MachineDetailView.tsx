@@ -162,7 +162,11 @@ export function MachineDetailView({
 
         <DetailSection title="데이터 품질">
           <DefinitionList
-            entries={[["데이터 구성", consistencyLabel(detail.consistency, replayStatus)]]}
+            entries={[
+              ["데이터 구성", consistencyLabel(detail.consistency, replayStatus)],
+              ["최신성", freshnessQualityLabel(detail.freshness.value)],
+              ["종합 점수", "종합 점수는 계산하지 않음"],
+            ]}
           />
           <h3>현재 없는 핵심 정보</h3>
           {detail.missingFields.length === 0 ? (
@@ -174,9 +178,8 @@ export function MachineDetailView({
               ))}
             </ul>
           )}
-          <p className="section-note">
-            데이터 유효성, 순서, 중복 여부 같은 상세 품질 정보는 아직 제공하지 않습니다.
-          </p>
+          <p className="section-note">유효성·완전성·순서·중복·최신성·의미 변환률은 각각 따로 확인합니다.</p>
+          <a className="inline-link" href="/data-quality">상세 데이터 품질 보기</a>
         </DetailSection>
 
         <DetailSection title="데이터 출처" wide>
@@ -257,6 +260,12 @@ function formatAge(millis: number): string {
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
   return minutes === 0 ? `${hours}시간 전` : `${hours}시간 ${minutes}분 전`;
+}
+
+function freshnessQualityLabel(value: string): string {
+  if (value === "FRESH") return "최신";
+  if (value === "LAGGING") return "반영 지연";
+  return value === "STALE" ? "오래된 데이터" : "측정 불가";
 }
 
 function MachineOperationalSummary({

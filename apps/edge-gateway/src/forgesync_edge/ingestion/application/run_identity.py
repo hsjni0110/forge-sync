@@ -7,7 +7,7 @@ import json
 
 from ..domain.mapping import MappingTable
 
-MAPPER_VERSION = "2.2.0"
+MAPPER_VERSION = "2.3.1"
 
 
 def canonical_processing_run_id(table: MappingTable, parser_version: str) -> str:

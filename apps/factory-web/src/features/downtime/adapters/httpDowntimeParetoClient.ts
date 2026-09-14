@@ -51,7 +51,7 @@ export class HttpDowntimeParetoClient implements DowntimeParetoClient {
       `/api/v1/machines/${machinePath}/downtime-pareto/processing-runs`,
       {
         utilizationProcessingRunId: processingRunIdOf(utilization),
-        ruleVersion: "1.0.0",
+        ruleVersion: "1.1.0",
       },
       "application/vnd.forgesync.downtime-pareto.v1+json",
       signal,

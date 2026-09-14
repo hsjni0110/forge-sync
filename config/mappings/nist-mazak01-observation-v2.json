@@ -1,5 +1,5 @@
 {
-  "mappingVersion": "2.2.0",
+  "mappingVersion": "2.3.0",
   "sourceSetId": "nist-mazak01-20161005",
   "machineId": "Mazak01",
   "devicesArtifactId": "sha256:bb54e4eca7b65e50b026d02b785c3f905b66bd38493456569272540296f68166",
@@ -26,6 +26,7 @@
     {"dataItemId":"Mazak01-path_19","componentId":"Mazak01-path","name":"cut_time","category":"SAMPLE","type":"ACCUMULATED_TIME","subType":"x:CUT","unit":null,"derivedUnit":"SECOND","target":"CUT_ACCUMULATED_TIME"},
     {"dataItemId":"Mazak01-electric_1","componentId":"Mazak01-electric","name":"power","category":"EVENT","type":"POWER_STATE","subType":null,"unit":null,"derivedUnit":null,"target":"POWER_STATE"},
     {"dataItemId":"Mazak01-path_1","componentId":"Mazak01-path","name":"program","category":"EVENT","type":"PROGRAM","subType":null,"unit":null,"derivedUnit":null,"target":"PROGRAM"},
+    {"dataItemId":"Mazak01-path_2","componentId":"Mazak01-path","name":"subprogram","category":"EVENT","type":"PROGRAM","subType":"x:SUB","unit":null,"derivedUnit":null,"target":"SUBPROGRAM"},
     {"dataItemId":"Mazak01-path_10","componentId":"Mazak01-path","name":"Tool_number","category":"EVENT","type":"TOOL_NUMBER","subType":null,"unit":null,"derivedUnit":null,"target":"TOOL_NUMBER"},
     {"dataItemId":"Mazak01-path_13","componentId":"Mazak01-path","name":"execution","category":"EVENT","type":"EXECUTION","subType":null,"unit":null,"derivedUnit":null,"target":"EXECUTION"},
     {"dataItemId":"Mazak01-path_14","componentId":"Mazak01-path","name":"mode","category":"EVENT","type":"CONTROLLER_MODE","subType":null,"unit":null,"derivedUnit":null,"target":"CONTROLLER_MODE"},

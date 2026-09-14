@@ -10,6 +10,8 @@ import { classificationLabel, confidenceLabel, RunDetail } from "./RunDetail";
 import { HelpTip } from "./HelpTip";
 import { useProcessAnalysis } from "./useProcessAnalysis";
 import { formatDecimal } from "../../../shared/presentation/valueFormatters";
+import { ObservedProductionContextPanel } from "../../production/ui/ObservedProductionContextPanel";
+import { ToolLoadTrendPanel } from "../../tool-load-trend/ui/ToolLoadTrendPanel";
 
 const browserClient = new HttpProcessAnalysisClient(import.meta.env.VITE_API_BASE_URL ?? "");
 
@@ -85,6 +87,8 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
       <button type="button" className="button-quiet" disabled={!canRetry} onClick={retry}>{analysis ? "분석 다시 계산" : "분석 다시 시도"}</button>
       {analysis && <p className="section-note">분석 기준 · {cursor?.sourceObservedAt} · Twin v{cursor?.twinVersion}</p>}
     </section>
+    {analysis && <ObservedProductionContextPanel machineId={machineId} analysis={analysis} compact={layout === "COMPACT"} />}
+    {analysis && <ToolLoadTrendPanel machineId={machineId} analysis={analysis} compact={layout === "COMPACT"} />}
     {layout === "COMPACT" && <div className="process-summary">
       <p>PROCESS / ANOMALY · {current ? "완료된 가공만 분석 가능" : "현재 가공의 분석 없음"}</p>
       <p className="section-note">상단 2D 보기에서 가공 목록과 이상 근거를 확인할 수 있습니다.</p>

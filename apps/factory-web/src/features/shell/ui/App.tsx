@@ -9,6 +9,10 @@ import type { ToolChangeClient } from "../../tool-change/application/ports";
 import type { ObservedToolpathClient } from "../../toolpath/application/ports";
 import type { DowntimeParetoClient } from "../../downtime/application/ports";
 import type { OperationalEffectivenessClient } from "../../effectiveness/application/ports";
+import type { ShiftOverviewClient } from "../../shift-overview/application/ports";
+import type { AlarmClient } from "../../alarm/application/ports";
+import type { DataQualityClient } from "../../data-quality/application/ports";
+import { DataQualityRoute } from "../../data-quality/ui/DataQualityRoute";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -21,6 +25,9 @@ export function App({
   observedToolpathClient,
   downtimeParetoClient,
   operationalEffectivenessClient,
+  shiftOverviewClient,
+  alarmClient,
+  dataQualityClient,
 }: {
   twinSessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
@@ -29,6 +36,9 @@ export function App({
   observedToolpathClient?: ObservedToolpathClient;
   downtimeParetoClient?: DowntimeParetoClient;
   operationalEffectivenessClient?: OperationalEffectivenessClient;
+  shiftOverviewClient?: ShiftOverviewClient;
+  alarmClient?: AlarmClient;
+  dataQualityClient?: DataQualityClient;
 }) {
   return (
     <div className="site-shell">
@@ -46,6 +56,7 @@ export function App({
         <nav aria-label="주요 메뉴">
           <NavLink to="/" end>대시보드</NavLink>
           <NavLink to="/factory">공장 보기</NavLink>
+          <NavLink to="/data-quality">데이터 품질</NavLink>
         </nav>
       </header>
       <main id="main-content" className="app-shell">
@@ -58,6 +69,8 @@ export function App({
                 replayControlClient={replayControlClient}
                 downtimeParetoClient={downtimeParetoClient}
                 operationalEffectivenessClient={operationalEffectivenessClient}
+                shiftOverviewClient={shiftOverviewClient}
+                alarmClient={alarmClient}
               />
             }
           />
@@ -70,9 +83,13 @@ export function App({
                 sceneLoader={factorySceneLoader}
                 toolChangeClient={toolChangeClient}
                 observedToolpathClient={observedToolpathClient}
+                alarmClient={alarmClient}
               />
             }
           />
+          <Route path="/data-quality" element={
+            <DataQualityRoute client={dataQualityClient} twinSessionFactory={twinSessionFactory} />
+          } />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

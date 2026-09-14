@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
+import type { ComponentType } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -13,7 +14,11 @@ import paretoFixture from "../../../../../../tests/fixtures/twin/v1/mazak01-down
 import type { DowntimeParetoReport } from "../../downtime/domain/downtimePareto";
 import type { OperationalEffectivenessClient } from "../../effectiveness/application/ports";
 import type { OperationalEffectivenessReport } from "../../effectiveness/domain/operationalEffectiveness";
+import { ShiftOverviewError } from "../../shift-overview/application/ports";
 import { DashboardRoute } from "./DashboardRoute";
+import type { AlarmClient } from "../../alarm/application/ports";
+import type { AlarmTimeline } from "../../alarm/domain/alarm";
+import alarmFixture from "../../../../../../tests/fixtures/alarm/v1/mazak01-alarm-timeline.json";
 
 const snapshot = structuredClone(twinFixture) as unknown as TwinSnapshot;
 
@@ -51,12 +56,138 @@ function renderDashboard(
 }
 
 describe("DashboardRoute", () => {
+  it("introduces the dashboard as the whole observed shift overview", () => {
+    renderDashboard({ connectionStatus: "LIVE", snapshot, freshness: "FRESH" });
+
+    expect(screen.getByRole("heading", { name: "교대조 개요" })).toBeTruthy();
+    expect(screen.getByText(/전체 관측 구간의 가동 상태와 주요 손실/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "시점 상세 보기" }).getAttribute("href")).toBe(
+      "/factory",
+    );
+  });
+
+  it("shows version-aligned shift KPIs and keeps interrupted intervals distinct", async () => {
+    const paused: ReplaySessionState = {
+      schemaVersion: "1.0.0", replaySessionId: snapshot.replayCursor.replaySessionId,
+      machineId: "Mazak01", sourceSetId: "nist-mazak01-20161005", status: "PAUSED",
+      speedMultiplier: 100, revision: 7,
+      sourceRange: { startsAt: "2016-10-05T05:27:55.740Z", endsAt: "2016-10-05T19:15:07.025Z" },
+    };
+    const replayClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(paused), start: vi.fn(), pause: vi.fn(), resume: vi.fn(),
+      changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    const shiftOverviewClient = {
+      load: vi.fn().mockResolvedValue({
+        machineId: "Mazak01", replaySessionId: snapshot.replayCursor.replaySessionId,
+        throughReplaySequence: snapshot.replayCursor.replaySequence,
+        observedFrom: "2016-10-05T05:27:55.740Z", observedTo: "2016-10-05T19:15:07.025Z",
+        availabilityPercent: 30, cuttingPercent: 40, downtimeSeconds: 160,
+        totalMachiningCount: 122, completedMachiningCount: 94,
+        intervalProcessingRunId: `sha256:${"a".repeat(64)}`,
+        utilizationProcessingRunId: `sha256:${"b".repeat(64)}`,
+        intervals: [
+          { state: "ACTIVE", startedAt: "2016-10-05T09:00:00Z", endedAt: "2016-10-05T09:01:00Z" },
+          { state: "INTERRUPTED", startedAt: "2016-10-05T09:01:00Z", endedAt: "2016-10-05T09:02:00Z" },
+        ],
+        markers: [{ kind: "TOOL_CHANGE", sourceObservedAt: "2016-10-05T09:01:30Z",
+          seekTo: "2016-10-05T09:01:30Z", label: "공구 교체 2번에서 7번" }],
+        pareto: { ...structuredClone(paretoFixture),
+          replaySessionId: snapshot.replayCursor.replaySessionId,
+          throughReplaySequence: snapshot.replayCursor.replaySequence,
+          totalDowntimeSeconds: 160 },
+      }),
+    };
+    const alarmClient: AlarmClient = {
+      find: vi.fn().mockResolvedValue(alarmFixture as AlarmTimeline), acknowledge: vi.fn(),
+    };
+    const ShiftAwareDashboard = DashboardRoute as unknown as ComponentType<Record<string, unknown>>;
+
+    render(<MemoryRouter><ShiftAwareDashboard twinSessionFactory={sessionFactoryFor({
+      connectionStatus: "LIVE", snapshot, freshness: "FRESH",
+    })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient}
+      alarmClient={alarmClient} /></MemoryRouter>);
+
+    expect(await screen.findByRole("region", { name: "교대조 핵심 지표" })).toBeTruthy();
+    expect(screen.getByText("30%")).toBeTruthy();
+    expect(screen.getByText("40%")).toBeTruthy();
+    expect(screen.getByText("전체 122건")).toBeTruthy();
+    expect(screen.getByText("완료 94건")).toBeTruthy();
+    expect(within(screen.getByRole("region", { name: "교대조 핵심 지표" }))
+      .getByText("선택 시점 데이터")).toBeTruthy();
+    expect(screen.getByRole("region", { name: "설비 상태 구간" })).toBeTruthy();
+    expect(screen.queryByText("주축 속도")).toBeNull();
+    expect(screen.getByRole("button", { name: /가공 중단.*09:01:00.*09:02:00/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "공구 교체 2번에서 7번" }));
+    await waitFor(() => expect(replayClient.seek).toHaveBeenCalledWith(
+      paused.replaySessionId, paused.revision, "2016-10-05T09:01:30Z", paused.speedMultiplier,
+    ));
+    expect(screen.getByRole("button", { name: /1위.*정지/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /주의 알람.*345/ })
+      .getAttribute("data-alarm-id")).toBe(alarmFixture.alarms[0].alarmId);
+    expect(screen.queryByText(/품질 100%/)).toBeNull();
+  });
+
+  it("announces shift loading and a version mismatch instead of keeping stale results", async () => {
+    const paused: ReplaySessionState = {
+      schemaVersion: "1.0.0", replaySessionId: snapshot.replayCursor.replaySessionId,
+      machineId: "Mazak01", sourceSetId: "nist-mazak01-20161005", status: "PAUSED",
+      speedMultiplier: 100, revision: 7,
+      sourceRange: { startsAt: "2016-10-05T05:27:55.740Z", endsAt: "2016-10-05T19:15:07.025Z" },
+    };
+    const replayClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(paused), start: vi.fn(), pause: vi.fn(), resume: vi.fn(),
+      changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    let rejectLoad: (failure: unknown) => void = () => undefined;
+    const shiftOverviewClient = { load: vi.fn().mockReturnValue(new Promise((_resolve, reject) => {
+      rejectLoad = reject;
+    })) };
+    const ShiftAwareDashboard = DashboardRoute as unknown as ComponentType<Record<string, unknown>>;
+    render(<MemoryRouter><ShiftAwareDashboard twinSessionFactory={sessionFactoryFor({
+      connectionStatus: "LIVE", snapshot, freshness: "FRESH",
+    })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient} /></MemoryRouter>);
+
+    expect(await screen.findByText("교대조 분석을 불러오는 중입니다.")).toBeTruthy();
+    rejectLoad(new ShiftOverviewError("VERSION_MISMATCH"));
+    expect((await screen.findByRole("alert")).textContent).toMatch("분석 버전이 일치하지 않습니다");
+    expect(screen.queryByRole("region", { name: "교대조 핵심 지표" })).toBeNull();
+  });
+
+  it("waits for the twin to reach the paused replay cursor before starting shift analysis", async () => {
+    const paused: ReplaySessionState = {
+      schemaVersion: "1.0.0", replaySessionId: snapshot.replayCursor.replaySessionId,
+      machineId: "Mazak01", sourceSetId: "nist-mazak01-20161005", status: "PAUSED",
+      speedMultiplier: 100, revision: 7,
+      sourceRange: { startsAt: "2016-10-05T05:27:55.740Z", endsAt: "2016-10-05T19:15:07.025Z" },
+      publicationCursor: {
+        replaySequence: snapshot.replayCursor.replaySequence + 1,
+        sourceObservedAt: "2016-10-05T19:15:07.025Z",
+        replayPublishedAt: "2026-09-12T00:00:00Z",
+      },
+    };
+    const replayClient: ReplayControlClient = {
+      load: vi.fn().mockResolvedValue(paused), start: vi.fn(), pause: vi.fn(), resume: vi.fn(),
+      changeSpeed: vi.fn(), seek: vi.fn(),
+    };
+    const shiftOverviewClient = { load: vi.fn() };
+    const ShiftAwareDashboard = DashboardRoute as unknown as ComponentType<Record<string, unknown>>;
+
+    render(<MemoryRouter><ShiftAwareDashboard twinSessionFactory={sessionFactoryFor({
+      connectionStatus: "LIVE", snapshot, freshness: "FRESH",
+    })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient} /></MemoryRouter>);
+
+    expect(await screen.findByText("Replay 데이터가 화면에 반영되기를 기다리는 중입니다.")).toBeTruthy();
+    expect(shiftOverviewClient.load).not.toHaveBeenCalled();
+    expect(screen.queryByText("교대조 분석을 불러오는 중입니다.")).toBeNull();
+  });
+
   it("shows a loading placeholder before the first snapshot", () => {
     renderDashboard({ connectionStatus: "LOADING" });
 
-    expect(screen.getByRole("heading", { name: "ForgeSync" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "교대조 개요" })).toBeTruthy();
     expect(screen.getByText(/설비 상태를 불러오는 중입니다/)).toBeTruthy();
-    expect(screen.getByRole("link", { name: "운영 뷰 열기" }).getAttribute("href")).toBe(
+    expect(screen.getByRole("link", { name: "시점 상세 보기" }).getAttribute("href")).toBe(
       "/factory",
     );
   });

@@ -11,7 +11,7 @@ import java.util.Objects;
 
 public final class DowntimeParetoPolicy {
 
-  public static final String RULE_VERSION = "1.0.0";
+  public static final String RULE_VERSION = "1.1.0";
 
   public DowntimeParetoReport rank(
       String utilizationProcessingRunId,
@@ -139,7 +139,7 @@ public final class DowntimeParetoPolicy {
     return new DowntimeEvidence(
         DowntimeEvidenceKind.MODE_CHANGE,
         interval.signal().name(),
-        interval.value(),
+        interval.value() == null ? "UNKNOWN" : interval.value(),
         interval.startedAt(),
         interval.startEvidence().replaySequence(),
         interval.startEvidence().sourceEventKey(),

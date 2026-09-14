@@ -11,12 +11,17 @@ import com.forgesync.factoryapi.processanalytics.application.MachiningRunService
 import com.forgesync.factoryapi.processanalytics.application.ProcessAnomalyAssessmentsCommand;
 import com.forgesync.factoryapi.processanalytics.application.ProcessCycleFeaturesCommand;
 import com.forgesync.factoryapi.processanalytics.application.SegmentMachiningRunsCommand;
+import com.forgesync.factoryapi.processanalytics.application.ToolLoadTrendService;
 import com.forgesync.factoryapi.processanalytics.domain.AnomalyAssessmentPolicy;
 import com.forgesync.factoryapi.processanalytics.domain.CycleBaselinePolicy;
 import com.forgesync.factoryapi.processanalytics.domain.CycleFeatureExtractor;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunSegmentationPolicy;
 import com.forgesync.factoryapi.processanalytics.domain.MachiningRunStatus;
 import com.forgesync.factoryapi.processanalytics.domain.ProcessFactSourcePolicy;
+import com.forgesync.factoryapi.processanalytics.domain.ToolLoadTrendPolicy;
+import com.forgesync.factoryapi.production.adapter.outbound.postgres.PostgresObservedProductionContextSource;
+import com.forgesync.factoryapi.production.application.ObservedProductionContextService;
+import com.forgesync.factoryapi.production.domain.ObservedProductionContextPolicy;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -203,6 +208,72 @@ class PostgresMachiningRunRepositoryIntegrationTest {
   }
 
   @Test
+  void composesObservedProductionContextAtTheMachiningRunCursorWithoutCreatingAResult() {
+    insertEvent(1, "PROGRAM", "155");
+    insertEvent(2, "SUBPROGRAM", "1001");
+    insertEvent(3, "PART_COUNT", 10);
+    insertEvent(4, "EXECUTION", "READY");
+    insertEvent(5, "EXECUTION", "ACTIVE");
+    insertEvent(6, "PART_COUNT", 12);
+    insertEvent(7, "EXECUTION", "READY");
+    var machining = service.segment(command(7));
+    var production =
+        new ObservedProductionContextService(
+                new PostgresObservedProductionContextSource(jdbcClient, OBJECT_MAPPER),
+                new ObservedProductionContextPolicy())
+            .find("Mazak01", machining.processingRunId(), "1.0.0");
+
+    assertThat(production.replaySessionId()).isEqualTo(SESSION.toString());
+    assertThat(production.throughReplaySequence()).isEqualTo(7);
+    assertThat(production.programIntervals())
+        .extracting("kind")
+        .containsExactly("MAIN", "SUBPROGRAM");
+    assertThat(production.programSummaries())
+        .singleElement()
+        .satisfies(summary -> assertThat(summary.programName()).isEqualTo("155"));
+    assertThat(production.partCount().netIncrease()).isEqualByComparingTo("2");
+    assertThat(production.partCount().associations())
+        .singleElement()
+        .satisfies(
+            association ->
+                assertThat(association.relationship()).isEqualTo("TEMPORAL_OVERLAP_ONLY"));
+  }
+
+  @Test
+  void calculatesObservedToolLoadTrendFromTheSameMachiningRunCursor() {
+    insertEvent(1, "PROGRAM", "155");
+    insertEvent(2, "TOOL_NUMBER", 4);
+    insertEvent(3, "EXECUTION", "READY");
+    long sequence = 4;
+    for (int run = 0; run < 5; run++) {
+      insertEvent(sequence++, "EXECUTION", "ACTIVE");
+      insertLoadSample(sequence++, 10 + run);
+      insertLoadSample(sequence++, 9 + run);
+      insertLoadSample(sequence++, 11 + run);
+      insertEvent(sequence++, "EXECUTION", "READY");
+    }
+    var machining = service.segment(command(sequence - 1));
+
+    var report =
+        new ToolLoadTrendService(
+                new PostgresToolLoadTrendSource(jdbcClient, OBJECT_MAPPER),
+                new ToolLoadTrendPolicy())
+            .find("Mazak01", machining.processingRunId(), "1.0.0");
+
+    assertThat(report.throughReplaySequence()).isEqualTo(sequence - 1);
+    assertThat(report.groups())
+        .singleElement()
+        .satisfies(
+            group -> {
+              assertThat(group.programName()).isEqualTo("155");
+              assertThat(group.toolNumber()).isEqualTo(4);
+              assertThat(group.sourceDataItemId()).isEqualTo("Mazak01-C_2");
+              assertThat(group.baselineMedianLoad()).isEqualByComparingTo("11.000000");
+              assertThat(group.status()).isEqualTo("AVAILABLE");
+            });
+  }
+
+  @Test
   void rollsBackCycleFeatureMetadataWhenProjectionStorageFails() {
     insertEvent(1, "EXECUTION", "READY");
     insertEvent(2, "EXECUTION", "ACTIVE");
@@ -360,15 +431,37 @@ class PostgresMachiningRunRepositoryIntegrationTest {
     insertObservation(sequence, "SAMPLE", "SPINDLE_SPEED", value);
   }
 
+  private static void insertLoadSample(long sequence, int value) {
+    insertObservation(sequence, "SAMPLE", "LOAD", value, "Mazak01-C", "Mazak01-C_2", "PERCENT");
+  }
+
   private static void insertObservation(
       long sequence, String observationKind, String signal, Object value) {
+    insertObservation(
+        sequence,
+        observationKind,
+        signal,
+        value,
+        "Mazak01-path",
+        signal.toLowerCase(),
+        observationKind.equals("SAMPLE") ? "REVOLUTION/MINUTE" : null);
+  }
+
+  private static void insertObservation(
+      long sequence,
+      String observationKind,
+      String signal,
+      Object value,
+      String componentId,
+      String sourceDataItemId,
+      String unit) {
     String sourceEventKey = "source-" + sequence;
     ObjectNode root = OBJECT_MAPPER.createObjectNode();
     root.put("schemaVersion", "2.0.0");
     root.put("eventId", UUID.nameUUIDFromBytes(sourceEventKey.getBytes()).toString());
     root.put("sourceEventKey", sourceEventKey);
     root.put("machineId", "Mazak01");
-    root.putObject("subject").put("componentId", "Mazak01-path");
+    root.putObject("subject").put("componentId", componentId);
     root.put("observationKind", observationKind);
     root.putObject("source").put("sourceObservedAt", sourceTime(sequence).toString());
     root.putObject("replay")
@@ -386,7 +479,7 @@ class PostgresMachiningRunRepositoryIntegrationTest {
         .putObject("transformation")
         .put("rawRecordId", sourceEventKey)
         .put("mappingVersion", "2.0.0")
-        .put("sourceDataItemId", signal.toLowerCase());
+        .put("sourceDataItemId", sourceDataItemId);
     ObjectNode payload = root.putObject("payload");
     payload.put(observationKind.equals("EVENT") ? "eventType" : "metric", signal);
     payload.put("availability", "AVAILABLE");
@@ -395,8 +488,8 @@ class PostgresMachiningRunRepositoryIntegrationTest {
     } else {
       payload.put("value", value.toString());
     }
-    if (observationKind.equals("SAMPLE")) {
-      payload.put("unit", "REVOLUTION/MINUTE");
+    if (unit != null) {
+      payload.put("unit", unit);
     }
 
     jdbcClient
@@ -419,7 +512,7 @@ class PostgresMachiningRunRepositoryIntegrationTest {
               replay_published_at, ingested_at, artifact_id, raw_record_id, mapping_version,
               source_data_item_id, canonical_envelope
             ) VALUES (
-              :event_id, :session, :source_key, '2.0.0', 'Mazak01', 'Mazak01-path',
+              :event_id, :session, :source_key, '2.0.0', 'Mazak01', :component_id,
               :observation_kind, :source_observed_at, :replay_sequence, :replay_published_at,
               :ingested_at, :artifact_id, :raw_record_id, '2.0.0', :source_data_item_id,
               CAST(:canonical_envelope AS JSONB)
@@ -428,6 +521,7 @@ class PostgresMachiningRunRepositoryIntegrationTest {
         .param("event_id", UUID.fromString(root.path("eventId").asText()))
         .param("session", SESSION)
         .param("source_key", sourceEventKey)
+        .param("component_id", componentId)
         .param("observation_kind", observationKind)
         .param("source_observed_at", asOffset(sourceTime(sequence)))
         .param("replay_sequence", sequence)
@@ -435,7 +529,7 @@ class PostgresMachiningRunRepositoryIntegrationTest {
         .param("ingested_at", asOffset(Instant.parse("2026-09-04T01:00:01Z")))
         .param("artifact_id", "sha256:" + "a".repeat(64))
         .param("raw_record_id", sourceEventKey)
-        .param("source_data_item_id", signal.toLowerCase())
+        .param("source_data_item_id", sourceDataItemId)
         .param("canonical_envelope", root.toString())
         .update();
   }

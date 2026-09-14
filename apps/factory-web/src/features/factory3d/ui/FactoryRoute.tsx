@@ -2,6 +2,7 @@ import {
   lazy,
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -32,6 +33,9 @@ import type { MachiningRun } from "../../process-analytics/domain/processAnalysi
 import { useObservedToolpath } from "../../toolpath/ui/useObservedToolpath";
 import { mapObservedToolpathToScene } from "../../toolpath/domain/observedToolpath";
 import { composeFunctionalTwinPresentation } from "../domain/functionalTwinPresentation";
+import type { AlarmClient } from "../../alarm/application/ports";
+import type { Alarm } from "../../alarm/domain/alarm";
+import { AlarmPanel } from "../../alarm/ui/AlarmPanel";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
@@ -42,6 +46,7 @@ export function FactoryRoute({
   processAnalysisClient,
   toolChangeClient,
   observedToolpathClient,
+  alarmClient,
 }: {
   sessionFactory: TwinSessionFactory;
   replayControlClient?: ReplayControlClient;
@@ -49,8 +54,10 @@ export function FactoryRoute({
   processAnalysisClient?: ProcessAnalysisClient;
   toolChangeClient?: ToolChangeClient;
   observedToolpathClient?: ObservedToolpathClient;
+  alarmClient?: AlarmClient;
 }) {
   const [viewMode, setViewMode] = useState<FactoryViewMode>("SPLIT");
+  const [alarms, setAlarms] = useState<Alarm[]>([]);
   const [unavailableReason, setUnavailableReason] =
     useState<SceneUnavailableReason>();
   const [isAssetFallback, setIsAssetFallback] = useState(false);
@@ -66,6 +73,10 @@ export function FactoryRoute({
     selectionStore.subscribe,
     selectionStore.currentSelection,
   );
+  const selectMachineAndShowDetails = useCallback((selectedId: string) => {
+    selectionStore.selectMachine(selectedId);
+    setViewMode((current) => current === "3D" ? "SPLIT" : current);
+  }, [selectionStore]);
   const machineId = selectedMachineId ?? MAZAK01_SCENE_BINDING.machineId;
   const replay = useReplayController(machineId, replayControlClient);
   const replayStatus = replay.session?.status;
@@ -75,6 +86,27 @@ export function FactoryRoute({
   );
   const { state: twinState, retryNow } = useTwinLiveSession(createSession);
   useReplayDrivenTwinBootstrap(replayStatus, twinState, retryNow);
+  const alarmRefreshKey = twinState.snapshot
+    ? `${twinState.snapshot.replayCursor.replaySessionId}:${twinState.snapshot.conditions
+      .map((condition) => `${condition.provenance.transformation.sourceDataItemId}:${condition.level}:${condition.nativeCode ?? ""}`)
+      .join("|")}`
+    : undefined;
+  useEffect(() => {
+    const snapshot = twinState.snapshot;
+    if (!alarmClient || !snapshot) return;
+    const abort = new AbortController();
+    void alarmClient.find(machineId, snapshot.replayCursor.replaySessionId,
+      snapshot.replayCursor.replaySequence, abort.signal)
+      .then((timeline) => { if (!abort.signal.aborted) setAlarms(timeline.alarms); })
+      .catch(() => undefined);
+    return () => abort.abort();
+  }, [alarmClient, alarmRefreshKey, machineId]);
+  const acknowledgeAlarm = useCallback(async (alarm: Alarm, operatorName: string) => {
+    if (!alarmClient) return;
+    const acknowledged = await alarmClient.acknowledge(alarm.alarmId, alarm.revision, operatorName);
+    setAlarms((current) => current.map((item) => item.alarmId === acknowledged.alarmId
+      ? acknowledged : item));
+  }, [alarmClient]);
   const visualState = useMemo(() => {
     if (!twinState.snapshot) {
       return undefined;
@@ -86,10 +118,11 @@ export function FactoryRoute({
       selectedMachineId,
       visualSpindleSourceDataItemId:
         MAZAK01_SCENE_BINDING.visualSpindleSourceDataItemId,
+      alarms,
       }),
       isReplayAdvancing: replayStatus === undefined || replayStatus === "RUNNING",
     };
-  }, [replayControlClient, replayStatus, selectedMachineId, twinState.freshness, twinState.snapshot]);
+  }, [alarms, replayControlClient, replayStatus, selectedMachineId, twinState.freshness, twinState.snapshot]);
   const visualPresentation = useMemo(
     () => deriveMachineVisualPresentation(visualState, isReducedMotion),
     [isReducedMotion, visualState],
@@ -240,7 +273,7 @@ export function FactoryRoute({
                       selectedRunLabel={(selectedPathRun ?? currentRun)?.program
                         ? `PGM ${(selectedPathRun ?? currentRun)?.program}` : "선택한 가공"}
                       toolpathStatus={observedPath.message}
-                      onSelectMachine={selectionStore.selectMachine}
+                      onSelectMachine={selectMachineAndShowDetails}
                       onAssetFallback={() => setIsAssetFallback(true)}
                       onUnavailable={setUnavailableReason}
                     />
@@ -265,6 +298,7 @@ export function FactoryRoute({
               replayStatus={replayStatus}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}
             />
+            {alarmClient && <AlarmPanel alarms={alarms} onAcknowledge={acknowledgeAlarm} />}
             {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
               session={replay.authoritativeSession} twinState={twinState} client={processAnalysisClient}
               layout={viewMode === "2D" ? "FULL" : "COMPACT"}

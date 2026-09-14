@@ -33,7 +33,7 @@ describe("HttpDowntimeParetoClient", () => {
     });
     expect(JSON.parse(fetchMock.mock.calls[2][1].body as string)).toEqual({
       utilizationProcessingRunId: `sha256:${"b".repeat(64)}`,
-      ruleVersion: "1.0.0",
+      ruleVersion: "1.1.0",
     });
   });
 });

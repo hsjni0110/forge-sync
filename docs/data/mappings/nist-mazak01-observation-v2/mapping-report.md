@@ -2,15 +2,15 @@
 
 ## Reproducibility
 
-- Processing run: `sha256:0f1a8dfec2c252df98a344fb33131f40b01fcac88f1c4f3b31f7df4da9415bc4`
-- Mapping / Mapper / Parser: `2.2.0` / `2.2.0` / `1.0.0`
+- Processing run: `sha256:839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c`
+- Mapping / Mapper / Parser: `2.3.0` / `2.3.1` / `1.0.0`
 - Raw artifact: `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf`
-- Mapping table SHA-256: `1e6d2d2381218303230bbecc404430e59acf271e4621bd2e65adc20309cc109c`
+- Mapping table SHA-256: `70d61111887fa84021375d4a80bf3924548aecb192f0d31f719e90efac8966b7`
 
 ## Semantic coverage
 
-- Mapped / parsed: 101644 / 115991 (87.63%)
-- Status counts: `{'MAPPED': 101644, 'UNKNOWN_DATA_ITEM': 22, 'UNSUPPORTED_DATA_ITEM': 14325}`
+- Mapped / parsed: 101693 / 115991 (87.67%)
+- Status counts: `{'MAPPED': 101693, 'UNKNOWN_DATA_ITEM': 22, 'UNSUPPORTED_DATA_ITEM': 14276}`
 
 ## Explicit mappings
 
@@ -58,6 +58,7 @@
 | `auto_time` | `Mazak01-path` | SAMPLE | `ACCUMULATED_TIME` | `SECOND` (derived) | `AUTO_ACCUMULATED_TIME` | 10111 | 25 | 0 |
 | `total_time` | `Mazak01-path` | SAMPLE | `ACCUMULATED_TIME` | `SECOND` (derived) | `TOTAL_ACCUMULATED_TIME` | 32471 | 25 | 0 |
 | `cut_time` | `Mazak01-path` | SAMPLE | `ACCUMULATED_TIME` | `SECOND` (derived) | `CUT_ACCUMULATED_TIME` | 3516 | 25 | 0 |
+| `subprogram` | `Mazak01-path` | EVENT | `PROGRAM` | - | `SUBPROGRAM` | 49 | 49 | 0 |
 | `motion_cond` | `Mazak01-path` | CONDITION | `MOTION_PROGRAM` | - | `MOTION_PROGRAM` | 49 | 0 | 0 |
 | `path_system` | `Mazak01-path` | CONDITION | `SYSTEM` | - | `SYSTEM` | 49 | 0 | 0 |
 | `line` | `Mazak01-path` | EVENT | `LINE` | - | `LINE` | 686 | 25 | 0 |
@@ -83,7 +84,6 @@
 | `Tool_suffix` | 595 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3206-3257` |
 | `program_cmt` | 50 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3353-3404` |
 | `subprogram_cmt` | 49 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3405-3459` |
-| `subprogram` | 49 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3610-3660` |
 | `unitNum` | 634 | `sha256:6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf#bytes=3818-3865` |
 
 ## Unknown DataItems
