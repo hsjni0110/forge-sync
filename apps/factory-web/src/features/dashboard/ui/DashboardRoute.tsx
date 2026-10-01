@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { InlineNotification, SkeletonText } from "@carbon/react";
 
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { ReplayStatus } from "../../replay/domain/replay";
@@ -204,29 +205,20 @@ export function DashboardRoute({
         <DashboardPlaceholder state={state} retryNow={retryNow} />
       )}
 
-      {isShiftCursorPending ? (
-        <section className="shift-placeholder" aria-live="polite">
-          <p>재생 데이터가 화면에 반영되기를 기다리는 중입니다.</p>
-        </section>
-      ) : shiftOverviewClient && shiftLoad.status === "LOADING" ? (
-        <section className="shift-placeholder" aria-busy="true" aria-live="polite">
-          <p>교대조 분석을 불러오는 중입니다.</p>
-        </section>
-      ) : shiftOverviewClient && shiftLoad.status === "FAILED" ? (
-        <section className="shift-placeholder" role="alert"
-          data-shift-diagnostic={shiftLoad.diagnostic}>
-          <p>{shiftFailureMessage(shiftLoad.failure)}</p>
-        </section>
-      ) : shiftLoad.report ? (
+      {shiftOverviewClient && (
+        <AnalysisReadiness
+          isCursorPending={isShiftCursorPending}
+          load={shiftLoad}
+          replayStatus={replaySession?.status}
+        />
+      )}
+
+      {shiftLoad.report && !isShiftCursorPending ? (
         <>
           <ShiftOverviewPanel report={shiftLoad.report} freshness={state.freshness}
             replayStatus={replaySession?.status} onSeek={seekToDowntime} alarms={alarms} />
           <DowntimeParetoPanel report={shiftLoad.report.pareto} onSelect={seekToDowntime} />
         </>
-      ) : shiftOverviewClient && replaySession && !["PAUSED", "COMPLETED"].includes(replaySession.status) ? (
-        <section className="shift-placeholder" aria-live="polite">
-          <p>과거 데이터 재생을 일시정지하거나 완료하면 같은 버전의 교대조 분석을 표시합니다.</p>
-        </section>
       ) : null}
 
       {!shiftOverviewClient && downtimeReport ? (
@@ -255,6 +247,83 @@ export function DashboardRoute({
         </p>
       </div>
     </section>
+  );
+}
+
+function AnalysisReadiness({
+  isCursorPending,
+  load,
+  replayStatus,
+}: {
+  isCursorPending: boolean;
+  load: {
+    status: "IDLE" | "LOADING" | "READY" | "FAILED";
+    report?: ShiftOverview;
+    failure?: "NETWORK" | "INSUFFICIENT_DATA" | "VERSION_MISMATCH";
+    diagnostic?: string;
+  };
+  replayStatus?: ReplayStatus;
+}) {
+  let content: ReactNode;
+
+  if (isCursorPending) {
+    content = <p>재생 데이터가 화면에 반영되기를 기다리는 중입니다.</p>;
+  } else if (load.status === "LOADING") {
+    content = (
+      <div className="analysis-readiness-loading" aria-busy="true">
+        <SkeletonText width="12rem" />
+        <p>교대조 분석을 불러오는 중입니다.</p>
+      </div>
+    );
+  } else if (load.status === "FAILED") {
+    content = (
+      <InlineNotification
+        kind="error"
+        lowContrast
+        hideCloseButton
+        role="alert"
+        title="분석을 준비하지 못했습니다"
+        subtitle={shiftFailureMessage(load.failure)}
+        data-shift-diagnostic={load.diagnostic}
+      />
+    );
+  } else if (load.report) {
+    content = (
+      <div className="analysis-readiness-ready">
+        <CheckIcon />
+        <div>
+          <strong>교대조 분석 준비됨</strong>
+          <p>화면과 분석이 같은 재생 버전을 사용합니다.</p>
+        </div>
+      </div>
+    );
+  } else if (replayStatus && !["PAUSED", "COMPLETED"].includes(replayStatus)) {
+    content = (
+      <InlineNotification
+        kind="info"
+        lowContrast
+        hideCloseButton
+        title="분석 대기 중"
+        subtitle="과거 데이터 재생을 일시정지하거나 완료하면 같은 버전의 교대조 분석을 표시합니다."
+      />
+    );
+  } else {
+    content = <p>재생 세션과 분석 구간을 선택하면 조사할 수 있습니다.</p>;
+  }
+
+  return (
+    <section className="analysis-readiness" aria-label="분석 가능 상태" aria-live="polite">
+      <span className="analysis-readiness-label">분석 가능 상태</span>
+      {content}
+    </section>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M13.4 4.3 6.7 11 2.9 7.2l.9-.9 2.9 2.9 5.8-5.8.9.9Z" />
+    </svg>
   );
 }
 

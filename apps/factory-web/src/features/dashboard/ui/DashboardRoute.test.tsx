@@ -103,11 +103,12 @@ describe("DashboardRoute", () => {
     };
     const ShiftAwareDashboard = DashboardRoute as unknown as ComponentType<Record<string, unknown>>;
 
-    render(<MemoryRouter><ShiftAwareDashboard twinSessionFactory={sessionFactoryFor({
+    const { container } = render(<MemoryRouter><ShiftAwareDashboard twinSessionFactory={sessionFactoryFor({
       connectionStatus: "LIVE", snapshot, freshness: "FRESH",
     })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient}
       alarmClient={alarmClient} /></MemoryRouter>);
 
+    const readiness = await screen.findByRole("region", { name: "분석 가능 상태" });
     expect(await screen.findByRole("region", { name: "교대조 핵심 지표" })).toBeTruthy();
     expect(screen.getByText("30%")).toBeTruthy();
     expect(screen.getByText("40%")).toBeTruthy();
@@ -116,8 +117,34 @@ describe("DashboardRoute", () => {
     expect(within(screen.getByRole("region", { name: "교대조 핵심 지표" }))
       .getByText("선택 시점 데이터")).toBeTruthy();
     expect(screen.getByRole("region", { name: "설비 상태 구간" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "확인할 알람" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "주요 정지 원인" })).toBeTruthy();
     expect(screen.queryByText("주축 속도")).toBeNull();
-    expect(screen.getByRole("button", { name: /가공 중단.*09:01:00.*09:02:00/ })).toBeTruthy();
+    const interrupted = screen.getByRole("button", { name: /가공 중단.*09:01:00.*09:02:00/ });
+    expect(interrupted.querySelector("svg")).toBeTruthy();
+    expect(within(interrupted).getByText("가공 중단")).toBeTruthy();
+    const alarmRegion = screen.getByRole("region", { name: "확인할 알람" });
+    expect(alarmRegion.querySelector("svg")).toBeTruthy();
+    expect(within(alarmRegion).getByText("주의 알람")).toBeTruthy();
+    const kpiBand = screen.getByRole("region", { name: "교대조 핵심 지표" });
+    expect(kpiBand.querySelectorAll(".metric-card")).toHaveLength(0);
+    expect(container.querySelectorAll(".shift-kpi-band")).toHaveLength(1);
+    expect(screen.getAllByRole("link", { name: "시점 상세 보기" })).toHaveLength(1);
+
+    const scanOrder = [
+      readiness,
+      kpiBand,
+      screen.getByRole("region", { name: "설비 상태 구간" }),
+      alarmRegion,
+      screen.getByRole("region", { name: "주요 정지 원인" }),
+      screen.getByRole("link", { name: "시점 상세 보기" }),
+    ];
+    for (let index = 0; index < scanOrder.length - 1; index += 1) {
+      expect(
+        scanOrder[index]!.compareDocumentPosition(scanOrder[index + 1]!)
+          & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
     fireEvent.click(screen.getByRole("button", { name: "공구 교체 2번에서 7번" }));
     await waitFor(() => expect(replayClient.seek).toHaveBeenCalledWith(
       paused.replaySessionId, paused.revision, "2016-10-05T09:01:30Z", paused.speedMultiplier,
@@ -180,6 +207,7 @@ describe("DashboardRoute", () => {
     expect(await screen.findByText("재생 데이터가 화면에 반영되기를 기다리는 중입니다.")).toBeTruthy();
     expect(shiftOverviewClient.load).not.toHaveBeenCalled();
     expect(screen.queryByText("교대조 분석을 불러오는 중입니다.")).toBeNull();
+    expect(screen.queryByRole("region", { name: "교대조 핵심 지표" })).toBeNull();
   });
 
   it("shows a loading placeholder before the first snapshot", () => {

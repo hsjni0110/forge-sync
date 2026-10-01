@@ -22,6 +22,10 @@ describe("DowntimeParetoPanel", () => {
     expect(within(first).getByText(/상태 경고.*DOOR OPEN/)).toBeTruthy();
     expect(screen.getByText("사유 미확인")).toBeTruthy();
     expect(screen.getByText(/원인으로 확정하지 않습니다/)).toBeTruthy();
+    expect(screen.getByRole("region", { name: "주요 정지 원인" })).toBeTruthy();
+    const unknown = screen.getByRole("button", { name: /2위.*상태 미확인/ });
+    expect(unknown.querySelector("svg")).toBeTruthy();
+    expect(within(unknown).getByText("상태 미확인")).toBeTruthy();
   });
 
   it("selects the beginning of a ranked downtime interval", () => {
