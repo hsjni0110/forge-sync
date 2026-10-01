@@ -15,6 +15,8 @@ import type { AlarmClient } from "../../alarm/application/ports";
 import type { DataQualityClient } from "../../data-quality/application/ports";
 import { DataQualityRoute } from "../../data-quality/ui/DataQualityRoute";
 import { ThemeControl, useThemePreference } from "./ThemeControl";
+import { OperationalContextProvider } from "./OperationalContext";
+import { OperationalContextBar } from "./OperationalContextBar";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -46,7 +48,8 @@ export function App({
 
   return (
     <Theme theme={theme}>
-      <div className="site-shell" data-carbon-theme={theme}>
+      <OperationalContextProvider>
+        <div className="site-shell" data-carbon-theme={theme}>
         <a className="skip-link" href="#main-content">
           본문으로 바로가기
         </a>
@@ -65,9 +68,7 @@ export function App({
           </nav>
           <ThemeControl preference={preference} onPreferenceChange={setPreference} />
         </aside>
-        <section className="operational-context" aria-label="운영 상황">
-          <p>운영 데이터의 상태와 근거를 현재 화면에서 함께 확인합니다.</p>
-        </section>
+        <OperationalContextBar />
         <main id="main-content" className="app-shell">
           <Routes>
           <Route
@@ -102,7 +103,8 @@ export function App({
           <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
-      </div>
+        </div>
+      </OperationalContextProvider>
     </Theme>
   );
 }

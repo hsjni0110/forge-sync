@@ -8,6 +8,8 @@ import { useReplayController, type ReplayController } from "./useReplayControlle
 import { UtcTimestamp } from "../../../shared/presentation/UtcTimestamp";
 import type { ToolChangeClient } from "../../tool-change/application/ports";
 import type { ToolChange } from "../../tool-change/domain/toolChange";
+import { PROCESS_GLOSSARY } from "../../../shared/presentation/processGlossary";
+import { TermHelp } from "../../../shared/presentation/TermHelp";
 
 interface ReplayControlsProps {
   machineId: string;
@@ -83,9 +85,12 @@ function ReplayControlsView({
   const timelineStyle = { "--replay-progress": `${progressPercent}%` } as CSSProperties;
 
   return (
-    <section className="replay-controls" aria-label="Replay 시간 제어">
+    <section className="replay-controls" aria-label="과거 데이터 재생 제어">
       <div className="replay-heading">
-        <strong className="replay-badge">REPLAY</strong>
+        <strong className="replay-badge" data-contract-term="Replay">
+          {PROCESS_GLOSSARY.REPLAY.label}
+        </strong>
+        <TermHelp term="REPLAY_CURSOR" />
         <span className="replay-status-pill" data-status={session?.status ?? "NONE"} aria-live="polite">
           <span className="replay-status-dot" aria-hidden="true" />
           {session ? statusLabel(session.status) : "시작 전"}
@@ -106,7 +111,7 @@ function ReplayControlsView({
             hasLoadFailure ? void reload() : void start()
           }
         >
-          {isLoading ? "Replay 확인 중" : hasLoadFailure ? "Replay 상태 다시 확인" : "Replay 시작"}
+          {isLoading ? "재생 확인 중" : hasLoadFailure ? "재생 상태 다시 확인" : "재생 시작"}
         </button>
       ) : (
         <>
@@ -160,7 +165,7 @@ function ReplayControlsView({
                 </svg>
               </button>
             </div>
-            <div className="replay-speed-toggle" role="group" aria-label="Replay 배속">
+            <div className="replay-speed-toggle" role="group" aria-label="재생 배속">
               {([1, 10, 100] as const).map((speed) => (
                 <button
                   type="button"
@@ -175,11 +180,11 @@ function ReplayControlsView({
             </div>
           </div>
           <div className="replay-timeline">
-            <span>Replay timeline</span>
+            <span>{PROCESS_GLOSSARY.REPLAY_CURSOR.label}</span>
             <input
               ref={rangeRef}
               type="range"
-              aria-label="Replay timeline"
+              aria-label="재생 위치"
               min={startMs}
               max={endMs}
               step={1000}
@@ -206,11 +211,11 @@ function ReplayControlsView({
             </div>
           </div>
           <dl className="replay-times">
-            <div><dt>Source Time</dt><dd>{snapshot?.replayCursor.sourceObservedAt ? <UtcTimestamp value={snapshot.replayCursor.sourceObservedAt} /> : "아직 없음"}</dd></div>
-            <div><dt>Replay Time</dt><dd>{snapshot?.replayCursor.replayPublishedAt ? <UtcTimestamp value={snapshot.replayCursor.replayPublishedAt} /> : "아직 없음"}</dd></div>
+            <div><dt>원천 관찰 시각</dt><dd>{snapshot?.replayCursor.sourceObservedAt ? <UtcTimestamp value={snapshot.replayCursor.sourceObservedAt} /> : "아직 없음"}</dd></div>
+            <div><dt>재생 발행 시각</dt><dd>{snapshot?.replayCursor.replayPublishedAt ? <UtcTimestamp value={snapshot.replayCursor.replayPublishedAt} /> : "아직 없음"}</dd></div>
             <div>
-              <dt>Twin Freshness</dt>
-              <dd><span className="freshness-chip" data-freshness={freshness ?? "UNKNOWN"}>{freshness ?? "확인 중"}</span></dd>
+              <dt>{PROCESS_GLOSSARY.FRESHNESS.label}</dt>
+              <dd><span className="freshness-chip" data-freshness={freshness ?? "UNKNOWN"}>{freshnessLabel(freshness)}</span></dd>
             </div>
           </dl>
         </>
@@ -218,6 +223,13 @@ function ReplayControlsView({
       {error && <p role="alert">{error}</p>}
     </section>
   );
+}
+
+function freshnessLabel(freshness: Freshness | undefined): string {
+  if (freshness === "FRESH") return "최신";
+  if (freshness === "LAGGING") return "반영 지연";
+  if (freshness === "STALE") return "오래된 데이터";
+  return "확인 중";
 }
 
 function statusLabel(status: ReplayStatus): string {

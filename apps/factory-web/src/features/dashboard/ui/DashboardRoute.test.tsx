@@ -177,7 +177,7 @@ describe("DashboardRoute", () => {
       connectionStatus: "LIVE", snapshot, freshness: "FRESH",
     })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient} /></MemoryRouter>);
 
-    expect(await screen.findByText("Replay 데이터가 화면에 반영되기를 기다리는 중입니다.")).toBeTruthy();
+    expect(await screen.findByText("재생 데이터가 화면에 반영되기를 기다리는 중입니다.")).toBeTruthy();
     expect(shiftOverviewClient.load).not.toHaveBeenCalled();
     expect(screen.queryByText("교대조 분석을 불러오는 중입니다.")).toBeNull();
   });

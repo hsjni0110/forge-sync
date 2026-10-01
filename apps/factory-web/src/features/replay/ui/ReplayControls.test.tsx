@@ -55,10 +55,11 @@ describe("ReplayControls", () => {
       />,
     );
 
-    expect(await screen.findByText("Source Time")).toBeTruthy();
-    expect(screen.getByText("Replay Time")).toBeTruthy();
-    expect(screen.getByText("Twin Freshness")).toBeTruthy();
-    expect(screen.getByRole("slider", { name: "Replay timeline" })).toBeTruthy();
+    expect(screen.getByText("과거 데이터 재생")).toBeTruthy();
+    expect(await screen.findByText("원천 관찰 시각")).toBeTruthy();
+    expect(screen.getByText("재생 발행 시각")).toBeTruthy();
+    expect(screen.getByText("데이터 최신성")).toBeTruthy();
+    expect(screen.getByRole("slider", { name: "재생 위치" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "일시정지" })).toBeTruthy();
   });
 
@@ -153,9 +154,9 @@ describe("ReplayControls", () => {
     render(<ReplayControls machineId="Mazak01" client={clientWith({ load, start })} />);
 
     expect((await screen.findByRole("alert")).textContent).toMatch(/불러오지 못했습니다/);
-    expect(screen.queryByRole("button", { name: "Replay 시작" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "재생 시작" })).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Replay 상태 다시 확인" }));
+    fireEvent.click(screen.getByRole("button", { name: "재생 상태 다시 확인" }));
     await waitFor(() => expect(load).toHaveBeenCalledTimes(2));
     expect(start).not.toHaveBeenCalled();
   });
@@ -169,7 +170,7 @@ describe("ReplayControls", () => {
     );
 
     expect(
-      (await screen.findByRole("button", { name: "Replay 시작" })).hasAttribute("disabled"),
+      (await screen.findByRole("button", { name: "재생 시작" })).hasAttribute("disabled"),
     ).toBe(false);
   });
 });

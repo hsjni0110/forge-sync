@@ -4,6 +4,11 @@ import type { TwinSessionFactory } from "../../twin/application/ports";
 import { useTwinLiveSession } from "../../twin/ui/useTwinLiveSession";
 import type { DataQualityClient } from "../application/ports";
 import type { DataQualityReport } from "../domain/dataQuality";
+import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
+import {
+  useOperationalContextPublisher,
+  type OperationalContextValue,
+} from "../../shell/ui/OperationalContext";
 
 const MACHINE_ID = "Mazak01";
 
@@ -20,6 +25,14 @@ export function DataQualityRoute({
   const [scopedReport, setScopedReport] = useState<DataQualityReport>();
   const [sourceFailure, setSourceFailure] = useState<string>();
   const cursor = state.snapshot?.replayCursor;
+  useOperationalContextPublisher({
+    machineId: MACHINE_ID,
+    connection: connectionContext(state.connectionStatus),
+    freshness: freshnessContext(state.freshness),
+    replay: cursor
+      ? { label: `재생 범위 #${cursor.replaySequence}`, tone: "positive" }
+      : { label: "재생 범위 확인 중", tone: "neutral" },
+  });
 
   useEffect(() => {
     if (!client) return;
@@ -91,7 +104,7 @@ export function DataQualityView({
         <h1>데이터 품질</h1>
         <p>{report.machineId}의 원천·수신·파생 품질을 서로 섞지 않고 보여줍니다.</p>
         <strong className="quality-no-score">종합 품질 점수 없음</strong>
-        {refreshing && <p role="status">현재 Replay 범위의 수신 품질을 맞추는 중입니다.</p>}
+        {refreshing && <p role="status">현재 재생 범위의 수신 품질을 맞추는 중입니다.</p>}
       </header>
 
       <section className="quality-dimension-grid" aria-label="데이터 품질 차원">
@@ -102,13 +115,13 @@ export function DataQualityView({
         <DimensionCard title="완전성" description="기대해야 할 데이터 대비 빠진 양입니다.">
           <MeasurementRow label="레코드 연속성" measurement={dimensions.completeness} />
         </DimensionCard>
-        <DimensionCard title="순서" description="선언된 Replay 순서보다 뒤늦게 도착했는지 확인합니다.">
+        <DimensionCard title="순서" description="선언된 재생 순서보다 뒤늦게 도착했는지 확인합니다.">
           <MeasurementRow label="원천 파일" measurement={dimensions.ordering.sourceProfile} />
-          <MeasurementRow label="현재 Replay" measurement={dimensions.ordering.runtime} />
+          <MeasurementRow label="현재 재생" measurement={dimensions.ordering.runtime} />
         </DimensionCard>
         <DimensionCard title="중복" description="같은 수신 identity가 반복 전달됐는지 확인합니다.">
           <MeasurementRow label="원천 파일" measurement={dimensions.duplication.sourceProfile} />
-          <MeasurementRow label="현재 Replay" measurement={dimensions.duplication.runtime} />
+          <MeasurementRow label="현재 재생" measurement={dimensions.duplication.runtime} />
         </DimensionCard>
         <DimensionCard title="최신성" description="원천 시각이 아닌 마지막 반영 시각을 기준으로 합니다.">
           <p className="quality-reading">
@@ -125,7 +138,7 @@ export function DataQualityView({
       </section>
 
       <section className="quality-section">
-        <header><h2>현재 Replay 수신</h2><p>세션과 cursor 범위로만 집계합니다.</p></header>
+        <header><h2>현재 재생 수신</h2><p>세션과 재생 위치 범위로만 집계합니다.</p></header>
         {report.runtime.status === "MEASURED" ? (
           <dl className="quality-facts">
             <Fact label="받음" value={report.runtime.receivedCount} />
@@ -133,7 +146,7 @@ export function DataQualityView({
             <Fact label="중복" value={report.runtime.duplicateCount} />
             <Fact label="순서 지연" value={report.runtime.outOfOrderCount} />
           </dl>
-        ) : <p className="quality-unavailable">Replay 수신 범위가 없어 측정하지 않았습니다.</p>}
+        ) : <p className="quality-unavailable">재생 수신 범위가 없어 측정하지 않았습니다.</p>}
       </section>
 
       <section className="quality-section">
@@ -185,6 +198,23 @@ export function DataQualityView({
       </details>
     </article>
   );
+}
+
+function connectionContext(status: TwinLiveState["connectionStatus"]): OperationalContextValue {
+  return {
+    LOADING: { label: "불러오는 중", tone: "neutral" },
+    LIVE: { label: "연결됨", tone: "positive" },
+    RECONNECTING: { label: "다시 연결 중", tone: "warning" },
+    RESYNCING: { label: "상태 동기화 중", tone: "warning" },
+    UNAVAILABLE: { label: "연결할 수 없음", tone: "critical" },
+  }[status] as OperationalContextValue;
+}
+
+function freshnessContext(freshness: TwinLiveState["freshness"]): OperationalContextValue {
+  if (freshness === "FRESH") return { label: "최신", tone: "positive" };
+  if (freshness === "LAGGING") return { label: "반영 지연", tone: "warning" };
+  if (freshness === "STALE") return { label: "오래된 데이터", tone: "critical" };
+  return { label: "최신성 확인 중", tone: "neutral" };
 }
 
 function DimensionCard({ title, description, children }: { title: string; description: string; children: ReactNode }) {

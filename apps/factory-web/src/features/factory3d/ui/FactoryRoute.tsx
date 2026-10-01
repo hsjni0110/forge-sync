@@ -36,6 +36,13 @@ import { composeFunctionalTwinPresentation } from "../domain/functionalTwinPrese
 import type { AlarmClient } from "../../alarm/application/ports";
 import type { Alarm } from "../../alarm/domain/alarm";
 import { AlarmPanel } from "../../alarm/ui/AlarmPanel";
+import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
+import type { ReplayStatus } from "../../replay/domain/replay";
+import {
+  useOperationalContextPublisher,
+  type OperationalContextValue,
+} from "../../shell/ui/OperationalContext";
+import { PROCESS_GLOSSARY } from "../../../shared/presentation/processGlossary";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
@@ -85,6 +92,12 @@ export function FactoryRoute({
     [machineId, sessionFactory],
   );
   const { state: twinState, retryNow } = useTwinLiveSession(createSession);
+  useOperationalContextPublisher({
+    machineId,
+    connection: connectionContext(twinState.connectionStatus),
+    freshness: freshnessContext(twinState.freshness),
+    replay: replayContext(replayStatus),
+  });
   useReplayDrivenTwinBootstrap(replayStatus, twinState, retryNow);
   const alarmRefreshKey = twinState.snapshot
     ? `${twinState.snapshot.replayCursor.replaySessionId}:${twinState.snapshot.conditions
@@ -188,7 +201,7 @@ export function FactoryRoute({
             <span>{machineId}</span>
             <span>운영 트윈</span>
           </h1>
-          <p>같은 Twin State를 2D와 공간 3D에 동기화합니다.</p>
+          <p>같은 설비 상태를 2D와 공간 3D에 동기화합니다.</p>
         </div>
         <div className="factory-controls">
           <div className="view-toggle" role="group" aria-label="공장 보기 방식">
@@ -233,7 +246,7 @@ export function FactoryRoute({
           {staleAfterSeconds}초 동안 새 값이 없으면 안전하게 오래된 데이터로 표시합니다.
           데이터 재생이 끝났다는 뜻은 아닙니다.
         </p>
-        <p>Layout provenance · {machineBinding.spatialProvenance}</p>
+        <p>배치 {PROCESS_GLOSSARY.PROVENANCE.label} · {machineBinding.spatialProvenance}</p>
         {machineBinding.spatialAvailability === "FALLBACK" && (
           <p>배치 정보 사용 불가 · 기본 배치를 표시합니다.</p>
         )}
@@ -324,6 +337,41 @@ export function FactoryRoute({
       )}
     </section>
   );
+}
+
+function connectionContext(status: TwinLiveState["connectionStatus"]): OperationalContextValue {
+  return {
+    LOADING: { label: "불러오는 중", tone: "neutral" },
+    LIVE: { label: "연결됨", tone: "positive" },
+    RECONNECTING: { label: "다시 연결 중", tone: "warning" },
+    RESYNCING: { label: "상태 동기화 중", tone: "warning" },
+    UNAVAILABLE: { label: "연결할 수 없음", tone: "critical" },
+  }[status] as OperationalContextValue;
+}
+
+function freshnessContext(freshness: TwinLiveState["freshness"]): OperationalContextValue {
+  if (freshness === "FRESH") return { label: "최신", tone: "positive" };
+  if (freshness === "LAGGING") return { label: "반영 지연", tone: "warning" };
+  if (freshness === "STALE") return { label: "오래된 데이터", tone: "critical" };
+  return { label: "최신성 확인 중", tone: "neutral" };
+}
+
+function replayContext(status: ReplayStatus | undefined): OperationalContextValue {
+  const labels: Record<ReplayStatus, string> = {
+    PREPARING: "준비 중",
+    RUNNING: "재생 중",
+    PAUSED: "일시정지됨",
+    SEEKING: "이동 중",
+    COMPLETED: "재생 완료",
+    FAILED: "재생 실패",
+  };
+  if (status === undefined) {
+    return { label: `${PROCESS_GLOSSARY.REPLAY.label} 시작 전`, tone: "neutral" };
+  }
+  const tone = status === "FAILED" ? "critical"
+    : status === "RUNNING" ? "positive"
+      : status === "SEEKING" || status === "PREPARING" ? "warning" : "neutral";
+  return { label: `${PROCESS_GLOSSARY.REPLAY.label} ${labels[status]}`, tone };
 }
 
 /**

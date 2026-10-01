@@ -35,3 +35,28 @@ textarea {
 .skip-link:focus {
   transform: translateY(0);
 }
+
+.term-help-trigger.cds--toggletip-button {
+  display: inline-grid;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-inline-start: 0.25rem;
+  padding: 0;
+  place-items: center;
+  color: var(--fs-text-muted);
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.term-help-content p {
+  margin: 0 0 0.5rem;
+  line-height: 1.45;
+}
+
+.term-help-content small {
+  color: var(--fs-text-muted);
+  font-size: 0.75rem;
+}

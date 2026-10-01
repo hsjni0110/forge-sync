@@ -77,6 +77,36 @@ describe("App", () => {
     expect(screen.getByRole("region", { name: "운영 상황" })).toBeTruthy();
   });
 
+  it("shows the active route's machine, connection, freshness, and replay context", () => {
+    render(
+      <MemoryRouter>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    const context = screen.getByRole("region", { name: "운영 상황" });
+    expect(context.textContent).toContain("Mazak01");
+    expect(context.textContent).toContain("불러오는 중");
+    expect(context.textContent).toContain("최신성 확인 중");
+    expect(context.textContent).toContain("과거 데이터 재생 시작 전");
+  });
+
+  it("replaces factory context when navigating to data quality", () => {
+    render(
+      <MemoryRouter initialEntries={["/factory"]}>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    const context = screen.getByRole("region", { name: "운영 상황" });
+    expect(context.textContent).toContain("과거 데이터 재생 시작 전");
+
+    fireEvent.click(screen.getByRole("link", { name: "데이터 품질" }));
+
+    expect(context.textContent).toContain("재생 범위 확인 중");
+    expect(context.textContent).not.toContain("과거 데이터 재생 시작 전");
+  });
+
   it("follows the system theme until the user chooses an override", () => {
     stubDarkSystemTheme();
 
