@@ -11,6 +11,7 @@ import { HttpShiftOverviewClient } from "./features/shift-overview/adapters/http
 import { HttpAlarmClient } from "./features/alarm/adapters/httpAlarmClient";
 import { HttpDataQualityClient } from "./features/data-quality/adapters/httpDataQualityClient";
 import "./styles.css";
+import "./styles/index.scss";
 
 const root = document.getElementById("root");
 const twinSessionFactory = createBrowserTwinSessionFactory(
