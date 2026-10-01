@@ -71,8 +71,8 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
         <div><dt>기준선</dt><dd>{GLOSSARY.baseline}</dd></div>
       </dl>
     </div>}
-    <section className="detail-section" aria-label="CURRENT RUN · 현재 가공">
-      <h2>CURRENT RUN · 현재 가공</h2>
+    <section className="detail-section" aria-label="현재 가공">
+      <h2>현재 가공</h2>
       {!analysis ? <p role="status">{message}</p> : current ? <>
         <p className="run-detail-badges">
           <span className="status-badge" data-status="active">{runStatusLabel(current)}</span>
@@ -90,7 +90,7 @@ export function ProcessAnalysisPanel({ machineId, session, twinState, retryTwin,
     {analysis && <ObservedProductionContextPanel machineId={machineId} analysis={analysis} compact={layout === "COMPACT"} />}
     {analysis && <ToolLoadTrendPanel machineId={machineId} analysis={analysis} compact={layout === "COMPACT"} />}
     {layout === "COMPACT" && <div className="process-summary">
-      <p>PROCESS / ANOMALY · {current ? "완료된 가공만 분석 가능" : "현재 가공의 분석 없음"}</p>
+      <p>공정 분석 · {current ? "완료된 가공만 분석 가능" : "현재 가공의 분석 없음"}</p>
       <p className="section-note">상단 2D 보기에서 가공 목록과 이상 근거를 확인할 수 있습니다.</p>
     </div>}
     {analysis && layout === "FULL" && <section className="detail-section" aria-label="가공 목록과 상세">

@@ -30,7 +30,7 @@ export function ShiftOverviewPanel({
     <section className="shift-overview" aria-labelledby="shift-overview-title">
       <div className="shift-overview-heading">
         <div>
-          <h2 id="shift-overview-title">관측 구간 요약</h2>
+          <h2 id="shift-overview-title">교대조 관측 구간</h2>
           <p>{clock(report.observedFrom)} - {clock(report.observedTo)} UTC</p>
         </div>
         <span className="provenance-chip">같은 Replay 버전</span>
@@ -48,7 +48,7 @@ export function ShiftOverviewPanel({
 
       <section className="shift-timeline-section" aria-labelledby="shift-timeline-title">
         <div className="shift-timeline-heading">
-          <h3 id="shift-timeline-title">Replay 상태 흐름</h3>
+          <h3 id="shift-timeline-title">설비 상태 흐름</h3>
           <p>색과 상태 이름을 함께 표시합니다.</p>
         </div>
         <section className="shift-timeline" aria-label="설비 상태 구간">
@@ -74,7 +74,7 @@ export function ShiftOverviewPanel({
                 data-kind="ALARM" data-severity={alarm.severity} data-alarm-id={alarm.alarmId}
                 style={{ left: `${left}%` }} onClick={() => onSeek(alarm.openedAt)}
                 aria-label={`${severity} 알람 · 코드 ${alarm.nativeCode} · ${alarm.message ?? alarm.conditionType}`}>
-                <span aria-hidden="true">!</span>
+                <WarningIcon />
               </button>
             );
           })}
@@ -87,6 +87,32 @@ export function ShiftOverviewPanel({
             <li key={state} data-state={state}><span aria-hidden="true" />{label}</li>
           ))}
         </ul>
+      </section>
+
+      <section className="shift-alarm-summary" aria-label="확인할 알람">
+        <header>
+          <h3>확인할 알람</h3>
+          <span>{alarms.length}건</span>
+        </header>
+        {alarms.length === 0 ? (
+          <p>이 관측 구간에 연결된 알람이 없습니다.</p>
+        ) : (
+          <ul>
+            {alarms.map((alarm) => (
+              <li key={alarm.alarmId} data-severity={alarm.severity}>
+                <button type="button" onClick={() => onSeek(alarm.openedAt)}
+                  aria-label={`알람 상세로 이동 · 코드 ${alarm.nativeCode} · ${clock(alarm.openedAt)} UTC`}>
+                  <WarningIcon />
+                  <span>
+                    <strong>{alarm.severity === "CRITICAL" ? "긴급 알람" : "주의 알람"}</strong>
+                    <small>{alarm.nativeCode} · {alarm.message ?? alarm.conditionType}</small>
+                  </span>
+                  <time dateTime={alarm.openedAt}>{clock(alarm.openedAt)} UTC</time>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </section>
   );
@@ -103,9 +129,30 @@ function IntervalButton({ interval, report, onSeek }: {
       style={{ left: `${start}%`, width: `${Math.max(0.25, end - start)}%` }}
       onClick={() => onSeek(interval.startedAt)}
       aria-label={`${STATE_LABELS[interval.state]} ${clock(interval.startedAt)} - ${endLabel}`}>
+      <StateIcon state={interval.state} />
       <span>{STATE_LABELS[interval.state]}</span>
     </button>
   );
+}
+
+function StateIcon({ state }: { state: ShiftState }) {
+  if (state === "INTERRUPTED") {
+    return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M2 2h4v12H2V2Zm8 0h4v12h-4V2Z" />
+    </svg>;
+  }
+  if (state === "UNKNOWN") {
+    return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M7.3 10.3h1.4v1.4H7.3v-1.4Zm.7-8a4 4 0 0 1 2.4 7.2c-.9.7-1.7 1-1.7 1.9H7.3c0-1.6 1.1-2.3 2.1-3A2.6 2.6 0 1 0 5.4 6H4a4 4 0 0 1 4-3.7Z" />
+    </svg>;
+  }
+  return null;
+}
+
+function WarningIcon() {
+  return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <path d="M8 1.6 15 14H1L8 1.6Zm0 3L3.4 12.7h9.2L8 4.6ZM7.3 7h1.4v3.2H7.3V7Zm0 4.1h1.4v1.4H7.3v-1.4Z" />
+  </svg>;
 }
 
 function ShiftKpi({ label, value, detail, provenance }: {

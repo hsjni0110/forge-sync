@@ -1,0 +1,172 @@
+.quality-page {
+  display: grid;
+  gap: 1px;
+  max-width: 96rem;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  background: var(--fs-border);
+}
+
+.quality-header,
+.quality-group {
+  background: var(--fs-surface);
+}
+
+.quality-header {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) minmax(20rem, 2fr);
+  gap: 0.35rem 2rem;
+  padding: 2rem;
+}
+
+.quality-header .eyebrow,
+.quality-header h1,
+.quality-header p { margin: 0; }
+.quality-header .eyebrow { grid-column: 1 / -1; }
+.quality-header h1 { color: var(--fs-text); font-size: var(--fs-type-display); letter-spacing: -0.04em; }
+.quality-header > p:nth-of-type(2) { align-self: end; color: var(--fs-text-muted); line-height: 1.6; }
+.quality-no-score {
+  grid-column: 2;
+  width: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fs-text-muted);
+  font-size: var(--fs-type-sm);
+}
+
+.quality-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(20rem, 0.72fr);
+  gap: 1px;
+  background: var(--fs-border);
+}
+
+.quality-group {
+  min-width: 0;
+  padding: 1.5rem 2rem;
+}
+
+.quality-source,
+.quality-runtime,
+.quality-unmapped { grid-column: 1; }
+.quality-freshness,
+.quality-derived-group { grid-column: 2; }
+.quality-freshness { grid-row: 1; }
+.quality-derived-group { grid-row: 2; }
+.quality-unmapped { grid-column: 1 / -1; }
+
+.quality-group-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--fs-border-strong);
+}
+.quality-group-heading h2,
+.quality-group-heading p { margin: 0; }
+.quality-group-heading h2 { font-size: var(--fs-type-xl); letter-spacing: -0.02em; }
+.quality-group-heading p { margin-top: 0.35rem; color: var(--fs-text-muted); font-size: var(--fs-type-sm); line-height: 1.5; }
+
+.quality-dimension-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--fs-border);
+  border-left: 1px solid var(--fs-border);
+}
+.quality-runtime .quality-dimension-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.quality-dimension,
+.quality-runtime-validity {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 0;
+  border-right: 1px solid var(--fs-border);
+  border-bottom: 1px solid var(--fs-border);
+  background: transparent;
+}
+.quality-dimension header { display: grid; gap: 0.25rem; }
+.quality-dimension h2,
+.quality-dimension p { margin: 0; }
+.quality-dimension h2 { font-size: var(--fs-type-base); }
+.quality-dimension header p { color: var(--fs-text-muted); font-size: var(--fs-type-xs); line-height: 1.4; }
+
+.quality-measurement {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--fs-border);
+}
+.quality-measurement:first-child { border-top: 0; }
+.quality-measurement span { color: var(--fs-text-muted); font-size: var(--fs-type-sm); }
+.quality-measurement strong { color: var(--fs-text); font-variant-numeric: tabular-nums; }
+.quality-measurement small { grid-column: 1 / -1; color: var(--fs-text-muted); overflow-wrap: anywhere; }
+.quality-measurement strong:has(+ small) { white-space: nowrap; }
+
+.quality-evidence {
+  margin-top: 1rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.quality-evidence summary { padding: 0.75rem 0; border-top: 1px solid var(--fs-border); cursor: pointer; }
+.quality-evidence dl { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.5rem 1rem; }
+.quality-evidence dt { color: var(--fs-text-muted); }
+.quality-evidence dd { margin: 0; overflow-wrap: anywhere; font-family: ui-monospace, monospace; font-size: var(--fs-type-xs); }
+
+.quality-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 1rem 0 0;
+  border-block: 1px solid var(--fs-border);
+}
+.quality-facts div { padding: 0.75rem; border-left: 1px solid var(--fs-border); }
+.quality-facts div:first-child { border-left: 0; }
+.quality-facts dt { color: var(--fs-text-muted); font-size: var(--fs-type-xs); }
+.quality-facts dd { margin: 0.25rem 0 0; font-size: var(--fs-type-xl); font-weight: 700; }
+
+.quality-derived-grid { display: grid; grid-template-columns: 1fr; gap: 1px; margin: 0; background: var(--fs-border); }
+.quality-derived { padding: 1rem; border: 0; background: var(--fs-canvas); }
+.quality-derived h3 { margin: 0 0 0.75rem; font-size: var(--fs-type-base); }
+.quality-derived dl { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0; }
+.quality-derived dl div { display: flex; justify-content: space-between; gap: 0.75rem; }
+.quality-derived dt { color: var(--fs-text-muted); }
+.quality-derived dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 700; }
+.quality-not-evaluated { border-left: 3px solid var(--fs-border-strong); padding-left: 0.75rem; }
+.quality-not-evaluated strong { color: var(--fs-text); }
+.quality-not-evaluated p { margin: 0.35rem 0 0; color: var(--fs-text-muted); font-size: var(--fs-type-sm); line-height: 1.45; }
+.quality-reading { color: var(--fs-text); font-size: var(--fs-type-2xl); font-weight: 700; }
+
+.quality-table-wrap { max-width: 100%; overflow-x: auto; }
+.quality-table { width: 100%; min-width: 42rem; border-collapse: collapse; font-size: var(--fs-type-sm); }
+.quality-table th,
+.quality-table td { padding: 0.875rem; border-bottom: 1px solid var(--fs-border); text-align: left; }
+.quality-table th { position: sticky; top: 0; background: var(--fs-surface); color: var(--fs-text-muted); font-size: var(--fs-type-xs); }
+.quality-table th small,
+.quality-table td small { display: block; color: var(--fs-text-muted); }
+
+@media (max-width: 48rem) {
+  .quality-page { padding: 1rem; }
+  .quality-header { grid-template-columns: 1fr; padding: 1.5rem; }
+  .quality-no-score { grid-column: 1; }
+  .quality-workspace { grid-template-columns: minmax(0, 1fr); }
+  .quality-source,
+  .quality-runtime,
+  .quality-freshness,
+  .quality-derived-group,
+  .quality-unmapped { grid-column: 1; grid-row: auto; }
+  .quality-group { padding: 1.25rem; }
+  .quality-dimension-list,
+  .quality-runtime .quality-dimension-list { grid-template-columns: 1fr; }
+  .quality-facts { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 30rem) {
+  .quality-facts,
+  .quality-derived dl { grid-template-columns: 1fr; }
+}

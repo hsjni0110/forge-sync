@@ -34,12 +34,12 @@ export function useReplayController(machineId: string, client?: ReplayControlCli
     const request = ++generation.current;
     try {
       const session = await client.load(machineId);
-      if (session && session.machineId !== machineId) throw new Error("Replay machine mismatch");
+      if (session && session.machineId !== machineId) throw new Error("재생 설비가 일치하지 않습니다.");
       if (request === generation.current) setState({ machineId, session, confirmedSession: session,
         isLoading: false, isCommandPending: false, hasLoadFailure: false });
     } catch {
       if (request === generation.current) setState((previous) => ({ ...previous, isLoading: false,
-        hasLoadFailure: true, error: "Replay 상태를 불러오지 못했습니다. 서버 연결을 확인한 뒤 다시 시도해 주세요." }));
+        hasLoadFailure: true, error: "재생 상태를 불러오지 못했습니다. 서버 연결을 확인한 뒤 다시 시도해 주세요." }));
     }
   }, [client, machineId]);
 
@@ -82,7 +82,7 @@ export function useReplayController(machineId: string, client?: ReplayControlCli
     setState((value) => ({ ...value, isCommandPending: true, error: undefined,
       session: { ...previous, status: optimisticStatus } }));
     const settle = (session: ReplaySessionState) => {
-      if (session.machineId !== machineId) throw new Error("Replay machine mismatch");
+      if (session.machineId !== machineId) throw new Error("재생 설비가 일치하지 않습니다.");
       if (request === generation.current) setState({ machineId, session, confirmedSession: session,
         isLoading: false, isCommandPending: false, hasLoadFailure: false });
     };
@@ -123,7 +123,7 @@ export function useReplayController(machineId: string, client?: ReplayControlCli
         isLoading: false, isCommandPending: false, hasLoadFailure: false });
     } catch {
       if (request === generation.current) setState((value) => ({ ...value, isLoading: false,
-        isCommandPending: false, hasLoadFailure: true, error: "Replay를 시작할 수 없습니다." }));
+        isCommandPending: false, hasLoadFailure: true, error: "과거 데이터 재생을 시작할 수 없습니다." }));
     } finally {
       if (request === generation.current) commandPending.current = false;
     }

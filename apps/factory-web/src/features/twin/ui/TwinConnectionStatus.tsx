@@ -4,6 +4,8 @@ import {
   deriveTwinPresentation,
   type ReplayLifecycleStatus,
 } from "../application/twinPresentationPolicy";
+import { TermHelp } from "../../../shared/presentation/TermHelp";
+import { PROCESS_GLOSSARY } from "../../../shared/presentation/processGlossary";
 
 interface TwinConnectionStatusViewProps {
   state: TwinLiveState;
@@ -43,6 +45,17 @@ export function TwinConnectionStatus({
         value={isHistoricalReplay ? "REPLAY_SNAPSHOT" : state.freshness ?? "UNAVAILABLE"}
         labelOverride={presentation.freshnessLabel}
       />
+      {layout === "FULL" && state.snapshot && (
+        <StatusValue
+          label={
+            <span className="status-label-with-help">
+              {PROCESS_GLOSSARY.TWIN_VERSION.label}
+              <TermHelp term="TWIN_VERSION" />
+            </span>
+          }
+          value={`v${state.snapshot.consistency.twinVersion}`}
+        />
+      )}
     </section>
   );
 }
@@ -52,7 +65,7 @@ function StatusValue({
   value,
   labelOverride,
 }: {
-  label: string;
+  label: React.ReactNode;
   value: string;
   labelOverride?: string;
 }) {
@@ -78,6 +91,6 @@ const STATUS_LABELS: Record<string, string> = {
   FRESH: "최신",
   LAGGING: "지연됨",
   STALE: "오래된 데이터",
-  REPLAY_CONNECTED: "Replay 연결됨",
+  REPLAY_CONNECTED: "과거 데이터 재생 연결됨",
   REPLAY_SNAPSHOT: "재생 기준 데이터",
 };

@@ -1,17 +1,18 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 import { describe, expect, it } from "vitest";
 
-const styles = readFileSync("src/styles.css", "utf8");
+const factoryStylesPath = "src/styles/_factory.scss";
+const styles = existsSync(factoryStylesPath) ? readFileSync(factoryStylesPath, "utf8") : "";
 
 describe("factory 3D layout", () => {
-  it("bounds the two scene-panel children without an unused intrinsic grid row", () => {
-    expect(styles).toContain(
-      ".factory-console .scene-panel { display: grid; grid-template-rows: auto minmax(0, 1fr); }",
-    );
+  it("names the four desktop investigation areas", () => {
+    expect(styles).toMatch(/grid-template-areas:\s*"detail scene inspector"\s*"transport scene inspector"/);
   });
 
-  it("gives the canvas a definite height when split panels stack on a narrow screen", () => {
-    expect(styles).toContain(".factory-console .scene-canvas-stage { height: 23rem; }");
+  it("stacks critical state and transport before the scene on narrow screens", () => {
+    expect(styles).toMatch(/grid-template-areas:\s*"detail"\s*"transport"\s*"scene"\s*"inspector"/);
+    expect(styles).toContain(".scene-canvas-stage");
+    expect(styles).toContain("height: 23rem");
   });
 });

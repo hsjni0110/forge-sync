@@ -52,13 +52,13 @@ test("available WebGL keeps the 3D factory scene visible", async ({ page }) => {
 
   await page.getByRole("button", { name: "평면 보기" }).click();
   await expect(
-    page.locator(".metric-card").filter({ hasText: "X축 위치" }).getByText("80.08 mm"),
+    page.locator(".machine-reading").filter({ hasText: "X축 위치" }).getByText("80.08 mm"),
   ).toBeVisible();
   await expect(
-    page.locator(".metric-card").filter({ hasText: "Y축 위치" }).getByText("-68.79 mm"),
+    page.locator(".machine-reading").filter({ hasText: "Y축 위치" }).getByText("-68.79 mm"),
   ).toBeVisible();
   await expect(
-    page.locator(".metric-card").filter({ hasText: "Z축 위치" }).getByText("9.64 mm"),
+    page.locator(".machine-reading").filter({ hasText: "Z축 위치" }).getByText("9.64 mm"),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "데이터 품질" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "데이터 출처" })).toBeVisible();

@@ -1,5 +1,6 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { ZoomFit, ZoomIn, ZoomOut } from "@carbon/icons-react";
 
 import { FloatingMachineLabel } from "./FloatingMachineLabel";
 import type { FactorySceneProps } from "./factorySceneContract";
@@ -31,10 +32,8 @@ export default function FactoryScene({
   const [isEnclosureTransparent, setIsEnclosureTransparent] = useState(false);
   const [isToolpathVisible, setIsToolpathVisible] = useState(true);
   const [cameraCommand, setCameraCommand] = useState<CameraCommand>();
-  const [bottomObstructionFraction, setBottomObstructionFraction] = useState(0);
   const cameraSequence = useRef(0);
   const stageRef = useRef<HTMLDivElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null);
   const handleModelReady = useCallback((readyModel?: MachineTwinModel) => {
     setModel(readyModel);
   }, []);
@@ -75,36 +74,6 @@ export default function FactoryScene({
     return () => stage.removeEventListener("webglcontextlost", reportLostContext, true);
     // The stage only exists once WebGL is known to be available, so this must run again then.
   }, [onUnavailable, webGlAvailability]);
-
-  // The summary and the inspection strip float over the canvas, so the camera has to know how much
-  // of the viewport they hide or it frames the machine behind them.
-  useEffect(() => {
-    const stage = stageRef.current;
-    const overlay = overlayRef.current;
-    if (!stage || !overlay) {
-      setBottomObstructionFraction(0);
-      return;
-    }
-    // Reframing the camera resizes the canvas, which the observer sees again. Sub-pixel drift in
-    // the measurement would make that loop forever, so only a step that actually matters counts.
-    const measure = () => {
-      const stageBox = stage.getBoundingClientRect();
-      const overlayBox = overlay.getBoundingClientRect();
-      const covered =
-        stageBox.height <= 0 || overlayBox.height <= 0
-          ? 0
-          : (stageBox.bottom - overlayBox.top) / stageBox.height;
-      const quantized = Math.round(Math.min(Math.max(covered, 0), 0.8) * 50) / 50;
-      setBottomObstructionFraction((current) =>
-        current === quantized ? current : quantized,
-      );
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(stage);
-    observer.observe(overlay);
-    return () => observer.disconnect();
-  }, [webGlAvailability, functionalPresentation, model]);
 
   if (webGlAvailability !== "AVAILABLE") {
     return <div className="scene-loading" role="status">3D 그래픽 환경을 확인하는 중입니다.</div>;
@@ -178,7 +147,7 @@ export default function FactoryScene({
           model={model}
           command={cameraCommand}
           isReducedMotion={isReducedMotion}
-          bottomObstructionFraction={bottomObstructionFraction}
+          bottomObstructionFraction={0}
         />
         </Canvas>
         <FloatingMachineLabel
@@ -188,24 +157,24 @@ export default function FactoryScene({
           onSelectMachine={onSelectMachine}
         />
         {isSceneReady && <span className="visually-hidden">3D 장면 준비됨</span>}
-        <div className="scene-hud" ref={overlayRef}>
-          <MachineInspectionControls
-            model={model}
-            selectedPartId={selectedPartId}
-            isEnclosureTransparent={isEnclosureTransparent}
-            issueCameraCommand={issueCameraCommand}
-            selectPart={selectPart}
-            toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
-            bAxisStatus={bAxisStatus(machineBinding, visualState)}
-            linearAxisStatus={linearAxisStatus(machineBinding, visualState, model)}
-            toolStatus={toolStatus(visualState)}
-            observedToolpath={observedToolpath}
-            selectedRunLabel={selectedRunLabel}
-            toolpathStatus={toolpathStatus}
-            isToolpathVisible={isToolpathVisible}
-            toggleToolpath={() => setIsToolpathVisible((current) => !current)}
-          />
-        </div>
+      </div>
+      <div className="scene-hud">
+        <MachineInspectionControls
+          model={model}
+          selectedPartId={selectedPartId}
+          isEnclosureTransparent={isEnclosureTransparent}
+          issueCameraCommand={issueCameraCommand}
+          selectPart={selectPart}
+          toggleEnclosure={() => setIsEnclosureTransparent((current) => !current)}
+          bAxisStatus={bAxisStatus(machineBinding, visualState)}
+          linearAxisStatus={linearAxisStatus(machineBinding, visualState, model)}
+          toolStatus={toolStatus(visualState)}
+          observedToolpath={observedToolpath}
+          selectedRunLabel={selectedRunLabel}
+          toolpathStatus={toolpathStatus}
+          isToolpathVisible={isToolpathVisible}
+          toggleToolpath={() => setIsToolpathVisible((current) => !current)}
+        />
       </div>
       {/* The summary grows with the data, so it stays in the flow. Only the fixed control strip
           floats, keeping the hidden band predictable. */}
@@ -247,11 +216,11 @@ function MachineInspectionControls({
   isToolpathVisible: boolean;
   toggleToolpath: () => void;
 }) {
-  const cameraButtons: Array<[string, string, CameraCommandType]> = [
-    ["축소", "−", "ZOOM_OUT"],
-    ["확대", "+", "ZOOM_IN"],
-    ["전체 보기", "⌂", "RESET"],
-  ];
+  const cameraButtons = [
+    ["축소", <ZoomOut size={20} aria-hidden="true" data-carbon-icon="zoom-out" />, "ZOOM_OUT"],
+    ["확대", <ZoomIn size={20} aria-hidden="true" data-carbon-icon="zoom-in" />, "ZOOM_IN"],
+    ["전체 보기", <ZoomFit size={20} aria-hidden="true" data-carbon-icon="zoom-fit" />, "RESET"],
+  ] satisfies Array<[string, ReactNode, CameraCommandType]>;
   const [openPanel, setOpenPanel] = useState<"OPTIONS" | "MODEL" | "HELP">();
   const togglePanel = (
     panel: "OPTIONS" | "MODEL" | "HELP",
@@ -262,7 +231,7 @@ function MachineInspectionControls({
   return (
     <aside className="machine-inspection-panel" aria-label="3D 카메라와 부품 검사">
       <div className="camera-button-grid" role="group" aria-label="3D 카메라 조작">
-        {cameraButtons.map(([label, symbol, command]) => (
+        {cameraButtons.map(([label, icon, command]) => (
           <button
             type="button"
             aria-label={label}
@@ -270,7 +239,7 @@ function MachineInspectionControls({
             key={command}
             onClick={() => issueCameraCommand(command)}
           >
-            <span aria-hidden="true">{symbol}</span>
+            {icon}
           </button>
         ))}
       </div>

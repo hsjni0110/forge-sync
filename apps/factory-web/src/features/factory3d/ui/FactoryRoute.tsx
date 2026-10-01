@@ -7,6 +7,11 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import {
+  Cube as SpatialViewIcon,
+  SplitScreen as SplitViewIcon,
+  ViewMode_1 as PlanViewIcon,
+} from "@carbon/icons-react";
 
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
@@ -36,6 +41,13 @@ import { composeFunctionalTwinPresentation } from "../domain/functionalTwinPrese
 import type { AlarmClient } from "../../alarm/application/ports";
 import type { Alarm } from "../../alarm/domain/alarm";
 import { AlarmPanel } from "../../alarm/ui/AlarmPanel";
+import type { TwinLiveState } from "../../twin/application/TwinLiveSession";
+import type { ReplayStatus } from "../../replay/domain/replay";
+import {
+  useOperationalContextPublisher,
+  type OperationalContextValue,
+} from "../../shell/ui/OperationalContext";
+import { PROCESS_GLOSSARY } from "../../../shared/presentation/processGlossary";
 
 export type FactoryViewMode = "2D" | "3D" | "SPLIT";
 
@@ -85,6 +97,12 @@ export function FactoryRoute({
     [machineId, sessionFactory],
   );
   const { state: twinState, retryNow } = useTwinLiveSession(createSession);
+  useOperationalContextPublisher({
+    machineId,
+    connection: connectionContext(twinState.connectionStatus),
+    freshness: freshnessContext(twinState.freshness),
+    replay: replayContext(replayStatus),
+  });
   useReplayDrivenTwinBootstrap(replayStatus, twinState, retryNow);
   const alarmRefreshKey = twinState.snapshot
     ? `${twinState.snapshot.replayCursor.replaySessionId}:${twinState.snapshot.conditions
@@ -183,12 +201,12 @@ export function FactoryRoute({
     <section className={`factory-page${showsScene ? " factory-console" : ""}`}>
       <header className="factory-header">
         <div className="factory-identity">
-          <p className="factory-kicker">OPERATIONAL DIGITAL TWIN</p>
+          <p className="factory-kicker">운영 디지털 트윈</p>
           <h1>
             <span>{machineId}</span>
             <span>운영 트윈</span>
           </h1>
-          <p>같은 Twin State를 2D와 공간 3D에 동기화합니다.</p>
+          <p>같은 설비 상태를 2D와 공간 3D에 동기화합니다.</p>
         </div>
         <div className="factory-controls">
           <div className="view-toggle" role="group" aria-label="공장 보기 방식">
@@ -233,7 +251,7 @@ export function FactoryRoute({
           {staleAfterSeconds}초 동안 새 값이 없으면 안전하게 오래된 데이터로 표시합니다.
           데이터 재생이 끝났다는 뜻은 아닙니다.
         </p>
-        <p>Layout provenance · {machineBinding.spatialProvenance}</p>
+        <p>배치 {PROCESS_GLOSSARY.PROVENANCE.label} · {machineBinding.spatialProvenance}</p>
         {machineBinding.spatialAvailability === "FALLBACK" && (
           <p>배치 정보 사용 불가 · 기본 배치를 표시합니다.</p>
         )}
@@ -248,6 +266,31 @@ export function FactoryRoute({
       )}
 
       <div className={`factory-layout factory-layout-${viewMode.toLowerCase()}`}>
+        {showsDetail && (
+          <section className="factory-detail-summary" aria-label="핵심 2D 상태">
+            <MachineDetailView
+              machineId={machineId}
+              state={twinState}
+              retryNow={retryNow}
+              replayStatus={replayStatus}
+              layout={viewMode === "2D" ? "FULL" : "COMPACT"}
+            />
+          </section>
+        )}
+
+        {replayControlClient && (
+          <div className="factory-transport">
+            <ReplayControls
+              machineId={machineId}
+              client={replayControlClient}
+              snapshot={twinState.snapshot}
+              freshness={twinState.freshness}
+              controller={replay}
+              toolChangeClient={toolChangeClient}
+            />
+          </div>
+        )}
+
         {showsScene && (
           <section className="scene-panel" aria-labelledby="factory-scene-title">
             <h2 id="factory-scene-title">공간 투영</h2>
@@ -290,14 +333,7 @@ export function FactoryRoute({
         )}
 
         {showsDetail && (
-          <section className="factory-detail-panel" aria-label="2D 설비 상세">
-            <MachineDetailView
-              machineId={machineId}
-              state={twinState}
-              retryNow={retryNow}
-              replayStatus={replayStatus}
-              layout={viewMode === "2D" ? "FULL" : "COMPACT"}
-            />
+          <aside className="factory-inspector" aria-label="조사 상세">
             {alarmClient && <AlarmPanel alarms={alarms} onAcknowledge={acknowledgeAlarm} />}
             {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
               session={replay.authoritativeSession} twinState={twinState} client={processAnalysisClient}
@@ -307,23 +343,46 @@ export function FactoryRoute({
               retryTwin={retryNow} reloadReplay={replay.reload} seek={(at) => void replay.run("SEEKING", (current) =>
                 replayControlClient.seek(current.replaySessionId, current.revision, at, current.speedMultiplier))} />}
             {showsScene && <p className="section-note" role="status">{observedPath.message}</p>}
-          </section>
+          </aside>
         )}
       </div>
-
-      {/* PRD 30 keeps the transport under the scene so the machine holds the top of the console. */}
-      {replayControlClient && (
-        <ReplayControls
-          machineId={machineId}
-          client={replayControlClient}
-          snapshot={twinState.snapshot}
-          freshness={twinState.freshness}
-          controller={replay}
-          toolChangeClient={toolChangeClient}
-        />
-      )}
     </section>
   );
+}
+
+function connectionContext(status: TwinLiveState["connectionStatus"]): OperationalContextValue {
+  return {
+    LOADING: { label: "불러오는 중", tone: "neutral" },
+    LIVE: { label: "연결됨", tone: "positive" },
+    RECONNECTING: { label: "다시 연결 중", tone: "warning" },
+    RESYNCING: { label: "상태 동기화 중", tone: "warning" },
+    UNAVAILABLE: { label: "연결할 수 없음", tone: "critical" },
+  }[status] as OperationalContextValue;
+}
+
+function freshnessContext(freshness: TwinLiveState["freshness"]): OperationalContextValue {
+  if (freshness === "FRESH") return { label: "최신", tone: "positive" };
+  if (freshness === "LAGGING") return { label: "반영 지연", tone: "warning" };
+  if (freshness === "STALE") return { label: "오래된 데이터", tone: "critical" };
+  return { label: "최신성 확인 중", tone: "neutral" };
+}
+
+function replayContext(status: ReplayStatus | undefined): OperationalContextValue {
+  const labels: Record<ReplayStatus, string> = {
+    PREPARING: "준비 중",
+    RUNNING: "재생 중",
+    PAUSED: "일시정지됨",
+    SEEKING: "이동 중",
+    COMPLETED: "재생 완료",
+    FAILED: "재생 실패",
+  };
+  if (status === undefined) {
+    return { label: `${PROCESS_GLOSSARY.REPLAY.label} 시작 전`, tone: "neutral" };
+  }
+  const tone = status === "FAILED" ? "critical"
+    : status === "RUNNING" ? "positive"
+      : status === "SEEKING" || status === "PREPARING" ? "warning" : "neutral";
+  return { label: `${PROCESS_GLOSSARY.REPLAY.label} ${labels[status]}`, tone };
 }
 
 /**
@@ -335,44 +394,19 @@ const VIEW_PROJECTIONS = [
     mode: "2D" as const,
     label: "평면 보기",
     caption: "평면",
-    glyph: (
-      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
-        <rect x="6.5" y="2.5" width="13" height="11" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M2 8h3.5M20.5 8H24" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
-    ),
+    glyph: <PlanViewIcon size={20} aria-hidden="true" data-carbon-icon="plan" />,
   },
   {
     mode: "3D" as const,
     label: "입체 보기",
     caption: "입체",
-    glyph: (
-      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
-        <path
-          d="M13 1.6 21.5 6.4v5.2L13 16.4 4.5 11.6V6.4L13 1.6Z"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-        />
-        <path d="M13 1.6v5.2M13 6.8l8.5-.4M13 6.8 4.5 6.4" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
+    glyph: <SpatialViewIcon size={20} aria-hidden="true" data-carbon-icon="spatial" />,
   },
   {
     mode: "SPLIT" as const,
     label: "평면과 입체 함께 보기",
     caption: "함께",
-    glyph: (
-      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
-        <path
-          d="M8.6 2.4 14 5.4v4.4l-5.4 3-5.4-3V5.4l5.4-3Z"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-        />
-        <rect x="17" y="3.4" width="6.5" height="9.2" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
+    glyph: <SplitViewIcon size={20} aria-hidden="true" data-carbon-icon="split" />,
   },
 ];
 

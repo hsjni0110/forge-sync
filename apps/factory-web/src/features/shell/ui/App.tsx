@@ -1,4 +1,5 @@
 import { Link, NavLink, Route, Routes } from "react-router-dom";
+import { Theme } from "@carbon/react";
 
 import { DashboardRoute } from "../../dashboard/ui/DashboardRoute";
 import { FactoryRoute } from "../../factory3d/ui/FactoryRoute";
@@ -13,6 +14,9 @@ import type { ShiftOverviewClient } from "../../shift-overview/application/ports
 import type { AlarmClient } from "../../alarm/application/ports";
 import type { DataQualityClient } from "../../data-quality/application/ports";
 import { DataQualityRoute } from "../../data-quality/ui/DataQualityRoute";
+import { ThemeControl, useThemePreference } from "./ThemeControl";
+import { OperationalContextProvider } from "./OperationalContext";
+import { OperationalContextBar } from "./OperationalContextBar";
 
 const loadFactoryScene: FactorySceneLoader = () =>
   import("../../factory3d/ui/FactoryScene");
@@ -40,27 +44,33 @@ export function App({
   alarmClient?: AlarmClient;
   dataQualityClient?: DataQualityClient;
 }) {
+  const { preference, setPreference, theme } = useThemePreference();
+
   return (
-    <div className="site-shell">
-      <a className="skip-link" href="#main-content">
-        본문으로 바로가기
-      </a>
-      <header className="site-header">
-        <Link className="brand" to="/">
-          <span className="brand-mark" aria-hidden="true">FS</span>
-          <span className="brand-lockup">
-            <strong>ForgeSync</strong>
-            <small>Operational Twin</small>
-          </span>
-        </Link>
-        <nav aria-label="주요 메뉴">
-          <NavLink to="/" end>대시보드</NavLink>
-          <NavLink to="/factory">공장 보기</NavLink>
-          <NavLink to="/data-quality">데이터 품질</NavLink>
-        </nav>
-      </header>
-      <main id="main-content" className="app-shell">
-        <Routes>
+    <Theme theme={theme}>
+      <OperationalContextProvider>
+        <div className="site-shell" data-carbon-theme={theme}>
+        <a className="skip-link" href="#main-content">
+          본문으로 바로가기
+        </a>
+        <aside className="site-rail">
+          <Link className="brand" to="/">
+            <span className="brand-mark" aria-hidden="true">FS</span>
+            <span className="brand-lockup">
+              <strong>ForgeSync</strong>
+              <small>운영 트윈</small>
+            </span>
+          </Link>
+          <nav aria-label="ForgeSync navigation">
+            <NavLink to="/" end>대시보드</NavLink>
+            <NavLink to="/factory">공장 보기</NavLink>
+            <NavLink to="/data-quality">데이터 품질</NavLink>
+          </nav>
+          <ThemeControl preference={preference} onPreferenceChange={setPreference} />
+        </aside>
+        <OperationalContextBar />
+        <main id="main-content" className="app-shell">
+          <Routes>
           <Route
             path="/"
             element={
@@ -91,9 +101,11 @@ export function App({
             <DataQualityRoute client={dataQualityClient} twinSessionFactory={twinSessionFactory} />
           } />
           <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-    </div>
+          </Routes>
+        </main>
+        </div>
+      </OperationalContextProvider>
+    </Theme>
   );
 }
 

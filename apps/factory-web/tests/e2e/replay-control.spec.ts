@@ -6,7 +6,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   test.setTimeout(900_000);
   await page.goto("/factory");
 
-  await page.getByRole("button", { name: "Replay 시작" }).click();
+  await page.getByRole("button", { name: "재생 시작" }).click();
   await expect(page.getByText("재생 중", { exact: true })).toBeVisible();
 
   await expect
@@ -46,7 +46,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   // The source fixture and original boundary evidence are pinned in the run contract fixture.
   // Dragging the scrubber and releasing (native "change") seeks immediately —
   // there is no separate confirm step.
-  await page.getByRole("slider", { name: "Replay timeline" }).evaluate((input) => {
+  await page.getByRole("slider", { name: "재생 위치" }).evaluate((input) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
     setter?.call(input, String(Date.parse("2016-10-05T09:21:00.740Z")));
     input.dispatchEvent(new Event("input", { bubbles: true }));
@@ -63,7 +63,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(analysis).toHaveAttribute("data-process-session", twin.replayCursor.replaySessionId);
   await expect(page.locator(".floating-machine-label")).toContainText(`Twin v${twin.consistency.twinVersion}`);
   await expect(page.locator(".machine-summary .machine-version")).toHaveText(`v${twin.consistency.twinVersion}`);
-  await expect(page.getByRole("region", { name: "CURRENT RUN · 현재 가공" })).toContainText("현재 가공 없음");
+  await expect(page.getByRole("region", { name: "현재 가공" })).toContainText("현재 가공 없음");
   const productionContext = page.getByRole("region", { name: "생산 문맥" });
   await expect(productionContext).toContainText("ProductionResult · 원천에서 관측되지 않음", {
     timeout: 60_000,
@@ -80,12 +80,12 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   const run = page.getByRole("button", { name: /가공 선택 · 155 · 2016-10-05T09:18:30\.447Z/ });
   await run.focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("region", { name: "PROCESS · 공정 특징" })).toContainText("148.734 초");
+  await expect(page.getByRole("region", { name: "공정 특징" })).toContainText("148.734 초");
   const evidence = page.locator("summary").filter({ hasText: "가공의 관측 근거" });
   await evidence.focus();
   await page.keyboard.press("Enter");
   await expect(page.getByText("OBSERVED · REAL:NIST", { exact: true })).toBeVisible();
-  await expect(page.getByRole("region", { name: "ANOMALY · 이전 가공과의 차이" })).toContainText("고장 판정이 아닙니다");
+  await expect(page.getByRole("region", { name: "이전 가공과의 차이" })).toContainText("고장 판정이 아닙니다");
   await page.getByRole("button", { name: "평면과 입체 함께 보기", exact: true }).click();
   const currentAction = page.getByRole("region", { name: "현재 동작" });
   await expect(currentAction).toContainText("현재 재생 가공 · 없음");
@@ -103,11 +103,11 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(analysis).toHaveAttribute("data-process-session", twin.replayCursor.replaySessionId);
   await page.getByRole("button", { name: "가공 시작 시점으로 이동", exact: true }).click();
   await expect(analysis).not.toHaveAttribute("data-process-session", twin.replayCursor.replaySessionId);
-  await expect(page.getByRole("region", { name: "CURRENT RUN · 현재 가공" })).toContainText(
+  await expect(page.getByRole("region", { name: "현재 가공" })).toContainText(
     "종료 근거 미확정",
     { timeout: 120_000 },
   );
-  await expect(page.getByRole("region", { name: "PROCESS · 공정 특징" })).toContainText("완료된 가공만 분석 가능");
+  await expect(page.getByRole("region", { name: "공정 특징" })).toContainText("완료된 가공만 분석 가능");
 
   // Exercise the first reviewed alarm interval before the source-range-end seek. The end
   // publishes more than 100,000 observations, so issuing another seek while that ingestion
@@ -117,7 +117,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
     { headers: { Accept: "application/vnd.forgesync.twin.v1+json" } },
   );
   const beforeAlarmSeek = await beforeAlarmSeekResponse.json();
-  await page.getByRole("slider", { name: "Replay timeline" }).evaluate((input) => {
+  await page.getByRole("slider", { name: "재생 위치" }).evaluate((input) => {
     const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
     // The range preserves the source start's .740 millisecond offset. This normalizes to
     // 09:03:58.740Z: after WARNING 406 at .872 and before its NORMAL at 09:03:59.755Z.
@@ -174,8 +174,8 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   await expect(page.getByRole("heading", { name: "데이터 품질", exact: true })).toBeVisible();
   await expect(page.getByText("종합 품질 점수 없음")).toBeVisible();
   await expect(page.getByText("87.67%")).toBeVisible({ timeout: 60_000 });
-  const runtimeQuality = page.locator(".quality-section").filter({ hasText: "현재 Replay 수신" });
-  await expect(runtimeQuality).not.toContainText("Replay 수신 범위가 없어", { timeout: 60_000 });
+  const runtimeQuality = page.getByRole("region", { name: "수신과 순서" });
+  await expect(runtimeQuality).not.toContainText("재생 수신 범위가 없어", { timeout: 60_000 });
   await expect(page.getByRole("link", { name: "원본 줄 보기" }).first()).toHaveAttribute(
     "href",
     /#L\d+$/,
@@ -195,7 +195,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   // The Dashboard Pareto reuses the authoritative seek path whose current-run convergence was
   // verified above. Its first-ranked interval must move the cursor and shared 2D/3D Twin version.
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "정지 사유 Pareto" })).toBeVisible({
+  await expect(page.getByRole("heading", { name: "주요 정지 원인" })).toBeVisible({
     timeout: 60_000,
   });
   const firstDowntime = page.locator(".downtime-list button").first();

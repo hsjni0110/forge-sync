@@ -17,6 +17,9 @@ const run: MachiningRun = {
 describe("readable process evidence", () => {
   it("explains confidence and a large duration difference without declaring a fault", () => {
     render(<RunDetail run={run} />);
+    expect(screen.getByRole("region", { name: "공정 특징" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "이전 가공과의 차이" })).toBeTruthy();
+    expect(screen.queryByText(/PROCESS|ANOMALY/)).toBeNull();
     expect(screen.getByText(/신뢰도 높음/)).toBeTruthy();
     expect(screen.getByText(/실행 시작 관측 확인/)).toBeTruthy();
     expect(screen.getByText(/큰 차이/)).toBeTruthy();
