@@ -17,13 +17,13 @@
 
 .factory-kicker {
   color: var(--fs-accent) !important;
-  font-size: 0.6875rem !important;
+  font-size: var(--fs-type-2xs) !important;
   letter-spacing: 0.12em;
 }
 
 .factory-identity h1 {
   margin: 0;
-  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  font-size: var(--fs-type-hero);
 }
 
 .factory-controls,
@@ -155,6 +155,30 @@
 .summary-metric {
   border-radius: 0;
 }
+
+.machine-detail {
+  display: grid;
+  gap: 1px;
+  background: var(--fs-border);
+}
+
+.machine-detail > * { background: var(--fs-surface); }
+.machine-header { margin: 0; padding: 1.5rem 2rem; }
+.machine-hero { border: 0; border-left: 3px solid var(--fs-accent); border-radius: 0; }
+.detail-grid { gap: 1px; background: var(--fs-border); }
+.detail-section { padding: 1.5rem; border: 0; border-radius: 0; background: var(--fs-surface); }
+.metric-grid { gap: 1px; border: 1px solid var(--fs-border); background: var(--fs-border); }
+.machine-reading {
+  display: grid;
+  min-width: 0;
+  gap: 0.35rem;
+  padding: 1rem;
+  background: var(--fs-surface);
+}
+.machine-reading > span,
+.machine-reading small { color: var(--fs-text-muted); font-size: var(--fs-type-xs); }
+.machine-reading strong { font-size: var(--fs-type-xl); font-variant-numeric: tabular-nums; }
+.provenance-card { border-radius: 0; background: transparent; }
 
 .factory-transport .replay-controls {
   height: 100%;

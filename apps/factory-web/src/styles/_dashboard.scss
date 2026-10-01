@@ -33,7 +33,7 @@
 
 .dashboard-header h1 {
   color: var(--fs-text);
-  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-size: var(--fs-type-display);
   letter-spacing: -0.04em;
 }
 
@@ -54,7 +54,7 @@
 
 .analysis-readiness-label {
   color: var(--fs-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--fs-type-xs);
   font-weight: 600;
   letter-spacing: 0.08em;
 }
@@ -91,7 +91,7 @@
 .analysis-readiness-ready p {
   margin-top: 0.2rem;
   color: var(--fs-text-muted);
-  font-size: 0.8125rem;
+  font-size: var(--fs-type-sm);
 }
 
 .shift-overview {
@@ -123,7 +123,7 @@
 }
 
 .shift-overview-heading h2 {
-  font-size: 1.5rem;
+  font-size: var(--fs-type-2xl);
   letter-spacing: -0.02em;
 }
 
@@ -131,7 +131,7 @@
 .shift-timeline-heading p,
 .shift-alarm-summary > p {
   color: var(--fs-text-muted);
-  font-size: 0.8125rem;
+  font-size: var(--fs-type-sm);
 }
 
 .provenance-chip {
@@ -139,7 +139,7 @@
   border-radius: 2px;
   padding: 0.25rem 0.5rem;
   color: var(--fs-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--fs-type-xs);
 }
 
 .shift-kpi-band {
@@ -161,13 +161,13 @@
 .shift-kpi small,
 .shift-kpi em {
   color: var(--fs-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--fs-type-xs);
   font-style: normal;
 }
 
 .shift-kpi strong {
   margin: 0.75rem 0 0.25rem;
-  font-size: clamp(1.25rem, 2.4vw, 2rem);
+  font-size: var(--fs-type-section);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.03em;
 }
@@ -184,7 +184,7 @@
 
 .shift-timeline-heading h3,
 .shift-alarm-summary h3 {
-  font-size: 1rem;
+  font-size: var(--fs-type-base);
 }
 
 .shift-timeline {
@@ -208,7 +208,7 @@
   border: 0;
   border-right: 1px solid var(--fs-surface);
   color: #101820;
-  font-size: 0.75rem;
+  font-size: var(--fs-type-xs);
   font-weight: 600;
   white-space: nowrap;
   cursor: pointer;
@@ -263,7 +263,7 @@
   display: flex;
   justify-content: space-between;
   color: var(--fs-text-muted);
-  font-size: 0.75rem;
+  font-size: var(--fs-type-xs);
 }
 
 .shift-timeline-axis { margin-top: 0.35rem; }
@@ -289,7 +289,7 @@
   cursor: pointer;
 }
 .shift-alarm-summary small { display: block; margin-top: 0.2rem; color: var(--fs-text-muted); }
-.shift-alarm-summary time { color: var(--fs-text-muted); font-size: 0.75rem; font-variant-numeric: tabular-nums; }
+.shift-alarm-summary time { color: var(--fs-text-muted); font-size: var(--fs-type-xs); font-variant-numeric: tabular-nums; }
 .shift-alarm-summary li[data-severity="CRITICAL"] svg { color: var(--fs-danger); }
 .shift-alarm-summary li[data-severity="WARNING"] svg { color: var(--fs-warning); }
 
@@ -301,9 +301,9 @@
 }
 
 .downtime-panel > header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
-.downtime-panel h2 { margin: 0; font-size: 1.5rem; }
-.downtime-panel > header > strong { color: var(--fs-accent); font-size: 1.5rem; font-variant-numeric: tabular-nums; }
-.downtime-disclaimer { margin: 0; color: var(--fs-text-muted); font-size: 0.8125rem; }
+.downtime-panel h2 { margin: 0; font-size: var(--fs-type-2xl); }
+.downtime-panel > header > strong { color: var(--fs-accent); font-size: var(--fs-type-2xl); font-variant-numeric: tabular-nums; }
+.downtime-disclaimer { margin: 0; color: var(--fs-text-muted); font-size: var(--fs-type-sm); }
 .downtime-list { border-top: 1px solid var(--fs-border-strong); }
 .downtime-list li { border-bottom: 1px solid var(--fs-border); }
 .downtime-list button {
@@ -324,7 +324,7 @@
 .downtime-summary small { display: block; margin-top: 0.25rem; color: var(--fs-text-muted); }
 .downtime-evidence-list { display: flex; flex-wrap: wrap; gap: 0.35rem; }
 .downtime-evidence-list span,
-.downtime-evidence-list em { border: 1px solid var(--fs-border); padding: 0.25rem 0.4rem; color: var(--fs-text-muted); font-size: 0.75rem; font-style: normal; }
+.downtime-evidence-list em { border: 1px solid var(--fs-border); padding: 0.25rem 0.4rem; color: var(--fs-text-muted); font-size: var(--fs-type-xs); font-style: normal; }
 
 .dashboard-actions {
   display: grid;
@@ -333,7 +333,7 @@
   gap: 1.5rem;
   padding: 1.5rem 2rem;
 }
-.dashboard-provenance { margin: 0; color: var(--fs-text-muted); font-size: 0.8125rem; }
+.dashboard-provenance { margin: 0; color: var(--fs-text-muted); font-size: var(--fs-type-sm); }
 .dashboard-provenance small { display: block; margin-top: 0.25rem; }
 
 .alarm-panel { margin: 0; border: 0; border-radius: 0; background: var(--fs-surface); }

@@ -10,7 +10,6 @@ import { HttpObservedToolpathClient } from "./features/toolpath/adapters/httpObs
 import { HttpShiftOverviewClient } from "./features/shift-overview/adapters/httpShiftOverviewClient";
 import { HttpAlarmClient } from "./features/alarm/adapters/httpAlarmClient";
 import { HttpDataQualityClient } from "./features/data-quality/adapters/httpDataQualityClient";
-import "./styles.css";
 import "./styles/index.scss";
 
 const root = document.getElementById("root");

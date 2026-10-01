@@ -22,8 +22,8 @@ export function RunDetail({ run }: { run: MachiningRun }) {
     </header>
     <p className="section-note">신뢰도 {confidenceLabel(run.confidence)}<HelpTip text={GLOSSARY.confidence} /> · {run.reasons.map(reasonLabel).join(" · ")}</p>
     <TraceDetails title="가공의 관측 근거" helpText={GLOSSARY.observedEvidence} entries={run.evidence} observed />
-    <section className="run-detail-block" aria-label="PROCESS · 공정 특징">
-      <h3>PROCESS · 공정 특징<HelpTip text={GLOSSARY.cyclePurpose} /></h3>
+    <section className="run-detail-block" aria-label="공정 특징">
+      <h3>공정 특징<HelpTip text={GLOSSARY.cyclePurpose} /></h3>
       {!run.feature ? <p className="empty-state">완료된 가공만 분석 가능</p> : <>
         <p className="run-detail-badges">
           <span className="status-badge">{dataStatusLabel(run.feature.status)}</span>
@@ -48,8 +48,8 @@ export function RunDetail({ run }: { run: MachiningRun }) {
         <TraceDetails title="특징 계산·단위·coverage·출처" helpText={GLOSSARY.rawEvidence} entries={run.feature.evidence} />
       </>}
     </section>
-    <section className="run-detail-block" aria-label="ANOMALY · 이전 가공과의 차이">
-      <h3>ANOMALY · 이전 가공과의 차이<HelpTip text={GLOSSARY.anomalyPurpose} /></h3>
+    <section className="run-detail-block" aria-label="이전 가공과의 차이">
+      <h3>이전 가공과의 차이<HelpTip text={GLOSSARY.anomalyPurpose} /></h3>
       {!run.assessment ? <p className="empty-state">완료된 가공만 분석 가능</p> : <>
         <p className="status-badge">{dataStatusLabel(run.assessment.status)}</p>
         {run.assessment.status !== "AVAILABLE" && (

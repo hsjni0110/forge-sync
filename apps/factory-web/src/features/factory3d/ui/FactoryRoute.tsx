@@ -201,7 +201,7 @@ export function FactoryRoute({
     <section className={`factory-page${showsScene ? " factory-console" : ""}`}>
       <header className="factory-header">
         <div className="factory-identity">
-          <p className="factory-kicker">OPERATIONAL DIGITAL TWIN</p>
+          <p className="factory-kicker">운영 디지털 트윈</p>
           <h1>
             <span>{machineId}</span>
             <span>운영 트윈</span>

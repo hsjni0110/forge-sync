@@ -73,6 +73,8 @@ describe("App", () => {
     expect(navigation.querySelector('a[href="/data-quality"]')?.textContent).toContain(
       "데이터 품질",
     );
+    expect(screen.getByText("운영 트윈")).toBeTruthy();
+    expect(screen.queryByText("Operational Twin")).toBeNull();
     expect(screen.getByRole("button", { name: "화면 테마" })).toBeTruthy();
     expect(screen.getByRole("region", { name: "운영 상황" })).toBeTruthy();
   });

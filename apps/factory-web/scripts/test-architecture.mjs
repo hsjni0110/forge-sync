@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 import { ESLint } from "eslint";
@@ -47,7 +47,14 @@ assert.doesNotMatch(
   "runtime binding created geometry or searched semantic nodes by name",
 );
 
-const styles = await readFile(new URL("../src/styles.css", import.meta.url), "utf8");
+const stylesDirectory = new URL("../src/styles/", import.meta.url);
+const styleFiles = (await readdir(stylesDirectory))
+  .filter((fileName) => fileName.endsWith(".scss"))
+  .sort();
+const styleSources = await Promise.all(
+  styleFiles.map((fileName) => readFile(new URL(fileName, stylesDirectory), "utf8")),
+);
+const styles = styleSources.join("\n");
 const indexHtml = await readFile(new URL("../index.html", import.meta.url), "utf8");
 
 assert.match(
@@ -95,6 +102,6 @@ assert.deepEqual(
 
 assert.match(
   styles,
-  /\.metric-card strong[^{]*\{[^}]*font-variant-numeric:\s*tabular-nums/s,
+  /\.machine-reading strong[^{]*\{[^}]*font-variant-numeric:\s*tabular-nums/s,
   "live metric readouts still use proportional digits, so values jitter as they update",
 );

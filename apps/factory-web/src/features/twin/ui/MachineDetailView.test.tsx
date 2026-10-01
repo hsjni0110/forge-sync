@@ -66,7 +66,7 @@ describe("MachineDetailView", () => {
     expect(within(readings).getByText("5.4 mm/s")).toBeTruthy();
     const unavailableLoad = within(readings)
       .getByText("부하 · Mazak01-Y")
-      .closest<HTMLElement>(".metric-card");
+      .closest<HTMLElement>(".machine-reading");
     expect(within(unavailableLoad!).getByText("확인할 수 없음")).toBeTruthy();
     expect(within(readings).getByText("0 %")).toBeTruthy();
   });

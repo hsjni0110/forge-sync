@@ -58,7 +58,7 @@ export function App({
             <span className="brand-mark" aria-hidden="true">FS</span>
             <span className="brand-lockup">
               <strong>ForgeSync</strong>
-              <small>Operational Twin</small>
+              <small>운영 트윈</small>
             </span>
           </Link>
           <nav aria-label="ForgeSync navigation">

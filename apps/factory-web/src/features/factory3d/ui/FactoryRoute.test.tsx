@@ -36,7 +36,8 @@ describe("FactoryRoute", () => {
   it("identifies the workspace as one operational Twin projected into 2D and spatial 3D", async () => {
     renderFactory(async () => ({ default: HealthyScene }), createSession);
 
-    expect(screen.getByText("OPERATIONAL DIGITAL TWIN")).toBeTruthy();
+    expect(screen.getByText("운영 디지털 트윈")).toBeTruthy();
+    expect(screen.queryByText("OPERATIONAL DIGITAL TWIN")).toBeNull();
     expect(screen.getByRole("heading", { name: "Mazak01 운영 트윈" })).toBeTruthy();
     expect(screen.getByText("같은 설비 상태를 2D와 공간 3D에 동기화합니다.")).toBeTruthy();
     expect(await screen.findByRole("heading", { name: "공간 투영" })).toBeTruthy();
