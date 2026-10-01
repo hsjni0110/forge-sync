@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { Pause, Play, SkipBack, SkipForward } from "@carbon/icons-react";
 
 import type { ReplayControlClient } from "../application/ports";
 import type { ReplaySessionState, ReplayStatus } from "../domain/replay";
@@ -124,9 +125,7 @@ function ReplayControlsView({
                 disabled={isCommandPending || session.status === "SEEKING"}
                 onClick={() => seekTo(session.sourceRange.startsAt)}
               >
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M7 6v12M17 6l-9 6 9 6V6z" fill="currentColor" />
-                </svg>
+                <SkipBack size={20} aria-hidden="true" data-carbon-icon="skip-back" />
               </button>
               {session.status === "RUNNING" ? (
                 <button
@@ -136,9 +135,7 @@ function ReplayControlsView({
                   disabled={isCommandPending}
                   onClick={() => void run("PAUSED", (current) => client.pause(current.replaySessionId, current.revision))}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M7 5h4v14H7zM13 5h4v14h-4z" fill="currentColor" />
-                  </svg>
+                  <Pause size={20} aria-hidden="true" data-carbon-icon="pause" />
                 </button>
               ) : (
                 <button
@@ -148,9 +145,7 @@ function ReplayControlsView({
                   disabled={isCommandPending || !(["PAUSED"] as ReplayStatus[]).includes(session.status)}
                   onClick={() => void run("RUNNING", (current) => client.resume(current.replaySessionId, current.revision))}
                 >
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M8 5v14l11-7L8 5z" fill="currentColor" />
-                  </svg>
+                  <Play size={20} aria-hidden="true" data-carbon-icon="play" />
                 </button>
               )}
               <button
@@ -160,9 +155,7 @@ function ReplayControlsView({
                 disabled={isCommandPending || session.status === "SEEKING"}
                 onClick={() => seekTo(session.sourceRange.endsAt)}
               >
-                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                  <path d="M17 6v12M7 6l9 6-9 6V6z" fill="currentColor" />
-                </svg>
+                <SkipForward size={20} aria-hidden="true" data-carbon-icon="skip-forward" />
               </button>
             </div>
             <div className="replay-speed-toggle" role="group" aria-label="재생 배속">

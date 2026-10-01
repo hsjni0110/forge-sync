@@ -60,7 +60,12 @@ describe("ReplayControls", () => {
     expect(screen.getByText("재생 발행 시각")).toBeTruthy();
     expect(screen.getByText("데이터 최신성")).toBeTruthy();
     expect(screen.getByRole("slider", { name: "재생 위치" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "일시정지" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "처음으로 이동" })
+      .querySelector("svg[data-carbon-icon]")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "일시정지" })
+      .querySelector("svg[data-carbon-icon]")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "끝으로 이동" })
+      .querySelector("svg[data-carbon-icon]")).toBeTruthy();
   });
 
   it("renders observed tool transitions from the cursor-bound timeline contract", async () => {

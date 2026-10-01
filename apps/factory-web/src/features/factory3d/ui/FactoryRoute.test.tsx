@@ -143,7 +143,7 @@ describe("FactoryRoute", () => {
       "입체 보기",
       "평면과 입체 함께 보기",
     ]);
-    expect(views.every((button) => button.querySelector("svg"))).toBe(true);
+    expect(views.every((button) => button.querySelector("svg[data-carbon-icon]"))).toBe(true);
     expect(within(group).queryByRole("button", { name: /모션/ })).toBeNull();
     expect(container.querySelector(".motion-toggle")).toBeTruthy();
   });
@@ -165,7 +165,7 @@ describe("FactoryRoute", () => {
     );
   });
 
-  it("puts the replay transport below the scene so the machine keeps the top of the console", async () => {
+  it("keeps critical 2D state and replay before 3D in narrow-screen document order", async () => {
     const replayControlClient: ReplayControlClient = {
       load: vi.fn().mockResolvedValue({ schemaVersion: "1.0.0", machineId: "Mazak01",
         replaySessionId: snapshot.replayCursor.replaySessionId, sourceSetId: "nist-mazak01-20161005",
@@ -181,14 +181,19 @@ describe("FactoryRoute", () => {
     );
     await screen.findByRole("button", { name: "평면과 입체 함께 보기" });
 
-    const layout = container.querySelector(".factory-layout");
-    const transport = container.querySelector(".replay-controls");
-    expect(transport).toBeTruthy();
-    expect(layout).toBeTruthy();
-    expect(
-      (layout as Element).compareDocumentPosition(transport as Node) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
+    const scanOrder = [
+      container.querySelector(".factory-detail-summary"),
+      container.querySelector(".factory-transport"),
+      container.querySelector(".scene-panel"),
+      container.querySelector(".factory-inspector"),
+    ];
+    expect(scanOrder.every(Boolean)).toBe(true);
+    for (let index = 0; index < scanOrder.length - 1; index += 1) {
+      expect(
+        (scanOrder[index] as Element).compareDocumentPosition(scanOrder[index + 1] as Node)
+          & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    }
   });
 
   it("starts in SPLIT mode and switches between accessible 2D and 3D views", async () => {

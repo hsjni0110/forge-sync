@@ -1,0 +1,215 @@
+.factory-page {
+  display: grid;
+  gap: 1rem;
+  max-width: 120rem;
+  padding: clamp(1rem, 2vw, 2rem);
+}
+
+.factory-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--fs-border);
+  background: var(--fs-surface);
+}
+
+.factory-kicker {
+  color: var(--fs-accent) !important;
+  font-size: 0.6875rem !important;
+  letter-spacing: 0.12em;
+}
+
+.factory-identity h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.factory-controls,
+.view-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.factory-controls { gap: 0.5rem; flex-wrap: wrap; }
+.view-toggle { border: 1px solid var(--fs-border-strong); }
+.view-toggle button {
+  display: flex;
+  min-width: 4rem;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 0;
+  border-left: 1px solid var(--fs-border);
+  border-radius: 0;
+  background: var(--fs-surface);
+  color: var(--fs-text-muted);
+  white-space: nowrap;
+}
+.view-toggle button:first-child { border-left: 0; }
+.view-toggle button[aria-pressed="true"] { background: var(--fs-accent); color: #fff; }
+.view-toggle button svg { flex: 0 0 auto; }
+.motion-toggle { min-height: 3rem; border-radius: 2px; }
+
+.scene-disclaimer {
+  margin: 0;
+  padding-inline: 0.5rem;
+}
+
+.factory-layout {
+  display: grid;
+  grid-template-columns: minmax(17rem, 0.7fr) minmax(26rem, 1.6fr) minmax(20rem, 0.8fr);
+  grid-template-areas:
+    "detail scene inspector"
+    "transport scene inspector";
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  gap: 1px;
+  background: var(--fs-border);
+}
+
+.factory-detail-summary { grid-area: detail; min-width: 0; background: var(--fs-surface); }
+.factory-transport { grid-area: transport; min-width: 0; background: var(--fs-surface); }
+.scene-panel { grid-area: scene; min-width: 0; padding: 1rem; border: 0; border-radius: 0; background: var(--fs-surface); }
+.factory-inspector { grid-area: inspector; min-width: 0; overflow: auto; background: var(--fs-surface); }
+
+.factory-layout-2d {
+  grid-template-columns: minmax(0, 1.5fr) minmax(20rem, 0.7fr);
+  grid-template-areas:
+    "detail inspector"
+    "transport inspector";
+}
+
+.factory-layout-3d {
+  grid-template-columns: minmax(17rem, 0.6fr) minmax(0, 2fr);
+  grid-template-areas:
+    "transport scene";
+}
+
+.factory-console {
+  height: auto;
+  min-height: 0;
+}
+
+.factory-console .scene-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 38rem;
+  overflow: hidden;
+}
+
+.scene-viewport,
+.scene-canvas-root {
+  min-width: 0;
+  min-height: 36rem;
+  border-radius: 2px;
+}
+
+.scene-canvas-root {
+  display: grid;
+  grid-template-rows: minmax(23rem, 1fr) auto auto;
+}
+
+.scene-canvas-stage {
+  position: relative;
+  height: 32rem;
+  min-height: 23rem;
+}
+
+.scene-hud {
+  position: static;
+  background: #141b1f;
+}
+
+.machine-inspection-panel {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #30393e;
+  background: #141b1f;
+}
+
+.camera-button-grid button {
+  display: grid;
+  width: 2.5rem;
+  min-height: 2.5rem;
+  place-items: center;
+  border-radius: 2px;
+}
+
+.camera-button-grid svg { width: 1.25rem; height: 1.25rem; }
+.inspection-part-select select { border-radius: 2px; }
+
+.machine-summary,
+.factory-console .factory-detail-summary .machine-summary {
+  border: 0;
+  border-radius: 0;
+  background: var(--fs-surface);
+}
+
+.summary-state-grid > div,
+.summary-metric {
+  border-radius: 0;
+}
+
+.factory-transport .replay-controls {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+}
+
+.factory-inspector .alarm-panel {
+  border-bottom: 1px solid var(--fs-border);
+}
+
+@media (max-width: 80rem) {
+  .factory-layout {
+    grid-template-columns: minmax(18rem, 0.8fr) minmax(24rem, 1.4fr);
+    grid-template-areas:
+      "detail scene"
+      "transport scene"
+      "inspector inspector";
+  }
+  .factory-layout-2d {
+    grid-template-columns: 1fr;
+    grid-template-areas: "detail" "transport" "inspector";
+  }
+  .factory-inspector { overflow: visible; }
+}
+
+@media (max-width: 48rem) {
+  .factory-page { padding: 0.75rem; }
+  .factory-header { align-items: flex-start; flex-direction: column; padding: 1rem; }
+  .factory-layout,
+  .factory-layout-2d,
+  .factory-layout-3d {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "detail"
+      "transport"
+      "scene"
+      "inspector";
+    grid-template-rows: auto;
+  }
+  .factory-console .scene-panel { min-height: 0; overflow: visible; }
+  .scene-viewport,
+  .scene-canvas-root { min-height: 28rem; }
+  .scene-canvas-stage { height: 23rem; min-height: 23rem; }
+  .machine-inspection-panel { align-items: stretch; flex-wrap: wrap; }
+  .inspection-part-select { min-width: 0; flex: 1 1 12rem; }
+  .machine-inspection-panel details { position: static; }
+  .inspection-popover { right: 0.75rem; left: 0.75rem; width: auto; }
+  .replay-transport { flex-wrap: wrap; }
+}
+
+@media (max-width: 30rem) {
+  .view-toggle { width: 100%; }
+  .view-toggle button { min-width: 0; flex: 1; }
+  .motion-toggle { width: 100%; }
+  .machine-inspection-panel { display: grid; grid-template-columns: 1fr; }
+  .camera-button-grid { flex-wrap: wrap; }
+}

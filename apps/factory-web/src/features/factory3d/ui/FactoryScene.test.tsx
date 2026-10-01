@@ -324,6 +324,15 @@ describe("FactoryScene asset isolation", () => {
 
     await screen.findByLabelText("3D 조작 영역");
 
+    const stage = container.querySelector(".scene-canvas-stage");
+    const toolbar = screen.getByRole("complementary", { name: "3D 카메라와 부품 검사" });
+    expect(stage).toBeTruthy();
+    expect(stage?.contains(toolbar)).toBe(false);
+    expect((stage as Element).compareDocumentPosition(toolbar)
+      & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByRole("button", { name: "확대" })
+      .querySelector("svg[data-carbon-icon]")).toBeTruthy();
+
     expect(
       container.querySelector('.inspection-options > [role="group"][aria-label="보기 옵션 내용"]'),
     ).toBeTruthy();

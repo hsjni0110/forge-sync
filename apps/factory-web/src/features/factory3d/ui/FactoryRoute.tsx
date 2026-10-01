@@ -7,6 +7,11 @@ import {
   useState,
   useSyncExternalStore,
 } from "react";
+import {
+  Cube as SpatialViewIcon,
+  SplitScreen as SplitViewIcon,
+  ViewMode_1 as PlanViewIcon,
+} from "@carbon/icons-react";
 
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import type { ReplayControlClient } from "../../replay/application/ports";
@@ -261,6 +266,31 @@ export function FactoryRoute({
       )}
 
       <div className={`factory-layout factory-layout-${viewMode.toLowerCase()}`}>
+        {showsDetail && (
+          <section className="factory-detail-summary" aria-label="핵심 2D 상태">
+            <MachineDetailView
+              machineId={machineId}
+              state={twinState}
+              retryNow={retryNow}
+              replayStatus={replayStatus}
+              layout={viewMode === "2D" ? "FULL" : "COMPACT"}
+            />
+          </section>
+        )}
+
+        {replayControlClient && (
+          <div className="factory-transport">
+            <ReplayControls
+              machineId={machineId}
+              client={replayControlClient}
+              snapshot={twinState.snapshot}
+              freshness={twinState.freshness}
+              controller={replay}
+              toolChangeClient={toolChangeClient}
+            />
+          </div>
+        )}
+
         {showsScene && (
           <section className="scene-panel" aria-labelledby="factory-scene-title">
             <h2 id="factory-scene-title">공간 투영</h2>
@@ -303,14 +333,7 @@ export function FactoryRoute({
         )}
 
         {showsDetail && (
-          <section className="factory-detail-panel" aria-label="2D 설비 상세">
-            <MachineDetailView
-              machineId={machineId}
-              state={twinState}
-              retryNow={retryNow}
-              replayStatus={replayStatus}
-              layout={viewMode === "2D" ? "FULL" : "COMPACT"}
-            />
+          <aside className="factory-inspector" aria-label="조사 상세">
             {alarmClient && <AlarmPanel alarms={alarms} onAcknowledge={acknowledgeAlarm} />}
             {replayControlClient && <ProcessAnalysisPanel machineId={machineId}
               session={replay.authoritativeSession} twinState={twinState} client={processAnalysisClient}
@@ -320,21 +343,9 @@ export function FactoryRoute({
               retryTwin={retryNow} reloadReplay={replay.reload} seek={(at) => void replay.run("SEEKING", (current) =>
                 replayControlClient.seek(current.replaySessionId, current.revision, at, current.speedMultiplier))} />}
             {showsScene && <p className="section-note" role="status">{observedPath.message}</p>}
-          </section>
+          </aside>
         )}
       </div>
-
-      {/* PRD 30 keeps the transport under the scene so the machine holds the top of the console. */}
-      {replayControlClient && (
-        <ReplayControls
-          machineId={machineId}
-          client={replayControlClient}
-          snapshot={twinState.snapshot}
-          freshness={twinState.freshness}
-          controller={replay}
-          toolChangeClient={toolChangeClient}
-        />
-      )}
     </section>
   );
 }
@@ -383,44 +394,19 @@ const VIEW_PROJECTIONS = [
     mode: "2D" as const,
     label: "평면 보기",
     caption: "평면",
-    glyph: (
-      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
-        <rect x="6.5" y="2.5" width="13" height="11" stroke="currentColor" strokeWidth="1.2" />
-        <path d="M2 8h3.5M20.5 8H24" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      </svg>
-    ),
+    glyph: <PlanViewIcon size={20} aria-hidden="true" data-carbon-icon="plan" />,
   },
   {
     mode: "3D" as const,
     label: "입체 보기",
     caption: "입체",
-    glyph: (
-      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
-        <path
-          d="M13 1.6 21.5 6.4v5.2L13 16.4 4.5 11.6V6.4L13 1.6Z"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-        />
-        <path d="M13 1.6v5.2M13 6.8l8.5-.4M13 6.8 4.5 6.4" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
+    glyph: <SpatialViewIcon size={20} aria-hidden="true" data-carbon-icon="spatial" />,
   },
   {
     mode: "SPLIT" as const,
     label: "평면과 입체 함께 보기",
     caption: "함께",
-    glyph: (
-      <svg width="26" height="16" viewBox="0 0 26 16" fill="none" aria-hidden="true">
-        <path
-          d="M8.6 2.4 14 5.4v4.4l-5.4 3-5.4-3V5.4l5.4-3Z"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-        />
-        <rect x="17" y="3.4" width="6.5" height="9.2" stroke="currentColor" strokeWidth="1.2" />
-      </svg>
-    ),
+    glyph: <SplitViewIcon size={20} aria-hidden="true" data-carbon-icon="split" />,
   },
 ];
 

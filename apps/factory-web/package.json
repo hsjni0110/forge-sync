@@ -17,6 +17,7 @@
     "verify": "npm run lint && npm run typecheck && npm run test && npm run architecture && npm run build"
   },
   "dependencies": {
+    "@carbon/icons-react": "11.89.0",
     "@carbon/react": "1.113.0",
     "@react-three/fiber": "^9.7.0",
     "ajv": "^8.20.0",
