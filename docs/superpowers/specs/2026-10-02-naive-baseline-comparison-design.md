@@ -196,3 +196,30 @@ Replay Edge의 `ReplayPublisher` Port에 seed 고정 decorator를 둔다. 실제
 - 주입한 중복·역순 비율은 합성 값이다. 실제 QoS1 재전송률이나 네트워크 역순률을 주장하지 않는다.
 - Alarm 규칙은 같은 데이터에서 만들어졌으므로 Alarm 건수의 적절성은 이 실험에서 평가하지 않는다.
 - 역순 주입은 평가 실행에서만 V-019 보장을 의도적으로 깨며, 제품 실행 경로의 보장과 섞어 보고하지 않는다.
+
+## 10. 사전 등록 보충 (2026-10-03)
+
+NA-OEE와 NA-CAUSE 결과를 계산하기 전에, 4절 문구의 모호한 부분을 다음과 같이 해석한다. 규칙을 바꾸는
+것이 아니라 구현 가능한 수준으로 좁히는 것이며, 이 보충을 커밋한 뒤에 결과를 처음 계산한다.
+
+### NA-OEE의 Performance
+
+- `ACTIVE` stretch는 `ACTIVE`가 아닌 값에서 `ACTIVE`로 바뀐 시점부터 다음 `execution` 관찰까지다.
+  NA-PROD-2가 센 진입과 같은 집합이며, 첫 관찰부터 `ACTIVE`인 구간은 stretch로 세지 않는다.
+- 각 stretch는 그 시작 시점에 마지막으로 도착한 `program` 값에 속한다. `program` 관찰이 아직 없거나
+  `UNAVAILABLE`이면 그 값 자체를 하나의 묶음으로 둔다.
+- 프로그램 `p`의 이상 cycle time은 `p`에 속한 stretch 중 가장 짧은 길이다.
+- `Performance = Σ_p(이상 cycle time_p × stretch 수_p) / ACTIVE 체류시간`. 분모는 NA-UTIL과 같은
+  `ACTIVE` 체류시간이다. 프로그램이 하나면 4절의 식과 같다.
+- NA-OEE의 숨은 가정은 사용한 가동률 규칙의 가정, `ONE_ACTIVE_ENTRY_IS_ONE_PART`,
+  `SHORTEST_ACTIVE_STRETCH_IS_IDEAL_CYCLE`, 가동률 분모를 계획 생산 시간으로 보는 가정, 그리고
+  `NO_QUALITY_DATA_MEANS_ALL_GOOD`를 모두 나열한다. H-A3의 "근거 없는 가정 수"는 이 목록의 길이다.
+
+### NA-CAUSE-1의 겹침
+
+- ForgeSync Downtime Pareto에는 "긴 정지" 임계값이 없다. naive도 Pareto의 모든 구간을 그대로 쓴다.
+- Condition은 점시점 관찰로 보고, 관찰 시각이 `[startedAt, endedAt)` 안에 있는 `Warning` 또는
+  `Fault`만 겹친 것으로 본다. ForgeSync와 같은 연결 기준을 써서, 두 결과의 차이가 연결 방식이 아니라
+  "원인"이라는 표현에서만 나오게 한다.
+- naive는 연결된 Condition 중 가장 이른 관찰을 그 정지의 원인으로 표시한다. 비상 정지와 운전 모드
+  근거는 naive가 사용하지 않는다.
