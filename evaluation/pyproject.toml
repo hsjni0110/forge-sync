@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "forgesync-evaluation"
+version = "0.1.0"
+description = "ForgeSync comparison against preregistered naive baselines"
+requires-python = ">=3.12,<3.15"
+dependencies = []
+
+[project.scripts]
+forgesync-evaluation = "forgesync_evaluation.adapter.inbound.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/forgesync_evaluation"]

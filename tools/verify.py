@@ -30,6 +30,7 @@ COMMANDS = (
         "Virtual controller package",
         ("uv", "build", "--package", "forgesync-virtual-controller"),
     ),
+    VerificationCommand("Evaluation package", ("uv", "build", "--package", "forgesync-evaluation")),
     VerificationCommand(
         "Factory API", ("apps/factory-api/gradlew", "-p", "apps/factory-api", "check", "bootJar")
     ),

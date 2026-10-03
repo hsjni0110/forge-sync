@@ -6,6 +6,7 @@ requires-python = ">=3.12, <3.15"
 members = [
     "forgesync-ai-service",
     "forgesync-edge-gateway",
+    "forgesync-evaluation",
     "forgesync-virtual-controller",
     "forgesync-workspace",
 ]
@@ -130,6 +131,11 @@ requires-dist = [
     { name = "paho-mqtt", specifier = ">=2.1,<3" },
     { name = "uvicorn", specifier = ">=0.35,<0.36" },
 ]
+
+[[package]]
+name = "forgesync-evaluation"
+version = "0.1.0"
+source = { editable = "evaluation" }
 
 [[package]]
 name = "forgesync-virtual-controller"
