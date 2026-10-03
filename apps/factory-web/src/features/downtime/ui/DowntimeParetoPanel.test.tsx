@@ -16,19 +16,19 @@ describe("DowntimeParetoPanel", () => {
       />,
     );
 
-    const first = screen.getByRole("button", { name: /1위.*정지/ });
-    expect(within(first).getByText(/비상정지/)).toBeTruthy();
-    expect(within(first).getByText(/운전 모드 변경/)).toBeTruthy();
-    expect(within(first).getByText(/상태 경고.*DOOR OPEN/)).toBeTruthy();
-    expect(screen.getByText("사유 미확인")).toBeTruthy();
-    expect(screen.getByText(/원인으로 확정하지 않습니다/)).toBeTruthy();
+    const first = screen.getByRole("button", { name: /1위.*멈춤/ });
+    expect(within(first).getByText("비상정지 기록")).toBeTruthy();
+    expect(within(first).getByText("수동 모드로 바뀜")).toBeTruthy();
+    expect(within(first).getByText("경고 406 · DOOR OPEN")).toBeTruthy();
+    expect(screen.getByText("함께 기록된 사실 없음")).toBeTruthy();
+    expect(screen.getByText("같은 시간에 함께 기록된 사실이에요. 멈춘 원인이라고 단정하지 않아요.")).toBeTruthy();
     // The Pareto ranks every non-operating interval, so it must not call them stops or causes.
     const panel = screen.getByRole("region", { name: "주요 비가동 구간" });
     expect(within(panel).getByText("관측된 비가동 시간")).toBeTruthy();
-    expect(within(panel).getByText("정지·중단 1분 40초 · 확인 불가 1분")).toBeTruthy();
-    const unknown = screen.getByRole("button", { name: /2위.*상태 미확인/ });
+    expect(within(panel).getByText("멈춤 1분 40초 · 기록 없음 1분")).toBeTruthy();
+    const unknown = screen.getByRole("button", { name: /2위.*기록 없음/ });
     expect(unknown.querySelector("svg")).toBeTruthy();
-    expect(within(unknown).getByText("상태 미확인")).toBeTruthy();
+    expect(within(unknown).getByText("기록 없음")).toBeTruthy();
   });
 
   it("selects the beginning of a ranked downtime interval", () => {
@@ -40,7 +40,7 @@ describe("DowntimeParetoPanel", () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole("button", { name: /1위.*정지/ }));
+    fireEvent.click(screen.getByRole("button", { name: /1위.*멈춤/ }));
 
     expect(onSelect).toHaveBeenCalledWith("2016-10-05T09:00:00Z");
   });
@@ -53,6 +53,6 @@ describe("DowntimeParetoPanel", () => {
 
     render(<DowntimeParetoPanel report={report} onSelect={() => undefined} />);
 
-    expect(screen.getByText("운전 모드 변경 · 값 확인 불가")).toBeTruthy();
+    expect(screen.getByText("운전 모드 기록 없음")).toBeTruthy();
   });
 });

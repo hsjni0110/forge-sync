@@ -21,7 +21,7 @@ interface IntervalDocument extends ProcessingDocument {
 }
 interface UtilizationDocument extends ProcessingDocument {
   intervalProcessingRunId: string;
-  state: { status: string; states: { state: string; ratioPercent: number }[] };
+  state: { status: string; states: { state: string; duration: string; ratioPercent: number }[] };
   counters: { cuttingRatio: { status: string; ratioPercent?: number } };
 }
 interface ParetoDocument extends ProcessingDocument {
@@ -144,20 +144,18 @@ function mapOverview(intervals: IntervalDocument, utilization: UtilizationDocume
     .map((interval): ShiftInterval => ({
       state: stateOf(interval.value), startedAt: interval.startedAt, endedAt: interval.endedAt,
     }));
-  const markers: ShiftMarker[] = [
-    ...pareto.entries.map((entry): ShiftMarker => ({ kind: "DOWNTIME",
-      sourceObservedAt: entry.startedAt, seekTo: entry.startedAt,
-      label: `${downtimeLabel(entry.state)} ${entry.startedAt} 시작`, })),
-    ...toolChanges.toolChanges.map((change): ShiftMarker => ({ kind: "TOOL_CHANGE",
-      sourceObservedAt: change.sourceObservedAt, seekTo: change.sourceObservedAt,
-      label: `공구 교체 ${change.fromToolNumber}번에서 ${change.toToolNumber}번 ${change.sourceObservedAt}`, })),
-  ].sort((left, right) => Date.parse(left.sourceObservedAt) - Date.parse(right.sourceObservedAt));
+  const markers: ShiftMarker[] = toolChanges.toolChanges.map((change): ShiftMarker => ({
+    kind: "TOOL_CHANGE", sourceObservedAt: change.sourceObservedAt, seekTo: change.sourceObservedAt,
+    label: `공구 교체 ${change.fromToolNumber}번에서 ${change.toToolNumber}번 ${change.sourceObservedAt}`,
+  })).sort((left, right) => Date.parse(left.sourceObservedAt) - Date.parse(right.sourceObservedAt));
   return {
     machineId: intervals.machineId, replaySessionId: intervals.replaySessionId,
     throughReplaySequence: requestedThroughReplaySequence,
     observedFrom: intervals.observedFrom, observedTo: intervals.observedTo,
     availabilityPercent: utilization.state.status === "UNAVAILABLE" ? undefined
       : utilization.state.states.find((state) => state.state === "ACTIVE")?.ratioPercent,
+    activeSeconds: utilization.state.status === "UNAVAILABLE" ? undefined
+      : isoDurationSeconds(utilization.state.states.find((state) => state.state === "ACTIVE")?.duration),
     cuttingPercent: utilization.counters.cuttingRatio.status !== "UNAVAILABLE"
       ? utilization.counters.cuttingRatio.ratioPercent : undefined,
     stoppedSeconds: secondsInStates(pareto.entries, ["STOPPED", "INTERRUPTED"]),
@@ -188,9 +186,11 @@ function stateOf(value?: string): ShiftState {
   throw new ShiftOverviewError("VERSION_MISMATCH", `execution state ${value}`);
 }
 
-function downtimeLabel(state: string): string {
-  return ({ STOPPED: "정지", INTERRUPTED: "가공 중단", UNKNOWN: "확인 불가" } as Record<string, string>)[state]
-    ?? "비가동";
+/** Utilization durations are ISO-8601 time spans such as `PT3H14M2.5S`; days never appear. */
+function isoDurationSeconds(value?: string): number | undefined {
+  const match = value?.match(/^PT(?:(\d+)H)?(?:(\d+)M)?(?:([\d.]+)S)?$/);
+  if (!match) return undefined;
+  return Number(match[1] ?? 0) * 3600 + Number(match[2] ?? 0) * 60 + Number(match[3] ?? 0);
 }
 
 function requireReference(actual: string, expected: string): void {

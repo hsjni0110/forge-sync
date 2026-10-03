@@ -184,20 +184,28 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   // The Dashboard timeline must reuse the same acknowledged Alarm identity shown in 2D and 3D.
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "교대조 개요" })).toBeVisible();
-  await expect(page.getByRole("region", { name: "교대조 핵심 지표" })).toContainText("가동률", {
+  await expect(page.getByRole("list", { name: "하루 요약" })).toContainText("작업", {
     timeout: 60_000,
   });
-  await expect(page.getByRole("region", { name: "교대조 핵심 지표" })).toContainText("전체");
+  await page.getByText("자세히 보기", { exact: true }).click();
+  await expect(page.getByRole("region", { name: "그 밖의 지표" })).toContainText("전체");
   await expect(page.getByRole("region", { name: "설비 상태 구간" })).toBeVisible();
-  await expect(page.locator(`[data-kind="ALARM"][data-alarm-id="${activeAlarm.alarmId}"]`))
+  // Alarms are an opt-in layer so the first read stays on working and stopped time.
+  await page.getByRole("button", { name: /^알람 \d+건 함께 보기$/ }).click();
+  // An alarm after the last state record has no place on the bar, so identity is checked in the list.
+  await expect(page.getByRole("region", { name: "확인할 알람" })
+    .locator(`[data-alarm-id="${activeAlarm.alarmId}"]`)).toBeVisible();
+  await page.getByRole("button", { name: "가장 오래 멈춘 때 보기" }).click();
+  await expect(page.getByRole("heading", { name: /동안 (멈춰 있었어요|작업이 중단돼 있었어요)\./ }))
     .toBeVisible();
+  await expect(page.getByRole("slider", { name: "볼 시각 고르기" })).toBeAttached();
 
   // The Dashboard Pareto reuses the authoritative seek path whose current-run convergence was
   // verified above. Its first-ranked interval must move the cursor and shared 2D/3D Twin version.
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "주요 비가동 구간" })).toBeVisible({
-    timeout: 60_000,
-  });
+  // Ranked downtime sits under "자세히 보기" so the first read stays on the day's conclusion.
+  await page.getByText("자세히 보기", { exact: true }).click({ timeout: 60_000 });
+  await expect(page.getByRole("heading", { name: "주요 비가동 구간" })).toBeVisible();
   const firstDowntime = page.locator(".downtime-list button").first();
   const downtimeStartedAt = await firstDowntime.getAttribute("data-started-at");
   expect(downtimeStartedAt).toBeTruthy();

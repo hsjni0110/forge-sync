@@ -60,7 +60,7 @@ describe("DashboardRoute", () => {
     renderDashboard({ connectionStatus: "LIVE", snapshot, freshness: "FRESH" });
 
     expect(screen.getByRole("heading", { name: "교대조 개요" })).toBeTruthy();
-    expect(screen.getByText(/전체 관측 구간의 가동 상태와 주요 손실/)).toBeTruthy();
+    expect(screen.getByText(/하루 기록에서 작업한 시간과 멈춘 때를 확인해요/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "시점 상세 보기" }).getAttribute("href")).toBe(
       "/factory",
     );
@@ -109,33 +109,45 @@ describe("DashboardRoute", () => {
       alarmClient={alarmClient} /></MemoryRouter>);
 
     const readiness = await screen.findByRole("region", { name: "분석 가능 상태" });
-    expect(await screen.findByRole("region", { name: "교대조 핵심 지표" })).toBeTruthy();
-    expect(screen.getByText("30%")).toBeTruthy();
-    expect(screen.getByText("40%")).toBeTruthy();
-    expect(screen.getByText("전체 122건")).toBeTruthy();
-    expect(screen.getByText("완료 94건")).toBeTruthy();
-    expect(within(screen.getByRole("region", { name: "교대조 핵심 지표" }))
-      .getByText("선택 시점 데이터")).toBeTruthy();
-    expect(screen.getByRole("region", { name: "설비 상태 구간" })).toBeTruthy();
-    expect(screen.getByRole("region", { name: "확인할 알람" })).toBeTruthy();
+    const daySummary = await screen.findByRole("list", { name: "하루 요약" });
+    expect(screen.getByRole("heading", { name: /^기계가 실제로 작업한 시간은 하루의 30%예요\./ }))
+      .toBeTruthy();
+    expect(within(daySummary).getByText("30%")).toBeTruthy();
+    const otherKpis = screen.getByRole("region", { name: "그 밖의 지표" });
+    expect(within(otherKpis).getByText("40%")).toBeTruthy();
+    expect(within(otherKpis).getByText("전체 122건")).toBeTruthy();
+    expect(within(otherKpis).getByText("완료 94건")).toBeTruthy();
+    expect(within(otherKpis).getByText("선택 시점 데이터")).toBeTruthy();
     expect(screen.getByRole("region", { name: "주요 비가동 구간" })).toBeTruthy();
     expect(screen.queryByText("주축 속도")).toBeNull();
-    const interrupted = screen.getByRole("button", { name: /가공 중단.*09:01:00.*09:02:00/ });
+    const interrupted = screen.getByRole("button", { name: /작업 중단.*09:01:00.*09:02:00/ });
     expect(interrupted.querySelector("svg")).toBeTruthy();
-    expect(within(interrupted).getByText("가공 중단")).toBeTruthy();
+    expect(within(interrupted).getByText("작업 중단")).toBeTruthy();
+    expect(screen.queryByRole("region", { name: "확인할 알람" })).toBeNull();
+    fireEvent.click(await screen.findByRole("button", { name: "알람 1건 함께 보기" }));
     const alarmRegion = screen.getByRole("region", { name: "확인할 알람" });
     expect(alarmRegion.querySelector("svg")).toBeTruthy();
     expect(within(alarmRegion).getByText("주의 알람")).toBeTruthy();
-    const kpiBand = screen.getByRole("region", { name: "교대조 핵심 지표" });
-    expect(kpiBand.querySelectorAll(".metric-card")).toHaveLength(0);
+    expect(otherKpis.querySelectorAll(".metric-card")).toHaveLength(0);
     expect(container.querySelectorAll(".shift-kpi-band")).toHaveLength(1);
     expect(screen.getAllByRole("link", { name: "시점 상세 보기" })).toHaveLength(1);
 
+    // Above the conclusion only the scope remains; the shell's top bar already states the link,
+    // freshness and replay, and the title and readiness stay for screen readers.
+    expect(screen.queryByRole("region", { name: "트윈 연결 상태" })).toBeNull();
+    expect(screen.getByRole("heading", { level: 1, name: "교대조 개요" }).closest("header")?.className)
+      .toContain("cds--visually-hidden");
+    expect(readiness.className).toContain("cds--visually-hidden");
+    const details = screen.getByText("자세히 보기").closest("details")!;
+    expect(within(details).getByRole("region", { name: "주요 비가동 구간", hidden: true })).toBeTruthy();
+
     const scanOrder = [
       readiness,
-      kpiBand,
+      screen.getByRole("heading", { name: /^기계가 실제로 작업한 시간은 하루의 30%예요\./ }),
       screen.getByRole("region", { name: "설비 상태 구간" }),
       alarmRegion,
+      daySummary,
+      otherKpis,
       screen.getByRole("region", { name: "주요 비가동 구간" }),
       screen.getByRole("link", { name: "시점 상세 보기" }),
     ];
@@ -145,11 +157,12 @@ describe("DashboardRoute", () => {
           & Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy();
     }
+    fireEvent.click(screen.getByRole("button", { name: "공구 교체 1건 함께 보기" }));
     fireEvent.click(screen.getByRole("button", { name: "공구 교체 2번에서 7번" }));
     await waitFor(() => expect(replayClient.seek).toHaveBeenCalledWith(
       paused.replaySessionId, paused.revision, "2016-10-05T09:01:30Z", paused.speedMultiplier,
     ));
-    expect(screen.getByRole("button", { name: /1위.*정지/ })).toBeTruthy();
+    expect(screen.getByRole("button", { name: /1위.*멈춤/ })).toBeTruthy();
     expect(screen.getByRole("button", { name: /주의 알람.*345/ })
       .getAttribute("data-alarm-id")).toBe(alarmFixture.alarms[0].alarmId);
     expect(screen.queryByText(/품질 100%/)).toBeNull();
@@ -175,9 +188,9 @@ describe("DashboardRoute", () => {
       connectionStatus: "LIVE", snapshot, freshness: "FRESH",
     })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient} /></MemoryRouter>);
 
-    expect(await screen.findByText("교대조 분석을 불러오는 중입니다.")).toBeTruthy();
+    expect(await screen.findByText("교대조 분석을 불러오고 있어요.")).toBeTruthy();
     rejectLoad(new ShiftOverviewError("VERSION_MISMATCH"));
-    expect((await screen.findByRole("alert")).textContent).toMatch("분석 버전이 일치하지 않습니다");
+    expect((await screen.findByRole("alert")).textContent).toMatch("분석 버전이 맞지 않아요");
     expect(screen.queryByRole("region", { name: "교대조 핵심 지표" })).toBeNull();
   });
 
@@ -204,9 +217,9 @@ describe("DashboardRoute", () => {
       connectionStatus: "LIVE", snapshot, freshness: "FRESH",
     })} replayControlClient={replayClient} shiftOverviewClient={shiftOverviewClient} /></MemoryRouter>);
 
-    expect(await screen.findByText("재생 데이터가 화면에 반영되기를 기다리는 중입니다.")).toBeTruthy();
+    expect(await screen.findByText("재생 데이터가 화면에 반영되기를 기다리고 있어요.")).toBeTruthy();
     expect(shiftOverviewClient.load).not.toHaveBeenCalled();
-    expect(screen.queryByText("교대조 분석을 불러오는 중입니다.")).toBeNull();
+    expect(screen.queryByText("교대조 분석을 불러오고 있어요.")).toBeNull();
     expect(screen.queryByRole("region", { name: "교대조 핵심 지표" })).toBeNull();
   });
 
@@ -299,7 +312,7 @@ describe("DashboardRoute", () => {
       paretoClient,
     );
 
-    fireEvent.click(await screen.findByRole("button", { name: /1위.*정지/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /1위.*멈춤/ }));
 
     await waitFor(() =>
       expect(replayClient.seek).toHaveBeenCalledWith(
