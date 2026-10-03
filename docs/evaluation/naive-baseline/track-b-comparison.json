@@ -1,0 +1,80 @@
+{
+  "scenarios": [
+    {
+      "scenario": "S1",
+      "deliveredEnvelopeCount": 102712,
+      "baselineDeliveredEnvelopeCount": 101693,
+      "naive": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": 0,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 0
+      },
+      "forgesync": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": null,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 0
+      }
+    },
+    {
+      "scenario": "S2",
+      "deliveredEnvelopeCount": 106785,
+      "baselineDeliveredEnvelopeCount": 101693,
+      "naive": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": 0,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 1
+      },
+      "forgesync": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": null,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 0
+      }
+    },
+    {
+      "scenario": "S3",
+      "deliveredEnvelopeCount": 101693,
+      "baselineDeliveredEnvelopeCount": 101693,
+      "naive": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": 829,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 0
+      },
+      "forgesync": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": null,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 0
+      }
+    },
+    {
+      "scenario": "S4",
+      "deliveredEnvelopeCount": 106783,
+      "baselineDeliveredEnvelopeCount": 101693,
+      "naive": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": 3952,
+        "misattributedSeconds": 15.182,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": 1
+      },
+      "forgesync": {
+        "finalValueMismatchCount": 0,
+        "rollbackCount": null,
+        "misattributedSeconds": 0.0,
+        "activeEntryDifference": 0,
+        "extraAlarmOpeningCount": -1
+      }
+    }
+  ]
+}
