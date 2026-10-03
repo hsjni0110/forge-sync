@@ -7,6 +7,7 @@ import downtimeSchema from "../../../../../../contracts/twin/v1/downtime-pareto.
 import intervalsSchema from "../../../../../../contracts/twin/v1/equipment-state-intervals.schema.json";
 import utilizationSchema from "../../../../../../contracts/twin/v1/utilization-kpis.schema.json";
 import type { DowntimeParetoEntry } from "../../downtime/domain/downtimePareto";
+import { secondsInStates } from "../../downtime/domain/downtimePareto";
 import { ShiftOverviewError, type ShiftOverviewClient } from "../application/ports";
 import type { ShiftInterval, ShiftMarker, ShiftOverview, ShiftState } from "../domain/shiftOverview";
 
@@ -159,7 +160,8 @@ function mapOverview(intervals: IntervalDocument, utilization: UtilizationDocume
       : utilization.state.states.find((state) => state.state === "ACTIVE")?.ratioPercent,
     cuttingPercent: utilization.counters.cuttingRatio.status !== "UNAVAILABLE"
       ? utilization.counters.cuttingRatio.ratioPercent : undefined,
-    downtimeSeconds: pareto.totalDowntimeSeconds,
+    stoppedSeconds: secondsInStates(pareto.entries, ["STOPPED", "INTERRUPTED"]),
+    unknownSeconds: secondsInStates(pareto.entries, ["UNKNOWN"]),
     totalMachiningCount: runs.machiningRuns.length,
     completedMachiningCount: runs.machiningRuns.filter((run) => run.status === "COMPLETED").length,
     intervalProcessingRunId: intervals.processingRunId,

@@ -54,9 +54,11 @@ describe("HttpShiftOverviewClient", () => {
     const overview = await client.load("Mazak01", replaySessionId, 42);
 
     expect(overview).toMatchObject({
-      replaySessionId, throughReplaySequence: 42, availabilityPercent: 30,
-      cuttingPercent: 40, downtimeSeconds: pareto.totalDowntimeSeconds,
+      replaySessionId, throughReplaySequence: 42, availabilityPercent: 30, cuttingPercent: 40,
     });
+    // The Pareto ranks every non-operating interval; UNKNOWN must not be reported as stopped.
+    expect(overview.stoppedSeconds).toBe(100);
+    expect(overview.unknownSeconds).toBe(60);
     expect(overview.intervals).toEqual([{
       state: "INTERRUPTED", startedAt: "2016-10-05T09:00:00Z", endedAt: "2016-10-05T09:01:00Z",
     }]);

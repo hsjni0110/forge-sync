@@ -195,7 +195,7 @@ test("browser Replay start creates an authoritative session and Twin", async ({ 
   // The Dashboard Pareto reuses the authoritative seek path whose current-run convergence was
   // verified above. Its first-ranked interval must move the cursor and shared 2D/3D Twin version.
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "주요 정지 원인" })).toBeVisible({
+  await expect(page.getByRole("heading", { name: "주요 비가동 구간" })).toBeVisible({
     timeout: 60_000,
   });
   const firstDowntime = page.locator(".downtime-list button").first();

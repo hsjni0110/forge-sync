@@ -22,7 +22,10 @@ describe("DowntimeParetoPanel", () => {
     expect(within(first).getByText(/상태 경고.*DOOR OPEN/)).toBeTruthy();
     expect(screen.getByText("사유 미확인")).toBeTruthy();
     expect(screen.getByText(/원인으로 확정하지 않습니다/)).toBeTruthy();
-    expect(screen.getByRole("region", { name: "주요 정지 원인" })).toBeTruthy();
+    // The Pareto ranks every non-operating interval, so it must not call them stops or causes.
+    const panel = screen.getByRole("region", { name: "주요 비가동 구간" });
+    expect(within(panel).getByText("관측된 비가동 시간")).toBeTruthy();
+    expect(within(panel).getByText("정지·중단 1분 40초 · 확인 불가 1분")).toBeTruthy();
     const unknown = screen.getByRole("button", { name: /2위.*상태 미확인/ });
     expect(unknown.querySelector("svg")).toBeTruthy();
     expect(within(unknown).getByText("상태 미확인")).toBeTruthy();

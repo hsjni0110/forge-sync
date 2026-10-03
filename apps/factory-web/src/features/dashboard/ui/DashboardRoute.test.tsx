@@ -82,7 +82,7 @@ describe("DashboardRoute", () => {
         machineId: "Mazak01", replaySessionId: snapshot.replayCursor.replaySessionId,
         throughReplaySequence: snapshot.replayCursor.replaySequence,
         observedFrom: "2016-10-05T05:27:55.740Z", observedTo: "2016-10-05T19:15:07.025Z",
-        availabilityPercent: 30, cuttingPercent: 40, downtimeSeconds: 160,
+        availabilityPercent: 30, cuttingPercent: 40, stoppedSeconds: 100, unknownSeconds: 60,
         totalMachiningCount: 122, completedMachiningCount: 94,
         intervalProcessingRunId: `sha256:${"a".repeat(64)}`,
         utilizationProcessingRunId: `sha256:${"b".repeat(64)}`,
@@ -118,7 +118,7 @@ describe("DashboardRoute", () => {
       .getByText("선택 시점 데이터")).toBeTruthy();
     expect(screen.getByRole("region", { name: "설비 상태 구간" })).toBeTruthy();
     expect(screen.getByRole("region", { name: "확인할 알람" })).toBeTruthy();
-    expect(screen.getByRole("region", { name: "주요 정지 원인" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "주요 비가동 구간" })).toBeTruthy();
     expect(screen.queryByText("주축 속도")).toBeNull();
     const interrupted = screen.getByRole("button", { name: /가공 중단.*09:01:00.*09:02:00/ });
     expect(interrupted.querySelector("svg")).toBeTruthy();
@@ -136,7 +136,7 @@ describe("DashboardRoute", () => {
       kpiBand,
       screen.getByRole("region", { name: "설비 상태 구간" }),
       alarmRegion,
-      screen.getByRole("region", { name: "주요 정지 원인" }),
+      screen.getByRole("region", { name: "주요 비가동 구간" }),
       screen.getByRole("link", { name: "시점 상세 보기" }),
     ];
     for (let index = 0; index < scanOrder.length - 1; index += 1) {

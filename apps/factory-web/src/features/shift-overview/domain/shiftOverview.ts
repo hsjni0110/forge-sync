@@ -23,7 +23,10 @@ export interface ShiftOverview {
   observedTo: string;
   availabilityPercent?: number;
   cuttingPercent?: number;
-  downtimeSeconds: number;
+  /** STOPPED and INTERRUPTED intervals; the observed but non-operating time we can name. */
+  stoppedSeconds: number;
+  /** Intervals opened by UNAVAILABLE: not operating as far as we know, but not observed as stopped. */
+  unknownSeconds: number;
   totalMachiningCount: number;
   completedMachiningCount: number;
   intervalProcessingRunId: string;

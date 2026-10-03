@@ -15,7 +15,7 @@ describe("ShiftOverviewPanel Alarm marker", () => {
     const report: ShiftOverview = {
       machineId: "Mazak01", replaySessionId: alarmFixture.replaySessionId,
       throughReplaySequence: 100, observedFrom: "2016-10-05T09:00:00Z",
-      observedTo: "2016-10-05T09:10:00Z", downtimeSeconds: 0,
+      observedTo: "2016-10-05T09:10:00Z", stoppedSeconds: 0, unknownSeconds: 0,
       totalMachiningCount: 0, completedMachiningCount: 0,
       intervalProcessingRunId: `sha256:${"a".repeat(64)}`,
       utilizationProcessingRunId: `sha256:${"b".repeat(64)}`,
@@ -37,5 +37,25 @@ describe("ShiftOverviewPanel Alarm marker", () => {
     expect(within(interrupted).getByText("가공 중단")).toBeTruthy();
     fireEvent.click(marker);
     expect(onSeek).toHaveBeenCalledWith(alarmFixture.alarms[0].openedAt);
+  });
+});
+
+describe("ShiftOverviewPanel downtime KPI", () => {
+  it("reports observed stops and keeps unknown time out of them, stated beside the value", () => {
+    const report: ShiftOverview = {
+      machineId: "Mazak01", replaySessionId: alarmFixture.replaySessionId,
+      throughReplaySequence: 100, observedFrom: "2016-10-05T09:00:00Z",
+      observedTo: "2016-10-05T13:00:00Z", stoppedSeconds: 10_920, unknownSeconds: 12_660,
+      totalMachiningCount: 0, completedMachiningCount: 0,
+      intervalProcessingRunId: `sha256:${"a".repeat(64)}`,
+      utilizationProcessingRunId: `sha256:${"b".repeat(64)}`,
+      intervals: [], markers: [], pareto: paretoFixture as never,
+    };
+    render(<ShiftOverviewPanel report={report} onSeek={vi.fn()} />);
+
+    const kpis = screen.getByRole("region", { name: "교대조 핵심 지표" });
+    expect(within(kpis).getByText("정지 시간").parentElement?.textContent)
+      .toContain("3시간 2분");
+    expect(within(kpis).getByText("확인 불가 3시간 31분은 따로 집계")).toBeTruthy();
   });
 });

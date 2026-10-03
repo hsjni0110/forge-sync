@@ -3,6 +3,7 @@ import type {
   DowntimeParetoReport,
   DowntimeState,
 } from "../domain/downtimePareto";
+import { secondsInStates } from "../domain/downtimePareto";
 
 const STATE_LABELS: Record<DowntimeState, string> = {
   STOPPED: "정지",
@@ -21,10 +22,16 @@ export function DowntimeParetoPanel({
     <section className="downtime-panel" aria-labelledby="downtime-pareto-title">
       <header>
         <div>
-          <p className="eyebrow">관측된 정지 시간</p>
-          <h2 id="downtime-pareto-title">주요 정지 원인</h2>
+          <p className="eyebrow">관측된 비가동 시간</p>
+          <h2 id="downtime-pareto-title">주요 비가동 구간</h2>
         </div>
-        <strong>{formatSeconds(report.totalDowntimeSeconds)}</strong>
+        <div className="downtime-total">
+          <strong>{formatSeconds(report.totalDowntimeSeconds)}</strong>
+          <small>
+            {`정지·중단 ${formatSeconds(secondsInStates(report.entries, ["STOPPED", "INTERRUPTED"]))}`}
+            {` · 확인 불가 ${formatSeconds(secondsInStates(report.entries, ["UNKNOWN"]))}`}
+          </small>
+        </div>
       </header>
       <p className="downtime-disclaimer">
         표시된 항목은 같은 시간에 관측된 근거이며 원인으로 확정하지 않습니다.

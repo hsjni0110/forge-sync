@@ -39,7 +39,10 @@ export function ShiftOverviewPanel({
       <section className="shift-kpi-band" aria-label="교대조 핵심 지표">
         <ShiftKpi label="가동률" value={percent(report.availabilityPercent)} provenance="파생" />
         <ShiftKpi label="절삭 비율" value={percent(report.cuttingPercent)} provenance="파생" />
-        <ShiftKpi label="정지 시간" value={duration(report.downtimeSeconds)} provenance="파생" />
+        <ShiftKpi label="정지 시간" value={duration(report.stoppedSeconds)}
+          detail={report.unknownSeconds > 0
+            ? `확인 불가 ${duration(report.unknownSeconds)}은 따로 집계` : undefined}
+          provenance="파생" />
         <ShiftKpi label="가공 건수" value={`전체 ${report.totalMachiningCount}건`}
           detail={`완료 ${report.completedMachiningCount}건`} provenance="파생" />
         <ShiftKpi label="데이터 최신성" value={freshnessLabel(freshness, replayStatus)}
