@@ -39,3 +39,22 @@ def _unit_draw(seed: int, index: int, purpose: str) -> float:
     """A value in [0, 1) fixed by seed, index and purpose, independent of call order."""
     digest = hashlib.sha256(f"{seed}:{index}:{purpose}".encode()).digest()
     return int.from_bytes(digest[:8], "big") / 2**64
+
+
+# Scenario matrix fixed in the 2026-10-02 preregistration (section 6.2); S5 is a restart.
+_PREREGISTERED_RATES = {
+    "S0": (0.0, 0.0),
+    "S1": (0.01, 0.0),
+    "S2": (0.05, 0.0),
+    "S3": (0.0, 0.01),
+    "S4": (0.05, 0.05),
+}
+PREREGISTERED_SEED = 1
+PREREGISTERED_MAX_DELAY = 50
+
+
+def preregistered_scenario(name: str) -> FaultScenario:
+    duplicate_rate, reorder_rate = _PREREGISTERED_RATES[name]
+    return FaultScenario(
+        name, PREREGISTERED_SEED, duplicate_rate, reorder_rate, PREREGISTERED_MAX_DELAY
+    )

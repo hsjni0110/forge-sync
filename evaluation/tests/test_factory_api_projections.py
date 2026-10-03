@@ -157,3 +157,18 @@ def test_client_starts_a_replay_and_reads_its_progress_and_the_twin(api_base_url
         ("GET", "/api/v1/machines/Mazak01/replay-session", None),
         ("GET", "/api/v1/machines/Mazak01/twin", None),
     ]
+
+
+def test_client_reads_alarms_at_one_replay_cursor(api_base_url: str) -> None:
+    client = FactoryApiProjectionClient(api_base_url, "Mazak01")
+
+    client.find_alarms("00000000-0000-0000-0000-000000000001", 10)
+
+    assert RecordingFactoryApi.requests == [
+        (
+            "GET",
+            "/api/v1/machines/Mazak01/alarms?replaySessionId=00000000-0000-0000-0000-000000000001"
+            "&throughReplaySequence=10",
+            None,
+        )
+    ]

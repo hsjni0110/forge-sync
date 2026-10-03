@@ -26,9 +26,11 @@ class TimelineSegment:
 
 
 @dataclass(frozen=True, slots=True)
-class NaiveStreamOutcome:
+class ConsumerOutcome:
+    """What one consumer ended up with; `rollback_count` is None when it cannot be observed."""
+
     final_values: Mapping[str, str | None]
-    rollback_count: int
+    rollback_count: int | None
     execution_timeline: tuple[TimelineSegment, ...]
     active_entry_count: int
     alarm_opening_count: int
@@ -39,7 +41,7 @@ ACTIVE = "ACTIVE"
 
 def consume_naively(
     observations: Sequence[DeliveredObservation], execution_item_id: str
-) -> NaiveStreamOutcome:
+) -> ConsumerOutcome:
     held_at: dict[str, datetime] = {}
     final_values: dict[str, str | None] = {}
     rollbacks = 0
@@ -50,7 +52,7 @@ def consume_naively(
             rollbacks += 1
         held_at[item_id] = observation.source_observed_at
         final_values[item_id] = observation.value
-    return NaiveStreamOutcome(
+    return ConsumerOutcome(
         final_values=final_values,
         rollback_count=rollbacks,
         execution_timeline=_timeline(executions, observations),

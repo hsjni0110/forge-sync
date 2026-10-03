@@ -47,6 +47,15 @@ class FactoryApiProjectionClient:
     def current_twin(self) -> JsonDocument:
         return self._get("twin")
 
+    def find_alarms(self, replay_session_id: str, through_replay_sequence: int) -> JsonDocument:
+        query = urllib.parse.urlencode(
+            {
+                "replaySessionId": replay_session_id,
+                "throughReplaySequence": through_replay_sequence,
+            }
+        )
+        return self._get(f"alarms?{query}")
+
     def project_state_intervals(
         self, replay_session_id: str, through_replay_sequence: int
     ) -> JsonDocument:

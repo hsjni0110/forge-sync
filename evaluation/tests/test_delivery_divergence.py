@@ -8,7 +8,7 @@ from forgesync_evaluation.domain.delivery_divergence import (
     diverge,
     misattributed_seconds,
 )
-from forgesync_evaluation.domain.naive_stream import NaiveStreamOutcome, TimelineSegment
+from forgesync_evaluation.domain.naive_stream import ConsumerOutcome, TimelineSegment
 
 STARTED_AT = datetime(2016, 10, 5, 9, 0, tzinfo=UTC)
 
@@ -36,8 +36,8 @@ def test_the_latest_arrived_segment_wins_where_observed_segments_overlap() -> No
 
 
 def test_divergence_compares_tracked_final_values_and_counts_against_the_baseline() -> None:
-    baseline = NaiveStreamOutcome({"x": "1", "y": "A", "z": "q"}, 0, BASELINE, 3, 4)
-    observed = NaiveStreamOutcome({"x": "1", "y": "B", "z": "r"}, 2, BASELINE, 5, 9)
+    baseline = ConsumerOutcome({"x": "1", "y": "A", "z": "q"}, 0, BASELINE, 3, 4)
+    observed = ConsumerOutcome({"x": "1", "y": "B", "z": "r"}, 2, BASELINE, 5, 9)
 
     assert diverge(baseline, observed, tracked_item_ids=("x", "y")) == DeliveryDivergence(
         final_value_mismatch_count=1,

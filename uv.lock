@@ -136,6 +136,16 @@ requires-dist = [
 name = "forgesync-evaluation"
 version = "0.1.0"
 source = { editable = "evaluation" }
+dependencies = [
+    { name = "forgesync-edge-gateway" },
+    { name = "paho-mqtt" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "forgesync-edge-gateway", editable = "apps/edge-gateway" },
+    { name = "paho-mqtt", specifier = ">=2.1,<3" },
+]
 
 [[package]]
 name = "forgesync-virtual-controller"

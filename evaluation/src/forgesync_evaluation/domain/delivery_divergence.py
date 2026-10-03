@@ -7,13 +7,13 @@ from dataclasses import dataclass
 from datetime import datetime
 from itertools import pairwise
 
-from .naive_stream import NaiveStreamOutcome, TimelineSegment
+from .naive_stream import ConsumerOutcome, TimelineSegment
 
 
 @dataclass(frozen=True, slots=True)
 class DeliveryDivergence:
     final_value_mismatch_count: int
-    rollback_count: int
+    rollback_count: int | None
     misattributed_seconds: float
     active_entry_difference: int
     extra_alarm_opening_count: int
@@ -34,7 +34,7 @@ def misattributed_seconds(
 
 
 def diverge(
-    baseline: NaiveStreamOutcome, observed: NaiveStreamOutcome, tracked_item_ids: Sequence[str]
+    baseline: ConsumerOutcome, observed: ConsumerOutcome, tracked_item_ids: Sequence[str]
 ) -> DeliveryDivergence:
     return DeliveryDivergence(
         final_value_mismatch_count=sum(

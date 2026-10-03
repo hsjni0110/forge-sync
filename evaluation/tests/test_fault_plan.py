@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from forgesync_evaluation.domain.fault_plan import EnvelopeFault, FaultScenario, fault_for
+from forgesync_evaluation.domain.fault_plan import (
+    EnvelopeFault,
+    FaultScenario,
+    fault_for,
+    preregistered_scenario,
+)
 
 ENVELOPES = 20_000
 COMBINED = FaultScenario("combined", seed=1, duplicate_rate=0.05, reorder_rate=0.05, max_delay=50)
@@ -35,3 +40,18 @@ def test_baseline_scenario_injects_nothing() -> None:
     baseline = FaultScenario("baseline", seed=1, duplicate_rate=0.0, reorder_rate=0.0, max_delay=50)
 
     assert set(faults(baseline)) == {EnvelopeFault(is_duplicated=False, delay=0)}
+
+
+def test_preregistered_scenarios_match_the_design_matrix() -> None:
+    expected = {
+        "S0": (0.0, 0.0),
+        "S1": (0.01, 0.0),
+        "S2": (0.05, 0.0),
+        "S3": (0.0, 0.01),
+        "S4": (0.05, 0.05),
+    }
+
+    for name, (duplicate_rate, reorder_rate) in expected.items():
+        assert preregistered_scenario(name) == FaultScenario(
+            name, seed=1, duplicate_rate=duplicate_rate, reorder_rate=reorder_rate, max_delay=50
+        )
