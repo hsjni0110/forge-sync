@@ -32,6 +32,26 @@
   --fs-rail: #101820;
   --fs-rail-text: #f4f6f8;
   --fs-rail-muted: #a9b4bf;
+  /* Only a stop gets a hue; working and waiting stay grey so the eye goes to the exception. */
+  --fs-state-track: #eceff3;
+  --fs-state-work: #8b9aab;
+  --fs-state-idle: #e3e7ec;
+  --fs-state-stop: #e08a1e;
+  --fs-state-stop-text: #a85a00;
+  --fs-state-unknown-hatch: #b4bec9;
+  --fs-state-ink: #101820;
+  /* Shift overview page, light counterpart of the v3 dark palette. */
+  --fs-shift-bg: #f6f7f9;
+  --fs-shift-text: #0e1116;
+  --fs-shift-text-2: #4f5b68;
+  --fs-shift-text-3: #6e7885;
+  --fs-shift-sep: #c5cdd6;
+  --fs-shift-line: #e1e5ea;
+  --fs-shift-ghost-line: #c5cdd6;
+  --fs-shift-ghost-text: #2f3a46;
+  --fs-shift-action: #0e1116;
+  --fs-shift-action-ink: #ffffff;
+  --fs-shift-cursor: #0f62fe;
 }
 
 [data-carbon-theme="g100"] {
@@ -67,6 +87,25 @@
   --fs-rail: #090c0f;
   --fs-rail-text: #f4f7fa;
   --fs-rail-muted: #8d9aa6;
+  --fs-state-track: #141920;
+  --fs-state-work: #7f93a8;
+  --fs-state-idle: #1c232c;
+  --fs-state-stop: #e89a2c;
+  --fs-state-stop-text: #e89a2c;
+  --fs-state-unknown-hatch: #2e3640;
+  --fs-state-ink: #0e1116;
+  /* Shift overview page, values from the v3 calm design board. */
+  --fs-shift-bg: #0e1116;
+  --fs-shift-text: #eceff3;
+  --fs-shift-text-2: #9aa4b1;
+  --fs-shift-text-3: #6e7885;
+  --fs-shift-sep: #3a424e;
+  --fs-shift-line: #1c232c;
+  --fs-shift-ghost-line: #2e3640;
+  --fs-shift-ghost-text: #c9d1db;
+  --fs-shift-action: #eceff3;
+  --fs-shift-action-ink: #0e1116;
+  --fs-shift-cursor: #9cc2ff;
 }
 
 :root {
@@ -80,6 +119,9 @@
   --fs-type-2xl: 1.5rem;
   --fs-type-3xl: 2rem;
   --fs-type-hero: clamp(1.75rem, 4vw, 2.5rem);
+  --fs-type-action: 0.9375rem;
+  --fs-type-fact: 1.875rem;
+  --fs-type-headline: 2.125rem;
   --fs-type-hero-sm: clamp(1.5rem, 3vw, 2rem);
   --fs-type-display: clamp(2rem, 4vw, 3.5rem);
   --fs-type-section: clamp(1.25rem, 2.4vw, 2rem);
@@ -96,4 +138,6 @@
   --fs-radius-md: 2px;
   --fs-radius-lg: 2px;
   --fs-radius-pill: 999px;
+  --fs-font-plex: "IBM Plex Sans KR", Pretendard, "Apple SD Gothic Neo", sans-serif;
+  --fs-font-plex-mono: "IBM Plex Mono", ui-monospace, monospace;
 }

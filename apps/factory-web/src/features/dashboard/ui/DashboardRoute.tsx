@@ -182,18 +182,20 @@ export function DashboardRoute({
     );
   };
 
+  // Once the shift report is on screen it carries its own scope, so the page chrome steps back.
+  const showsShiftReport = Boolean(shiftLoad.report && !isShiftCursorPending);
+  const quietWhenReported = showsShiftReport ? " cds--visually-hidden" : "";
   return (
     <section className="dashboard-page">
-      <header className="dashboard-header">
+      <header className={`dashboard-header${quietWhenReported}`}>
         <p className="eyebrow">제조 운영 디지털 트윈</p>
         <h1>교대조 개요</h1>
-        <p>{MACHINE_ID} 전체 관측 구간의 가동 상태와 주요 손실을 확인하세요.</p>
+        <p>{MACHINE_ID}의 하루 기록에서 작업한 시간과 멈춘 때를 확인해요.</p>
       </header>
 
       {state.snapshot ? (
-        shiftOverviewClient ? (
-          <TwinConnectionStatus state={state} replayStatus={replay.session?.status} />
-        ) : (
+        // With a shift report the shell's top bar already states connection, freshness and replay.
+        shiftOverviewClient ? null : (
           <DashboardSummary
             state={state}
             snapshot={state.snapshot}
@@ -207,17 +209,19 @@ export function DashboardRoute({
 
       {shiftOverviewClient && (
         <AnalysisReadiness
+          className={quietWhenReported}
           isCursorPending={isShiftCursorPending}
           load={shiftLoad}
           replayStatus={replaySession?.status}
         />
       )}
 
-      {shiftLoad.report && !isShiftCursorPending ? (
+      {showsShiftReport && shiftLoad.report ? (
         <>
           <ShiftOverviewPanel report={shiftLoad.report} freshness={state.freshness}
-            replayStatus={replaySession?.status} onSeek={seekToDowntime} alarms={alarms} />
-          <DowntimeParetoPanel report={shiftLoad.report.pareto} onSelect={seekToDowntime} />
+            replayStatus={replaySession?.status} onSeek={seekToDowntime} alarms={alarms}>
+            <DowntimeParetoPanel report={shiftLoad.report.pareto} onSelect={seekToDowntime} />
+          </ShiftOverviewPanel>
         </>
       ) : null}
 
@@ -225,14 +229,14 @@ export function DashboardRoute({
         <DowntimeParetoPanel report={downtimeReport} onSelect={seekToDowntime} />
       ) : downtimeFailure ? (
         <p className="downtime-unavailable" role="status">
-          정지 시간 분석을 불러오지 못했습니다.
+          비가동 분석을 불러오지 못했어요.
         </p>
       ) : null}
 
       {!shiftOverviewClient && effectivenessReport ? (
         <OperationalEffectivenessPanel report={effectivenessReport} />
       ) : effectivenessFailure ? (
-        <p className="effectiveness-unavailable" role="status">운영 효과 분석을 불러오지 못했습니다.</p>
+        <p className="effectiveness-unavailable" role="status">운영 효과 분석을 불러오지 못했어요.</p>
       ) : null}
 
       <div className="dashboard-actions">
@@ -240,7 +244,7 @@ export function DashboardRoute({
           시점 상세 보기
         </Link>
         <p className="dashboard-provenance">
-          공장 배치는 {PROCESS_GLOSSARY.SIMULATED.label}, 설비 측정값은 실측 관찰값입니다.
+          공장 배치는 {PROCESS_GLOSSARY.SIMULATED.label}, 설비 측정값은 실측 관찰값이에요.
           <small data-evidence="SIMULATED_LAYOUT REAL:NIST">
             배치 SIMULATED · 측정 REAL · NIST Mazak01
           </small>
@@ -251,10 +255,12 @@ export function DashboardRoute({
 }
 
 function AnalysisReadiness({
+  className,
   isCursorPending,
   load,
   replayStatus,
 }: {
+  className: string;
   isCursorPending: boolean;
   load: {
     status: "IDLE" | "LOADING" | "READY" | "FAILED";
@@ -267,12 +273,12 @@ function AnalysisReadiness({
   let content: ReactNode;
 
   if (isCursorPending) {
-    content = <p>재생 데이터가 화면에 반영되기를 기다리는 중입니다.</p>;
+    content = <p>재생 데이터가 화면에 반영되기를 기다리고 있어요.</p>;
   } else if (load.status === "LOADING") {
     content = (
       <div className="analysis-readiness-loading" aria-busy="true">
         <SkeletonText width="12rem" />
-        <p>교대조 분석을 불러오는 중입니다.</p>
+        <p>교대조 분석을 불러오고 있어요.</p>
       </div>
     );
   } else if (load.status === "FAILED") {
@@ -282,7 +288,7 @@ function AnalysisReadiness({
         lowContrast
         hideCloseButton
         role="alert"
-        title="분석을 준비하지 못했습니다"
+        title="분석을 준비하지 못했어요"
         subtitle={shiftFailureMessage(load.failure)}
         data-shift-diagnostic={load.diagnostic}
       />
@@ -292,8 +298,8 @@ function AnalysisReadiness({
       <div className="analysis-readiness-ready">
         <CheckIcon />
         <div>
-          <strong>교대조 분석 준비됨</strong>
-          <p>화면과 분석이 같은 재생 버전을 사용합니다.</p>
+          <strong>교대조 분석을 준비했어요</strong>
+          <p>화면과 분석이 같은 재생 버전을 써요.</p>
         </div>
       </div>
     );
@@ -303,16 +309,16 @@ function AnalysisReadiness({
         kind="info"
         lowContrast
         hideCloseButton
-        title="분석 대기 중"
-        subtitle="과거 데이터 재생을 일시정지하거나 완료하면 같은 버전의 교대조 분석을 표시합니다."
+        title="분석을 기다리고 있어요"
+        subtitle="재생을 일시정지하거나 끝까지 재생하면 같은 버전으로 교대조 분석을 보여 드려요."
       />
     );
   } else {
-    content = <p>재생 세션과 분석 구간을 선택하면 조사할 수 있습니다.</p>;
+    content = <p>재생을 시작하면 하루 기록을 조사할 수 있어요.</p>;
   }
 
   return (
-    <section className="analysis-readiness" aria-label="분석 가능 상태" aria-live="polite">
+    <section className={`analysis-readiness${className}`} aria-label="분석 가능 상태" aria-live="polite">
       <span className="analysis-readiness-label">분석 가능 상태</span>
       {content}
     </section>
@@ -359,10 +365,10 @@ function replayContext(status: ReplayStatus | undefined): OperationalContextValu
 
 function shiftFailureMessage(failure?: "NETWORK" | "INSUFFICIENT_DATA" | "VERSION_MISMATCH"): string {
   if (failure === "VERSION_MISMATCH") {
-    return "분석 버전이 일치하지 않습니다. 재생 위치를 다시 맞춘 뒤 확인해 주세요.";
+    return "분석 버전이 맞지 않아요. 재생 위치를 다시 맞춘 뒤 확인해 주세요.";
   }
-  if (failure === "INSUFFICIENT_DATA") return "교대조를 분석할 관측 데이터가 아직 충분하지 않습니다.";
-  return "교대조 분석을 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.";
+  if (failure === "INSUFFICIENT_DATA") return "교대조를 분석할 관측 데이터가 아직 부족해요.";
+  return "교대조 분석을 불러오지 못했어요. 잠시 후 다시 시도해 주세요.";
 }
 
 function DashboardSummary({

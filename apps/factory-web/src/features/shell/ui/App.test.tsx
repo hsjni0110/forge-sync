@@ -32,7 +32,7 @@ describe("App", () => {
     );
 
     expect(screen.getByRole("heading", { name: "교대조 개요" })).toBeTruthy();
-    expect(screen.getByText(/전체 관측 구간의 가동 상태와 주요 손실/)).toBeTruthy();
+    expect(screen.getByText(/하루 기록에서 작업한 시간과 멈춘 때를 확인해요/)).toBeTruthy();
     expect(screen.getByText(/설비 상태를 불러오는 중입니다/)).toBeTruthy();
   });
 

@@ -39,3 +39,19 @@ export interface DowntimeParetoReport {
   totalDowntimeSeconds: number;
   entries: DowntimeParetoEntry[];
 }
+
+/** UNKNOWN intervals are ranked too, but nothing records that the machine stopped in them. */
+export function longestStops(entries: DowntimeParetoEntry[], count: number): DowntimeParetoEntry[] {
+  return entries.filter((entry) => entry.state !== "UNKNOWN")
+    .sort((left, right) => right.durationSeconds - left.durationSeconds)
+    .slice(0, count);
+}
+
+/** The Pareto ranks every non-operating interval; callers name which states they mean. */
+export function secondsInStates(
+  entries: Pick<DowntimeParetoEntry, "state" | "durationSeconds">[],
+  states: DowntimeState[],
+): number {
+  return entries.filter((entry) => states.includes(entry.state))
+    .reduce((total, entry) => total + entry.durationSeconds, 0);
+}

@@ -1,13 +1,11 @@
-import type {
-  DowntimeEvidence,
-  DowntimeParetoReport,
-  DowntimeState,
-} from "../domain/downtimePareto";
+import type { DowntimeParetoReport, DowntimeState } from "../domain/downtimePareto";
+import { secondsInStates } from "../domain/downtimePareto";
+import { concurrentFactLabel } from "./concurrentFactLabel";
 
 const STATE_LABELS: Record<DowntimeState, string> = {
-  STOPPED: "정지",
-  INTERRUPTED: "중단",
-  UNKNOWN: "상태 미확인",
+  STOPPED: "멈춤",
+  INTERRUPTED: "작업 중단",
+  UNKNOWN: "기록 없음",
 };
 
 export function DowntimeParetoPanel({
@@ -21,16 +19,22 @@ export function DowntimeParetoPanel({
     <section className="downtime-panel" aria-labelledby="downtime-pareto-title">
       <header>
         <div>
-          <p className="eyebrow">관측된 정지 시간</p>
-          <h2 id="downtime-pareto-title">주요 정지 원인</h2>
+          <p className="eyebrow">관측된 비가동 시간</p>
+          <h2 id="downtime-pareto-title">주요 비가동 구간</h2>
         </div>
-        <strong>{formatSeconds(report.totalDowntimeSeconds)}</strong>
+        <div className="downtime-total">
+          <strong>{formatSeconds(report.totalDowntimeSeconds)}</strong>
+          <small>
+            {`멈춤 ${formatSeconds(secondsInStates(report.entries, ["STOPPED", "INTERRUPTED"]))}`}
+            {` · 기록 없음 ${formatSeconds(secondsInStates(report.entries, ["UNKNOWN"]))}`}
+          </small>
+        </div>
       </header>
       <p className="downtime-disclaimer">
-        표시된 항목은 같은 시간에 관측된 근거이며 원인으로 확정하지 않습니다.
+        같은 시간에 함께 기록된 사실이에요. 멈춘 원인이라고 단정하지 않아요.
       </p>
       {report.entries.length === 0 ? (
-        <p className="downtime-empty">완료된 정지 구간이 없습니다.</p>
+        <p className="downtime-empty">끝난 비가동 구간이 없어요.</p>
       ) : (
         <ol className="downtime-list">
           {report.entries.map((entry) => (
@@ -49,11 +53,11 @@ export function DowntimeParetoPanel({
                 </span>
                 <span className="downtime-evidence-list">
                   {entry.reasonClassification === "UNCONFIRMED_REASON" ? (
-                    <em>사유 미확인</em>
+                    <em>함께 기록된 사실 없음</em>
                   ) : (
                     entry.evidence.map((evidence) => (
                       <span key={`${evidence.kind}-${evidence.sourceEventKey}`}>
-                        {evidenceLabel(evidence)}
+                        {concurrentFactLabel(evidence)}
                       </span>
                     ))
                   )}
@@ -81,15 +85,6 @@ function DowntimeStateIcon({ state }: { state: DowntimeState }) {
   return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
     <path d="M3 3h10v10H3V3Z" />
   </svg>;
-}
-
-function evidenceLabel(evidence: DowntimeEvidence): string {
-  if (evidence.kind === "ESTOP_OVERLAP") return "비상정지 관측";
-  if (evidence.kind === "MODE_CHANGE") {
-    return `운전 모드 변경 · ${evidence.value === "UNKNOWN" ? "값 확인 불가" : evidence.value}`;
-  }
-  const detail = evidence.message ?? evidence.nativeCode ?? evidence.conditionType;
-  return `상태 경고${detail ? ` · ${detail}` : ""}`;
 }
 
 function formatSeconds(seconds: number): string {
