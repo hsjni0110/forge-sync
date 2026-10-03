@@ -6,7 +6,7 @@
 실제 데이터: NIST Smart Manufacturing Systems Test Bed의 Mazak Integrex 100-IV(`Mazak01`) 하루 기록
 (2016-10-05, 약 13.8시간, 115,991 레코드).
 
-![하루 전체의 가동 상태, 정지 Pareto와 알람 흐름을 보여 주는 교대조 개요](docs/assets/readme/shift-overview.png)
+![하루 전체의 가동률, 가공 건수, 설비 상태 흐름과 확인할 알람을 보여 주는 교대조 개요](docs/assets/readme/shift-overview.png)
 
 ## 풀려는 문제
 
@@ -48,7 +48,7 @@ ForgeSync는 정지나 이상이 생긴 시점을 조사하는 엔지니어를 �
 3. **근거 확인**: 정지 구간에 겹친 운전 모드 변경과 Condition을 "동시 근거"로 보고, 값마다 원본
    레코드 위치까지 따라간다.
 
-![17:53부터 약 30분 이어진 정지 시점으로 이동한 공장 보기](docs/assets/readme/factory-stop.png)
+![17:53부터 약 30분 이어진 정지 구간의 17:54:35에서 일시정지한 공장 보기. 정지 상태, 주축 0 rpm, Condition에서 만든 알람과 해제 이력](docs/assets/readme/factory-stop.png)
 
 ## 동작 방식
 
