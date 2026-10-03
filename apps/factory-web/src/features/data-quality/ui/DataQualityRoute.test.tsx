@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import fixture from "../../../../../../tests/fixtures/data-quality/v1/mazak01-data-quality.json";
@@ -19,8 +19,33 @@ describe("DataQualityView", () => {
     }
     expect(screen.getByText("종합 품질 점수 없음")).toBeTruthy();
     expect(screen.getByText("87.67%")).toBeTruthy();
-    expect(screen.getAllByText("측정 불가").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("평가할 수 없음").length).toBeGreaterThan(0);
     expect(screen.queryByText("정상")).toBeNull();
+    const groups = ["원천과 의미 매핑", "수신과 순서", "데이터 최신성", "파생 분석 범위", "미해석 원천 항목"];
+    for (const group of groups) {
+      expect(screen.getByRole("region", { name: group })).toBeTruthy();
+    }
+    const source = screen.getByRole("region", { name: "원천과 의미 매핑" });
+    const runtime = screen.getByRole("region", { name: "수신과 순서" });
+    expect(source.compareDocumentPosition(runtime) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(source).getByRole("button", { name: "출처와 계보 도움말" })).toBeTruthy();
+    expect(screen.getByText("특징값 확보 범위")).toBeTruthy();
+  });
+
+  it("keeps every not-evaluated derived reason visible without inventing a score", () => {
+    const report = structuredClone(fixture) as DataQualityReport;
+    report.derivedProcess.segmentation.status = "NOT_EVALUATED";
+    report.derivedProcess.segmentation.reason = "재생 범위가 선택되지 않았습니다.";
+    report.derivedProcess.featureCoverage.status = "NOT_EVALUATED";
+    report.derivedProcess.featureCoverage.reason = "가공 구간 근거가 없습니다.";
+
+    render(<DataQualityView report={report} />);
+
+    const derived = screen.getByRole("region", { name: "파생 분석 범위" });
+    expect(within(derived).getAllByText("평가할 수 없음")).toHaveLength(2);
+    expect(within(derived).getByText("재생 범위가 선택되지 않았습니다.")).toBeTruthy();
+    expect(within(derived).getByText("가공 구간 근거가 없습니다.")).toBeTruthy();
+    expect(derived.textContent).not.toMatch(/%|정상|100/);
   });
 
   it("links every unmapped item to its preserved raw locator", () => {

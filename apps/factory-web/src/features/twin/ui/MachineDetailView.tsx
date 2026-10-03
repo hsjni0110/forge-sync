@@ -115,12 +115,12 @@ export function MachineDetailView({
             {detail.metrics
               .filter((metric) => CURRENT_WORK_KEYS.includes(metric.key))
               .map((metric) => (
-                <div className="metric-card" key={metric.key}>
+                <div className="machine-reading" key={metric.key}>
                   <span>{metric.label}</span>
                   <strong>{metric.value}</strong>
                 </div>
               ))}
-            <div className="metric-card">
+            <div className="machine-reading">
               <span>주축 속도</span>
               <strong>{detail.spindleSummary.value}</strong>
               <small>{detail.spindleSummary.detail}</small>
@@ -143,7 +143,7 @@ export function MachineDetailView({
             {detail.metrics
               .filter(isChannelReading)
               .map((metric) => (
-              <div className="metric-card" key={metric.key}>
+              <div className="machine-reading" key={metric.key}>
                 <span>{metric.label}</span>
                 <strong>{metric.value}</strong>
                 {metric.detail && <small>{metric.detail}</small>}

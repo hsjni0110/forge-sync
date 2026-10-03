@@ -1,11 +1,19 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { TwinSessionFactory } from "../../twin/application/ports";
 import { App } from "./App";
 
-afterEach(cleanup);
+const originalMatchMediaDescriptor = Object.getOwnPropertyDescriptor(window, "matchMedia");
+const originalLocalStorageDescriptor = Object.getOwnPropertyDescriptor(window, "localStorage");
+
+afterEach(() => {
+  cleanup();
+  restoreWindowProperty("matchMedia", originalMatchMediaDescriptor);
+  restoreWindowProperty("localStorage", originalLocalStorageDescriptor);
+  window.localStorage.clear();
+});
 
 const idleSessionFactory: TwinSessionFactory = () => ({
   start: () => undefined,
@@ -47,6 +55,101 @@ describe("App", () => {
     );
   });
 
+  it("uses a workstation rail without changing primary routes", () => {
+    render(
+      <MemoryRouter>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    const navigation = screen.getByRole("navigation", {
+      name: "ForgeSync navigation",
+    });
+
+    expect(navigation.querySelector('a[href="/"]')?.textContent).toContain("대시보드");
+    expect(navigation.querySelector('a[href="/factory"]')?.textContent).toContain(
+      "공장 보기",
+    );
+    expect(navigation.querySelector('a[href="/data-quality"]')?.textContent).toContain(
+      "데이터 품질",
+    );
+    expect(screen.getByText("운영 트윈")).toBeTruthy();
+    expect(screen.queryByText("Operational Twin")).toBeNull();
+    expect(screen.getByRole("button", { name: "화면 테마" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "운영 상황" })).toBeTruthy();
+  });
+
+  it("shows the active route's machine, connection, freshness, and replay context", () => {
+    render(
+      <MemoryRouter>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    const context = screen.getByRole("region", { name: "운영 상황" });
+    expect(context.textContent).toContain("Mazak01");
+    expect(context.textContent).toContain("불러오는 중");
+    expect(context.textContent).toContain("최신성 확인 중");
+    expect(context.textContent).toContain("과거 데이터 재생 시작 전");
+  });
+
+  it("replaces factory context when navigating to data quality", () => {
+    render(
+      <MemoryRouter initialEntries={["/factory"]}>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    const context = screen.getByRole("region", { name: "운영 상황" });
+    expect(context.textContent).toContain("과거 데이터 재생 시작 전");
+
+    fireEvent.click(screen.getByRole("link", { name: "데이터 품질" }));
+
+    expect(context.textContent).toContain("재생 범위 확인 중");
+    expect(context.textContent).not.toContain("과거 데이터 재생 시작 전");
+  });
+
+  it("follows the system theme until the user chooses an override", () => {
+    stubDarkSystemTheme();
+
+    const { container } = render(
+      <MemoryRouter>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    expect(container.querySelector('[data-carbon-theme="g100"]')).toBeTruthy();
+
+    fireEvent.click(screen.getByRole("button", { name: "화면 테마" }));
+
+    expect(container.querySelector('[data-carbon-theme="white"]')).toBeTruthy();
+    expect(window.localStorage.getItem("forgesync-theme")).toBe("LIGHT");
+  });
+
+  it("renders when matchMedia and localStorage are unavailable", () => {
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      get: () => {
+        throw new Error("matchMedia unavailable");
+      },
+    });
+    Object.defineProperty(window, "localStorage", {
+      configurable: true,
+      get: () => {
+        throw new Error("localStorage unavailable");
+      },
+    });
+
+    const { container } = render(
+      <MemoryRouter>
+        <App twinSessionFactory={idleSessionFactory} />
+      </MemoryRouter>,
+    );
+
+    expect(container.querySelector('[data-carbon-theme="white"]')).toBeTruthy();
+    expect(screen.getByRole("main")).toBeTruthy();
+  });
+
   it("links from the dashboard to the operational factory view", () => {
     render(
       <MemoryRouter>
@@ -71,3 +174,30 @@ describe("App", () => {
     ).toBeTruthy();
   });
 });
+
+function stubDarkSystemTheme() {
+  Object.defineProperty(window, "matchMedia", {
+    configurable: true,
+    value: () => ({
+      matches: true,
+      media: "(prefers-color-scheme: dark)",
+      onchange: null,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      dispatchEvent: () => false,
+    }),
+  });
+}
+
+function restoreWindowProperty(
+  property: "matchMedia" | "localStorage",
+  descriptor: PropertyDescriptor | undefined,
+) {
+  if (descriptor === undefined) {
+    Reflect.deleteProperty(window, property);
+    return;
+  }
+  Object.defineProperty(window, property, descriptor);
+}

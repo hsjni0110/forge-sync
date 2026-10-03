@@ -1556,6 +1556,17 @@ reference model임을 model card에 명시한다. cut number를 Mazak tool numbe
 - dependency/secret/security configuration test.
 - 입력 payload size와 invalid command allowlist 경계 테스트.
 
+**현재 UI 리디자인 확인 (2026-10-01)**
+
+- Carbon React 기반 workstation shell, 한국어 운영 용어 도움말, Dashboard·공장 조사·Data Quality의
+  정보 위계를 적용했다. 데이터 의미와 public contract는 변경하지 않았다.
+- Playwright가 1440×900, 768×1024, 390×844의 라이트·다크 조합에서 가로 넘침과 핵심 조작부
+  겹침이 없고, 좁은 화면의 detail→transport→scene→inspector 순서와 3D 실패 시 2D 유지를 확인한다.
+- `npm --prefix apps/factory-web run verify`의 238개 프런트 테스트, `./scripts/verify` 전체 게이트,
+  실제 PostgreSQL/MQTT/API/Web/Chromium `./scripts/verify-e2e` 10개 시나리오가 통과했다.
+- 이 확인은 리디자인의 반응형·테마 baseline이다. Step 47의 FPS, heap, patch rate, 자동 접근성 scan,
+  dependency 취약점 처리는 별도 측정·검토가 남아 있으므로 Step 47 전체 완료를 뜻하지 않는다.
+
 **완료 조건**: 수치를 산업 SLA로 과장하지 않고 측정 환경과 함께 기록하며 실패 기준에는 후속 작업이 있다.
 
 **선행 조건**: Step 46.

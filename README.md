@@ -39,7 +39,7 @@ ForgeSync는 정지나 이상이 생긴 시점을 조사하는 엔지니어를 �
 
 이 실험은 ForgeSync의 결함도 찾았다. 역순 도착한 경고 1건이 업무 알람에서 빠졌고, 재생이 끝난
 시점에서 운영 효율 계산이 cursor 불일치로 실패한다. 두 결함은 보고서와
-[검증 장부](docs/verification-ledger.md)(V-069, V-070)에 기록했다.
+[검증 장부](docs/verification-ledger.md)(V-070, V-071)에 기록했다.
 
 ## 조사 흐름
 

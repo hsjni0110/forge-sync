@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
+import { InlineNotification, SkeletonText } from "@carbon/react";
 
 import type { ReplayControlClient } from "../../replay/application/ports";
 import type { ReplayStatus } from "../../replay/domain/replay";
@@ -23,6 +24,11 @@ import type { ShiftOverview } from "../../shift-overview/domain/shiftOverview";
 import { ShiftOverviewPanel } from "../../shift-overview/ui/ShiftOverviewPanel";
 import type { AlarmClient } from "../../alarm/application/ports";
 import type { Alarm } from "../../alarm/domain/alarm";
+import {
+  useOperationalContextPublisher,
+  type OperationalContextValue,
+} from "../../shell/ui/OperationalContext";
+import { PROCESS_GLOSSARY } from "../../../shared/presentation/processGlossary";
 
 const MACHINE_ID = "Mazak01";
 
@@ -69,6 +75,12 @@ export function DashboardRoute({
   }>({ status: "IDLE" });
   const replaySession = replay.authoritativeSession;
   const snapshot = state.snapshot;
+  useOperationalContextPublisher({
+    machineId: MACHINE_ID,
+    connection: connectionContext(state.connectionStatus),
+    freshness: freshnessContext(state.freshness),
+    replay: replayContext(replay.session?.status),
+  });
   const isShiftCursorPending = Boolean(
     shiftOverviewClient
       && snapshot
@@ -193,29 +205,20 @@ export function DashboardRoute({
         <DashboardPlaceholder state={state} retryNow={retryNow} />
       )}
 
-      {isShiftCursorPending ? (
-        <section className="shift-placeholder" aria-live="polite">
-          <p>Replay 데이터가 화면에 반영되기를 기다리는 중입니다.</p>
-        </section>
-      ) : shiftOverviewClient && shiftLoad.status === "LOADING" ? (
-        <section className="shift-placeholder" aria-busy="true" aria-live="polite">
-          <p>교대조 분석을 불러오는 중입니다.</p>
-        </section>
-      ) : shiftOverviewClient && shiftLoad.status === "FAILED" ? (
-        <section className="shift-placeholder" role="alert"
-          data-shift-diagnostic={shiftLoad.diagnostic}>
-          <p>{shiftFailureMessage(shiftLoad.failure)}</p>
-        </section>
-      ) : shiftLoad.report ? (
+      {shiftOverviewClient && (
+        <AnalysisReadiness
+          isCursorPending={isShiftCursorPending}
+          load={shiftLoad}
+          replayStatus={replaySession?.status}
+        />
+      )}
+
+      {shiftLoad.report && !isShiftCursorPending ? (
         <>
           <ShiftOverviewPanel report={shiftLoad.report} freshness={state.freshness}
             replayStatus={replaySession?.status} onSeek={seekToDowntime} alarms={alarms} />
           <DowntimeParetoPanel report={shiftLoad.report.pareto} onSelect={seekToDowntime} />
         </>
-      ) : shiftOverviewClient && replaySession && !["PAUSED", "COMPLETED"].includes(replaySession.status) ? (
-        <section className="shift-placeholder" aria-live="polite">
-          <p>Replay를 일시정지하거나 완료하면 같은 버전의 교대조 분석을 표시합니다.</p>
-        </section>
       ) : null}
 
       {!shiftOverviewClient && downtimeReport ? (
@@ -237,16 +240,126 @@ export function DashboardRoute({
           시점 상세 보기
         </Link>
         <p className="dashboard-provenance">
-          공장 배치는 SIMULATED, 설비 측정값은 REAL&nbsp;·&nbsp;NIST Mazak01 replay 입니다.
+          공장 배치는 {PROCESS_GLOSSARY.SIMULATED.label}, 설비 측정값은 실측 관찰값입니다.
+          <small data-evidence="SIMULATED_LAYOUT REAL:NIST">
+            배치 SIMULATED · 측정 REAL · NIST Mazak01
+          </small>
         </p>
       </div>
     </section>
   );
 }
 
+function AnalysisReadiness({
+  isCursorPending,
+  load,
+  replayStatus,
+}: {
+  isCursorPending: boolean;
+  load: {
+    status: "IDLE" | "LOADING" | "READY" | "FAILED";
+    report?: ShiftOverview;
+    failure?: "NETWORK" | "INSUFFICIENT_DATA" | "VERSION_MISMATCH";
+    diagnostic?: string;
+  };
+  replayStatus?: ReplayStatus;
+}) {
+  let content: ReactNode;
+
+  if (isCursorPending) {
+    content = <p>재생 데이터가 화면에 반영되기를 기다리는 중입니다.</p>;
+  } else if (load.status === "LOADING") {
+    content = (
+      <div className="analysis-readiness-loading" aria-busy="true">
+        <SkeletonText width="12rem" />
+        <p>교대조 분석을 불러오는 중입니다.</p>
+      </div>
+    );
+  } else if (load.status === "FAILED") {
+    content = (
+      <InlineNotification
+        kind="error"
+        lowContrast
+        hideCloseButton
+        role="alert"
+        title="분석을 준비하지 못했습니다"
+        subtitle={shiftFailureMessage(load.failure)}
+        data-shift-diagnostic={load.diagnostic}
+      />
+    );
+  } else if (load.report) {
+    content = (
+      <div className="analysis-readiness-ready">
+        <CheckIcon />
+        <div>
+          <strong>교대조 분석 준비됨</strong>
+          <p>화면과 분석이 같은 재생 버전을 사용합니다.</p>
+        </div>
+      </div>
+    );
+  } else if (replayStatus && !["PAUSED", "COMPLETED"].includes(replayStatus)) {
+    content = (
+      <InlineNotification
+        kind="info"
+        lowContrast
+        hideCloseButton
+        title="분석 대기 중"
+        subtitle="과거 데이터 재생을 일시정지하거나 완료하면 같은 버전의 교대조 분석을 표시합니다."
+      />
+    );
+  } else {
+    content = <p>재생 세션과 분석 구간을 선택하면 조사할 수 있습니다.</p>;
+  }
+
+  return (
+    <section className="analysis-readiness" aria-label="분석 가능 상태" aria-live="polite">
+      <span className="analysis-readiness-label">분석 가능 상태</span>
+      {content}
+    </section>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M13.4 4.3 6.7 11 2.9 7.2l.9-.9 2.9 2.9 5.8-5.8.9.9Z" />
+    </svg>
+  );
+}
+
+function connectionContext(status: TwinLiveState["connectionStatus"]): OperationalContextValue {
+  return {
+    LOADING: { label: "불러오는 중", tone: "neutral" },
+    LIVE: { label: "연결됨", tone: "positive" },
+    RECONNECTING: { label: "다시 연결 중", tone: "warning" },
+    RESYNCING: { label: "상태 동기화 중", tone: "warning" },
+    UNAVAILABLE: { label: "연결할 수 없음", tone: "critical" },
+  }[status] as OperationalContextValue;
+}
+
+function freshnessContext(freshness: TwinLiveState["freshness"]): OperationalContextValue {
+  if (freshness === "FRESH") return { label: "최신", tone: "positive" };
+  if (freshness === "LAGGING") return { label: "반영 지연", tone: "warning" };
+  if (freshness === "STALE") return { label: "오래된 데이터", tone: "critical" };
+  return { label: "최신성 확인 중", tone: "neutral" };
+}
+
+function replayContext(status: ReplayStatus | undefined): OperationalContextValue {
+  if (status === undefined) {
+    return { label: `${PROCESS_GLOSSARY.REPLAY.label} 시작 전`, tone: "neutral" };
+  }
+  const tone = status === "FAILED" ? "critical"
+    : status === "RUNNING" ? "positive"
+      : status === "SEEKING" || status === "PREPARING" ? "warning" : "neutral";
+  return {
+    label: `${PROCESS_GLOSSARY.REPLAY.label} ${REPLAY_STATUS_LABELS[status]}`,
+    tone,
+  };
+}
+
 function shiftFailureMessage(failure?: "NETWORK" | "INSUFFICIENT_DATA" | "VERSION_MISMATCH"): string {
   if (failure === "VERSION_MISMATCH") {
-    return "분석 버전이 일치하지 않습니다. Replay 시점을 다시 맞춘 뒤 확인해 주세요.";
+    return "분석 버전이 일치하지 않습니다. 재생 위치를 다시 맞춘 뒤 확인해 주세요.";
   }
   if (failure === "INSUFFICIENT_DATA") return "교대조를 분석할 관측 데이터가 아직 충분하지 않습니다.";
   return "교대조 분석을 불러올 수 없습니다. 잠시 후 다시 시도해 주세요.";
@@ -305,7 +418,7 @@ function DashboardSummary({
           detail={`상태 신호 ${detail.conditions.length}건 중`}
         />
         <Kpi
-          label="Replay"
+          label={PROCESS_GLOSSARY.REPLAY.label}
           value={replayStatus ? REPLAY_STATUS_LABELS[replayStatus] : "시작 전"}
           detail={replayStatus && replaySpeed ? `${replaySpeed}x 배속` : undefined}
         />

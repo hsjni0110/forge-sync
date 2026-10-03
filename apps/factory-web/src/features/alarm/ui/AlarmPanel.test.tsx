@@ -11,8 +11,10 @@ describe("AlarmPanel", () => {
   it("shows condition-derived identity, text severity cue, and lifecycle status", () => {
     render(<AlarmPanel alarms={fixture.alarms as Alarm[]} onAcknowledge={vi.fn()} />);
 
-    expect(screen.getByRole("heading", { name: "알람" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "확인할 알람" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "확인할 알람" })).toBeTruthy();
     expect(screen.getByText("주의 알람")).toBeTruthy();
+    expect(screen.getByText("주의 알람").closest("strong")?.querySelector("svg")).toBeTruthy();
     expect(screen.getByText(/Condition에서 생성/)).toBeTruthy();
     expect(screen.getByText(/345/)).toBeTruthy();
     expect(screen.getByText(fixture.alarms[0].alarmId)).toBeTruthy();

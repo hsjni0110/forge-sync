@@ -88,7 +88,7 @@ describe("Machine Detail process analysis", () => {
     run.confidence.reasons.push("END_BOUNDARY_INCOMPLETE");
     const fetch = showProcess(document);
 
-    const current = await screen.findByRole("region", { name: "CURRENT RUN · 현재 가공" });
+    const current = await screen.findByRole("region", { name: "현재 가공" });
     expect(await within(current).findByText("가공 중단 · 종료 근거 미확정")).toBeTruthy();
     expect(within(current).getByText("155")).toBeTruthy();
     expect(within(current).queryByText("RUNNING")).toBeNull();
@@ -100,7 +100,7 @@ describe("Machine Detail process analysis", () => {
 
   it("does not fill a gap with the last completed run", async () => {
     showProcess(structuredClone(runFixture));
-    const current = await screen.findByRole("region", { name: "CURRENT RUN · 현재 가공" });
+    const current = await screen.findByRole("region", { name: "현재 가공" });
     expect(await within(current).findByText("현재 가공 없음")).toBeTruthy();
   });
 
@@ -127,11 +127,11 @@ describe("Machine Detail process analysis", () => {
     expect(within(timelineItem).getByText("비교 불가")).toBeTruthy();
     expect(within(timelineItem).getByText("0/5")).toBeTruthy();
     fireEvent.click(timelineItem);
-    const process = screen.getByRole("region", { name: "PROCESS · 공정 특징" });
+    const process = screen.getByRole("region", { name: "공정 특징" });
     expect(within(process).getByText("120 REVOLUTION/MINUTE")).toBeTruthy();
     expect(within(process).getAllByText(/100%/).length).toBeGreaterThan(0);
     expect(within(process).getAllByText("데이터 없음").length).toBeGreaterThan(0);
-    const anomaly = screen.getByRole("region", { name: "ANOMALY · 이전 가공과의 차이" });
+    const anomaly = screen.getByRole("region", { name: "이전 가공과의 차이" });
     expect(within(anomaly).getByText("비교 표본 부족")).toBeTruthy();
     expect(within(anomaly).getByText(/같은 프로그램 155의 이전 가공이 아직 0건입니다/)).toBeTruthy();
     expect(within(anomaly).queryByText("0%")).toBeNull();
@@ -164,7 +164,7 @@ describe("Machine Detail process analysis", () => {
     const fetch = showProcess(structuredClone(runFixture));
     fireEvent.click(await screen.findByRole("button", { name: /가공 선택 · 155/ }));
     fireEvent.click(screen.getByRole("button", { name: "분석 다시 계산" }));
-    expect(screen.queryByRole("region", { name: "PROCESS · 공정 특징" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "공정 특징" })).toBeNull();
     await waitFor(() => expect(fetch).toHaveBeenCalledTimes(10));
     expect(await screen.findByText(/목록에서 가공을 선택/)).toBeTruthy();
   });
@@ -172,7 +172,7 @@ describe("Machine Detail process analysis", () => {
   it("selects a run from the timeline without seeking and seeks only on explicit navigation", async () => {
     const { replayControlClient } = showProcess(structuredClone(runFixture));
     fireEvent.click(await screen.findByRole("button", { name: /가공 선택 · 155/ }));
-    expect(screen.getByRole("region", { name: "PROCESS · 공정 특징" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "공정 특징" })).toBeTruthy();
     expect(replayControlClient.seek).not.toHaveBeenCalled();
     await act(async () => {
       fireEvent.click(screen.getByRole("button", { name: "가공 시작 시점으로 이동" }));
@@ -228,7 +228,7 @@ describe("Machine Detail process analysis", () => {
     showProcess(structuredClone(runFixture));
     const preview = await screen.findByRole("button", { name: /가공 미리보기 · 155/ });
     fireEvent.click(preview);
-    expect(screen.getByRole("region", { name: "PROCESS · 공정 특징" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "공정 특징" })).toBeTruthy();
     expect(preview.getAttribute("aria-pressed")).toBe("true");
   });
 

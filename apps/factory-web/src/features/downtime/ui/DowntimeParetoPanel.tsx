@@ -22,7 +22,7 @@ export function DowntimeParetoPanel({
       <header>
         <div>
           <p className="eyebrow">관측된 정지 시간</p>
-          <h2 id="downtime-pareto-title">정지 사유 Pareto</h2>
+          <h2 id="downtime-pareto-title">주요 정지 원인</h2>
         </div>
         <strong>{formatSeconds(report.totalDowntimeSeconds)}</strong>
       </header>
@@ -42,7 +42,7 @@ export function DowntimeParetoPanel({
               >
                 <span className="downtime-rank">{entry.rank}위</span>
                 <span className="downtime-summary">
-                  <strong>{STATE_LABELS[entry.state]}</strong>
+                  <strong><DowntimeStateIcon state={entry.state} />{STATE_LABELS[entry.state]}</strong>
                   <small>
                     {formatSeconds(entry.durationSeconds)} · 누적 {entry.cumulativeRatioPercent}%
                   </small>
@@ -65,6 +65,22 @@ export function DowntimeParetoPanel({
       )}
     </section>
   );
+}
+
+function DowntimeStateIcon({ state }: { state: DowntimeState }) {
+  if (state === "UNKNOWN") {
+    return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M7.3 10.3h1.4v1.4H7.3v-1.4Zm.7-8a4 4 0 0 1 2.4 7.2c-.9.7-1.7 1-1.7 1.9H7.3c0-1.6 1.1-2.3 2.1-3A2.6 2.6 0 1 0 5.4 6H4a4 4 0 0 1 4-3.7Z" />
+    </svg>;
+  }
+  if (state === "INTERRUPTED") {
+    return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+      <path d="M2 2h4v12H2V2Zm8 0h4v12h-4V2Z" />
+    </svg>;
+  }
+  return <svg viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+    <path d="M3 3h10v10H3V3Z" />
+  </svg>;
 }
 
 function evidenceLabel(evidence: DowntimeEvidence): string {
