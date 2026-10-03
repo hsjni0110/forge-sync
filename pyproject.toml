@@ -22,6 +22,7 @@ members = [
   "apps/edge-gateway",
   "apps/ai-service",
   "apps/virtual-controller",
+  "evaluation",
 ]
 
 [tool.pytest.ini_options]
@@ -34,6 +35,7 @@ testpaths = [
   "apps/edge-gateway/tests",
   "apps/ai-service/tests",
   "apps/virtual-controller/tests",
+  "evaluation/tests",
   "tests",
 ]
 
@@ -51,5 +53,6 @@ files = [
   "apps/edge-gateway/src",
   "apps/ai-service/src",
   "apps/virtual-controller/src",
+  "evaluation/src",
   "tools",
 ]

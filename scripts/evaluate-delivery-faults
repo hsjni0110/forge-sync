@@ -1,0 +1,163 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+database_compose="$repository_root/infra/database/compose.yaml"
+mqtt_compose="$repository_root/infra/mqtt/compose.yaml"
+database_port=${FORGESYNC_DATABASE_PORT:-15438}
+mqtt_port=${FORGESYNC_MQTT_PORT:-18888}
+api_port=${FORGESYNC_API_PORT:-18092}
+replay_api_port=${FORGESYNC_REPLAY_API_PORT:-18014}
+source_set_id="nist-mazak01-20161005"
+canonical_run="$repository_root/datasets/canonical/$source_set_id/839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c"
+runs_directory="$repository_root/datasets/evaluation/naive-baseline/track-b"
+report_directory="$repository_root/docs/evaluation/naive-baseline"
+scenarios=${FORGESYNC_DELIVERY_SCENARIOS:-"S0 S1 S2 S3 S4"}
+runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-delivery.XXXXXX")
+database_project=""
+mqtt_project=""
+api_mqtt_client_id=""
+api_pid=""
+replay_api_pid=""
+capture_pid=""
+
+run_database_compose() {
+  FORGESYNC_DATABASE_PORT="$database_port" \
+    docker compose --project-name "$database_project" --file "$database_compose" "$@"
+}
+
+run_mqtt_compose() {
+  FORGESYNC_MQTT_PORT="$mqtt_port" \
+    docker compose --project-name "$mqtt_project" --file "$mqtt_compose" "$@"
+}
+
+stop_scenario() {
+  if [ -n "$capture_pid" ]; then kill -TERM "$capture_pid" 2>/dev/null || true; wait "$capture_pid" 2>/dev/null || true; fi
+  if [ -n "$replay_api_pid" ]; then kill "$replay_api_pid" 2>/dev/null || true; fi
+  if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
+  if [ -n "$mqtt_project" ]; then run_mqtt_compose down --volumes >/dev/null 2>&1 || true; fi
+  if [ -n "$database_project" ]; then run_database_compose down --volumes >/dev/null 2>&1 || true; fi
+  if [ -n "$api_mqtt_client_id" ]; then rm -rf "$repository_root/apps/factory-api/$api_mqtt_client_id"; fi
+  capture_pid=""
+  replay_api_pid=""
+  api_pid=""
+  mqtt_project=""
+  database_project=""
+  api_mqtt_client_id=""
+}
+
+cleanup() {
+  exit_code=$?
+  trap - EXIT INT TERM
+  stop_scenario
+  if [ "$exit_code" -ne 0 ]; then
+    printf 'Runtime logs remain in %s\n' "$runtime_directory" >&2
+  else
+    rm -rf "$runtime_directory"
+  fi
+  exit "$exit_code"
+}
+trap cleanup EXIT INT TERM
+
+wait_for_url() {
+  url=$1
+  log_file=$2
+  attempts=0
+  until curl --fail --silent --show-error "$url" >/dev/null 2>&1; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 240 ]; then
+      tail -n 100 "$log_file" >&2
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+wait_for_file() {
+  attempts=0
+  until [ -f "$1" ]; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 60 ]; then
+      printf 'Timed out waiting for %s\n' "$1" >&2
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+run_scenario() {
+  scenario=$1
+  scenario_directory="$runs_directory/$scenario"
+  logs="$runtime_directory/$scenario"
+  mkdir -p "$scenario_directory" "$logs"
+  rm -f "$scenario_directory/deliveries.ndjson" "$scenario_directory/deliveries.ndjson.ready"
+  # Docker Compose project names must be lowercase.
+  run_label=$(printf '%s' "$scenario" | tr '[:upper:]' '[:lower:]')
+  database_project="forgesync-delivery-database-$run_label-$$"
+  mqtt_project="forgesync-delivery-mqtt-$run_label-$$"
+  api_mqtt_client_id="forgesync-api-evaluation-$run_label-$$"
+
+  run_database_compose up --detach --wait
+  run_mqtt_compose up --detach --wait
+
+  FORGESYNC_REPOSITORY_ROOT="$repository_root" \
+  FORGESYNC_REPLAY_SOURCE_PATH="$canonical_run" \
+  FORGESYNC_REPLAY_SOURCE_SET_ID="$source_set_id" \
+  FORGESYNC_EVALUATION_SCENARIO="$scenario" \
+  FORGESYNC_MQTT_HOST=127.0.0.1 \
+  FORGESYNC_MQTT_PORT="$mqtt_port" \
+  FORGESYNC_MQTT_CLIENT_ID="forgesync-replay-evaluation-$scenario-$$" \
+  FORGESYNC_REPLAY_API_PORT="$replay_api_port" \
+    uv run --directory "$repository_root" --package forgesync-evaluation \
+      forgesync-evaluation-replay-api >"$logs/replay-api.log" 2>&1 &
+  replay_api_pid=$!
+  wait_for_url "http://127.0.0.1:$replay_api_port/health" "$logs/replay-api.log"
+
+  FORGESYNC_DATABASE_URL="jdbc:postgresql://127.0.0.1:$database_port/forgesync" \
+  FORGESYNC_DATABASE_USERNAME=forgesync \
+  FORGESYNC_DATABASE_PASSWORD=forgesync-test \
+  FORGESYNC_MQTT_ENABLED=true \
+  FORGESYNC_MQTT_SERVER_URI="tcp://127.0.0.1:$mqtt_port" \
+  FORGESYNC_MQTT_CLIENT_ID="$api_mqtt_client_id" \
+  FORGESYNC_WEBSOCKET_ALLOWED_ORIGINS="http://127.0.0.1:1" \
+  FORGESYNC_REPLAY_EDGE_BASE_URL="http://127.0.0.1:$replay_api_port" \
+  SERVER_PORT="$api_port" \
+    "$repository_root/apps/factory-api/gradlew" -p "$repository_root/apps/factory-api" bootRun \
+    >"$logs/api.log" 2>&1 &
+  api_pid=$!
+  wait_for_url "http://127.0.0.1:$api_port/actuator/health" "$logs/api.log"
+
+  uv run --directory "$repository_root" --package forgesync-evaluation \
+    forgesync-evaluation-capture \
+    --port "$mqtt_port" \
+    --topic forgesync/observations/Mazak01 \
+    --client-id "forgesync-capture-$scenario-$$" \
+    --output "$scenario_directory/deliveries.ndjson" >"$logs/capture.log" 2>&1 &
+  capture_pid=$!
+  wait_for_file "$scenario_directory/deliveries.ndjson.ready"
+
+  uv run --directory "$repository_root" --package forgesync-evaluation forgesync-evaluation \
+    collect-track-b \
+    --api-base-url "http://127.0.0.1:$api_port" \
+    --machine-id Mazak01 \
+    --source-set-id "$source_set_id" \
+    --output-directory "$scenario_directory" \
+    >"$report_directory/track-b-collection-$scenario.json"
+
+  stop_scenario
+  printf 'Scenario %s collected\n' "$scenario"
+}
+
+if [ ! -f "$canonical_run/observations.ndjson" ]; then
+  printf 'Missing pinned canonical run %s.\n' "$canonical_run" >&2
+  exit 1
+fi
+mkdir -p "$report_directory"
+for scenario in $scenarios; do
+  run_scenario "$scenario"
+done
+
+uv run --directory "$repository_root" --package forgesync-evaluation forgesync-evaluation \
+  compare-track-b --runs-directory "$runs_directory" \
+  >"$report_directory/track-b-comparison.json"
+printf 'Track B comparison written to %s\n' "$report_directory/track-b-comparison.json"

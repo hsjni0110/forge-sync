@@ -9,6 +9,7 @@ def test_python_sources_follow_inward_dependency_direction() -> None:
         repository_root / "apps/edge-gateway/src",
         repository_root / "apps/ai-service/src",
         repository_root / "apps/virtual-controller/src",
+        repository_root / "evaluation/src",
     ]
 
     assert check_architecture(source_roots) == []
