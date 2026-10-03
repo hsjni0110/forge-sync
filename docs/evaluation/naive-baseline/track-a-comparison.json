@@ -1,0 +1,112 @@
+{
+  "rawPayloadSha256": "6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf",
+  "naiveEstimates": [
+    {
+      "ruleId": "NA-PROD-1",
+      "value": 0,
+      "hiddenAssumptions": [
+        "PART_COUNTER_COUNTS_COMPLETED_PARTS"
+      ]
+    },
+    {
+      "ruleId": "NA-PROD-2",
+      "value": 137,
+      "hiddenAssumptions": [
+        "ONE_ACTIVE_ENTRY_IS_ONE_PART"
+      ]
+    },
+    {
+      "ruleId": "NA-UTIL-1",
+      "value": 0.23471187248942893,
+      "hiddenAssumptions": [
+        "UNAVAILABLE_MEANS_NOT_OPERATING"
+      ]
+    },
+    {
+      "ruleId": "NA-UTIL-2",
+      "value": 0.3150417693540301,
+      "hiddenAssumptions": [
+        "MISSING_TIME_MATCHES_OBSERVED_TIME"
+      ]
+    },
+    {
+      "ruleId": "NA-UTIL-3",
+      "value": 0.31898124884292933,
+      "hiddenAssumptions": [
+        "COUNTERS_SHARE_UNIT_AND_MEANING"
+      ]
+    },
+    {
+      "ruleId": "NA-OEE-1",
+      "value": 0.003397554580491417,
+      "hiddenAssumptions": [
+        "UNAVAILABLE_MEANS_NOT_OPERATING",
+        "OBSERVED_SPAN_IS_PLANNED_PRODUCTION_TIME",
+        "ONE_ACTIVE_ENTRY_IS_ONE_PART",
+        "SHORTEST_ACTIVE_STRETCH_IS_IDEAL_CYCLE",
+        "NO_QUALITY_DATA_MEANS_ALL_GOOD"
+      ]
+    },
+    {
+      "ruleId": "NA-OEE-2",
+      "value": 0.00456036413992272,
+      "hiddenAssumptions": [
+        "MISSING_TIME_MATCHES_OBSERVED_TIME",
+        "AVAILABLE_TIME_IS_PLANNED_PRODUCTION_TIME",
+        "ONE_ACTIVE_ENTRY_IS_ONE_PART",
+        "SHORTEST_ACTIVE_STRETCH_IS_IDEAL_CYCLE",
+        "NO_QUALITY_DATA_MEANS_ALL_GOOD"
+      ]
+    },
+    {
+      "ruleId": "NA-CAUSE-1",
+      "value": 6,
+      "hiddenAssumptions": [
+        "CONCURRENT_CONDITION_IS_CAUSE"
+      ]
+    }
+  ],
+  "forgesync": {
+    "productionResultStatus": "NOT_OBSERVED",
+    "partCount": {
+      "status": "UNAVAILABLE",
+      "percent": null,
+      "reason": "NO_USABLE_TRANSITIONS"
+    },
+    "machiningRunCount": 122,
+    "completedMachiningRunCount": 102,
+    "activeState": {
+      "status": "AVAILABLE",
+      "percent": 23.471187,
+      "reason": null
+    },
+    "unknownStatePercent": 25.498173,
+    "counterAutomatic": {
+      "status": "PARTIAL",
+      "percent": 31.561114,
+      "reason": null
+    },
+    "compositeOee": {
+      "status": "UNAVAILABLE",
+      "percent": null,
+      "reason": "QUALITY_COMPONENT_UNAVAILABLE"
+    },
+    "performance": {
+      "status": "AVAILABLE",
+      "percent": 756.95846,
+      "reason": null
+    },
+    "downtimeCount": 59,
+    "downtimeReasonCounts": {
+      "UNCONFIRMED_REASON": 17,
+      "CONCURRENT_EVIDENCE": 42
+    }
+  },
+  "forgesyncDocumentsSha256": {
+    "machining-runs.json": "76253c4d701a2b53698207b92e5db97dfa784384fd15ca44154afab1cadc59ab",
+    "utilization-kpis.json": "0b06078e3efc09f68cd05ae435b765c20beef328153164641c42f697edbfcf2d",
+    "downtime-pareto.json": "7f4713be542c8d60db04e6bdbda792867c502e9480870ac9bcde1045ed2209d4",
+    "operational-effectiveness.json": "5501054f71731f05f3176043b86072da10b7099f1036e774d8adbde073ba89da",
+    "production-context.json": "02c72cb08003e4b38f675ecf34999cc3cb874057383904421cab1f128a1ec015"
+  }
+}

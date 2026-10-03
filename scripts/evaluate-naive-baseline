@@ -1,0 +1,115 @@
+#!/bin/sh
+set -eu
+
+repository_root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+database_compose="$repository_root/infra/database/compose.yaml"
+mqtt_compose="$repository_root/infra/mqtt/compose.yaml"
+database_port=${FORGESYNC_DATABASE_PORT:-15437}
+mqtt_port=${FORGESYNC_MQTT_PORT:-18887}
+api_port=${FORGESYNC_API_PORT:-18091}
+replay_api_port=${FORGESYNC_REPLAY_API_PORT:-18013}
+database_project="forgesync-evaluation-database-$$"
+mqtt_project="forgesync-evaluation-mqtt-$$"
+api_mqtt_client_id="forgesync-api-evaluation-$$"
+runtime_directory=$(mktemp -d "${TMPDIR:-/tmp}/forgesync-evaluation.XXXXXX")
+source_set_id="nist-mazak01-20161005"
+raw_payload="$repository_root/datasets/raw/nist/sha256/6eec7afdba356285d0fef70f43552996ab3f17802b3af5cbab243dd2676ef2cf/payload"
+canonical_run="$repository_root/datasets/canonical/$source_set_id/839ad138d6da7b2d5439c118d6f3bd88ab820824ae9f460c8e1848e6c638109c"
+documents_directory="$repository_root/datasets/evaluation/naive-baseline/forgesync"
+report_directory="$repository_root/docs/evaluation/naive-baseline"
+api_pid=""
+replay_api_pid=""
+
+run_database_compose() {
+  FORGESYNC_DATABASE_PORT="$database_port" \
+    docker compose --project-name "$database_project" --file "$database_compose" "$@"
+}
+
+run_mqtt_compose() {
+  FORGESYNC_MQTT_PORT="$mqtt_port" \
+    docker compose --project-name "$mqtt_project" --file "$mqtt_compose" "$@"
+}
+
+cleanup() {
+  exit_code=$?
+  trap - EXIT INT TERM
+  if [ -n "$replay_api_pid" ]; then kill "$replay_api_pid" 2>/dev/null || true; fi
+  if [ -n "$api_pid" ]; then kill "$api_pid" 2>/dev/null || true; fi
+  run_mqtt_compose down --volumes >/dev/null 2>&1 || true
+  run_database_compose down --volumes >/dev/null 2>&1 || true
+  rm -rf "$repository_root/apps/factory-api/$api_mqtt_client_id"
+  if [ "$exit_code" -ne 0 ]; then
+    printf 'Runtime logs remain in %s\n' "$runtime_directory" >&2
+  else
+    rm -rf "$runtime_directory"
+  fi
+  exit "$exit_code"
+}
+trap cleanup EXIT INT TERM
+
+wait_for_url() {
+  url=$1
+  log_file=$2
+  attempts=0
+  until curl --fail --silent --show-error "$url" >/dev/null 2>&1; do
+    attempts=$((attempts + 1))
+    if [ "$attempts" -ge 240 ]; then
+      tail -n 100 "$log_file" >&2
+      return 1
+    fi
+    sleep 1
+  done
+}
+
+for required in "$raw_payload" "$canonical_run/observations.ndjson"; do
+  if [ ! -f "$required" ]; then
+    printf 'Missing pinned input %s. Acquire the source and canonical run first.\n' "$required" >&2
+    exit 1
+  fi
+done
+
+run_database_compose up --detach --wait
+run_mqtt_compose up --detach --wait
+
+FORGESYNC_REPOSITORY_ROOT="$repository_root" \
+FORGESYNC_REPLAY_SOURCE_PATH="$canonical_run" \
+FORGESYNC_REPLAY_SOURCE_SET_ID="$source_set_id" \
+FORGESYNC_MQTT_HOST=127.0.0.1 \
+FORGESYNC_MQTT_PORT="$mqtt_port" \
+FORGESYNC_MQTT_CLIENT_ID="forgesync-replay-evaluation-$$" \
+FORGESYNC_REPLAY_API_PORT="$replay_api_port" \
+  uv run --directory "$repository_root" --package forgesync-edge-gateway forgesync-replay-api \
+  >"$runtime_directory/replay-api.log" 2>&1 &
+replay_api_pid=$!
+wait_for_url "http://127.0.0.1:$replay_api_port/health" "$runtime_directory/replay-api.log"
+
+FORGESYNC_DATABASE_URL="jdbc:postgresql://127.0.0.1:$database_port/forgesync" \
+FORGESYNC_DATABASE_USERNAME=forgesync \
+FORGESYNC_DATABASE_PASSWORD=forgesync-test \
+FORGESYNC_MQTT_ENABLED=true \
+FORGESYNC_MQTT_SERVER_URI="tcp://127.0.0.1:$mqtt_port" \
+FORGESYNC_MQTT_CLIENT_ID="$api_mqtt_client_id" \
+FORGESYNC_WEBSOCKET_ALLOWED_ORIGINS="http://127.0.0.1:1" \
+FORGESYNC_REPLAY_EDGE_BASE_URL="http://127.0.0.1:$replay_api_port" \
+SERVER_PORT="$api_port" \
+  "$repository_root/apps/factory-api/gradlew" -p "$repository_root/apps/factory-api" bootRun \
+  >"$runtime_directory/api.log" 2>&1 &
+api_pid=$!
+wait_for_url "http://127.0.0.1:$api_port/actuator/health" "$runtime_directory/api.log"
+
+mkdir -p "$report_directory"
+uv run --directory "$repository_root" --package forgesync-evaluation forgesync-evaluation \
+  collect-forgesync \
+  --api-base-url "http://127.0.0.1:$api_port" \
+  --machine-id Mazak01 \
+  --source-set-id "$source_set_id" \
+  --output-directory "$documents_directory" \
+  >"$report_directory/track-a-collection.json"
+
+uv run --directory "$repository_root" --package forgesync-evaluation forgesync-evaluation \
+  compare-track-a \
+  --raw-payload "$raw_payload" \
+  --forgesync-documents "$documents_directory" \
+  >"$report_directory/track-a-comparison.json"
+
+printf 'Track A comparison written to %s\n' "$report_directory/track-a-comparison.json"

@@ -135,3 +135,25 @@ def test_client_sends_the_rest_of_the_projection_chain_with_pinned_versions(
             None,
         ),
     ]
+
+
+def test_client_starts_a_replay_and_reads_its_progress_and_the_twin(api_base_url: str) -> None:
+    client = FactoryApiProjectionClient(api_base_url, "Mazak01")
+
+    client.start_replay("nist-mazak01-20161005", 100)
+    client.current_replay()
+    client.current_twin()
+
+    assert RecordingFactoryApi.requests == [
+        (
+            "POST",
+            "/api/v1/replay-sessions",
+            {
+                "machineId": "Mazak01",
+                "sourceSetId": "nist-mazak01-20161005",
+                "speedMultiplier": 100,
+            },
+        ),
+        ("GET", "/api/v1/machines/Mazak01/replay-session", None),
+        ("GET", "/api/v1/machines/Mazak01/twin", None),
+    ]

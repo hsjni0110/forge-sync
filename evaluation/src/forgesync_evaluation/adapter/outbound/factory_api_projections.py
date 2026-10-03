@@ -26,8 +26,26 @@ class FactoryApiError(RuntimeError):
 
 class FactoryApiProjectionClient:
     def __init__(self, api_base_url: str, machine_id: str, timeout_seconds: float = 120.0) -> None:
-        self._machine_url = f"{api_base_url.rstrip('/')}/api/v1/machines/{machine_id}"
+        self._api_url = f"{api_base_url.rstrip('/')}/api/v1"
+        self._machine_id = machine_id
+        self._machine_url = f"{self._api_url}/machines/{machine_id}"
         self._timeout_seconds = timeout_seconds
+
+    def start_replay(self, source_set_id: str, speed_multiplier: int) -> JsonDocument:
+        return self._send_post(
+            f"{self._api_url}/replay-sessions",
+            {
+                "machineId": self._machine_id,
+                "sourceSetId": source_set_id,
+                "speedMultiplier": speed_multiplier,
+            },
+        )
+
+    def current_replay(self) -> JsonDocument:
+        return self._get("replay-session")
+
+    def current_twin(self) -> JsonDocument:
+        return self._get("twin")
 
     def project_state_intervals(
         self, replay_session_id: str, through_replay_sequence: int
@@ -104,24 +122,27 @@ class FactoryApiProjectionClient:
         return self._get(f"production-context?{query}")
 
     def _post(self, resource: str, body: JsonDocument) -> JsonDocument:
+        return self._send_post(f"{self._machine_url}/{resource}", body)
+
+    def _get(self, resource: str) -> JsonDocument:
+        url = f"{self._machine_url}/{resource}"
+        return self._send(urllib.request.Request(url, method="GET", headers={"Accept": "*/*"}))
+
+    def _send_post(self, url: str, body: JsonDocument) -> JsonDocument:
         request = urllib.request.Request(
-            f"{self._machine_url}/{resource}",
+            url,
             data=json.dumps(body).encode("utf-8"),
             method="POST",
             headers={"Content-Type": "application/json", "Accept": "*/*"},
         )
-        return self._send(request, resource)
+        return self._send(request)
 
-    def _get(self, resource: str) -> JsonDocument:
-        request = urllib.request.Request(
-            f"{self._machine_url}/{resource}", method="GET", headers={"Accept": "*/*"}
-        )
-        return self._send(request, resource)
-
-    def _send(self, request: urllib.request.Request, resource: str) -> JsonDocument:
+    def _send(self, request: urllib.request.Request) -> JsonDocument:
         try:
             with urllib.request.urlopen(request, timeout=self._timeout_seconds) as response:
                 document: JsonDocument = json.loads(response.read())
                 return document
         except urllib.error.HTTPError as error:
-            raise FactoryApiError(f"Factory API returned {error.code} for {resource}") from error
+            raise FactoryApiError(
+                f"Factory API returned {error.code} for {request.full_url}"
+            ) from error

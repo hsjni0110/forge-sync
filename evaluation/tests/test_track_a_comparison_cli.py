@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -75,3 +76,8 @@ def test_comparison_reports_naive_causal_claims_next_to_forgesync_concurrent_evi
         "reason": "QUALITY_COMPONENT_UNAVAILABLE",
     }
     assert report["forgesync"]["productionResultStatus"] == "NOT_OBSERVED"
+    production_context = (tmp_path / "forgesync" / "production-context.json").read_bytes()
+    assert report["forgesyncDocumentsSha256"]["production-context.json"] == (
+        hashlib.sha256(production_context).hexdigest()
+    )
+    assert len(report["forgesyncDocumentsSha256"]) == 5

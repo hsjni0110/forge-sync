@@ -5,15 +5,26 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import time
 from collections.abc import Sequence
 from pathlib import Path
 
+from forgesync_evaluation.adapter.outbound.factory_api_projections import (
+    FactoryApiProjectionClient,
+)
 from forgesync_evaluation.adapter.outbound.projection_document_files import (
+    FILE_NAMES,
     load_projection_documents,
+    save_projection_documents,
 )
 from forgesync_evaluation.adapter.outbound.projection_document_reader import read_disclosure
 from forgesync_evaluation.adapter.outbound.shdr_readings import read_shdr_readings
+from forgesync_evaluation.application.forgesync_track_a import collect_projection_documents
 from forgesync_evaluation.application.naive_track_a import estimate_naive_track_a
+from forgesync_evaluation.application.replay_completion import (
+    PollingPolicy,
+    replay_to_completion,
+)
 from forgesync_evaluation.application.track_a_comparison import compare_track_a
 from forgesync_evaluation.domain.forgesync_disclosure import DisclosedValue, ForgeSyncDisclosure
 from forgesync_evaluation.domain.naive_estimate import NaiveEstimate
@@ -21,7 +32,9 @@ from forgesync_evaluation.domain.naive_estimate import NaiveEstimate
 
 def main(arguments: Sequence[str] | None = None) -> int:
     namespace = _parser().parse_args(arguments)
-    if namespace.command == "compare-track-a":
+    if namespace.command == "collect-forgesync":
+        report = _collect_forgesync(namespace)
+    elif namespace.command == "compare-track-a":
         report = _compare_track_a(namespace.raw_payload, namespace.forgesync_documents)
     else:
         report = _naive_track_a(namespace.raw_payload)
@@ -44,6 +57,29 @@ def _compare_track_a(payload_path: Path, documents_directory: Path) -> dict[str,
         "rawPayloadSha256": _sha256(payload_path),
         "naiveEstimates": [_estimate_document(item) for item in comparison.naive_estimates],
         "forgesync": _disclosure_document(comparison.forgesync),
+        "forgesyncDocumentsSha256": {
+            file_name: _sha256(documents_directory / file_name) for file_name in FILE_NAMES.values()
+        },
+    }
+
+
+# A full 100x replay of the pinned day takes about ten minutes; allow three times that.
+REPLAY_POLLING = PollingPolicy(interval_seconds=5.0, max_polls=360)
+
+
+def _collect_forgesync(namespace: argparse.Namespace) -> dict[str, object]:
+    client = FactoryApiProjectionClient(namespace.api_base_url, namespace.machine_id)
+    replay = replay_to_completion(
+        client, namespace.source_set_id, namespace.speed_multiplier, REPLAY_POLLING, time.sleep
+    )
+    documents = collect_projection_documents(
+        client, replay.replay_session_id, replay.through_replay_sequence
+    )
+    save_projection_documents(documents, namespace.output_directory)
+    return {
+        "replaySessionId": replay.replay_session_id,
+        "publishedThroughReplaySequence": replay.through_replay_sequence,
+        "collectedThroughReplaySequence": documents.machining_runs["throughReplaySequence"],
     }
 
 
@@ -57,6 +93,14 @@ def _parser() -> argparse.ArgumentParser:
     )
     comparison.add_argument("--raw-payload", type=Path, required=True)
     comparison.add_argument("--forgesync-documents", type=Path, required=True)
+    collection = commands.add_parser(
+        "collect-forgesync", help="Replay the source once and collect ForgeSync projections"
+    )
+    collection.add_argument("--api-base-url", required=True)
+    collection.add_argument("--machine-id", required=True)
+    collection.add_argument("--source-set-id", required=True)
+    collection.add_argument("--speed-multiplier", type=int, choices=(1, 10, 100), default=100)
+    collection.add_argument("--output-directory", type=Path, required=True)
     return parser
 
 
