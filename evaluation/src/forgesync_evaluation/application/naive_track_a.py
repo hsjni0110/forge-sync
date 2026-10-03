@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 
+from forgesync_evaluation.domain.effectiveness_estimates import (
+    estimate_effectiveness_over_available_time,
+    estimate_effectiveness_over_observed_span,
+)
 from forgesync_evaluation.domain.naive_estimate import NaiveEstimate, SourceReading
 from forgesync_evaluation.domain.production_estimates import (
     estimate_parts_from_active_entries,
@@ -24,6 +28,8 @@ PREREGISTERED_RULES: tuple[NaiveRule, ...] = (
     estimate_utilization_over_observed_span,
     estimate_utilization_over_available_time,
     estimate_utilization_from_accumulated_counters,
+    estimate_effectiveness_over_observed_span,
+    estimate_effectiveness_over_available_time,
 )
 
 

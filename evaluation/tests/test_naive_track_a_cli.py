@@ -38,5 +38,7 @@ def test_naive_track_a_prints_every_preregistered_estimate_with_the_payload_chec
         ("NA-UTIL-1", pytest.approx(60 / 100)),
         ("NA-UTIL-2", pytest.approx(60 / 70)),
         ("NA-UTIL-3", pytest.approx(60 / 100)),
+        ("NA-OEE-1", pytest.approx(60 / 100 * 1.0)),
+        ("NA-OEE-2", pytest.approx(60 / 70 * 1.0)),
     ]
     assert report["estimates"][0]["hiddenAssumptions"] == ["PART_COUNTER_COUNTS_COMPLETED_PARTS"]

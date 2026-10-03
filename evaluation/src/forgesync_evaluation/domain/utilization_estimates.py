@@ -21,7 +21,7 @@ TOTAL_TIME_COUNTER = "total_time"
 
 def estimate_utilization_over_observed_span(readings: Sequence[SourceReading]) -> NaiveEstimate:
     span_seconds = _observed_span_seconds(readings)
-    active_seconds = _execution_dwell_seconds(readings).get(ACTIVE, 0.0)
+    active_seconds = execution_dwell_seconds(readings).get(ACTIVE, 0.0)
     return NaiveEstimate(
         rule_id="NA-UTIL-1",
         value=active_seconds / span_seconds if span_seconds else None,
@@ -30,7 +30,7 @@ def estimate_utilization_over_observed_span(readings: Sequence[SourceReading]) -
 
 
 def estimate_utilization_over_available_time(readings: Sequence[SourceReading]) -> NaiveEstimate:
-    dwell = _execution_dwell_seconds(readings)
+    dwell = execution_dwell_seconds(readings)
     available_seconds = sum(dwell.values()) - dwell.get(UNAVAILABLE, 0.0)
     return NaiveEstimate(
         rule_id="NA-UTIL-2",
@@ -57,7 +57,7 @@ def _observed_span_seconds(readings: Sequence[SourceReading]) -> float:
     return (readings[-1].source_observed_at - readings[0].source_observed_at).total_seconds()
 
 
-def _execution_dwell_seconds(readings: Sequence[SourceReading]) -> dict[str, float]:
+def execution_dwell_seconds(readings: Sequence[SourceReading]) -> dict[str, float]:
     """A naive dashboard holds each execution value until the next one or the last reading."""
     executions = [reading for reading in readings if reading.data_item_name == EXECUTION]
     if not executions:
